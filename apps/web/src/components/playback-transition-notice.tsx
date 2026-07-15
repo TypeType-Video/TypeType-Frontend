@@ -8,7 +8,7 @@ import {
 } from "../lib/playback-mode";
 
 const PAPER_URL = "https://priveetee.github.io/Docs-PipePipe/developer-guide/introduction.html";
-const ISSUES_URL = "https://github.com/Priveetee/TypeType/issues/new/choose";
+const ISSUES_URL = "https://github.com/TypeType-Video/TypeType/issues/new/choose";
 
 const CLASSIC_FAILURES = [
   "Sign in to confirm you're not a bot",
