@@ -2,11 +2,11 @@ import { usePlayerError } from "../hooks/use-player-error";
 import { useSabrPlaybackConfig } from "../hooks/use-sabr-playback-config";
 import { useSettings } from "../hooks/use-settings";
 import { useVolumeSync } from "../hooks/use-volume-sync";
-import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { useWatchVttAssets } from "../hooks/use-watch-layout-assets";
+import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { getOriginalAudioLocale } from "../lib/audio-track";
-import type { VideoStream } from "../types/stream";
 import { toPublicWatchParam } from "../lib/watch-url";
+import type { VideoStream } from "../types/stream";
 import { EmbedVideoPlayer } from "./embed-player";
 
 type Props = {
