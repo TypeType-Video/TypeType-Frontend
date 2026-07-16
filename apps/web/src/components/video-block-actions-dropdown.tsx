@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { watchLaterActionLabel } from "../lib/watch-later-labels";
 
 const MARGIN = 8;
 
@@ -7,8 +8,11 @@ type Props = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   onSaveToPlaylist?: () => void;
+  onToggleWatchLater?: () => void;
   onToggleVideoBlock?: () => void;
   onToggleChannelBlock?: () => void;
+  watchLaterSaved?: boolean;
+  watchLaterPending?: boolean;
   videoBlocked?: boolean;
   channelBlocked?: boolean;
 };
@@ -17,8 +21,11 @@ export function VideoBlockActionsDropdown({
   anchorEl,
   onClose,
   onSaveToPlaylist,
+  onToggleWatchLater,
   onToggleVideoBlock,
   onToggleChannelBlock,
+  watchLaterSaved = false,
+  watchLaterPending = false,
   videoBlocked,
   channelBlocked,
 }: Props) {
@@ -68,6 +75,20 @@ export function VideoBlockActionsDropdown({
       style={panelStyle}
       className="fixed z-50 w-56 overflow-hidden rounded-lg border border-border-strong bg-surface shadow-2xl"
     >
+      {onToggleWatchLater && (
+        <button
+          type="button"
+          onClick={() => {
+            onToggleWatchLater();
+            onClose();
+          }}
+          disabled={watchLaterPending}
+          aria-pressed={watchLaterSaved}
+          className="w-full px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong disabled:cursor-wait disabled:opacity-60"
+        >
+          {watchLaterActionLabel(watchLaterSaved)}
+        </button>
+      )}
       {onSaveToPlaylist && (
         <button
           type="button"

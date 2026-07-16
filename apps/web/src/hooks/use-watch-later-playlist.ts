@@ -1,16 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { addWatchLater, fetchWatchLater, removeWatchLater } from "../lib/api-collections";
+import type { WatchLaterPayload } from "../lib/watch-later-mappers";
 import { useAuth } from "./use-auth";
 
 const KEY = ["watch-later"];
-
-type AddPayload = {
-  url: string;
-  title: string;
-  thumbnail: string;
-  duration: number;
-};
 
 type Intent = { url: string; adding: boolean };
 
@@ -34,7 +28,7 @@ export function useWatchLaterPlaylist() {
     setIntent(value);
   }
 
-  async function add(payload: AddPayload): Promise<void> {
+  async function add(payload: WatchLaterPayload): Promise<void> {
     if (isInWatchLater(payload.url)) return;
     applyIntent({ url: payload.url, adding: true });
     try {
@@ -59,5 +53,20 @@ export function useWatchLaterPlaylist() {
     applyIntent(null);
   }
 
-  return { isInWatchLater, add, remove, isPending: intent !== null };
+  async function toggle(payload: WatchLaterPayload): Promise<boolean> {
+    if (isInWatchLater(payload.url)) {
+      await remove(payload.url);
+      return false;
+    }
+    await add(payload);
+    return true;
+  }
+
+  return {
+    isInWatchLater,
+    add,
+    remove,
+    toggle,
+    isPending: query.isLoading || intent !== null,
+  };
 }

@@ -1,5 +1,6 @@
-import { lazy, Suspense, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { VideoStream } from "../types/stream";
+import { Toast } from "./toast";
 import { MoreIcon } from "./watch-icons";
 
 const VideoCardFeedbackPanel = lazy(() =>
@@ -14,7 +15,22 @@ type Props = {
 
 export function VideoCardFeedbackMenu({ stream }: Props) {
   const menuRef = useRef<HTMLButtonElement | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(
+    () => () => {
+      if (toastTimerRef.current !== null) window.clearTimeout(toastTimerRef.current);
+    },
+    [],
+  );
+
+  function handleSaved(message: string) {
+    setToast(message);
+    if (toastTimerRef.current !== null) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToast(null), 2000);
+  }
 
   return (
     <>
@@ -33,9 +49,11 @@ export function VideoCardFeedbackMenu({ stream }: Props) {
             stream={stream}
             anchorEl={menuRef.current}
             onClose={() => setMenuOpen(false)}
+            onSaved={handleSaved}
           />
         </Suspense>
       )}
+      <Toast message={toast} />
     </>
   );
 }
