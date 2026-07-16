@@ -9,7 +9,7 @@ import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { getOriginalAudioLocale } from "../lib/audio-track";
 import { toPublicWatchParam } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
-import { EmbedError } from "./embed-error";
+import { EmbedError, PLAYBACK_FAILED_MESSAGE } from "./embed-error";
 import { EmbedVideoPlayer } from "./embed-player";
 
 type Props = {
@@ -72,7 +72,7 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
   ].join(":");
 
   if (player.playerFailed) {
-    return <EmbedError message="Playback failed." onRetry={player.reset} />;
+    return <EmbedError message={PLAYBACK_FAILED_MESSAGE} onRetry={player.reset} />;
   }
 
   return (
