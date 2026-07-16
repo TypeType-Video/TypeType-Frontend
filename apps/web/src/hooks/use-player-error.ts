@@ -3,6 +3,7 @@ import { bilibiliVariantCount } from "../lib/bilibili-manifest";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { sanitizeVideoContext } from "../lib/debug-sanitize";
 import { isIosDevice } from "../lib/ios-device";
+import type { PlaybackMode } from "../lib/playback-mode";
 import { detectProvider } from "../lib/provider";
 import { claimAutomaticSabrRecovery, resetAutomaticSabrRecovery } from "../lib/sabr-error-recovery";
 import {
@@ -30,12 +31,17 @@ type UsePlayerErrorReturn = {
   seekStartTime: number | null;
 };
 
-export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerErrorReturn {
+export function usePlayerError(
+  stream: VideoStream,
+  isLive: boolean,
+  playbackModeOverride?: PlaybackMode,
+): UsePlayerErrorReturn {
   const debugVideo = sanitizeVideoContext(stream.id) ?? "unknown";
   const provider = detectProvider(stream.id);
   const iosDevice = isIosDevice();
   const { data: instance } = useInstance();
-  const { playbackMode } = usePlaybackMode();
+  const { playbackMode: storedPlaybackMode } = usePlaybackMode();
+  const playbackMode = playbackModeOverride ?? storedPlaybackMode;
   const playbackSourceId = stream.id.length === 0 ? "" : `${stream.id}:${playbackMode}`;
   const preferServerManifests = instance?.guestAllowed !== false;
   const legacyDashPair = hasLegacyDashPair(stream);

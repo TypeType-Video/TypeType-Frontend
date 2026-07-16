@@ -5,9 +5,9 @@ import { useAuth } from "./use-auth";
 
 const ACTIVITY_INTERVAL_MS = 60_000;
 
-export function useSessionActivityReporting() {
+export function useSessionActivityReporting(allowed = true) {
   const { status } = useAuth();
-  const enabled = status === "authenticated";
+  const enabled = allowed && status === "authenticated";
 
   useEffect(() => {
     if (!enabled) return;
