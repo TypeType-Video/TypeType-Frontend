@@ -46,6 +46,7 @@ export function VideoPlayer({
   settingsReady = false,
   autoplay = false,
   audioOnly = false,
+  hideCinemaMode = false,
   originalAudioLocale,
   overlay,
   captionStyles,
@@ -137,6 +138,7 @@ export function VideoPlayer({
       {overlay}
       <VideoPlayerLayout
         audioOnly={audioOnly}
+        hideCinemaMode={hideCinemaMode}
         audioUsesVideoProvider={audioOnly && viewType === "video"}
         sabr={Boolean(sabrConfig)}
         sabrVideo={sabrState.video}

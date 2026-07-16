@@ -12,6 +12,7 @@ import { SabrTimeSlider } from "./sabr-time-slider";
 
 type Props = {
   audioOnly?: boolean;
+  hideCinemaMode?: boolean;
   audioUsesVideoProvider?: boolean;
   sabr?: boolean;
   sabrVideo?: HTMLVideoElement | null;
@@ -24,6 +25,7 @@ type Props = {
 
 export function VideoPlayerLayout({
   audioOnly = false,
+  hideCinemaMode = false,
   audioUsesVideoProvider = false,
   sabr = false,
   sabrVideo = null,
@@ -119,7 +121,7 @@ export function VideoPlayerLayout({
         beforeFullscreenButton: (
           <>
             <PlayerVolumeControl />
-            <CinemaModeControl />
+            {!hideCinemaMode && <CinemaModeControl />}
           </>
         ),
       }}

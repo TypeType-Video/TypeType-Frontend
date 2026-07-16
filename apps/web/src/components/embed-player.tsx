@@ -24,7 +24,7 @@ export function EmbedVideoPlayer({ playerKey, watchUrl, ...props }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black group">
-      <VideoPlayer key={playerKey} overlay={overlay} {...props} />
+      <VideoPlayer key={playerKey} overlay={overlay} hideCinemaMode {...props} />
     </div>
   );
 }
