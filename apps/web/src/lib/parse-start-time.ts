@@ -1,10 +1,13 @@
 export function parseStartTime(raw?: string | number): number {
   if (raw == null) return 0;
-  if (typeof raw === "number") return Math.max(0, raw);
+  if (typeof raw === "number") {
+    if (!Number.isFinite(raw)) return 0;
+    return Math.max(0, Math.floor(raw));
+  }
   const trimmed = raw.trim();
   if (!trimmed) return 0;
   const num = Number(trimmed);
-  if (Number.isFinite(num)) return Math.max(0, num);
+  if (Number.isFinite(num)) return Math.max(0, Math.floor(num));
   const match = trimmed.match(/^(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s?)?$/);
   if (!match) return 0;
   const hours = Number(match[1] ?? 0);
