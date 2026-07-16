@@ -7,8 +7,16 @@ import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
 import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useSettings } from "../hooks/use-settings";
-import { MEMBER_ONLY_MESSAGE, useSabrBootstrap, useStream } from "../hooks/use-stream";
+import {
+  isMemberOnlyApiError,
+  isStreamUnavailableError,
+  MEMBER_ONLY_MESSAGE,
+  useSabrBootstrap,
+  useStream,
+} from "../hooks/use-stream";
+import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
+import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { toPublicWatchParam, toWatchSourceUrl } from "../lib/watch-url";
 
@@ -37,7 +45,12 @@ function EmbedPage() {
   const { t, autoplay } = Route.useSearch();
   const sourceUrl = toWatchSourceUrl(videoId);
   const watchUrl = `/watch?v=${encodeURIComponent(toPublicWatchParam(sourceUrl))}`;
-  const { data: instance, isPending: instancePending } = useInstance();
+  const {
+    data: instance,
+    isPending: instancePending,
+    isError: instanceError,
+    refetch: retryInstance,
+  } = useInstance();
   const { authReady, isAuthed } = useAuth();
   const { settings, settingsReady } = useSettings();
   const { playbackMode } = usePlaybackMode();
@@ -62,7 +75,10 @@ function EmbedPage() {
   const startTime = parseStartTime(t) * 1000;
   const shouldAutoplay = autoplay === 1;
 
-  if (instancePending || !instance) return <EmbedLoading />;
+  if (instancePending) return <EmbedLoading />;
+
+  if (instanceError || !instance)
+    return <EmbedError message="Could not load player." onRetry={() => void retryInstance()} />;
 
   if (!guestAllowed && !isAuthed) return <EmbedGuestRequired watchUrl={watchUrl} />;
 
@@ -71,17 +87,39 @@ function EmbedPage() {
 
   if (!activeStream) {
     const activeError = streamQuery.error ?? bootstrap.error;
-    if (
+    const genericExtractorError =
       activeError instanceof ApiError &&
-      (activeError.status === 401 || activeError.status === 403)
-    ) {
-      return <EmbedGuestRequired watchUrl={watchUrl} />;
-    }
-    const message =
-      activeError instanceof ApiError && (activeError.status === 400 || activeError.status === 422)
-        ? activeError.message
-        : "Failed to load video.";
-    return <EmbedError message={message} />;
+      activeError.status === 422 &&
+      activeError.message ===
+        "Error occurs when fetching the page. Try increase the loading timeout in Settings.";
+    const isMemberOnlyError = isMemberOnlyApiError(activeError) || genericExtractorError;
+    const needsYoutubeSession = isYoutubeSessionReconnectError(activeError);
+    const familyListBlocked = isChannelNotAllowedError(activeError);
+    const message = isMemberOnlyError
+      ? MEMBER_ONLY_MESSAGE
+      : familyListBlocked
+        ? FAMILY_LIST_BLOCKED_MESSAGE
+        : needsYoutubeSession
+          ? "Connect YouTube to load this browser-only video."
+          : activeError instanceof ApiError &&
+              (activeError.status === 400 || activeError.status === 422)
+            ? activeError.message
+            : isStreamUnavailableError(activeError)
+              ? "This video is currently unavailable"
+              : "Failed to load stream.";
+    return (
+      <EmbedError
+        message={message}
+        onRetry={
+          needsYoutubeSession || familyListBlocked
+            ? undefined
+            : () => {
+                void streamQuery.refetch();
+                void bootstrap.refetch();
+              }
+        }
+      />
+    );
   }
 
   if (activeStream.requiresMembership) {
