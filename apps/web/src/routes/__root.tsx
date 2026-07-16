@@ -14,6 +14,7 @@ import { useRegisterStatus } from "../hooks/use-register-status";
 import { useSessionActivityReporting } from "../hooks/use-session-activity-reporting";
 import { isAdminRoute, isAuthPage, requiresAuth } from "../lib/auth-routes";
 import { bootstrapSession } from "../lib/auth-session";
+import { isEmbeddedFrame } from "../lib/embed-access";
 import { applyTheme } from "../lib/theme";
 import { useAuthStore } from "../stores/auth-store";
 import { useThemeStore } from "../stores/theme-store";
@@ -38,20 +39,22 @@ function RootLayout() {
   const { isAuthed, isAdmin, isGuest, status } = useAuth();
   const setSignedOut = useAuthStore((s) => s.setSignedOut);
   const { data: instance } = useInstance();
-  const registerStatus = useRegisterStatus(status !== "loading");
   const location = useRouterState({ select: (state) => state.location });
   const pathname = location.pathname;
   const pathWithSearch = `${pathname}${location.searchStr}`;
   const hideEverythingPage = pathname === "/hide-everything";
   const shortsPage = pathname === "/shorts";
   const embedPage = pathname.startsWith("/embed/");
+  const framedEmbedPage = embedPage && isEmbeddedFrame();
+  const registerStatus = useRegisterStatus(status !== "loading" && !framedEmbedPage);
   const watchCinemaPage = pathname === "/watch" && cinemaMode;
   const wasWatchCinemaPage = useRef(watchCinemaPage);
-  useSessionActivityReporting();
+  useSessionActivityReporting(!framedEmbedPage);
 
   useEffect(() => {
+    if (framedEmbedPage) return;
     void bootstrapSession();
-  }, []);
+  }, [framedEmbedPage]);
 
   useEffect(() => {
     applyTheme(theme);

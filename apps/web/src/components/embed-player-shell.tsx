@@ -7,6 +7,8 @@ import { useVolumeSync } from "../hooks/use-volume-sync";
 import { useWatchVttAssets } from "../hooks/use-watch-layout-assets";
 import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { getOriginalAudioLocale } from "../lib/audio-track";
+import { resolveEmbedAutoplay } from "../lib/embed-playback";
+import type { PlaybackMode } from "../lib/playback-mode";
 import { toPublicWatchParam } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
 import { EmbedError, PLAYBACK_FAILED_MESSAGE } from "./embed-error";
@@ -17,21 +19,31 @@ type Props = {
   sourceUrl: string;
   startTime: number;
   autoplay: boolean;
-  isAuthed: boolean;
+  sessionEnabled: boolean;
+  playbackMode: PlaybackMode;
 };
 
-export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAuthed }: Props) {
-  const { settings, settingsReady, update } = useSettings();
+export function EmbedPlayerShell({
+  stream,
+  sourceUrl,
+  startTime,
+  autoplay,
+  sessionEnabled,
+  playbackMode,
+}: Props) {
+  const { settings, settingsReady, update } = useSettings({
+    forceAnonymous: !sessionEnabled,
+  });
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
-  const player = usePlayerError(stream, isLive);
+  const player = usePlayerError(stream, isLive, playbackMode);
   const handleVolumeChange = useVolumeSync(update.mutate);
 
   const positionRef = useRef(0);
-  const playbackIntentRef = useRef<boolean | null>(null);
+  const playbackIntentRef = useRef(autoplay);
   const prevStreamId = useRef(stream.id);
   if (prevStreamId.current !== stream.id) {
     prevStreamId.current = stream.id;
-    playbackIntentRef.current = null;
+    playbackIntentRef.current = autoplay;
   }
 
   const { retryStartTime, handlePlayerError } = usePlayerErrorResume(
@@ -42,12 +54,16 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
   );
 
   const effectiveStartTime = retryStartTime > 0 ? retryStartTime : startTime;
-  const effectiveAutoplay = player.retryKey !== 0 ? (playbackIntentRef.current ?? false) : autoplay;
+  const effectiveAutoplay = resolveEmbedAutoplay(
+    player.retryKey,
+    playbackIntentRef.current,
+    autoplay,
+  );
 
   const watchUrl = `/watch?v=${encodeURIComponent(toPublicWatchParam(sourceUrl))}`;
 
   const sponsor = useWatchSponsorBlock(stream, settings);
-  const autoSkipSponsorBlock = isAuthed && settings.sponsorBlockMode !== "disabled";
+  const autoSkipSponsorBlock = sessionEnabled && settings.sponsorBlockMode !== "disabled";
 
   const { thumbnailVtt, chaptersVtt } = useWatchVttAssets(
     stream,
@@ -94,8 +110,10 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
       initialVolume={settings.volume}
       initialMuted={settings.muted}
       sponsorBlockSegments={sponsor.segments}
-      autoSkipSponsorBlockSegments={isAuthed ? sponsor.autoSkipSegments : []}
-      manualSkipSponsorBlockSegments={isAuthed ? sponsor.manualSkipSegments : sponsor.segments}
+      autoSkipSponsorBlockSegments={sessionEnabled ? sponsor.autoSkipSegments : []}
+      manualSkipSponsorBlockSegments={
+        sessionEnabled ? sponsor.manualSkipSegments : sponsor.segments
+      }
       autoSkipSponsorBlock={autoSkipSponsorBlock}
       muteSponsorBlockInsteadOfSkip={settings.sponsorBlockMuteInsteadOfSkip}
       showCurrentSponsorBlockSegment={settings.sponsorBlockShowCurrentSegment}

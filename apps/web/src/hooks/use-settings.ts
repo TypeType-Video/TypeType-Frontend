@@ -8,6 +8,10 @@ import { useAuth } from "./use-auth";
 const KEY = ["settings"];
 const AUDIO_ONLY_STORAGE_KEY = "typetype-audio-only-playback";
 
+type UseSettingsOptions = {
+  forceAnonymous?: boolean;
+};
+
 const DEFAULTS: SettingsItem = {
   defaultService: 0,
   defaultLandingPage: "home",
@@ -62,26 +66,30 @@ function withLocalAudioOnly(settings: SettingsItem): SettingsItem {
   return audioOnlyPlayback === null ? settings : { ...settings, audioOnlyPlayback };
 }
 
-export function useSettings() {
+export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {}) {
   const qc = useQueryClient();
   const { authReady, isAuthed } = useAuth();
+  const useAccountSettings = isAuthed && !forceAnonymous;
 
   const query = useQuery({
     queryKey: KEY,
     queryFn: () => fetchSettings(),
-    enabled: authReady && isAuthed,
+    enabled: authReady && useAccountSettings,
     placeholderData: DEFAULTS,
     staleTime: 5 * 60 * 1000,
   });
   const settingsReady =
-    (authReady && !isAuthed) || (query.isSuccess && !query.isPlaceholderData) || query.isError;
+    forceAnonymous ||
+    (authReady && !isAuthed) ||
+    (query.isSuccess && !query.isPlaceholderData) ||
+    query.isError;
 
   const update = useMutation({
     mutationFn: (patch: Partial<SettingsItem>) => {
       const stored = qc.getQueryData<SettingsItem>(KEY);
       const current = stored ? { ...DEFAULTS, ...stored } : DEFAULTS;
       const next = { ...current, ...patch };
-      if (!isAuthed) return Promise.resolve(next);
+      if (!useAccountSettings) return Promise.resolve(next);
       return updateSettings(next);
     },
     onMutate: async (patch) => {

@@ -17,6 +17,7 @@ import {
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
+import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { toPublicWatchParam, toWatchSourceUrl } from "../lib/watch-url";
@@ -31,6 +32,7 @@ type EmbedSearch = {
 function EmbedPage() {
   const { videoId } = Route.useParams();
   const { t, start, time_continue, autoplay } = Route.useSearch();
+  const framed = isEmbeddedFrame();
   const sourceUrl = toWatchSourceUrl(videoId);
   const watchUrl = `/watch?v=${encodeURIComponent(toPublicWatchParam(sourceUrl))}`;
   const {
@@ -39,18 +41,42 @@ function EmbedPage() {
     isError: instanceError,
     refetch: retryInstance,
   } = useInstance();
-  const { authReady, isAuthed } = useAuth();
-  const { settings, settingsReady } = useSettings();
-  const { playbackMode } = usePlaybackMode();
+  const { authReady, isAuthed, isGuest } = useAuth();
   const guestAllowed = instance?.guestAllowed ?? false;
+  const accessWithoutSettings = resolveEmbedAccess({
+    framed,
+    guestAllowed,
+    authReady,
+    isAuthed,
+    isGuest,
+    settingsReady: false,
+  });
+  const { settings, settingsReady } = useSettings({
+    forceAnonymous: !accessWithoutSettings.sessionEnabled,
+  });
+  const access = resolveEmbedAccess({
+    framed,
+    guestAllowed,
+    authReady,
+    isAuthed,
+    isGuest,
+    settingsReady,
+  });
+  const { playbackMode: storedPlaybackMode } = usePlaybackMode();
+  const playbackMode = framed ? "legacy" : storedPlaybackMode;
   const useAuthenticatedStream =
-    isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
-  const streamEnabled = (guestAllowed || isAuthed) && authReady && (!isAuthed || settingsReady);
-  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, streamEnabled, playbackMode);
+    access.sessionEnabled &&
+    (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const streamQuery = useStream(
+    sourceUrl,
+    useAuthenticatedStream,
+    access.streamEnabled,
+    playbackMode,
+  );
   const bootstrap = useSabrBootstrap(
     sourceUrl,
     useAuthenticatedStream,
-    streamEnabled,
+    access.streamEnabled,
     playbackMode,
   );
   const publicParam = toPublicWatchParam(sourceUrl);
@@ -68,10 +94,11 @@ function EmbedPage() {
   if (instanceError || !instance)
     return <EmbedError message="Could not load player." onRetry={() => void retryInstance()} />;
 
-  if (!guestAllowed && !isAuthed) return <EmbedGuestRequired watchUrl={watchUrl} />;
+  if (!guestAllowed && !access.accountAuthenticated)
+    return <EmbedGuestRequired watchUrl={watchUrl} />;
 
   const pending = streamQuery.isLoading || bootstrap.isLoading;
-  if (!activeStream && (!streamEnabled || pending)) return <EmbedLoading />;
+  if (!activeStream && (!access.streamEnabled || pending)) return <EmbedLoading />;
 
   if (!activeStream) {
     const activeError = streamQuery.error ?? bootstrap.error;
@@ -120,7 +147,8 @@ function EmbedPage() {
       sourceUrl={sourceUrl}
       startTime={startTime}
       autoplay={shouldAutoplay}
-      isAuthed={isAuthed}
+      sessionEnabled={access.sessionEnabled}
+      playbackMode={playbackMode}
     />
   );
 }
