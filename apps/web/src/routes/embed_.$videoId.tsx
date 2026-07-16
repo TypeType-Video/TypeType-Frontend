@@ -17,32 +17,20 @@ import {
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
+import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { toPublicWatchParam, toWatchSourceUrl } from "../lib/watch-url";
 
 type EmbedSearch = {
   t?: string | number;
+  start?: string | number;
+  time_continue?: string | number;
   autoplay?: number;
 };
 
-function parseStartTime(raw?: string | number): number {
-  if (raw == null) return 0;
-  if (typeof raw === "number") return Math.max(0, raw);
-  const trimmed = raw.trim();
-  if (!trimmed) return 0;
-  const num = Number(trimmed);
-  if (Number.isFinite(num)) return Math.max(0, num);
-  const match = trimmed.match(/^(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s?)?$/);
-  if (!match) return 0;
-  const hours = Number(match[1] ?? 0);
-  const minutes = Number(match[2] ?? 0);
-  const seconds = Number(match[3] ?? 0);
-  return hours * 3600 + minutes * 60 + seconds;
-}
-
 function EmbedPage() {
   const { videoId } = Route.useParams();
-  const { t, autoplay } = Route.useSearch();
+  const { t, start, time_continue, autoplay } = Route.useSearch();
   const sourceUrl = toWatchSourceUrl(videoId);
   const watchUrl = `/watch?v=${encodeURIComponent(toPublicWatchParam(sourceUrl))}`;
   const {
@@ -72,7 +60,7 @@ function EmbedPage() {
     publicParam,
     [],
   );
-  const startTime = parseStartTime(t) * 1000;
+  const startTime = parseStartTime(t ?? start ?? time_continue) * 1000;
   const shouldAutoplay = autoplay === 1;
 
   if (instancePending) return <EmbedLoading />;
@@ -140,6 +128,14 @@ function EmbedPage() {
 export const Route = createFileRoute("/embed_/$videoId")({
   validateSearch: (search: Record<string, unknown>): EmbedSearch => ({
     t: typeof search.t === "string" || typeof search.t === "number" ? search.t : undefined,
+    start:
+      typeof search.start === "string" || typeof search.start === "number"
+        ? search.start
+        : undefined,
+    time_continue:
+      typeof search.time_continue === "string" || typeof search.time_continue === "number"
+        ? search.time_continue
+        : undefined,
     autoplay: typeof search.autoplay === "number" ? search.autoplay : undefined,
   }),
   component: EmbedPage,
