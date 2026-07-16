@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { usePlayerError } from "../hooks/use-player-error";
+import { usePlayerErrorResume } from "../hooks/use-player-error-resume";
 import { useSabrPlaybackConfig } from "../hooks/use-sabr-playback-config";
 import { useSettings } from "../hooks/use-settings";
 import { useVolumeSync } from "../hooks/use-volume-sync";
@@ -7,6 +9,7 @@ import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { getOriginalAudioLocale } from "../lib/audio-track";
 import { toPublicWatchParam } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
+import { EmbedError } from "./embed-error";
 import { EmbedVideoPlayer } from "./embed-player";
 
 type Props = {
@@ -22,6 +25,24 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
   const player = usePlayerError(stream, isLive);
   const handleVolumeChange = useVolumeSync(update.mutate);
+
+  const positionRef = useRef(0);
+  const playbackIntentRef = useRef<boolean | null>(null);
+  const prevStreamId = useRef(stream.id);
+  if (prevStreamId.current !== stream.id) {
+    prevStreamId.current = stream.id;
+    playbackIntentRef.current = null;
+  }
+
+  const { retryStartTime, handlePlayerError } = usePlayerErrorResume(
+    stream.id,
+    stream.duration,
+    positionRef,
+    player.handleError,
+  );
+
+  const effectiveStartTime = retryStartTime > 0 ? retryStartTime : startTime;
+  const effectiveAutoplay = player.retryKey !== 0 ? (playbackIntentRef.current ?? false) : autoplay;
 
   const watchUrl = `/watch?v=${encodeURIComponent(toPublicWatchParam(sourceUrl))}`;
 
@@ -50,6 +71,10 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
     chaptersVtt ? "chapters" : "no-chapters",
   ].join(":");
 
+  if (player.playerFailed) {
+    return <EmbedError message="Playback failed." onRetry={player.reset} />;
+  }
+
   return (
     <EmbedVideoPlayer
       playerKey={playerKey}
@@ -59,8 +84,8 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
       title={stream.title}
       poster={stream.thumbnail}
       subtitles={stream.subtitles}
-      startTime={startTime}
-      autoplay={autoplay}
+      startTime={effectiveStartTime}
+      autoplay={effectiveAutoplay}
       settingsReady={settingsReady}
       streamType={isLive ? "live" : "on-demand"}
       chaptersVtt={chaptersVtt}
@@ -77,7 +102,17 @@ export function EmbedPlayerShell({ stream, sourceUrl, startTime, autoplay, isAut
       captionStyles={settings.captionStyles}
       onCaptionStylesChange={(captionStyles) => update.mutate({ captionStyles })}
       onVolumeChange={handleVolumeChange}
-      onError={player.handleError}
+      onTimeUpdate={(positionMs) => {
+        positionRef.current = positionMs;
+      }}
+      onPlay={() => {
+        playbackIntentRef.current = true;
+        player.clearFailed();
+      }}
+      onPause={() => {
+        playbackIntentRef.current = false;
+      }}
+      onError={handlePlayerError}
       watchUrl={watchUrl}
     />
   );
