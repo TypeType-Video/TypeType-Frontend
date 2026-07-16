@@ -1,4 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { EmbedError } from "../components/embed-error";
+import { EmbedGuestRequired } from "../components/embed-guest-required";
+import { EmbedLoading } from "../components/embed-loading";
 import { EmbedPlayerShell } from "../components/embed-player-shell";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -27,47 +30,6 @@ function parseStartTime(raw?: string | number): number {
   const minutes = Number(match[2] ?? 0);
   const seconds = Number(match[3] ?? 0);
   return hours * 3600 + minutes * 60 + seconds;
-}
-
-function EmbedLoading() {
-  return (
-    <div className="w-full h-full bg-black flex items-center justify-center">
-      <div className="aspect-video w-full max-w-[133.333vh]">
-        <div className="w-full h-full bg-black rounded-lg" />
-      </div>
-    </div>
-  );
-}
-
-function EmbedError({ message }: { message: string }) {
-  return (
-    <div className="w-full h-full bg-black flex items-center justify-center px-4">
-      <div className="flex max-w-sm flex-col items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-6 text-center">
-        <p className="text-sm text-zinc-400">{message}</p>
-      </div>
-    </div>
-  );
-}
-
-function EmbedGuestRequired({ watchUrl }: { watchUrl: string }) {
-  return (
-    <div className="w-full h-full bg-black flex items-center justify-center px-4">
-      <div className="flex max-w-sm flex-col items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-6 text-center">
-        <h1 className="text-base font-semibold text-white">Embed unavailable</h1>
-        <p className="text-sm text-zinc-400">
-          This instance does not allow guest access, which is required for embedded playback.
-        </p>
-        <a
-          href={watchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1 inline-flex h-9 items-center rounded-lg bg-white px-4 text-sm font-medium text-black transition-opacity hover:opacity-90"
-        >
-          Go to video
-        </a>
-      </div>
-    </div>
-  );
 }
 
 function EmbedPage() {
