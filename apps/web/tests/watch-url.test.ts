@@ -1,5 +1,13 @@
 import { expect, test } from "bun:test";
-import { toPublicWatchParam, toWatchSourceUrl } from "../src/lib/watch-url";
+import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../src/lib/watch-url";
+
+test("builds a YouTube thumbnail URL from watch values", () => {
+  expect(youtubeThumbnailUrl("Z05XGDSTe7U")).toBe("https://i.ytimg.com/vi/Z05XGDSTe7U/hq720.jpg");
+  expect(youtubeThumbnailUrl("https://www.youtube.com/watch?v=Z05XGDSTe7U")).toBe(
+    "https://i.ytimg.com/vi/Z05XGDSTe7U/hq720.jpg",
+  );
+  expect(youtubeThumbnailUrl("sm46525483")).toBeNull();
+});
 
 test("shortens and expands NicoNico watch URLs", () => {
   expect(toPublicWatchParam("https://www.nicovideo.jp/watch/sm46525483")).toBe("sm46525483");

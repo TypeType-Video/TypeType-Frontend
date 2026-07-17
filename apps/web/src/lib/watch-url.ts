@@ -64,6 +64,11 @@ export function youtubeVideoId(value: string): string | null {
   return YOUTUBE_VIDEO_ID_PATTERN.test(trimmed) ? trimmed : youtubeVideoIdFromUrl(trimmed);
 }
 
+export function youtubeThumbnailUrl(value: string): string | null {
+  const videoId = youtubeVideoId(value);
+  return videoId ? `https://i.ytimg.com/vi/${videoId}/hq720.jpg` : null;
+}
+
 export function toWatchSourceUrl(value: string): string {
   const trimmed = value.trim();
   if (YOUTUBE_VIDEO_ID_PATTERN.test(trimmed)) {

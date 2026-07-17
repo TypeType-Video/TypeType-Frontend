@@ -3,20 +3,32 @@ import { useAuth } from "../hooks/use-auth";
 import { FAMILY_LIST_BLOCKED_MESSAGE } from "../lib/allow-list-error";
 import { parseGeoRestriction } from "../lib/geo-restriction";
 import { isMemberOnlyMessage } from "../lib/member-only";
+import { type VideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
 import { FlagIcon } from "./flag-icon";
+import { VideoAvailabilityPoster } from "./video-availability-poster";
 import { YoutubeIcon } from "./youtube-icon";
 
 type Props = {
   message: string;
   onRetry?: () => void;
   youtubeSessionReturnTo?: string;
+  availability?: VideoAvailability;
+  poster?: string;
 };
 
-export function StreamError({ message, onRetry, youtubeSessionReturnTo }: Props) {
+export function StreamError({
+  message,
+  onRetry,
+  youtubeSessionReturnTo,
+  availability,
+  poster,
+}: Props) {
   const router = useRouter();
   const { canGlobalBlock } = useAuth();
-  const countryCode = parseGeoRestriction(message);
-  const isMemberOnly = isMemberOnlyMessage(message);
+  const availabilityCopy = availability ? videoAvailabilityCopy(availability, message) : null;
+  const displayedMessage = availabilityCopy?.message ?? message;
+  const countryCode = parseGeoRestriction(displayedMessage);
+  const isMemberOnly = availability === "members_only" || isMemberOnlyMessage(displayedMessage);
   const familyListBlocked = message === FAMILY_LIST_BLOCKED_MESSAGE;
   const imageSrc = familyListBlocked
     ? "/family-list-blocked.gif"
@@ -25,25 +37,33 @@ export function StreamError({ message, onRetry, youtubeSessionReturnTo }: Props)
       : "/error-cat.gif";
 
   return (
-    <div className="fixed inset-0 bg-app flex flex-col items-center justify-center gap-5">
-      <img
-        src={imageSrc}
-        width="220"
-        height={familyListBlocked ? "181" : "220"}
-        alt=""
-        className="rounded-2xl"
-      />
-      <div className="flex flex-col items-center gap-1.5">
-        <p className="text-white text-base font-semibold tracking-tight">
-          Couldn't load this video
-        </p>
-        <div className="flex items-center gap-2">
-          {countryCode && <FlagIcon code={countryCode} className="w-5 h-4 rounded-sm shrink-0" />}
-          <p className="text-fg-muted text-sm max-w-xs text-center">{message}</p>
-        </div>
-      </div>
+    <div className="fixed inset-0 flex flex-col items-center justify-center gap-5 bg-app px-4">
+      {availability ? (
+        <VideoAvailabilityPoster availability={availability} message={message} poster={poster} />
+      ) : (
+        <>
+          <img
+            src={imageSrc}
+            width="220"
+            height={familyListBlocked ? "181" : "220"}
+            alt=""
+            className="rounded-2xl"
+          />
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="text-base font-semibold tracking-tight text-white">
+              Couldn't load this video
+            </p>
+            <div className="flex items-center gap-2">
+              {countryCode && (
+                <FlagIcon code={countryCode} className="h-4 w-5 shrink-0 rounded-sm" />
+              )}
+              <p className="max-w-xs text-center text-sm text-fg-muted">{displayedMessage}</p>
+            </div>
+          </div>
+        </>
+      )}
       <div className="flex flex-wrap justify-center gap-3">
-        {onRetry && (
+        {onRetry && !availability && (
           <button
             type="button"
             onClick={onRetry}

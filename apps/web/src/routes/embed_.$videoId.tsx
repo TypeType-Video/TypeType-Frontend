@@ -7,20 +7,16 @@ import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
 import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useSettings } from "../hooks/use-settings";
-import {
-  isMemberOnlyApiError,
-  isStreamUnavailableError,
-  MEMBER_ONLY_MESSAGE,
-  useSabrBootstrap,
-  useStream,
-} from "../hooks/use-stream";
+import { isStreamUnavailableError, useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
-import { toPublicWatchParam, toWatchSourceUrl } from "../lib/watch-url";
+import { proxyImage } from "../lib/proxy";
+import { resolveVideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
+import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 
 type EmbedSearch = {
   t?: string | number;
@@ -80,6 +76,7 @@ function EmbedPage() {
     playbackMode,
   );
   const publicParam = toPublicWatchParam(sourceUrl);
+  const availabilityPoster = proxyImage(youtubeThumbnailUrl(publicParam) ?? "");
   const activeStream = selectProgressiveWatchStream(
     streamQuery.isPlaceholderData ? undefined : streamQuery.data,
     playbackMode === "sabr" ? bootstrap.data : undefined,
@@ -107,11 +104,15 @@ function EmbedPage() {
       activeError.status === 422 &&
       activeError.message ===
         "Error occurs when fetching the page. Try increase the loading timeout in Settings.";
-    const isMemberOnlyError = isMemberOnlyApiError(activeError) || genericExtractorError;
+    const availability = genericExtractorError
+      ? "members_only"
+      : resolveVideoAvailability(activeError);
     const needsYoutubeSession = isYoutubeSessionReconnectError(activeError);
     const familyListBlocked = isChannelNotAllowedError(activeError);
-    const message = isMemberOnlyError
-      ? MEMBER_ONLY_MESSAGE
+    const message = availability
+      ? activeError instanceof Error
+        ? activeError.message
+        : videoAvailabilityCopy(availability).message
       : familyListBlocked
         ? FAMILY_LIST_BLOCKED_MESSAGE
         : needsYoutubeSession
@@ -125,8 +126,10 @@ function EmbedPage() {
     return (
       <EmbedError
         message={message}
+        availability={availability ?? undefined}
+        poster={availabilityPoster}
         onRetry={
-          needsYoutubeSession || familyListBlocked
+          availability || needsYoutubeSession || familyListBlocked
             ? undefined
             : () => {
                 void streamQuery.refetch();
@@ -138,7 +141,13 @@ function EmbedPage() {
   }
 
   if (activeStream.requiresMembership) {
-    return <EmbedError message={MEMBER_ONLY_MESSAGE} />;
+    return (
+      <EmbedError
+        message={videoAvailabilityCopy("members_only").message}
+        availability="members_only"
+        poster={activeStream.thumbnail}
+      />
+    );
   }
 
   return (

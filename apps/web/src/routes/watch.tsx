@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { StreamError } from "../components/stream-error";
 import { WatchPageSkeleton } from "../components/watch-page-skeleton";
+import { WatchStreamError } from "../components/watch-stream-error";
 import { useAuth } from "../hooks/use-auth";
 import { useDocumentTitle } from "../hooks/use-document-title";
 import { useHistory } from "../hooks/use-history";
@@ -9,19 +10,11 @@ import { useInstance } from "../hooks/use-instance";
 import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useProgress } from "../hooks/use-progress";
 import { useSettings } from "../hooks/use-settings";
-import {
-  isMemberOnlyApiError,
-  isStreamUnavailableError,
-  MEMBER_ONLY_MESSAGE,
-  useSabrBootstrap,
-  useStream,
-} from "../hooks/use-stream";
-import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
-import { ApiError } from "../lib/api";
-import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
+import { useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
-import { toPublicWatchParam, toWatchSourceUrl } from "../lib/watch-url";
-import { youtubeSessionReturnToForWatch } from "../lib/youtube-session-route";
+import { proxyImage } from "../lib/proxy";
+import { videoAvailabilityCopy } from "../lib/video-availability";
+import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 
 const WatchLayout = lazy(() =>
@@ -54,6 +47,9 @@ function WatchPage() {
     navigationSnapshot && toPublicWatchParam(navigationSnapshot.stream.id) === publicParam;
   const previewStream = previewMatches ? navigationSnapshot.stream : undefined;
   const previewRelated = previewMatches ? navigationSnapshot.relatedStreams : [];
+  const availabilityPoster = proxyImage(
+    previewStream?.rawThumbnail ?? youtubeThumbnailUrl(publicParam) ?? "",
+  );
   const activeStream = selectProgressiveWatchStream(
     streamQuery.isPlaceholderData ? undefined : streamQuery.data,
     playbackMode === "sabr" ? bootstrap.data : undefined,
@@ -106,47 +102,29 @@ function WatchPage() {
 
   if (!activeStream) {
     const activeError = streamQuery.error ?? bootstrap.error;
-    const genericExtractorError =
-      activeError instanceof ApiError &&
-      activeError.status === 422 &&
-      activeError.message ===
-        "Error occurs when fetching the page. Try increase the loading timeout in Settings.";
-    const isMemberOnlyError = isMemberOnlyApiError(activeError) || genericExtractorError;
-    const needsYoutubeSession = isYoutubeSessionReconnectError(activeError);
-    const familyListBlocked = isChannelNotAllowedError(activeError);
-    const youtubeSessionReturnTo = needsYoutubeSession
-      ? youtubeSessionReturnToForWatch(publicParam, list, shuffle)
-      : undefined;
-    const message = isMemberOnlyError
-      ? MEMBER_ONLY_MESSAGE
-      : familyListBlocked
-        ? FAMILY_LIST_BLOCKED_MESSAGE
-        : needsYoutubeSession
-          ? "Connect YouTube to load this browser-only video."
-          : activeError instanceof ApiError &&
-              (activeError.status === 400 || activeError.status === 422)
-            ? activeError.message
-            : isStreamUnavailableError(activeError)
-              ? "This video is currently unavailable"
-              : "Failed to load stream.";
     return (
-      <StreamError
-        message={message}
-        onRetry={
-          needsYoutubeSession || familyListBlocked
-            ? undefined
-            : () => {
-                void streamQuery.refetch();
-                void bootstrap.refetch();
-              }
-        }
-        youtubeSessionReturnTo={youtubeSessionReturnTo}
+      <WatchStreamError
+        error={activeError}
+        publicParam={publicParam}
+        list={list}
+        shuffle={shuffle}
+        poster={availabilityPoster}
+        onRetry={() => {
+          void streamQuery.refetch();
+          void bootstrap.refetch();
+        }}
       />
     );
   }
 
   if (activeStream.requiresMembership) {
-    return <StreamError message={MEMBER_ONLY_MESSAGE} />;
+    return (
+      <StreamError
+        message={videoAvailabilityCopy("members_only").message}
+        availability="members_only"
+        poster={activeStream.thumbnail}
+      />
+    );
   }
 
   const savedPosition = progressFetch.data?.position ?? 0;
