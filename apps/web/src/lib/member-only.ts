@@ -1,5 +1,3 @@
-import { ApiError } from "./api";
-
 export const MEMBER_ONLY_MESSAGE = "This video is only available for members";
 
 export function isMemberOnlyMessage(message: string | null | undefined): boolean {
@@ -15,5 +13,10 @@ export function isMemberOnlyMessage(message: string | null | undefined): boolean
 }
 
 export function isMemberOnlyApiError(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 400 && isMemberOnlyMessage(error.message);
+  return (
+    error instanceof Error &&
+    "status" in error &&
+    error.status === 400 &&
+    isMemberOnlyMessage(error.message)
+  );
 }
