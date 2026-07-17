@@ -9,6 +9,7 @@ import type { VideoStream } from "../types/stream";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
 import { VideoCardFeedbackMenu } from "./video-card-feedback-menu";
+import { VideoMembershipBadge } from "./video-membership-badge";
 import { VideoStatusBadge } from "./video-status-badge";
 import { VerifiedBadgeIcon } from "./watch-icons";
 
@@ -46,8 +47,8 @@ function RelatedCardComponent({ stream, relatedStreams }: Props) {
           decoding="async"
         />
         {stream.requiresMembership && (
-          <span className="absolute left-1 top-1 rounded bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-black">
-            Members only
+          <span className="absolute left-1.5 top-1.5">
+            <VideoMembershipBadge compact />
           </span>
         )}
         {(stream.isLive || stream.isPostLive) && (

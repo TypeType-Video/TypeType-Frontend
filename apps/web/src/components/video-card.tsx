@@ -10,6 +10,7 @@ import type { VideoStream } from "../types/stream";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
 import { VideoCardFeedbackMenu } from "./video-card-feedback-menu";
+import { VideoMembershipBadge } from "./video-membership-badge";
 import { VideoPreview } from "./video-preview";
 import { VideoStatusBadge } from "./video-status-badge";
 import { VerifiedBadgeIcon } from "./watch-icons";
@@ -86,8 +87,8 @@ function VideoCardComponent({ stream, onOpen, onImpression, listId, relatedStrea
           />
           <VideoPreview stream={preview.previewStream} show={preview.showPreview} />
           {preview.memberOnly && (
-            <span className="absolute left-1.5 top-1.5 rounded bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-black">
-              Members only
+            <span className="absolute left-2 top-2">
+              <VideoMembershipBadge />
             </span>
           )}
           {(stream.isLive || stream.isPostLive) && (

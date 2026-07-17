@@ -36,6 +36,7 @@ export function mapVideoItem(item: VideoItem): VideoStream {
     isLive: item.isLive,
     isPostLive: item.isPostLive,
     isLiveContent: item.isLiveContent,
+    requiresMembership: item.requiresMembership,
     isShortFormContent: item.isShortFormContent,
     shortDescription: item.shortDescription ?? undefined,
   };
