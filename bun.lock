@@ -12,11 +12,11 @@
     },
     "apps/web": {
       "name": "@typetype/web",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "dependencies": {
         "@tanstack/react-query": "^5.101.2",
         "@tanstack/react-router": "^1.170.17",
-        "@typetype/mse": "0.1.31",
+        "@typetype/mse": "0.1.32",
         "@vidstack/react": "1.12.13",
         "dashjs": "^5.2.0",
         "hls.js": "1.6.16",
@@ -311,7 +311,7 @@
 
     "@types/react-dom": ["@types/react-dom@19.2.3", "", { "peerDependencies": { "@types/react": "^19.2.0" } }, "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ=="],
 
-    "@typetype/mse": ["@typetype/mse@0.1.31", "", {}, "sha512-Ll1g9IRdYT7nm44Tq4D0DhLfAt99takj5AvEQryjF0Drq2nRflwC8NW9cxwazGby9UBTX6ggojPW+ttizzwjyA=="],
+    "@typetype/mse": ["@typetype/mse@0.1.32", "", {}, "sha512-r8IR/evrnGjBJV1lUdsDoAk5Y7WdNBUhzwaBEyUVNl9Tr83MjehA7j2M0aXbCE9pv2dvbZPLvwWeebcWVm0B5A=="],
 
     "@typetype/web": ["@typetype/web@workspace:apps/web"],
 
