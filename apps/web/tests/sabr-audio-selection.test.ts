@@ -61,3 +61,11 @@ test("matches the preferred language and switches the sabr track id", () => {
   expect(audioOnly?.audioOnly).toBe(true);
   expect(audioOnly?.key.endsWith(":audio")).toBe(true);
 });
+
+test("marks live playback sessions for the MSE engine", () => {
+  const live = { ...stream, isLive: true } as VideoStream;
+  const config = resolveSabrPlaybackConfig(live, 137, "en-US.4");
+
+  expect(config?.isLive).toBe(true);
+  expect(config?.key).toContain(":live:");
+});

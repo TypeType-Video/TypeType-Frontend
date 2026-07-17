@@ -85,6 +85,7 @@ export function SabrMsePlayer({
       audioItag: initialConfig.audioItag,
       audioTrackId: initialConfig.audioTrackId,
       audioOnly: initialConfig.audioOnly,
+      isLive: initialConfig.isLive,
       startTimeMs: Math.max(0, Math.round(latestStartTime())),
       headers: headersRef.current,
     });

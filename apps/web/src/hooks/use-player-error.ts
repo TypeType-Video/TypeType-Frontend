@@ -66,7 +66,7 @@ export function usePlayerError(
     provider === "bilibili"
       ? bilibiliVariantCount(stream.videoOnlyStreams ?? [], stream.audioStreams ?? [])
       : 0;
-  const sabrSelected = provider === "youtube" && !isLive && playbackMode === "sabr";
+  const sabrSelected = provider === "youtube" && playbackMode === "sabr";
   const sabrEnabled = sabrSelected && hasSabrPlayback(stream);
 
   const fallbackSrc = resolveManifestSrc(stream, isLive, qualityFailed, {

@@ -1,12 +1,44 @@
 import { expect, test } from "bun:test";
 import type { TypeTypeMsePlayer } from "@typetype/mse";
-import { runSabrSeek, secondsFromSliderPercent } from "../src/lib/sabr-player-seek";
+import {
+  runSabrSeek,
+  secondsFromMediaSliderPercent,
+  secondsFromSliderPercent,
+} from "../src/lib/sabr-player-seek";
 
 test("converts vidstack slider percentages to media seconds", () => {
   expect(secondsFromSliderPercent(3_554.534, 44)).toBeCloseTo(1_563.99496);
   expect(secondsFromSliderPercent(3_554.534, -1)).toBe(0);
   expect(secondsFromSliderPercent(3_554.534, 101)).toBe(3_554.534);
   expect(secondsFromSliderPercent(Number.NaN, 44)).toBeNull();
+});
+
+test("maps live slider percentages onto the native MSE seekable window", () => {
+  const media = {
+    duration: Number.POSITIVE_INFINITY,
+    seekable: {
+      length: 1,
+      start: () => 3_600,
+      end: () => 3_720,
+    },
+  };
+
+  expect(secondsFromMediaSliderPercent(media, 0)).toBe(3_600);
+  expect(secondsFromMediaSliderPercent(media, 50)).toBe(3_660);
+  expect(secondsFromMediaSliderPercent(media, 100)).toBe(3_720);
+});
+
+test("falls back to duration when the media has no native seekable window", () => {
+  const media = {
+    duration: 600,
+    seekable: {
+      length: 0,
+      start: () => 0,
+      end: () => 0,
+    },
+  };
+
+  expect(secondsFromMediaSliderPercent(media, 25)).toBe(150);
 });
 
 test("queues the latest sabr seek until the active seek completes", async () => {
