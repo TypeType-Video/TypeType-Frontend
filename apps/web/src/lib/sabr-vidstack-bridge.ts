@@ -2,6 +2,7 @@ export type SabrVidstackControls = {
   play: () => Promise<void>;
   pause: (userInitiated?: boolean) => void;
   seek: (seconds: number) => void;
+  isTransitioning?: () => boolean;
 };
 
 const controlsByVideo = new WeakMap<HTMLVideoElement, SabrVidstackControls>();
@@ -38,6 +39,7 @@ export function requestSabrVidstackPlayback(
   userInitiated = false,
 ): Promise<void> {
   const controls = getSabrVidstackControls(video);
+  if (!playing && !userInitiated && controls?.isTransitioning?.()) return Promise.resolve();
   video.autoplay = playing;
   if (!controls) {
     pendingPlaybackByVideo.set(video, playing);

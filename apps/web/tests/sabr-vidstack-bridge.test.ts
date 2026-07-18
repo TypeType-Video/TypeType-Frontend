@@ -42,6 +42,42 @@ test("keeps only the latest pending SABR playback intent", async () => {
   expect(pauses).toBe(1);
 });
 
+test("ignores technical pauses during SABR transitions", async () => {
+  let pauses = 0;
+  const video = { autoplay: true, pause: () => {} } as HTMLVideoElement;
+
+  registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {
+      pauses += 1;
+    },
+    seek: () => {},
+    isTransitioning: () => true,
+  });
+  await requestSabrVidstackPlayback(video, false);
+
+  expect(video.autoplay).toBe(true);
+  expect(pauses).toBe(0);
+});
+
+test("applies user pauses during SABR transitions", async () => {
+  let pauses = 0;
+  const video = { autoplay: true, pause: () => {} } as HTMLVideoElement;
+
+  registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {
+      pauses += 1;
+    },
+    seek: () => {},
+    isTransitioning: () => true,
+  });
+  await requestSabrVidstackPlayback(video, false, true);
+
+  expect(video.autoplay).toBe(false);
+  expect(pauses).toBe(1);
+});
+
 test("sends only explicit SABR seek requests to registered MSE controls", () => {
   const positions: number[] = [];
   const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
