@@ -12,6 +12,7 @@ import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/al
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
+import { resolveEmbedPlaybackMode } from "../lib/embed-playback";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
@@ -59,7 +60,7 @@ function EmbedPage() {
     settingsReady,
   });
   const { playbackMode: storedPlaybackMode } = usePlaybackMode();
-  const playbackMode = framed ? "legacy" : storedPlaybackMode;
+  const playbackMode = resolveEmbedPlaybackMode(framed, storedPlaybackMode);
   const useAuthenticatedStream =
     access.sessionEnabled &&
     (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
