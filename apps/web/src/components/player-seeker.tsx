@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { useMediaPlayer, useMediaRemote, useMediaState } from "../lib/vidstack";
 
+const SEEK_SETTLE_DELAY_MS = 750;
+
 function seekable(media: HTMLMediaElement, target: number) {
   if (media.readyState === 0 && !Number.isFinite(media.duration)) return false;
   if (media.seekable.length === 0) return true;
@@ -40,9 +42,6 @@ export function PlayerSeeker({ startTime }: { startTime: number }) {
         return;
       }
       applying = true;
-      try {
-        media.currentTime = target;
-      } catch {}
       remote.seek(target);
       recordClientEvent("player.seek_apply", {
         targetMs: Math.round(target * 1000),
@@ -61,7 +60,7 @@ export function PlayerSeeker({ startTime }: { startTime: number }) {
           return;
         }
         seekMedia(media);
-      }, 250);
+      }, SEEK_SETTLE_DELAY_MS);
     }
 
     if (canPlay) remote.seek(target);

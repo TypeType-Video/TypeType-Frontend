@@ -13,8 +13,6 @@ import {
   streamQueryKey,
 } from "../lib/stream-request";
 
-export { MEMBER_ONLY_MESSAGE };
-
 export function streamQueryOptions(
   url: string,
   useAuthenticatedStream = false,

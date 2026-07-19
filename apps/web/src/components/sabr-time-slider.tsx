@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { secondsFromSliderPercent } from "../lib/sabr-player-seek";
+import { secondsFromMediaSliderPercent } from "../lib/sabr-player-seek";
 import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { TimeSlider } from "../lib/vidstack";
 
@@ -26,7 +26,7 @@ export function SabrTimeSlider({ disabled = false, thumbnails, video }: Props) {
       disabled={disabled}
       onDragEnd={(percent) => {
         setSeekTarget(percent);
-        const seconds = video ? secondsFromSliderPercent(video.duration, percent) : null;
+        const seconds = video ? secondsFromMediaSliderPercent(video, percent) : null;
         if (video && !disabled && seconds !== null) requestSabrSeek(video, seconds);
       }}
     >

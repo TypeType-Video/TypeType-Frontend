@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { GripVertical } from "lucide-react";
+import { GripVertical, X } from "lucide-react";
 import type { DragEvent } from "react";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { formatDuration, formatViews } from "../lib/format";
@@ -12,27 +12,6 @@ import { ChannelRouteLink } from "./channel-route-link";
 import { VideoCardFeedbackMenu } from "./video-card-feedback-menu";
 import { VideoProgressBar } from "./video-progress-bar";
 import { WatchedBadge } from "./watched-badge";
-
-function XIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={12}
-      height={12}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="img"
-      aria-label="Remove"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
 
 type Props = {
   video: PlaylistVideoItem;
@@ -102,10 +81,10 @@ export function PlaylistVideoRow({ video, onRemove, reorderable, listId, onDragS
               e.preventDefault();
               onRemove();
             }}
-            aria-label="Remove from playlist"
-            className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-black/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label="Remove video"
+            className="absolute top-1.5 right-1.5 rounded-full bg-black/70 p-1 text-white transition-colors hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <XIcon />
+            <X className="h-3 w-3" aria-hidden="true" />
           </button>
           {reorderable && (
             <button

@@ -22,14 +22,16 @@ type RowProps = {
   label: string;
   checked: boolean;
   onToggle: () => void;
+  disabled?: boolean;
 };
 
-export function PlaylistRow({ label, checked, onToggle }: RowProps) {
+export function PlaylistRow({ label, checked, onToggle, disabled }: RowProps) {
   return (
     <button
       type="button"
       onClick={onToggle}
-      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-sm text-fg hover:bg-surface-strong hover:text-fg transition-colors"
+      disabled={disabled}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 text-sm text-fg hover:bg-surface-strong hover:text-fg transition-colors disabled:cursor-wait disabled:opacity-60"
     >
       <span
         className={`w-4 h-4 flex items-center justify-center rounded border flex-shrink-0 transition-colors ${

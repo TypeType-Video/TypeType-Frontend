@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePlaylists } from "../hooks/use-playlists";
+import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
+import { watchLaterResultLabel } from "../lib/watch-later-labels";
+import { toWatchLaterPayload } from "../lib/watch-later-mappers";
 import type { VideoStream } from "../types/stream";
 import { PlaylistRow } from "./playlist-row";
 
@@ -15,6 +18,7 @@ type Props = {
 
 export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Props) {
   const { query, create, addVideo, removeVideo, isInPlaylist } = usePlaylists();
+  const watchLater = useWatchLaterPlaylist();
   const playlists = query.data ?? [];
   const [newName, setNewName] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
@@ -98,6 +102,15 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
     onSaved(`Playlist "${trimmed}" created`);
   }
 
+  async function handleWatchLaterToggle() {
+    try {
+      const saved = await watchLater.toggle(toWatchLaterPayload(stream));
+      onSaved(watchLaterResultLabel(saved));
+    } catch {
+      onSaved("Could not update Watch later");
+    }
+  }
+
   return createPortal(
     <div
       ref={panelRef}
@@ -108,8 +121,16 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
         Save to playlist
       </p>
       <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="border-b border-border">
+          <PlaylistRow
+            label="Watch later"
+            checked={watchLater.isInWatchLater(stream.id)}
+            disabled={watchLater.isPending}
+            onToggle={() => void handleWatchLaterToggle()}
+          />
+        </div>
         {playlists.length === 0 && (
-          <p className="text-xs text-fg-soft px-3 py-3">No playlists yet.</p>
+          <p className="text-xs text-fg-soft px-3 py-3">No custom playlists yet.</p>
         )}
         {playlists.map((playlist) => (
           <PlaylistRow

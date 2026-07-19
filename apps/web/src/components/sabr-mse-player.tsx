@@ -85,6 +85,7 @@ export function SabrMsePlayer({
       audioItag: initialConfig.audioItag,
       audioTrackId: initialConfig.audioTrackId,
       audioOnly: initialConfig.audioOnly,
+      isLive: initialConfig.isLive,
       startTimeMs: Math.max(0, Math.round(latestStartTime())),
       headers: headersRef.current,
     });
@@ -137,6 +138,7 @@ export function SabrMsePlayer({
         const targetMs = Math.max(0, Math.round(seconds * 1000));
         runSabrSeek(engine, targetMs, seekingRef, reportError, latestHandlers().onSeekStateChange);
       },
+      isTransitioning: () => seekingRef.current,
     });
     void engine
       .load()

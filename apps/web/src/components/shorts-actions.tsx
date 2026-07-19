@@ -3,6 +3,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useFavoriteStatus } from "../hooks/use-favorite-status";
 import { useShareUrl } from "../hooks/use-share-url";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
+import { toWatchLaterPayload } from "../lib/watch-later-mappers";
 import { toPublicWatchUrl } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
 import { ShortsActionButton } from "./shorts-action-button";
@@ -30,14 +31,9 @@ export function ShortsActions({
     isFavorite: favorited,
     isPending: favoritesPending,
   } = useFavoriteStatus(stream.id);
-  const {
-    add: addWatchLater,
-    remove: removeWatchLater,
-    isInWatchLater,
-    isPending: watchLaterPending,
-  } = useWatchLaterPlaylist();
+  const watchLater = useWatchLaterPlaylist();
 
-  const watchLater = isInWatchLater(stream.id);
+  const savedForLater = watchLater.isInWatchLater(stream.id);
 
   function requireAuth(): boolean {
     if (isAuthed) return true;
@@ -57,16 +53,7 @@ export function ShortsActions({
 
   async function toggleWatchLater() {
     if (!requireAuth()) return;
-    if (watchLater) {
-      await removeWatchLater(stream.id);
-      return;
-    }
-    await addWatchLater({
-      url: stream.id,
-      title: stream.title,
-      thumbnail: stream.rawThumbnail || stream.thumbnail,
-      duration: stream.duration,
-    });
+    await watchLater.toggle(toWatchLaterPayload(stream));
   }
 
   function handleShare() {
@@ -87,9 +74,9 @@ export function ShortsActions({
       <ShortsActionButton
         icon={Clock3}
         label="Watch later"
-        stateLabel={watchLater ? "Saved" : "Watch Later"}
-        active={watchLater}
-        disabled={watchLaterPending}
+        stateLabel={savedForLater ? "Saved" : "Watch Later"}
+        active={savedForLater}
+        disabled={watchLater.isPending}
         compact={compact}
         onClick={() => void toggleWatchLater()}
       />

@@ -28,11 +28,12 @@ function WatchLaterPage() {
     [playlistVideos, sortMode, visibleIds],
   );
 
-  function playVideo(id: string, shuffle?: string) {
+  function playVideo(videoUrl: string | undefined, shuffle?: string) {
+    if (!videoUrl) return;
     markWatchAutoplayIntent();
     navigate({
       to: "/watch",
-      search: { v: toPublicWatchParam(id), ...(shuffle ? { shuffle } : {}) },
+      search: { v: toPublicWatchParam(videoUrl), ...(shuffle ? { shuffle } : {}) },
     });
   }
 
@@ -42,15 +43,12 @@ function WatchLaterPage() {
         title="Watch later"
         count={count}
         loading={isLoading}
-        canPlay={visibleVideos.length > 0}
-        onPlayAll={() => {
-          const first = visibleVideos[0];
-          if (first) playVideo(first.id);
-        }}
+        canPlay={visiblePlaylistVideos.length > 0}
+        onPlayAll={() => playVideo(visiblePlaylistVideos[0]?.url)}
         onShuffle={() => {
           const seed = randomShuffleSeed();
-          const first = shuffleByKey(visibleVideos, seed)[0];
-          if (first) playVideo(first.id, seed);
+          const first = shuffleByKey(visiblePlaylistVideos, seed)[0];
+          playVideo(first?.url, seed);
         }}
       />
       {!isLoading && videos.length > 0 && (

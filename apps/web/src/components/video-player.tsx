@@ -46,6 +46,7 @@ export function VideoPlayer({
   settingsReady = false,
   autoplay = false,
   audioOnly = false,
+  hideCinemaMode = false,
   originalAudioLocale,
   overlay,
   captionStyles,
@@ -71,6 +72,7 @@ export function VideoPlayer({
   const sabrSrc = useMemo(() => (sabrVideoId ? sabrMediaSrc(sabrVideoId) : null), [sabrVideoId]);
   const activeSrc = sabrSrc ?? src;
   const viewType = mediaSourceViewType(audioOnly, Boolean(sabrConfig), activeSrc);
+  const canSeek = streamType !== "live" || Boolean(sabrConfig);
   const { handleProviderChange, handleError, handleEnded } = useVideoPlayerEvents({
     src: activeSrc,
     onError,
@@ -137,6 +139,7 @@ export function VideoPlayer({
       {overlay}
       <VideoPlayerLayout
         audioOnly={audioOnly}
+        hideCinemaMode={hideCinemaMode}
         audioUsesVideoProvider={audioOnly && viewType === "video"}
         sabr={Boolean(sabrConfig)}
         sabrVideo={sabrState.video}
@@ -164,13 +167,13 @@ export function VideoPlayer({
       <MediaSessionSync
         title={title}
         artwork={poster}
-        canSeek={streamType !== "live"}
+        canSeek={canSeek}
         isLive={streamType === "live"}
         onPreviousTrack={onPreviousVideo}
         onNextTrack={onNextVideo}
       />
       <VideoPlayerPlaybackTools
-        canSeek={streamType !== "live"}
+        canSeek={canSeek}
         audioOnly={audioOnly}
         sabrVideo={sabrState.video}
         segments={sponsorBlockSegments}

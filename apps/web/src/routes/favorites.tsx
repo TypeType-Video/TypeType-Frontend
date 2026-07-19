@@ -18,9 +18,7 @@ function FavoritesPage() {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(FAVORITES_BATCH_SIZE);
   const [sortMode, setSortMode] = useState<PlaylistSortMode>("added-new");
-  const { videos, playlistVideos, count, requestedCount, isLoading } = useFavoriteStreams({
-    limit,
-  });
+  const { videos, playlistVideos, count, isLoading } = useFavoriteStreams();
   const favorites = useFavoritesPlaylist();
   const { filter } = useBlockedFilter();
   const visibleVideos = useMemo(() => filter(videos), [filter, videos]);
@@ -32,15 +30,15 @@ function FavoritesPage() {
     () => sortPlaylistVideos(playlistVideos, sortMode).filter((video) => visibleIds.has(video.url)),
     [playlistVideos, sortMode, visibleIds],
   );
-  const canLoadMore = requestedCount < count;
+  const displayedPlaylistVideos = visiblePlaylistVideos.slice(0, limit);
+  const canLoadMore = displayedPlaylistVideos.length < visiblePlaylistVideos.length;
 
-  function playFrom(index: number, shuffle?: string) {
-    const video = visibleVideos[index];
-    if (!video) return;
+  function playVideo(videoUrl: string | undefined, shuffle?: string) {
+    if (!videoUrl) return;
     markWatchAutoplayIntent();
     navigate({
       to: "/watch",
-      search: { v: toPublicWatchParam(video.id), ...(shuffle ? { shuffle } : {}) },
+      search: { v: toPublicWatchParam(videoUrl), ...(shuffle ? { shuffle } : {}) },
     });
   }
 
@@ -50,15 +48,13 @@ function FavoritesPage() {
         title="Favorites"
         count={count}
         loading={isLoading}
-        canPlay={visibleVideos.length > 0}
-        onPlayAll={() => playFrom(0)}
+        canPlay={visiblePlaylistVideos.length > 0}
+        onPlayAll={() => playVideo(visiblePlaylistVideos[0]?.url)}
         onShuffle={() => {
           const seed = randomShuffleSeed();
-          const shuffled = shuffleByKey(visibleVideos, seed);
+          const shuffled = shuffleByKey(visiblePlaylistVideos, seed);
           const first = shuffled[0];
-          if (!first) return;
-          markWatchAutoplayIntent();
-          navigate({ to: "/watch", search: { v: toPublicWatchParam(first.id), shuffle: seed } });
+          playVideo(first?.url, seed);
         }}
       />
       {!isLoading && videos.length > 0 && (
@@ -71,7 +67,7 @@ function FavoritesPage() {
       ) : (
         <>
           <PlaylistGrid
-            videos={visiblePlaylistVideos}
+            videos={displayedPlaylistVideos}
             reorderable={false}
             listId=""
             onRemove={(video) => void favorites.remove(video.url)}

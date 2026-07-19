@@ -35,6 +35,7 @@ export type VideoItem = {
   isLive: boolean;
   isPostLive: boolean;
   isLiveContent: boolean;
+  requiresMembership: boolean;
   isShortFormContent: boolean;
   shortDescription: string | null;
 };
