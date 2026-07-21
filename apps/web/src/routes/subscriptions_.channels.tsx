@@ -9,11 +9,8 @@ import { fetchSubscriptionFeed, fetchSubscriptions } from "../lib/api-user";
 
 const SUBSCRIPTION_STALE_MS = 5 * 60 * 1000;
 
-function nextSubscriptionPage(
-  last: Awaited<ReturnType<typeof fetchSubscriptionFeed>>,
-  pages: unknown[],
-) {
-  return last.nextpage !== null ? pages.length : undefined;
+function nextSubscriptionPage(last: Awaited<ReturnType<typeof fetchSubscriptionFeed>>) {
+  return last.nextpage ?? undefined;
 }
 
 function SubscriptionChannelsPage() {
@@ -32,8 +29,8 @@ function SubscriptionChannelsPage() {
   function prefetchVideos() {
     void queryClient.prefetchInfiniteQuery({
       queryKey: SUBSCRIPTION_FEED_KEY,
-      queryFn: ({ pageParam }) => fetchSubscriptionFeed(pageParam as number),
-      initialPageParam: 0,
+      queryFn: ({ pageParam, signal }) => fetchSubscriptionFeed(pageParam as string | null, signal),
+      initialPageParam: null as string | null,
       getNextPageParam: nextSubscriptionPage,
       staleTime: SUBSCRIPTION_STALE_MS,
     });

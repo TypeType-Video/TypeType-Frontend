@@ -133,9 +133,56 @@ export async function clearSearchHistory(): Promise<void> {
   await authed(`${BASE}/search-history`, { method: "DELETE" });
 }
 
-export async function fetchSubscriptionFeed(page: number): Promise<SubscriptionFeedPage> {
-  const search = new URLSearchParams({ page: String(page), limit: "30" });
-  return authedJson(`${BASE}/subscriptions/feed?${search.toString()}`);
+export async function fetchSubscriptionFeed(
+  cursor: string | null = null,
+  signal?: AbortSignal,
+): Promise<SubscriptionFeedPage> {
+  const search = new URLSearchParams({ limit: "30" });
+  if (cursor !== null) search.set("cursor", cursor);
+  const url = `${BASE}/subscriptions/feed?${search.toString()}`;
+  while (true) {
+    const res = await authed(url, { signal });
+    const body = normalizeApiPayload(await res.json());
+    if (res.status === 202 && isSubscriptionFeedPreparing(body)) {
+      await waitForSubscriptionFeed(body.retryAfterMs, signal);
+      continue;
+    }
+    if (!res.ok) {
+      const error = body as { code?: string; error?: string };
+      throw new ApiError(
+        error.error ?? "Subscription feed request failed",
+        res.status,
+        error.code ?? null,
+      );
+    }
+    return body as SubscriptionFeedPage;
+  }
+}
+
+function isSubscriptionFeedPreparing(
+  body: unknown,
+): body is { code: string; retryAfterMs: number } {
+  if (typeof body !== "object" || body === null) return false;
+  const preparing = body as { code?: unknown; retryAfterMs?: unknown };
+  return (
+    preparing.code === "subscription_feed_preparing" && typeof preparing.retryAfterMs === "number"
+  );
+}
+
+function waitForSubscriptionFeed(retryAfterMs: number, signal?: AbortSignal): Promise<void> {
+  const delayMs = Math.min(Math.max(retryAfterMs, 100), 5_000);
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const onAbort = () => {
+      clearTimeout(timeout);
+      reject(signal?.reason);
+    };
+    const timeout = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, delayMs);
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
 export async function fetchSubscriptionShorts(
