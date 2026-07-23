@@ -1,3 +1,4 @@
+import { isMseTypeSupported } from "@typetype/mse";
 import type { SabrQualityOption } from "../stores/sabr-quality-store";
 import type { AudioStreamItem, VideoStreamItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
@@ -27,13 +28,15 @@ function isSabrCandidate(item: SabrCandidate): boolean {
 
 function playableVideos(stream: VideoStream): VideoStreamItem[] {
   const videos = [...(stream.videoOnlyStreams ?? []), ...(stream.videoStreams ?? [])];
-  return videos.filter((video) => isSabrCandidate(video) && supportedVideo(video));
+  return videos.filter((video) => isSabrCandidate(video) && isSabrVideoSupported(video));
 }
 
-function supportedVideo(video: VideoStreamItem): boolean {
+export function isSabrVideoSupported(
+  video: VideoStreamItem,
+  supportsType = isMseTypeSupported,
+): boolean {
   if (!video.codec || !codecFamily(video.codec)) return false;
-  if (typeof MediaSource === "undefined") return true;
-  return MediaSource.isTypeSupported(`${video.mimeType}; codecs="${video.codec}"`);
+  return supportsType(`${video.mimeType}; codecs="${video.codec}"`);
 }
 
 function qualityLabel(video: VideoStreamItem): string {
