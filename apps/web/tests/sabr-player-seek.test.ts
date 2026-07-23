@@ -41,7 +41,7 @@ test("falls back to duration when the media has no native seekable window", () =
   expect(secondsFromMediaSliderPercent(media, 25)).toBe(150);
 });
 
-test("queues the latest sabr seek until the active seek completes", async () => {
+test("forwards repeated SABR seeks immediately and tracks only the latest", async () => {
   const finishSeeks: Array<() => void> = [];
   const positions: number[] = [];
   const states: boolean[] = [];
@@ -70,23 +70,22 @@ test("queues the latest sabr seek until the active seek completes", async () => 
     (state) => states.push(state),
   );
 
-  expect(positions).toEqual([60_000]);
+  expect(positions).toEqual([60_000, 120_000]);
   expect(flag.current).toBe(true);
   expect(states).toEqual([true]);
 
   finishSeeks.shift()?.();
-  await Bun.sleep(110);
   await Promise.resolve();
   await Promise.resolve();
 
   expect(positions).toEqual([60_000, 120_000]);
   expect(flag.current).toBe(true);
-  expect(states).toEqual([true, false, true]);
+  expect(states).toEqual([true]);
 
   finishSeeks.shift()?.();
   await Promise.resolve();
   await Promise.resolve();
 
   expect(flag.current).toBe(false);
-  expect(states).toEqual([true, false, true, false]);
+  expect(states).toEqual([true, false]);
 });
