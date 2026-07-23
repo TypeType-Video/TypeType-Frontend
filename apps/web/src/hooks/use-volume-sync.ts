@@ -1,17 +1,35 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { SettingsItem } from "../types/user";
 
 type MutateFn = (patch: Partial<SettingsItem>) => void;
 
+export function createDebouncedVolumeSync(mutate: MutateFn, delayMs = 1000) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return {
+    schedule(volume: number, muted: boolean) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        mutate({ volume, muted });
+      }, delayMs);
+    },
+    cancel() {
+      if (timer) clearTimeout(timer);
+      timer = null;
+    },
+  };
+}
+
 export function useVolumeSync(mutate: MutateFn): (volume: number, muted: boolean) => void {
   const mutateRef = useRef(mutate);
   mutateRef.current = mutate;
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncRef = useRef<ReturnType<typeof createDebouncedVolumeSync> | null>(null);
+  if (!syncRef.current) {
+    syncRef.current = createDebouncedVolumeSync((patch) => mutateRef.current(patch));
+  }
+  useEffect(() => () => syncRef.current?.cancel(), []);
 
   return useCallback((volume: number, muted: boolean) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      mutateRef.current({ volume, muted });
-    }, 1000);
+    syncRef.current?.schedule(volume, muted);
   }, []);
 }
