@@ -3,16 +3,7 @@ import { isAbortError } from "./sabr-playback-retry";
 
 type SeekFlag = { current: boolean };
 
-type PendingSeek = {
-  player: TypeTypeMsePlayer;
-  position: number;
-  onError: (error: unknown) => void;
-  onSeekingChange?: (seeking: boolean) => void;
-  timer: ReturnType<typeof setTimeout>;
-};
-
-const pendingSeeks = new WeakMap<SeekFlag, PendingSeek>();
-const SEEK_RETRY_MS = 100;
+const seekRevisions = new WeakMap<SeekFlag, number>();
 
 export function positionMs(video: HTMLVideoElement): number {
   return Math.max(0, Math.round(video.currentTime * 1000));
@@ -47,54 +38,24 @@ export function runSabrSeek(
   onSeekingChange?: (seeking: boolean) => void,
 ) {
   if (!player) return;
-  if (flag.current) {
-    queueSabrSeek(player, position, flag, onError, onSeekingChange);
-    return;
+  const revision = (seekRevisions.get(flag) ?? 0) + 1;
+  seekRevisions.set(flag, revision);
+  if (!flag.current) {
+    flag.current = true;
+    onSeekingChange?.(true);
   }
-  cancelPendingSabrSeek(flag);
-  flag.current = true;
-  onSeekingChange?.(true);
   void player
     .seek(position)
     .catch((error: unknown) => {
-      if (!isAbortError(error)) onError(error);
+      if (seekRevisions.get(flag) === revision && !isAbortError(error)) onError(error);
     })
     .finally(() => {
+      if (seekRevisions.get(flag) !== revision) return;
       flag.current = false;
       onSeekingChange?.(false);
     });
 }
 
-function queueSabrSeek(
-  player: TypeTypeMsePlayer,
-  position: number,
-  flag: SeekFlag,
-  onError: (error: unknown) => void,
-  onSeekingChange?: (seeking: boolean) => void,
-): void {
-  cancelPendingSabrSeek(flag);
-  const retry = () => {
-    const pending = pendingSeeks.get(flag);
-    if (!pending) return;
-    if (flag.current) {
-      pending.timer = setTimeout(retry, SEEK_RETRY_MS);
-      return;
-    }
-    pendingSeeks.delete(flag);
-    runSabrSeek(pending.player, pending.position, flag, pending.onError, pending.onSeekingChange);
-  };
-  pendingSeeks.set(flag, {
-    player,
-    position,
-    onError,
-    onSeekingChange,
-    timer: setTimeout(retry, SEEK_RETRY_MS),
-  });
-}
-
 export function cancelPendingSabrSeek(flag: SeekFlag): void {
-  const pending = pendingSeeks.get(flag);
-  if (!pending) return;
-  clearTimeout(pending.timer);
-  pendingSeeks.delete(flag);
+  seekRevisions.set(flag, (seekRevisions.get(flag) ?? 0) + 1);
 }

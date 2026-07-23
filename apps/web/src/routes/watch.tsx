@@ -14,6 +14,7 @@ import { useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { videoAvailabilityCopy } from "../lib/video-availability";
+import { resolveWatchStartTime } from "../lib/watch-resume";
 import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 
@@ -69,6 +70,7 @@ function WatchPage() {
   const addToHistoryRef = useRef(add.mutate);
   addToHistoryRef.current = add.mutate;
   const historyAddedForRef = useRef<string | null>(null);
+  const resumePending = isAuthed && progressFetch.isPending;
 
   useEffect(() => {
     if (v.trim() && publicParam !== v.trim()) {
@@ -77,7 +79,7 @@ function WatchPage() {
   }, [navigate, publicParam, v]);
 
   useEffect(() => {
-    if (!activeStream) return;
+    if (!activeStream || resumePending) return;
     if (historyAddedForRef.current === activeStream.id) return;
     const historyPositionMs =
       progressFetch.data?.position ?? (activeStream.startPosition ?? 0) * 1000;
@@ -95,9 +97,10 @@ function WatchPage() {
       viewCount: activeStream.views,
       progress,
     });
-  }, [activeStream, progressFetch.data?.position]);
+  }, [activeStream, progressFetch.data?.position, resumePending]);
 
   const pending = streamQuery.isLoading || bootstrap.isLoading;
+  if (resumePending) return loadingPage;
   if (!activeStream && (!streamEnabled || pending)) return loadingPage;
 
   if (!activeStream) {
@@ -127,11 +130,14 @@ function WatchPage() {
     );
   }
 
-  const savedPosition = progressFetch.data?.position ?? 0;
-  const serverPositionMs = (activeStream.startPosition ?? 0) * 1000;
-  const resumeMs = savedPosition > 0 ? savedPosition : serverPositionMs;
-  const durationMs = activeStream.duration * 1000;
-  const startTime = resumeMs >= 5000 && resumeMs < durationMs * 0.95 ? resumeMs : 0;
+  const startTime =
+    resolveWatchStartTime({
+      authenticated: isAuthed,
+      progressPending: progressFetch.isPending,
+      savedPositionMs: progressFetch.data?.position,
+      serverPositionSeconds: activeStream.startPosition,
+      durationSeconds: activeStream.duration,
+    }) ?? 0;
   const navigating = toPublicWatchParam(activeStream.id) !== publicParam;
 
   return (

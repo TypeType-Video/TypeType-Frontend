@@ -98,7 +98,10 @@ export function SabrMsePlayer({
     const offError = engine.on("error", (event) => {
       if (event.type === "error") reportError(event.error, event.recoveryPositionMs);
     });
-    const volumeChange = () => latestHandlers().onVolumeChange?.(video.volume, video.muted);
+    const volumeChange = () => {
+      if (engine.isApplyingTransientMediaState()) return;
+      latestHandlers().onVolumeChange?.(video.volume, video.muted);
+    };
     video.addEventListener("volumechange", volumeChange);
     let autoplayStartTime = 0;
     let engineLoaded = false;

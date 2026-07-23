@@ -56,16 +56,37 @@ test("exposes backend audio names without generic duplicate labels", () => {
 
 test("matches the preferred language and switches the sabr track id", () => {
   expect(defaultSabrAudioTrackId(stream, "fr-FR")).toBe("fr-FR.1");
-  expect(resolveSabrPlaybackConfig(stream, 137, "fr-FR.1")?.audioTrackId).toBe("fr-FR.1");
-  const audioOnly = resolveSabrPlaybackConfig(stream, 137, "fr-FR.1", true);
+  const config = withManagedMediaSource(() => resolveSabrPlaybackConfig(stream, 137, "fr-FR.1"));
+  expect(config?.audioTrackId).toBe("fr-FR.1");
+  const audioOnly = withManagedMediaSource(() =>
+    resolveSabrPlaybackConfig(stream, 137, "fr-FR.1", true),
+  );
   expect(audioOnly?.audioOnly).toBe(true);
   expect(audioOnly?.key.endsWith(":audio")).toBe(true);
 });
 
 test("marks live playback sessions for the MSE engine", () => {
   const live = { ...stream, isLive: true } as VideoStream;
-  const config = resolveSabrPlaybackConfig(live, 137, "en-US.4");
+  const config = withManagedMediaSource(() => resolveSabrPlaybackConfig(live, 137, "en-US.4"));
 
   expect(config?.isLive).toBe(true);
   expect(config?.key).toContain(":live:");
 });
+
+function withManagedMediaSource<T>(work: () => T): T {
+  const scope = globalThis as typeof globalThis & { ManagedMediaSource?: unknown };
+  const original = Object.getOwnPropertyDescriptor(scope, "ManagedMediaSource");
+  const FakeManagedMediaSource = Object.assign(function FakeManagedMediaSource() {}, {
+    isTypeSupported: () => true,
+  });
+  Object.defineProperty(scope, "ManagedMediaSource", {
+    configurable: true,
+    value: FakeManagedMediaSource,
+  });
+  try {
+    return work();
+  } finally {
+    if (original) Object.defineProperty(scope, "ManagedMediaSource", original);
+    else delete scope.ManagedMediaSource;
+  }
+}

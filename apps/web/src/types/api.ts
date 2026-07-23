@@ -122,6 +122,9 @@ export type HomeRecommendationsResponse = {
 export type SubscriptionFeedPage = {
   videos: VideoItem[];
   nextpage: string | null;
+  generation?: number | null;
+  generatedAt?: number | null;
+  refreshing?: boolean;
 };
 
 export type CommentItem = {

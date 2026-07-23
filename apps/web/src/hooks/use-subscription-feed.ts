@@ -1,5 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { ApiError } from "../lib/api";
 import { fetchSubscriptionFeed } from "../lib/api-user";
 import { mapVideoItem } from "../lib/mappers";
 import { proxyImage } from "../lib/proxy";
@@ -20,6 +21,7 @@ type Result = {
 export function useSubscriptionFeed(): Result {
   const { authReady, isAuthed } = useAuth();
   const { query: subsQuery } = useSubscriptions();
+  const queryClient = useQueryClient();
   const avatarMap = useMemo(
     () => new Map((subsQuery.data ?? []).map((s) => [s.channelUrl, proxyImage(s.avatarUrl)])),
     [subsQuery.data],
@@ -27,12 +29,21 @@ export function useSubscriptionFeed(): Result {
 
   const query = useInfiniteQuery({
     queryKey: SUBSCRIPTION_FEED_KEY,
-    queryFn: ({ pageParam }) => fetchSubscriptionFeed(pageParam as number),
-    initialPageParam: 0,
-    getNextPageParam: (last, pages) => (last.nextpage !== null ? pages.length : undefined),
+    queryFn: ({ pageParam, signal }) => fetchSubscriptionFeed(pageParam as string | null, signal),
+    initialPageParam: null as string | null,
+    getNextPageParam: (last) => last.nextpage ?? undefined,
     staleTime: 5 * 60 * 1000,
     enabled: authReady && isAuthed,
   });
+
+  useEffect(() => {
+    if (
+      query.error instanceof ApiError &&
+      query.error.code === "subscription_feed_stale_generation"
+    ) {
+      void queryClient.resetQueries({ queryKey: SUBSCRIPTION_FEED_KEY, exact: true });
+    }
+  }, [query.error, queryClient]);
 
   const streams = useMemo(
     () =>
