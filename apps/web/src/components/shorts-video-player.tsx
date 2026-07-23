@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { isIosDevice } from "../lib/ios-device";
+import { PLAYBACK_RATES } from "../lib/playback-rates";
 import type { MediaSrc } from "../lib/vidstack";
 import {
   DefaultVideoLayout,
@@ -121,6 +122,7 @@ export function ShortsVideoPlayer({
         </MediaProvider>
         <DefaultVideoLayout
           icons={defaultLayoutIcons}
+          playbackRates={PLAYBACK_RATES}
           translations={{ Captions: "Subtitles" }}
           smallLayoutWhen
           noModal

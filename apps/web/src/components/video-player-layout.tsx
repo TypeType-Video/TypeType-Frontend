@@ -1,3 +1,4 @@
+import { PLAYBACK_RATES } from "../lib/playback-rates";
 import { DefaultAudioLayout, DefaultVideoLayout, defaultLayoutIcons, Time } from "../lib/vidstack";
 import { AudioPlayButton } from "./audio-play-button";
 import { AudioSeekButton } from "./audio-seek-button";
@@ -55,6 +56,7 @@ export function VideoPlayerLayout({
         <DefaultVideoLayout
           className="typetype-adaptive-audio-layout"
           icons={defaultLayoutIcons}
+          playbackRates={PLAYBACK_RATES}
           smallLayoutWhen={false}
           translations={{ Captions: "Subtitles" }}
           slots={{
@@ -82,6 +84,7 @@ export function VideoPlayerLayout({
     return (
       <DefaultAudioLayout
         icons={defaultLayoutIcons}
+        playbackRates={PLAYBACK_RATES}
         smallLayoutWhen={false}
         translations={{ Captions: "Subtitles" }}
         slots={{
@@ -102,6 +105,7 @@ export function VideoPlayerLayout({
   return (
     <DefaultVideoLayout
       icons={defaultLayoutIcons}
+      playbackRates={PLAYBACK_RATES}
       thumbnails={thumbnailVtt}
       smallLayoutWhen={false}
       translations={{ Captions: "Subtitles" }}
