@@ -6,16 +6,20 @@ export function getWatchLayoutClasses(cinemaMode: boolean, hasSecondaryContent: 
     ? "pt-2 sm:pt-3 lg:flex-row lg:items-start"
     : "pt-2 sm:pt-3 lg:items-center";
   return {
-    containerClass: `flex flex-col gap-6 ${cinemaMode ? "" : standardLayout} ${anim}`,
+    containerClass: `watch-layout-container flex flex-col gap-6 ${
+      cinemaMode ? "" : standardLayout
+    } ${anim}`,
     playerWrapClass: cinemaMode
-      ? "overflow-hidden bg-black"
-      : `min-w-0 flex flex-col gap-4 ${
+      ? "watch-player-wrap overflow-hidden bg-black"
+      : `watch-player-wrap min-w-0 flex flex-col gap-4 ${
           hasSecondaryContent ? "flex-[2] max-w-[133.333vh]" : "mx-auto w-full max-w-[1600px]"
         }`,
     playerBoxClass: cinemaMode
-      ? "relative mx-auto aspect-video w-[min(100%,calc((100svh-4.5rem)*16/9))]"
-      : "relative overflow-hidden rounded-lg",
-    playerClassName: cinemaMode ? "w-full h-full dark [--video-aspect-ratio:16/9]" : undefined,
+      ? "watch-player-box relative mx-auto aspect-video w-[min(100%,calc((100svh-4.5rem)*16/9))]"
+      : "watch-player-box relative overflow-hidden rounded-lg",
+    playerClassName: cinemaMode
+      ? "watch-player-surface w-full h-full dark [--video-aspect-ratio:16/9]"
+      : "watch-player-surface",
     mediaClassName: cinemaMode ? "object-cover" : undefined,
   };
 }

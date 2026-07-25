@@ -107,7 +107,7 @@ export function VideoPlayerLayout({
       icons={defaultLayoutIcons}
       playbackRates={PLAYBACK_RATES}
       thumbnails={thumbnailVtt}
-      smallLayoutWhen={false}
+      smallLayoutWhen={({ height }) => height < 380}
       translations={{ Captions: "Subtitles" }}
       slots={{
         timeSlider: sabr ? (

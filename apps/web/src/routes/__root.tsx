@@ -47,6 +47,7 @@ function RootLayout() {
   const embedPage = pathname.startsWith("/embed/");
   const framedEmbedPage = embedPage && isEmbeddedFrame();
   const registerStatus = useRegisterStatus(status !== "loading" && !framedEmbedPage);
+  const watchPage = pathname === "/watch";
   const watchCinemaPage = pathname === "/watch" && cinemaMode;
   const wasWatchCinemaPage = useRef(watchCinemaPage);
   useSessionActivityReporting(!framedEmbedPage);
@@ -160,27 +161,35 @@ function RootLayout() {
     );
   }
 
-  const topPadding = { paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" };
+  const topPadding = watchPage
+    ? undefined
+    : { paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" };
   const showTabBar = isMobile && !shortsPage && !watchCinemaPage && !embedPage;
   const mainBottomPad = showTabBar
     ? "pb-[calc(env(safe-area-inset-bottom)+4.5rem)]"
     : "pb-5 sm:pb-6";
   const mainClasses = watchCinemaPage
-    ? "transition-all duration-200 ml-0"
-    : `px-3 sm:px-4 ${mainBottomPad} transition-all duration-200 ${
+    ? "watch-page-main transition-all duration-200 ml-0"
+    : `watch-page-main px-3 sm:px-4 ${mainBottomPad} transition-all duration-200 ${
         isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
       }`;
 
   return (
-    <div className="min-h-screen bg-app text-fg">
-      <Navbar />
+    <div className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell" : ""}`}>
+      <div className="watch-page-chrome">
+        <Navbar />
+      </div>
       <PlaybackTransitionNotice />
       {watchCinemaPage ? !isMobile && <Sidebar overlay /> : <Sidebar />}
       <main className={mainClasses} style={topPadding}>
         <Outlet />
         <AppFooter />
       </main>
-      {showTabBar && <MobileTabBar />}
+      {showTabBar && (
+        <div className="watch-page-chrome">
+          <MobileTabBar />
+        </div>
+      )}
     </div>
   );
 }
