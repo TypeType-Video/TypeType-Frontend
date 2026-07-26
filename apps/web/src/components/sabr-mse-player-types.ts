@@ -1,7 +1,9 @@
+import type { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 
 export type SabrMsePlayerProps = {
   config: SabrPlaybackConfig;
+  playbackRatePreference?: SabrPlaybackRatePreference;
   video: HTMLVideoElement | null;
   startTime: number;
   autoplay: boolean;

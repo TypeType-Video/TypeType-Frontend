@@ -1,4 +1,5 @@
-import type { MutableRefObject, ReactNode } from "react";
+import { type MutableRefObject, type ReactNode, useRef } from "react";
+import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem, SubtitleItem } from "../types/api";
@@ -46,6 +47,7 @@ type Props = {
 
 export function WatchStagePlayer(props: Props) {
   const settings = props.settings;
+  const playbackRatePreference = useRef(new SabrPlaybackRatePreference());
   return (
     <WatchPlayerCrossfade
       audioOnly={props.audioOnly}
@@ -56,6 +58,7 @@ export function WatchStagePlayer(props: Props) {
         key={props.playerKey}
         src={props.manifestSrc}
         sabrConfig={props.sabrConfig}
+        sabrPlaybackRatePreference={playbackRatePreference.current}
         audioOnly={props.audioOnly}
         title={props.streamTitle}
         poster={props.poster}

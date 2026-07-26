@@ -5,6 +5,7 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
+import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
 import { registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
@@ -13,6 +14,7 @@ import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
 
 export function SabrMsePlayer({
   config,
+  playbackRatePreference,
   video,
   startTime,
   autoplay,
@@ -36,6 +38,9 @@ export function SabrMsePlayer({
   const autoplayConfirmedRef = useRef(false);
   const seekingRef = useRef(false);
   const errorReportedRef = useRef(false);
+  const attachedVideoRef = useRef(false);
+  const fallbackPlaybackRateRef = useRef(new SabrPlaybackRatePreference());
+  const playbackRate = playbackRatePreference ?? fallbackPlaybackRateRef.current;
   const [engineReady, setEngineReady] = useState(false);
   const latestConfig = useLatestValue(config);
   const latestStartTime = useLatestValue(startTime);
@@ -77,6 +82,8 @@ export function SabrMsePlayer({
   useEffect(() => {
     if (!video) return;
     errorReportedRef.current = false;
+    const replacingVideo = attachedVideoRef.current;
+    attachedVideoRef.current = true;
     const initialConfig = latestConfig();
     const engine = new TypeTypeMsePlayer(video, {
       endpoint: toAbsoluteApiUrl(""),
@@ -102,7 +109,22 @@ export function SabrMsePlayer({
       if (engine.isApplyingTransientMediaState()) return;
       latestHandlers().onVolumeChange?.(video.volume, video.muted);
     };
+    let playbackRateSettled = false;
+    const playbackRateChange = () => {
+      playbackRate.capture(video, !playbackRateSettled || engine.isApplyingTransientMediaState());
+    };
+    const settlePlaybackRate = () => {
+      if (engine.isApplyingTransientMediaState()) return;
+      playbackRate.apply(video, false);
+      playbackRateSettled = true;
+    };
+    const playEngine = () =>
+      engine.play().then(() => {
+        settlePlaybackRate();
+      });
+    playbackRate.initialize(video);
     video.addEventListener("volumechange", volumeChange);
+    video.addEventListener("ratechange", playbackRateChange);
     let autoplayStartTime = 0;
     let engineLoaded = false;
     const startAutoplay = () => {
@@ -118,7 +140,7 @@ export function SabrMsePlayer({
       if (!latestHandlers().autoplay && !pendingPlayRef.current) return;
       autoplayStartTime = video.currentTime;
       autoplayStartedRef.current = true;
-      void engine.play().catch(() => {
+      void playEngine().catch(() => {
         autoplayStartedRef.current = false;
       });
     };
@@ -128,7 +150,7 @@ export function SabrMsePlayer({
       play: () => {
         pendingPlayRef.current = true;
         video.autoplay = true;
-        return engine.play();
+        return playEngine();
       },
       pause: (userInitiated = false) => {
         if (!userInitiated && pendingPlayRef.current && !autoplayConfirmedRef.current) return;
@@ -148,6 +170,7 @@ export function SabrMsePlayer({
       .then(() => {
         engineLoaded = true;
         setEngineReady(true);
+        if (!replacingVideo) settlePlaybackRate();
         startAutoplay();
       })
       .catch((error: unknown) => {
@@ -162,6 +185,7 @@ export function SabrMsePlayer({
       offError();
       unregisterControls();
       video.removeEventListener("volumechange", volumeChange);
+      video.removeEventListener("ratechange", playbackRateChange);
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);
       engine.destroy();
@@ -176,6 +200,14 @@ export function SabrMsePlayer({
       video.autoplay = false;
       latestHandlers().onPositionReaderChange(null);
     };
-  }, [config.videoId, latestConfig, latestHandlers, latestStartTime, reportError, video]);
+  }, [
+    config.videoId,
+    latestConfig,
+    latestHandlers,
+    latestStartTime,
+    playbackRate,
+    reportError,
+    video,
+  ]);
   return null;
 }
