@@ -143,7 +143,10 @@ export function usePlayerError(
     setRetryKey((k) => k + 1);
   }, []);
 
-  const clearFailed = useCallback(() => setPlayerFailed(false), []);
+  const clearFailed = useCallback(() => {
+    setPlayerFailed(false);
+    resetAutomaticSabrRecovery(sabrRecoveryRef);
+  }, []);
   useEffect(() => {
     if (playbackSourceId.length === 0) return;
     setHlsFailed(false);
