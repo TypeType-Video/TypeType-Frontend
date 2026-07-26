@@ -88,13 +88,8 @@ function HistoryPage() {
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex-1 min-w-0">
         <div className="grid grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((item: HistoryItem, index: number) => (
-            <HistoryCard
-              key={item.id}
-              item={item}
-              index={index}
-              onRemove={() => setPendingRemoveItem(item)}
-            />
+          {filtered.map((item: HistoryItem) => (
+            <HistoryCard key={item.id} item={item} onRemove={() => setPendingRemoveItem(item)} />
           ))}
         </div>
         <ScrollSentinel

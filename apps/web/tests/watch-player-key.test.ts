@@ -36,4 +36,19 @@ describe("buildWatchPlayerKey", () => {
       }),
     ).toBe(buildWatchPlayerKey(base));
   });
+
+  test("ignores the unused classic manifest identity for sabr", () => {
+    const base = {
+      streamId: "video",
+      retryKey: 0,
+      sourceKey: "sabr:manifest-a",
+      highQuality: true,
+      hasThumbnails: true,
+      hasChapters: true,
+    };
+
+    expect(buildWatchPlayerKey({ ...base, sourceKey: "sabr:manifest-b" })).toBe(
+      buildWatchPlayerKey(base),
+    );
+  });
 });

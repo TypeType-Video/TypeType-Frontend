@@ -27,6 +27,7 @@ patchVidstackProviderLoaders();
 export function VideoPlayer({
   src,
   sabrConfig,
+  sabrPlaybackRatePreference,
   title,
   poster,
   streamType = "on-demand",
@@ -97,7 +98,7 @@ export function VideoPlayer({
       title={title}
       poster={poster}
       onProviderChange={sabrState.handleProviderChange}
-      onError={handleError}
+      onError={sabrConfig ? undefined : handleError}
       aria-busy={sabrState.seeking}
       data-sabr-seeking={sabrState.seeking ? "true" : undefined}
     >
@@ -111,6 +112,7 @@ export function VideoPlayer({
       {sabrConfig && (
         <SabrMsePlayer
           config={sabrConfig}
+          playbackRatePreference={sabrPlaybackRatePreference}
           video={sabrState.video}
           startTime={startTime}
           autoplay={autoplay}

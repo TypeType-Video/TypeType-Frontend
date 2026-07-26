@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { formatDuration } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
@@ -10,28 +11,7 @@ import { HistoryChannelAvatar } from "./history-channel-avatar";
 import { VideoProgressBar } from "./video-progress-bar";
 import { WatchedBadge } from "./watched-badge";
 
-function XIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={12}
-      height={12}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="img"
-      aria-label="Remove"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
-
-type HistoryCardProps = { item: HistoryItem; onRemove: () => void; index: number };
+type HistoryCardProps = { item: HistoryItem; onRemove: () => void };
 
 function formatWatchedAt(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
@@ -43,8 +23,7 @@ function formatWatchedAt(timestamp: number): string {
   });
 }
 
-export function HistoryCard({ item, onRemove, index }: HistoryCardProps) {
-  const delay = Math.min(index * 45, 270);
+export function HistoryCard({ item, onRemove }: HistoryCardProps) {
   const watched = isVideoWatched(item.progress, item.duration);
   const branding = useDeArrowBranding(
     item.url,
@@ -54,44 +33,39 @@ export function HistoryCard({ item, onRemove, index }: HistoryCardProps) {
   );
 
   return (
-    <div
-      className="group relative grid animate-card-pop-in grid-cols-[8.75rem_minmax(0,1fr)] gap-3 rounded-2xl border border-border bg-surface/45 p-2.5 sm:flex sm:flex-col sm:gap-2 sm:border-0 sm:bg-transparent sm:p-0"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <Link to="/watch" search={watchRouteSearch(item.url)} className="block min-w-0 sm:w-full">
-        <div className="relative aspect-video overflow-hidden rounded-xl bg-surface-strong sm:rounded-lg">
-          <img
-            src={branding.thumbnail}
-            alt={branding.title}
-            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-            loading="lazy"
-            decoding="async"
-          />
-          {item.duration > 0 && (
-            <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs px-1 rounded">
-              {formatDuration(item.duration)}
-            </span>
-          )}
-          {watched && (
-            <span className="absolute top-2 left-2">
-              <WatchedBadge />
-            </span>
-          )}
-          <VideoProgressBar progress={item.progress} duration={item.duration} alwaysVisible />
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onRemove();
-            }}
-            aria-label="Remove from history"
-            className="absolute top-1.5 right-1.5 rounded-full bg-black/70 p-1.5 text-white opacity-100 transition-opacity hover:bg-black/90 sm:p-1 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
-          >
-            <XIcon />
-          </button>
-        </div>
-      </Link>
+    <div className="group relative grid grid-cols-[8.75rem_minmax(0,1fr)] gap-3 rounded-2xl border border-border bg-surface/45 p-2.5 sm:flex sm:flex-col sm:gap-2 sm:border-0 sm:bg-transparent sm:p-0">
+      <div className="relative min-w-0 sm:w-full">
+        <Link to="/watch" search={watchRouteSearch(item.url)} className="block">
+          <div className="relative aspect-video overflow-hidden rounded-xl bg-surface-strong sm:rounded-lg">
+            <img
+              src={branding.thumbnail}
+              alt={branding.title}
+              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+            {item.duration > 0 && (
+              <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs px-1 rounded">
+                {formatDuration(item.duration)}
+              </span>
+            )}
+            {watched && (
+              <span className="absolute top-2 left-2">
+                <WatchedBadge />
+              </span>
+            )}
+            <VideoProgressBar progress={item.progress} duration={item.duration} alwaysVisible />
+          </div>
+        </Link>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Remove from history"
+          className="absolute top-1.5 right-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-black/75 text-white opacity-100 shadow-sm transition-colors hover:bg-black/90 sm:h-7 sm:w-7 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+        >
+          <X className="h-4 w-4 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+        </button>
+      </div>
       <div className="flex min-w-0 gap-2 py-0.5 sm:flex-none sm:py-0">
         {item.channelUrl ? (
           <ChannelRouteLink url={item.channelUrl} className="mt-0.5 hidden flex-shrink-0 sm:block">

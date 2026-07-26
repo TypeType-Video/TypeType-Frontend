@@ -16,6 +16,15 @@ test("allows one automatic SABR recovery until reset", () => {
   expect(claimAutomaticSabrRecovery(recoveryRef)).toBe(true);
 });
 
+test("allows a later recovery after successful playback resets the episode", () => {
+  const recoveryRef = { current: false };
+
+  expect(claimAutomaticSabrRecovery(recoveryRef)).toBe(true);
+  resetAutomaticSabrRecovery(recoveryRef);
+  expect(claimAutomaticSabrRecovery(recoveryRef)).toBe(true);
+  expect(claimAutomaticSabrRecovery(recoveryRef)).toBe(false);
+});
+
 test("prefers the captured SABR position during player recovery", () => {
   expect(playerErrorResumePosition(0, 1_795_023, 1_892_543)).toBe(1_795_023);
   expect(playerErrorResumePosition(420_000, undefined, 1_892_543)).toBe(420_000);
