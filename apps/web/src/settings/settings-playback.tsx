@@ -1,6 +1,5 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useSettings } from "../hooks/use-settings";
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
@@ -73,8 +72,6 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
 
 export function SettingsPlayback() {
   const { settings, update } = useSettings();
-  const { playbackMode, setMode } = usePlaybackMode();
-  const sabrEnabled = playbackMode === "sabr";
   const autoplayCountdownSeconds = Math.min(
     60,
     Math.max(0, Math.round(settings.autoplayCountdownSeconds)),
@@ -124,12 +121,6 @@ export function SettingsPlayback() {
             onChange={(q) => update.mutate({ defaultQuality: q })}
           />
         </div>
-        <PlaybackToggleRow
-          title="SABR playback"
-          description="Recommended for YouTube as classic DASH and HLS extraction becomes less reliable"
-          checked={sabrEnabled}
-          onClick={() => setMode(sabrEnabled ? "legacy" : "sabr")}
-        />
       </div>
     </section>
   );

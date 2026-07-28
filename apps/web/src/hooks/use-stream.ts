@@ -6,27 +6,20 @@ import {
   isMemberOnlyApiError as isMemberOnlyApiResponse,
   MEMBER_ONLY_MESSAGE,
 } from "../lib/member-only";
-import { type PlaybackMode, readPlaybackMode } from "../lib/playback-mode";
 import {
   sabrBootstrapEndpoint,
   sabrBootstrapQueryKey,
   streamQueryKey,
 } from "../lib/stream-request";
 
-export function streamQueryOptions(
-  url: string,
-  useAuthenticatedStream = false,
-  enabled = true,
-  playbackMode: PlaybackMode = readPlaybackMode(),
-) {
+export function streamQueryOptions(url: string, useAuthenticatedStream = false, enabled = true) {
   return queryOptions({
-    queryKey: streamQueryKey(url, useAuthenticatedStream, playbackMode),
+    queryKey: streamQueryKey(url, useAuthenticatedStream),
     queryFn: ({ signal }) =>
       fetchStream(
         url,
         useAuthenticatedStream ? "authenticated_first" : "anonymous_first",
         signal,
-        playbackMode,
       ).then((r) => mapStreamResponse(r, url)),
     enabled: enabled && url.startsWith("http"),
     staleTime: 3 * 60 * 1000,
@@ -61,24 +54,14 @@ export function isMemberOnlyApiError(error: unknown): boolean {
   return isMemberOnlyApiResponse(error);
 }
 
-export function useStream(
-  url: string,
-  useAuthenticatedStream = false,
-  enabled = true,
-  playbackMode: PlaybackMode = readPlaybackMode(),
-) {
+export function useStream(url: string, useAuthenticatedStream = false, enabled = true) {
   return useQuery({
-    ...streamQueryOptions(url, useAuthenticatedStream, enabled, playbackMode),
+    ...streamQueryOptions(url, useAuthenticatedStream, enabled),
     placeholderData: keepPreviousData,
   });
 }
 
-export function useSabrBootstrap(
-  url: string,
-  useAuthenticatedStream = false,
-  enabled = true,
-  playbackMode: PlaybackMode = readPlaybackMode(),
-) {
+export function useSabrBootstrap(url: string, useAuthenticatedStream = false, enabled = true) {
   return useQuery({
     queryKey: sabrBootstrapQueryKey(url, useAuthenticatedStream),
     queryFn: ({ signal }) =>
@@ -87,8 +70,7 @@ export function useSabrBootstrap(
         useAuthenticatedStream ? "authenticated_first" : "anonymous_first",
         signal,
       ).then((response) => mapStreamResponse(response, url)),
-    enabled:
-      enabled && playbackMode === "sabr" && url.startsWith("http") && !!sabrBootstrapEndpoint(url),
+    enabled: enabled && url.startsWith("http") && !!sabrBootstrapEndpoint(url),
     staleTime: 3 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     retry: (count, error) => {

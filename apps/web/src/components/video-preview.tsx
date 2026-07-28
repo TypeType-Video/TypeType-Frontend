@@ -100,6 +100,6 @@ async function loadHls(video: HTMLVideoElement, url: string): Promise<Hls | null
 
 function supportsNativeHls(video: HTMLVideoElement): boolean {
   const appleType = video.canPlayType("application/vnd.apple.mpegurl");
-  const legacyType = video.canPlayType("application/x-mpegURL");
-  return appleType !== "" || legacyType !== "";
+  const hlsType = video.canPlayType("application/x-mpegURL");
+  return appleType !== "" || hlsType !== "";
 }

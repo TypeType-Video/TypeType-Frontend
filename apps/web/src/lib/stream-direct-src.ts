@@ -3,10 +3,10 @@ import { buildDashManifest } from "./dash-manifest";
 import { API_BASE as BASE } from "./env";
 import { pickCompactAudioTracks } from "./stream-audio-compact";
 import { pickCompatibleProgressiveSrc } from "./stream-compatibility";
-import { legacyAudioStreams, legacyVideoOnlyStreams } from "./stream-delivery";
+import { directAudioStreams, directVideoOnlyStreams } from "./stream-delivery";
 import type { MediaSrc } from "./vidstack";
 
-export function resolveLegacyFallbackSrc(
+export function resolveDirectSrc(
   stream: VideoStream,
   maxHeight: number | undefined,
   compactAudioTracks: boolean,
@@ -14,14 +14,14 @@ export function resolveLegacyFallbackSrc(
   maxCompactAudioTracks: number,
   allowServerManifests: boolean,
 ): MediaSrc {
-  const legacyVideos = legacyVideoOnlyStreams(stream);
-  const legacyAudios = legacyAudioStreams(stream);
+  const directVideos = directVideoOnlyStreams(stream);
+  const directAudios = directAudioStreams(stream);
   const audioStreams = compactAudioTracks
-    ? pickCompactAudioTracks(legacyAudios, preferredAudioLanguage, maxCompactAudioTracks)
-    : legacyAudios;
+    ? pickCompactAudioTracks(directAudios, preferredAudioLanguage, maxCompactAudioTracks)
+    : directAudios;
 
-  if (legacyVideos.length && audioStreams.length) {
-    const built = buildDashManifest(legacyVideos, audioStreams, stream.duration, maxHeight);
+  if (directVideos.length && audioStreams.length) {
+    const built = buildDashManifest(directVideos, audioStreams, stream.duration, maxHeight);
     if (built) return { src: built, type: "application/dash+xml" };
   }
   if (!allowServerManifests) {

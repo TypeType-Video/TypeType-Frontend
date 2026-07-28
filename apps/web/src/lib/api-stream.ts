@@ -3,7 +3,6 @@ import type { StreamResponse } from "../types/api";
 import { ApiError, request } from "./api";
 import { recordClientEvent } from "./client-debug-log";
 import { sanitizeVideoContext } from "./debug-sanitize";
-import { type PlaybackMode, readPlaybackMode } from "./playback-mode";
 import { sabrBootstrapEndpoint, streamEndpoint } from "./stream-request";
 
 type StreamFetchMode = "anonymous_first" | "authenticated_first";
@@ -21,9 +20,8 @@ export async function fetchStream(
   url: string,
   mode: StreamFetchMode = "anonymous_first",
   signal?: AbortSignal,
-  playbackMode: PlaybackMode = readPlaybackMode(),
 ): Promise<StreamResponse> {
-  const endpoint = streamEndpoint(url, playbackMode);
+  const endpoint = streamEndpoint(url);
   return fetchStreamEndpoint(url, endpoint, mode, signal);
 }
 

@@ -1,13 +1,13 @@
 import type { VideoStream } from "../types/stream";
 import { proxyDashManifest } from "./proxy";
-import { hasPlayableLegacyUrl } from "./stream-delivery";
+import { hasPlayableDirectUrl } from "./stream-delivery";
 import type { MediaSrc } from "./vidstack";
 
 export function pickCompatibleProgressiveSrc(stream: VideoStream): MediaSrc | null {
   const progressive = [...(stream.videoStreams ?? [])]
     .filter(
       (candidate) =>
-        hasPlayableLegacyUrl(candidate) &&
+        hasPlayableDirectUrl(candidate) &&
         typeof candidate.codec === "string" &&
         candidate.codec.includes("avc1") &&
         candidate.codec.includes("mp4a") &&
@@ -27,14 +27,14 @@ export function hasCompatibleMp4(stream: VideoStream): boolean {
   const audios = stream.audioStreams ?? [];
   const hasMp4Video = videos.some(
     (video) =>
-      hasPlayableLegacyUrl(video) &&
+      hasPlayableDirectUrl(video) &&
       typeof video.codec === "string" &&
       video.codec.startsWith("avc1") &&
       (video.mimeType?.includes("video/mp4") ?? true),
   );
   const hasMp4Audio = audios.some(
     (audio) =>
-      hasPlayableLegacyUrl(audio) &&
+      hasPlayableDirectUrl(audio) &&
       typeof audio.codec === "string" &&
       (audio.codec.startsWith("mp4a") || audio.codec === "mp4a") &&
       (audio.mimeType?.includes("audio/mp4") ?? true),

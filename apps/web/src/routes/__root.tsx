@@ -5,7 +5,6 @@ import { AuthBackdrop } from "../components/auth-backdrop";
 import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
-import { PlaybackTransitionNotice } from "../components/playback-transition-notice";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -144,7 +143,6 @@ function RootLayout() {
     return (
       <div className="min-h-screen bg-app text-fg">
         <Navbar />
-        <PlaybackTransitionNotice />
         <Sidebar />
         <main style={{ paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" }}>
           <Outlet />
@@ -179,7 +177,6 @@ function RootLayout() {
       <div className="watch-page-chrome">
         <Navbar />
       </div>
-      <PlaybackTransitionNotice />
       {watchCinemaPage ? !isMobile && <Sidebar overlay /> : <Sidebar />}
       <main className={mainClasses} style={topPadding}>
         <Outlet />

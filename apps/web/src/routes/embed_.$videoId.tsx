@@ -5,14 +5,12 @@ import { EmbedLoading } from "../components/embed-loading";
 import { EmbedPlayerShell } from "../components/embed-player-shell";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
-import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useSettings } from "../hooks/use-settings";
 import { isStreamUnavailableError, useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
-import { resolveEmbedPlaybackMode } from "../lib/embed-playback";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
@@ -59,28 +57,16 @@ function EmbedPage() {
     isGuest,
     settingsReady,
   });
-  const { playbackMode: storedPlaybackMode } = usePlaybackMode();
-  const playbackMode = resolveEmbedPlaybackMode(framed, storedPlaybackMode);
   const useAuthenticatedStream =
     access.sessionEnabled &&
     (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
-  const streamQuery = useStream(
-    sourceUrl,
-    useAuthenticatedStream,
-    access.streamEnabled,
-    playbackMode,
-  );
-  const bootstrap = useSabrBootstrap(
-    sourceUrl,
-    useAuthenticatedStream,
-    access.streamEnabled,
-    playbackMode,
-  );
+  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, access.streamEnabled);
+  const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, access.streamEnabled);
   const publicParam = toPublicWatchParam(sourceUrl);
   const availabilityPoster = proxyImage(youtubeThumbnailUrl(publicParam) ?? "");
   const activeStream = selectProgressiveWatchStream(
     streamQuery.isPlaceholderData ? undefined : streamQuery.data,
-    playbackMode === "sabr" ? bootstrap.data : undefined,
+    bootstrap.data,
     publicParam,
     [],
   );
@@ -158,7 +144,6 @@ function EmbedPage() {
       startTime={startTime}
       autoplay={shouldAutoplay}
       sessionEnabled={access.sessionEnabled}
-      playbackMode={playbackMode}
     />
   );
 }

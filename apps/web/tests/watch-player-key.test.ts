@@ -37,7 +37,7 @@ describe("buildWatchPlayerKey", () => {
     ).toBe(buildWatchPlayerKey(base));
   });
 
-  test("ignores the unused classic manifest identity for sabr", () => {
+  test("ignores the unused direct manifest identity for sabr", () => {
     const base = {
       streamId: "video",
       retryKey: 0,
