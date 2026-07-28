@@ -50,7 +50,7 @@ export function VideoPlayerLayout({
     const forwardButton = (
       <AudioSeekButton direction="forward" disabled={seeking} video={sabrVideo} />
     );
-    const timeSlider = <AudioTimeSlider disabled={seeking} video={sabrVideo} />;
+    const timeSlider = <AudioTimeSlider seeking={seeking} video={sabrVideo} />;
     if (audioUsesVideoProvider) {
       return (
         <DefaultVideoLayout
@@ -111,7 +111,7 @@ export function VideoPlayerLayout({
       translations={{ Captions: "Subtitles" }}
       slots={{
         timeSlider: sabr ? (
-          <SabrTimeSlider disabled={seeking} thumbnails={thumbnailVtt} video={sabrVideo} />
+          <SabrTimeSlider seeking={seeking} thumbnails={thumbnailVtt} video={sabrVideo} />
         ) : undefined,
         settingsMenuItemsStart: (
           <>

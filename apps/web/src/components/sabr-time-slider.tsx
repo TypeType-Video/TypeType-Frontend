@@ -4,16 +4,16 @@ import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { TimeSlider } from "../lib/vidstack";
 
 type Props = {
-  disabled?: boolean;
+  seeking?: boolean;
   thumbnails?: string;
   video: HTMLVideoElement | null;
 };
 
-export function SabrTimeSlider({ disabled = false, thumbnails, video }: Props) {
+export function SabrTimeSlider({ seeking = false, thumbnails, video }: Props) {
   const [seekTarget, setSeekTarget] = useState<number | null>(null);
   useEffect(() => {
-    if (!disabled) setSeekTarget(null);
-  }, [disabled]);
+    if (!seeking) setSeekTarget(null);
+  }, [seeking]);
   const style = seekTarget === null ? undefined : { "--typetype-seek-target": `${seekTarget}%` };
 
   return (
@@ -21,13 +21,12 @@ export function SabrTimeSlider({ disabled = false, thumbnails, video }: Props) {
       className="vds-time-slider vds-slider"
       style={style}
       aria-label="Seek"
-      aria-busy={disabled}
-      data-seeking={disabled ? "true" : undefined}
-      disabled={disabled}
+      aria-busy={seeking}
+      data-seeking={seeking ? "true" : undefined}
       onDragEnd={(percent) => {
         setSeekTarget(percent);
         const seconds = video ? secondsFromMediaSliderPercent(video, percent) : null;
-        if (video && !disabled && seconds !== null) requestSabrSeek(video, seconds);
+        if (video && seconds !== null) requestSabrSeek(video, seconds);
       }}
     >
       <TimeSlider.Track className="vds-slider-track" />
