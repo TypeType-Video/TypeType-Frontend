@@ -14,7 +14,7 @@ type Props = {
 export function SettingsNav({ items, active, onSelect }: Props) {
   return (
     <nav className="overflow-x-auto" aria-label="Settings sections">
-      <div className="flex min-w-max gap-3 sm:grid sm:min-w-0 sm:grid-cols-8 sm:gap-1">
+      <div className="flex min-w-max gap-3 sm:grid sm:min-w-0 sm:auto-cols-fr sm:grid-flow-col sm:gap-1">
         {items.map((item) => {
           const isActive = item.key === active;
           return (

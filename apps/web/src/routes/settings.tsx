@@ -8,6 +8,7 @@ import {
   rememberSettingsSection,
   type SettingsSection,
 } from "../lib/settings-section";
+import { SettingsAbout } from "../settings/settings-about";
 import { SettingsBlocked } from "../settings/settings-blocked";
 import { SettingsLandingPage } from "../settings/settings-landing-page";
 import { SettingsLanguage } from "../settings/settings-language";
@@ -30,6 +31,7 @@ const BASE_ITEMS: Item[] = [
   { key: "import", label: "Import" },
   { key: "privacy", label: "Privacy" },
   { key: "blocked", label: "Blocked" },
+  { key: "about", label: "About" },
 ];
 
 function settingsItems(showLanguage: boolean): Item[] {
@@ -96,6 +98,7 @@ function SettingsPage() {
       {activeSection === "import" && <SettingsImport />}
       {activeSection === "privacy" && <SettingsPrivacy />}
       {activeSection === "blocked" && <SettingsBlocked />}
+      {activeSection === "about" && <SettingsAbout />}
     </div>
   );
 }

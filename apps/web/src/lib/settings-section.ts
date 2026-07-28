@@ -6,7 +6,8 @@ export type SettingsSection =
   | "service"
   | "import"
   | "privacy"
-  | "blocked";
+  | "blocked"
+  | "about";
 
 const SETTINGS_SECTION_KEY = "typetype-settings-section";
 
@@ -19,7 +20,8 @@ export function isSettingsSection(value: unknown): value is SettingsSection {
     value === "service" ||
     value === "import" ||
     value === "privacy" ||
-    value === "blocked"
+    value === "blocked" ||
+    value === "about"
   );
 }
 
