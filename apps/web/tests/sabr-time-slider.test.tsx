@@ -1,9 +1,10 @@
 import { expect, mock, test } from "bun:test";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerSabrVidstackControls } from "../src/lib/sabr-vidstack-bridge";
 
 let sliderProps: Record<string, unknown> = {};
-const requestSabrSeek = mock(() => true);
+const sabrSeek = mock(() => undefined);
 const remoteSeek = mock(() => undefined);
 
 const Root = ({ children, ...props }: { children?: ReactNode } & Record<string, unknown>) => {
@@ -12,7 +13,6 @@ const Root = ({ children, ...props }: { children?: ReactNode } & Record<string, 
 };
 const Slot = ({ children }: { children?: ReactNode }) => <>{children}</>;
 
-mock.module("../src/lib/sabr-vidstack-bridge", () => ({ requestSabrSeek }));
 mock.module("../src/lib/vidstack", () => ({
   TimeSlider: {
     Root,
@@ -44,7 +44,12 @@ const video = {
 } as HTMLVideoElement;
 
 test("keeps the video SABR slider interactive while a seek is pending", () => {
-  requestSabrSeek.mockClear();
+  sabrSeek.mockClear();
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: sabrSeek,
+  });
   renderToStaticMarkup(<SabrTimeSlider seeking video={video} />);
 
   expect(sliderProps.disabled).toBeUndefined();
@@ -54,11 +59,17 @@ test("keeps the video SABR slider interactive while a seek is pending", () => {
   const onDragEnd = sliderProps.onDragEnd as (percent: number) => void;
   onDragEnd(80);
 
-  expect(requestSabrSeek).toHaveBeenCalledWith(video, 480);
+  expect(sabrSeek).toHaveBeenCalledWith(480);
+  unregister();
 });
 
 test("keeps the audio SABR slider interactive while a seek is pending", () => {
-  requestSabrSeek.mockClear();
+  sabrSeek.mockClear();
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: sabrSeek,
+  });
   renderToStaticMarkup(<AudioTimeSlider seeking video={video} />);
 
   expect(sliderProps.disabled).toBeUndefined();
@@ -68,6 +79,7 @@ test("keeps the audio SABR slider interactive while a seek is pending", () => {
   const onDragEnd = sliderProps.onDragEnd as (percent: number) => void;
   onDragEnd(20);
 
-  expect(requestSabrSeek).toHaveBeenCalledWith(video, 120);
+  expect(sabrSeek).toHaveBeenCalledWith(120);
   expect(remoteSeek).not.toHaveBeenCalled();
+  unregister();
 });
