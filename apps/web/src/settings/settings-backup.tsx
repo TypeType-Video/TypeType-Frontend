@@ -48,10 +48,10 @@ export function SettingsBackup() {
   });
   const importBackup = useMutation({
     mutationFn: restoreTypeType,
-    onSuccess: async (summary) => {
-      await queryClient.invalidateQueries();
+    onSuccess: (summary) => {
       const count = Object.values(summary.restored).reduce((total, value) => total + value, 0);
       setToast(`Backup restored: ${count} items`);
+      void queryClient.invalidateQueries();
     },
     onError: (error) => setToast(message(error, "Restore failed")),
   });
