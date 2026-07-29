@@ -124,7 +124,7 @@ export function SettingsBlocked() {
               disabled={!keyword.trim() || addKeyword.isPending}
               aria-label="Add blocked keyword"
               title="Add blocked keyword"
-              className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-fg text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-fg text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Plus size={16} />
             </button>

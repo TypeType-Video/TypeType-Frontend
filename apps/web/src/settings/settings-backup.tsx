@@ -96,7 +96,7 @@ export function SettingsBackup() {
               type="button"
               disabled={categories.length === 0 || exportBackup.isPending}
               onClick={() => exportBackup.mutate()}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Download size={15} />
               Export selected

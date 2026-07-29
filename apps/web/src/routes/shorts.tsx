@@ -56,7 +56,7 @@ function ShortsPage() {
           <button
             type="button"
             onClick={() => goto("/settings")}
-            className="mt-1 h-9 rounded-lg bg-fg px-4 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+            className="mt-1 h-9 rounded-lg bg-fg px-4 text-sm font-medium text-app transition-opacity hover:opacity-90"
           >
             Open settings
           </button>
