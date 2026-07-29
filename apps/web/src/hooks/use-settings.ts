@@ -16,6 +16,7 @@ const DEFAULTS: SettingsItem = {
   defaultService: 0,
   defaultLandingPage: "home",
   defaultQuality: "1080p",
+  defaultPlaybackSpeed: 1,
   autoplay: true,
   autoplayCountdownSeconds: 10,
   skipPlaylistAutoplayScreen: false,

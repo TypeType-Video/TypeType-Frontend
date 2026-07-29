@@ -105,6 +105,7 @@ export type SettingsItem = {
   defaultService: ServiceId;
   defaultLandingPage: string;
   defaultQuality: string;
+  defaultPlaybackSpeed: number;
   autoplay: boolean;
   autoplayCountdownSeconds: number;
   skipPlaylistAutoplayScreen: boolean;
@@ -149,6 +150,12 @@ export type BlockedItem = {
   url: string;
   name?: string;
   thumbnailUrl?: string;
+  blockedAt: number;
+  global?: boolean;
+};
+
+export type BlockedKeywordItem = {
+  keyword: string;
   blockedAt: number;
   global?: boolean;
 };
