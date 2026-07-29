@@ -9,6 +9,18 @@ function video(rate = 1): HTMLVideoElement {
 }
 
 describe("SabrPlaybackRatePreference", () => {
+  test("uses the configured default for the first media element", () => {
+    const preference = new SabrPlaybackRatePreference();
+    preference.setPreferredRate(1.5);
+    const element = video();
+
+    preference.initialize(element);
+    preference.apply(element, false);
+
+    expect(element.defaultPlaybackRate).toBe(1.5);
+    expect(element.playbackRate).toBe(1.5);
+  });
+
   test("restores the user rate after a media element replacement", () => {
     const preference = new SabrPlaybackRatePreference();
     const first = video();
@@ -22,6 +34,19 @@ describe("SabrPlaybackRatePreference", () => {
 
     expect(replacement.defaultPlaybackRate).toBe(4);
     expect(replacement.playbackRate).toBe(4);
+  });
+
+  test("keeps a manual rate ahead of the configured default after replacement", () => {
+    const preference = new SabrPlaybackRatePreference(1.5);
+    const first = video();
+    preference.apply(first, false);
+    first.playbackRate = 2;
+    preference.capture(first, false);
+
+    const replacement = video();
+    preference.apply(replacement, false);
+
+    expect(replacement.playbackRate).toBe(2);
   });
 
   test("ignores transient preroll and provider rate changes", () => {

@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { normalizeDefaultPlaybackSpeed } from "../lib/playback-speed";
+import type { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import {
   useAudioOptions,
   useMediaPlayer,
@@ -11,6 +13,7 @@ const QUALITY_OPTIONS = { sort: "descending" } as const;
 
 type PlayerDefaultsProps = {
   defaultQuality?: string;
+  defaultPlaybackSpeed?: number;
   defaultAudioLanguage?: string;
   preferOriginalLanguage?: boolean;
   requireOriginalLanguage?: boolean;
@@ -22,6 +25,11 @@ type PlayerDefaultsProps = {
   defaultSubtitleLanguage?: string;
 };
 
+type PlaybackSpeedDefaultProps = {
+  defaultPlaybackSpeed: number;
+  preference?: SabrPlaybackRatePreference;
+};
+
 function qualityLabelHeight(label: string): number | null {
   const match = label.match(/(\d+)/);
   if (!match) return null;
@@ -31,6 +39,7 @@ function qualityLabelHeight(label: string): number | null {
 
 export function PlayerDefaults({
   defaultQuality,
+  defaultPlaybackSpeed,
   defaultAudioLanguage,
   preferOriginalLanguage,
   requireOriginalLanguage,
@@ -149,6 +158,32 @@ export function PlayerDefaults({
       break;
     }
   }, [canPlay, textTracks, subtitlesEnabled, defaultSubtitleLanguage]);
+
+  if (defaultPlaybackSpeed === undefined) return null;
+  return <PlayerPlaybackSpeedDefault defaultPlaybackSpeed={defaultPlaybackSpeed} />;
+}
+
+export function PlayerPlaybackSpeedDefault({
+  defaultPlaybackSpeed,
+  preference,
+}: PlaybackSpeedDefaultProps) {
+  const canPlay = useMediaState("canPlay");
+  const player = useMediaPlayer();
+  const applied = useRef(false);
+
+  useEffect(() => {
+    if (!canPlay || applied.current) return;
+    const media = player?.el?.querySelector<HTMLMediaElement>("video,audio");
+    if (!media) return;
+    if (preference) {
+      preference.apply(media, false);
+    } else {
+      const speed = normalizeDefaultPlaybackSpeed(defaultPlaybackSpeed);
+      media.defaultPlaybackRate = speed;
+      media.playbackRate = speed;
+    }
+    applied.current = true;
+  }, [canPlay, defaultPlaybackSpeed, player, preference]);
 
   return null;
 }

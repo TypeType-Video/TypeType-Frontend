@@ -108,6 +108,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       autoplay={settings.autoplay}
       initialVolume={settings.volume}
       initialMuted={settings.muted}
+      defaultPlaybackSpeed={settings.defaultPlaybackSpeed}
       defaultAudioLanguage={settings.defaultAudioLanguage || undefined}
       preferOriginalLanguage={settings.preferOriginalLanguage}
       originalAudioTrackId={originalAudioTrackId}

@@ -8,19 +8,27 @@ function isValidPlaybackRate(rate: number): boolean {
 export class SabrPlaybackRatePreference {
   private preferredRate: number | null = null;
 
-  initialize(video: HTMLVideoElement): void {
+  constructor(initialRate?: number) {
+    if (initialRate !== undefined) this.setPreferredRate(initialRate);
+  }
+
+  setPreferredRate(rate: number): void {
+    if (isValidPlaybackRate(rate)) this.preferredRate = rate;
+  }
+
+  initialize(video: HTMLMediaElement): void {
     if (this.preferredRate === null && isValidPlaybackRate(video.playbackRate)) {
       this.preferredRate = video.playbackRate;
     }
   }
 
-  capture(video: HTMLVideoElement, transient: boolean): void {
+  capture(video: HTMLMediaElement, transient: boolean): void {
     if (!transient && isValidPlaybackRate(video.playbackRate)) {
       this.preferredRate = video.playbackRate;
     }
   }
 
-  apply(video: HTMLVideoElement, transient: boolean): void {
+  apply(video: HTMLMediaElement, transient: boolean): void {
     if (transient || this.preferredRate === null) return;
     video.defaultPlaybackRate = this.preferredRate;
     video.playbackRate = this.preferredRate;
