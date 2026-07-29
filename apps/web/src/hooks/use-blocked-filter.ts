@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { normalizeBlockedKeyword, titleMatchesBlockedKeyword } from "../lib/blocked-keyword-filter";
 import type { ChannelResultItem } from "../types/api";
 import type { PublicPlaylistInfo } from "../types/playlist";
 import type { VideoStream } from "../types/stream";
@@ -7,7 +8,7 @@ import { useBlocked } from "./use-blocked";
 
 export function useBlockedFilter() {
   const { isAuthed } = useAuth();
-  const { channels, videos } = useBlocked();
+  const { channels, videos, keywords } = useBlocked();
 
   const blockedChannelUrls = useMemo(
     () => new Set((channels.data ?? []).map((item) => item.url)),
@@ -21,14 +22,21 @@ export function useBlockedFilter() {
     () => new Set((channels.data ?? []).map((item) => item.name?.toLowerCase()).filter(Boolean)),
     [channels.data],
   );
+  const blockedKeywords = useMemo(
+    () =>
+      (keywords.data ?? [])
+        .map((item) => normalizeBlockedKeyword(item.keyword))
+        .filter((keyword) => keyword.length > 0),
+    [keywords.data],
+  );
 
   const isBlocked = useCallback(
     (stream: VideoStream): boolean => {
       if (blockedVideoUrls.has(stream.id)) return true;
       if (stream.channelUrl && blockedChannelUrls.has(stream.channelUrl)) return true;
-      return false;
+      return titleMatchesBlockedKeyword(stream.title, blockedKeywords);
     },
-    [blockedChannelUrls, blockedVideoUrls],
+    [blockedChannelUrls, blockedKeywords, blockedVideoUrls],
   );
 
   const filter = useCallback(
@@ -58,6 +66,7 @@ export function useBlockedFilter() {
     isChannelBlocked,
     isPlaylistBlocked,
     blockedChannelUrls,
+    blockedKeywords,
     blockedVideoUrls,
   };
 }

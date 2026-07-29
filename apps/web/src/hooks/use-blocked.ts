@@ -1,15 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   blockChannel,
+  blockKeyword,
   blockVideo,
   fetchBlockedChannels,
+  fetchBlockedKeywords,
   fetchBlockedVideos,
   unblockChannel,
+  unblockKeyword,
   unblockVideo,
 } from "../lib/api-collections";
 import { useAuth } from "./use-auth";
 
 const CHANNELS_KEY = ["blocked-channels"];
+const KEYWORDS_KEY = ["blocked-keywords"];
 const VIDEOS_KEY = ["blocked-videos"];
 
 type BlockChannelArgs = {
@@ -40,6 +44,12 @@ export function useBlocked() {
     enabled: authReady && isAuthed,
     staleTime: 5 * 60 * 1000,
   });
+  const keywords = useQuery({
+    queryKey: KEYWORDS_KEY,
+    queryFn: fetchBlockedKeywords,
+    enabled: authReady && isAuthed,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const addChannel = useMutation({
     mutationFn: ({ url, name, thumbnailUrl, global }: BlockChannelArgs) =>
@@ -63,5 +73,26 @@ export function useBlocked() {
     onSuccess: () => qc.invalidateQueries({ queryKey: VIDEOS_KEY }),
   });
 
-  return { channels, videos, addChannel, removeChannel, addVideo, removeVideo };
+  const addKeyword = useMutation({
+    mutationFn: (keyword: string) =>
+      isAuthed ? blockKeyword(keyword).then(() => undefined) : Promise.resolve(),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEYWORDS_KEY }),
+  });
+
+  const removeKeyword = useMutation({
+    mutationFn: (keyword: string) => (isAuthed ? unblockKeyword(keyword) : Promise.resolve()),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEYWORDS_KEY }),
+  });
+
+  return {
+    channels,
+    videos,
+    keywords,
+    addChannel,
+    removeChannel,
+    addVideo,
+    removeVideo,
+    addKeyword,
+    removeKeyword,
+  };
 }

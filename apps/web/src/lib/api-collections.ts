@@ -1,6 +1,7 @@
 import type {
   AllowedChannelItem,
   BlockedItem,
+  BlockedKeywordItem,
   FavoriteItem,
   ProgressItem,
   WatchLaterItem,
@@ -81,6 +82,25 @@ export async function blockVideo(url: string, global = false): Promise<void> {
 
 export async function unblockVideo(url: string): Promise<void> {
   const res = await authed(`${BASE}/blocked/videos/${encodeURIComponent(url)}`, {
+    method: "DELETE",
+  });
+  await throwIfFailed(res, "unblock failed");
+}
+
+export function fetchBlockedKeywords(): Promise<BlockedKeywordItem[]> {
+  return authedJson(`${BASE}/blocked/keywords`);
+}
+
+export function blockKeyword(keyword: string): Promise<BlockedKeywordItem> {
+  return authedJson(`${BASE}/blocked/keywords`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ keyword }),
+  });
+}
+
+export async function unblockKeyword(keyword: string): Promise<void> {
+  const res = await authed(`${BASE}/blocked/keywords/${encodeURIComponent(keyword)}`, {
     method: "DELETE",
   });
   await throwIfFailed(res, "unblock failed");
