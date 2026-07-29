@@ -12,8 +12,11 @@ RUN bun install --frozen-lockfile
 COPY apps/web ./apps/web
 
 RUN bun run --cwd apps/web build
+RUN find apps/web/dist -type f \
+        \( -name '*.css' -o -name '*.html' -o -name '*.js' -o -name '*.json' -o -name '*.svg' \) \
+        -exec gzip -9 -k '{}' \;
 
-FROM nginx:1.31.0-alpine AS runner
+FROM nginx:1.31.3-alpine AS runner
 ARG BUILD_VERSION=0.1.0
 ARG BUILD_REVISION=development
 ARG BUILD_TIME=unknown
