@@ -1,3 +1,4 @@
+import { shouldRunSponsorBlockAutoSkip } from "../lib/sponsorblock-playback-tools";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import { PlayerHotkeys } from "./player-hotkeys";
 import { SponsorBlockSkipper } from "./player-internals";
@@ -23,7 +24,7 @@ export function VideoPlayerPlaybackTools(props: Props) {
     <>
       <PlayerHotkeys canSeek={props.canSeek} sabrVideo={props.sabrVideo} />
       {!props.audioOnly && <PlayerPlayPauseIndicator />}
-      {!props.audioOnly && props.autoSkip && props.autoSkipSegments && (
+      {shouldRunSponsorBlockAutoSkip(props) && props.autoSkipSegments && (
         <SponsorBlockSkipper
           segments={props.autoSkipSegments}
           muteInsteadOfSkip={props.mutedSkip}

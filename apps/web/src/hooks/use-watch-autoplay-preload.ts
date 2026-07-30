@@ -7,7 +7,6 @@ import { toWatchSourceUrl } from "../lib/watch-url";
 import { useAuthStore } from "../stores/auth-store";
 import { useAuth } from "./use-auth";
 import { useInstance } from "./use-instance";
-import { usePlaybackMode } from "./use-playback-mode";
 import { useSettings } from "./use-settings";
 import { streamQueryOptions } from "./use-stream";
 import type { AutoplayTarget } from "./use-watch-ended-navigation";
@@ -23,7 +22,6 @@ export function useWatchAutoplayPreload({ durationMs, enabled, target }: Args) {
   const token = useAuthStore((state) => state.token);
   const { authReady, isAuthed } = useAuth();
   const { data: instance, isPending: instancePending } = useInstance();
-  const { playbackMode } = usePlaybackMode();
   const { settings, settingsReady } = useSettings();
   const preloadedRef = useRef(new Set<string>());
   const activeRef = useRef<AbortController | null>(null);
@@ -52,16 +50,16 @@ export function useWatchAutoplayPreload({ durationMs, enabled, target }: Args) {
       if (!shouldPreloadAutoplayTarget(positionMs, durationMs, enabled, Boolean(target))) return;
       if (!target || !ready) return;
       const sourceUrl = toWatchSourceUrl(target.search.v);
-      const key = `${sourceUrl}:${useAuthenticatedStream ? "auth" : "anon"}:${playbackMode}`;
+      const key = `${sourceUrl}:${useAuthenticatedStream ? "auth" : "anon"}`;
       if (preloadedRef.current.has(key)) return;
       preloadedRef.current.add(key);
       const controller = new AbortController();
       activeRef.current?.abort();
       activeRef.current = controller;
       void queryClient
-        .fetchQuery(streamQueryOptions(sourceUrl, useAuthenticatedStream, true, playbackMode))
+        .fetchQuery(streamQueryOptions(sourceUrl, useAuthenticatedStream, true))
         .then((stream) => {
-          if (controller.signal.aborted || playbackMode !== "sabr") return;
+          if (controller.signal.aborted) return;
           const itag = defaultSabrItag(sabrQualityOptions(stream), "720p");
           const config = resolveSabrPlaybackConfig(stream, itag);
           if (config) return prewarmSabrPlayback(config, token, controller.signal);
@@ -73,6 +71,6 @@ export function useWatchAutoplayPreload({ durationMs, enabled, target }: Args) {
           if (activeRef.current === controller) activeRef.current = null;
         });
     },
-    [durationMs, enabled, playbackMode, queryClient, ready, target, token, useAuthenticatedStream],
+    [durationMs, enabled, queryClient, ready, target, token, useAuthenticatedStream],
   );
 }

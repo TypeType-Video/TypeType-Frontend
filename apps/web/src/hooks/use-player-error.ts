@@ -3,19 +3,17 @@ import { bilibiliVariantCount } from "../lib/bilibili-manifest";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { sanitizeVideoContext } from "../lib/debug-sanitize";
 import { isIosDevice } from "../lib/ios-device";
-import type { PlaybackMode } from "../lib/playback-mode";
 import { detectProvider } from "../lib/provider";
 import { claimAutomaticSabrRecovery, resetAutomaticSabrRecovery } from "../lib/sabr-error-recovery";
 import {
-  hasLegacyDashPair,
+  directProgressiveStreams,
+  hasDirectDashPair,
   hasSabrPlayback,
-  legacyProgressiveStreams,
 } from "../lib/stream-delivery";
-import { resolveManifestSrc, shouldUseClassicHls } from "../lib/stream-src";
+import { resolveManifestSrc, shouldUseHls } from "../lib/stream-src";
 import type { MediaSrc } from "../lib/vidstack";
 import type { VideoStream } from "../types/stream";
 import { useInstance } from "./use-instance";
-import { usePlaybackMode } from "./use-playback-mode";
 
 type UsePlayerErrorReturn = {
   manifestSrc: MediaSrc;
@@ -31,29 +29,23 @@ type UsePlayerErrorReturn = {
   seekStartTime: number | null;
 };
 
-export function usePlayerError(
-  stream: VideoStream,
-  isLive: boolean,
-  playbackModeOverride?: PlaybackMode,
-): UsePlayerErrorReturn {
+export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerErrorReturn {
   const debugVideo = sanitizeVideoContext(stream.id) ?? "unknown";
   const provider = detectProvider(stream.id);
   const iosDevice = isIosDevice();
   const { data: instance } = useInstance();
-  const { playbackMode: storedPlaybackMode } = usePlaybackMode();
-  const playbackMode = playbackModeOverride ?? storedPlaybackMode;
-  const playbackSourceId = stream.id.length === 0 ? "" : `${stream.id}:${playbackMode}`;
+  const playbackSourceId = stream.id;
   const preferServerManifests = instance?.guestAllowed !== false;
-  const legacyDashPair = hasLegacyDashPair(stream);
-  const hasLegacyPlaybackFallback = legacyDashPair || legacyProgressiveStreams(stream).length > 0;
+  const directDashPair = hasDirectDashPair(stream);
+  const hasDirectPlaybackFallback = directDashPair || directProgressiveStreams(stream).length > 0;
   const highQualityEnabled =
     !isLive &&
     !iosDevice &&
     preferServerManifests &&
     !stream.hlsUrl &&
-    legacyDashPair &&
+    directDashPair &&
     provider === "youtube";
-  const hlsEnabled = shouldUseClassicHls(stream.hlsUrl, isLive, false, legacyDashPair);
+  const hlsEnabled = shouldUseHls(stream.hlsUrl, isLive, false, directDashPair);
   const [hlsFailed, setHlsFailed] = useState(false);
   const [highQualityFailed, setHighQualityFailed] = useState(false);
   const [qualityFailed, setQualityFailed] = useState(false);
@@ -66,7 +58,7 @@ export function usePlayerError(
     provider === "bilibili"
       ? bilibiliVariantCount(stream.videoOnlyStreams ?? [], stream.audioStreams ?? [])
       : 0;
-  const sabrSelected = provider === "youtube" && playbackMode === "sabr";
+  const sabrSelected = provider === "youtube";
   const sabrEnabled = sabrSelected && hasSabrPlayback(stream);
 
   const fallbackSrc = resolveManifestSrc(stream, isLive, qualityFailed, {
@@ -89,7 +81,7 @@ export function usePlayerError(
       setPlayerFailed(true);
     } else if (hlsEnabled && !hlsFailed) {
       recordClientEvent("player.hls_failed", { video: debugVideo });
-      if (!hasLegacyPlaybackFallback) {
+      if (!hasDirectPlaybackFallback) {
         setPlayerFailed(true);
         return;
       }
@@ -103,11 +95,11 @@ export function usePlayerError(
       recordClientEvent("player.high_quality_failed", { video: debugVideo });
       setHighQualityFailed(true);
       setRetryKey((k) => k + 1);
-    } else if (legacyDashPair && !qualityFailed) {
+    } else if (directDashPair && !qualityFailed) {
       recordClientEvent("player.quality_failed", { video: debugVideo });
       setQualityFailed(true);
       setRetryKey((k) => k + 1);
-    } else if (!isLive && hasLegacyPlaybackFallback && !compatibilityFallback) {
+    } else if (!isLive && hasDirectPlaybackFallback && !compatibilityFallback) {
       recordClientEvent("player.compatibility_fallback", { video: debugVideo });
       setCompatibilityFallback(true);
       setRetryKey((k) => k + 1);
@@ -120,13 +112,13 @@ export function usePlayerError(
     hlsEnabled,
     hlsFailed,
     sabrSelected,
-    hasLegacyPlaybackFallback,
+    hasDirectPlaybackFallback,
     provider,
     bilibiliVariant,
     bilibiliVariants,
     highQualityEnabled,
     highQualityFailed,
-    legacyDashPair,
+    directDashPair,
     qualityFailed,
     compatibilityFallback,
     isLive,

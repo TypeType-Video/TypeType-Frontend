@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useSettings } from "../hooks/use-settings";
-import { goto } from "../lib/route-redirect";
 import {
   getStoredSettingsSection,
   isSettingsSection,
   rememberSettingsSection,
   type SettingsSection,
 } from "../lib/settings-section";
+import { SettingsAbout } from "../settings/settings-about";
+import { SettingsBackup } from "../settings/settings-backup";
 import { SettingsBlocked } from "../settings/settings-blocked";
 import { SettingsLandingPage } from "../settings/settings-landing-page";
 import { SettingsLanguage } from "../settings/settings-language";
@@ -30,6 +31,7 @@ const BASE_ITEMS: Item[] = [
   { key: "import", label: "Import" },
   { key: "privacy", label: "Privacy" },
   { key: "blocked", label: "Blocked" },
+  { key: "about", label: "About" },
 ];
 
 function settingsItems(showLanguage: boolean): Item[] {
@@ -41,27 +43,6 @@ function settingsItems(showLanguage: boolean): Item[] {
     { key: "language", label: "Language" },
     ...BASE_ITEMS.slice(3),
   ];
-}
-
-function SettingsImport() {
-  return (
-    <section className="flex flex-col gap-3">
-      <p className="px-1 text-xs font-medium text-fg-soft uppercase tracking-wider">Migration</p>
-      <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm text-fg">Import from YouTube or PipePipe</span>
-          <span className="text-xs text-fg-soft">Open the dedicated import page.</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => goto("/import")}
-          className="h-9 w-full rounded-md bg-surface px-2.5 text-xs text-fg-muted transition-colors hover:text-fg sm:h-8 sm:w-auto"
-        >
-          Open import
-        </button>
-      </div>
-    </section>
-  );
 }
 
 function SettingsPage() {
@@ -93,9 +74,10 @@ function SettingsPage() {
       {activeSection === "home" && <SettingsLandingPage />}
       {activeSection === "language" && settings.defaultService === 0 && <SettingsLanguage />}
       {activeSection === "service" && <SettingsService />}
-      {activeSection === "import" && <SettingsImport />}
+      {activeSection === "import" && <SettingsBackup />}
       {activeSection === "privacy" && <SettingsPrivacy />}
       {activeSection === "blocked" && <SettingsBlocked />}
+      {activeSection === "about" && <SettingsAbout />}
     </div>
   );
 }

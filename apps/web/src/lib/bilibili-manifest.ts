@@ -1,6 +1,6 @@
 import type { AudioStreamItem, VideoStreamItem } from "../types/api";
 import { proxyUrl } from "./proxy";
-import { hasPlayableLegacyUrl } from "./stream-delivery";
+import { hasPlayableDirectUrl } from "./stream-delivery";
 
 type VideoCandidate = VideoStreamItem & { codec: string };
 type AudioCandidate = AudioStreamItem & { codec: string };
@@ -58,13 +58,13 @@ function isSupportedCodec(mimeType: string, codec: string): boolean {
 
 function isVideoCandidate(stream: VideoStreamItem): stream is VideoCandidate {
   return (
-    hasPlayableLegacyUrl(stream) && typeof stream.codec === "string" && stream.codec.length > 0
+    hasPlayableDirectUrl(stream) && typeof stream.codec === "string" && stream.codec.length > 0
   );
 }
 
 function isAudioCandidate(stream: AudioStreamItem): stream is AudioCandidate {
   return (
-    hasPlayableLegacyUrl(stream) && typeof stream.codec === "string" && stream.codec.length > 0
+    hasPlayableDirectUrl(stream) && typeof stream.codec === "string" && stream.codec.length > 0
   );
 }
 

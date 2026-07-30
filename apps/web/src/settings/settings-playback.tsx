@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useSettings } from "../hooks/use-settings";
+import { DEFAULT_PLAYBACK_SPEED_OPTIONS, playbackSpeedLabel } from "../lib/playback-speed";
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
@@ -18,6 +18,11 @@ const QUALITY_OPTIONS = [
 type DropdownProps = {
   value: string;
   onChange: (q: string) => void;
+};
+
+type SpeedDropdownProps = {
+  value: number;
+  onChange: (speed: number) => void;
 };
 
 function QualityDropdown({ value, onChange }: DropdownProps) {
@@ -71,10 +76,25 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
   );
 }
 
+function SpeedDropdown({ value, onChange }: SpeedDropdownProps) {
+  return (
+    <select
+      aria-label="Default playback speed"
+      value={value}
+      onChange={(event) => onChange(Number(event.target.value))}
+      className="ml-6 flex-shrink-0 rounded-lg border border-border-strong bg-surface-strong px-3 py-1.5 text-xs text-fg transition-colors hover:bg-surface-soft"
+    >
+      {DEFAULT_PLAYBACK_SPEED_OPTIONS.map((speed) => (
+        <option key={speed} value={speed}>
+          {playbackSpeedLabel(speed)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export function SettingsPlayback() {
   const { settings, update } = useSettings();
-  const { playbackMode, setMode } = usePlaybackMode();
-  const sabrEnabled = playbackMode === "sabr";
   const autoplayCountdownSeconds = Math.min(
     60,
     Math.max(0, Math.round(settings.autoplayCountdownSeconds)),
@@ -124,12 +144,16 @@ export function SettingsPlayback() {
             onChange={(q) => update.mutate({ defaultQuality: q })}
           />
         </div>
-        <PlaybackToggleRow
-          title="SABR playback"
-          description="Recommended for YouTube as classic DASH and HLS extraction becomes less reliable"
-          checked={sabrEnabled}
-          onClick={() => setMode(sabrEnabled ? "legacy" : "sabr")}
-        />
+        <div className={PLAYBACK_ROW}>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm text-fg">Default playback speed</span>
+            <span className="text-xs text-fg-soft">Applied when a video starts</span>
+          </div>
+          <SpeedDropdown
+            value={settings.defaultPlaybackSpeed}
+            onChange={(speed) => update.mutate({ defaultPlaybackSpeed: speed })}
+          />
+        </div>
       </div>
     </section>
   );

@@ -8,7 +8,6 @@ import { useWatchVttAssets } from "../hooks/use-watch-layout-assets";
 import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { getOriginalAudioLocale } from "../lib/audio-track";
 import { resolveEmbedAutoplay } from "../lib/embed-playback";
-import type { PlaybackMode } from "../lib/playback-mode";
 import { toPublicWatchParam } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
 import { EmbedError, PLAYBACK_FAILED_MESSAGE } from "./embed-error";
@@ -20,7 +19,6 @@ type Props = {
   startTime: number;
   autoplay: boolean;
   sessionEnabled: boolean;
-  playbackMode: PlaybackMode;
 };
 
 export function EmbedPlayerShell({
@@ -29,13 +27,12 @@ export function EmbedPlayerShell({
   startTime,
   autoplay,
   sessionEnabled,
-  playbackMode,
 }: Props) {
   const { settings, settingsReady, update } = useSettings({
     forceAnonymous: !sessionEnabled,
   });
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
-  const player = usePlayerError(stream, isLive, playbackMode);
+  const player = usePlayerError(stream, isLive);
   const handleVolumeChange = useVolumeSync(update.mutate);
 
   const positionRef = useRef(0);

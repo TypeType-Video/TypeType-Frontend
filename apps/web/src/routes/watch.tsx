@@ -7,7 +7,6 @@ import { useAuth } from "../hooks/use-auth";
 import { useDocumentTitle } from "../hooks/use-document-title";
 import { useHistory } from "../hooks/use-history";
 import { useInstance } from "../hooks/use-instance";
-import { usePlaybackMode } from "../hooks/use-playback-mode";
 import { useProgress } from "../hooks/use-progress";
 import { useSettings } from "../hooks/use-settings";
 import { useSabrBootstrap, useStream } from "../hooks/use-stream";
@@ -31,17 +30,11 @@ function WatchPage() {
   const { data: instance, isPending: instancePending } = useInstance();
   const { settings, settingsReady } = useSettings();
   const navigationSnapshot = useWatchNavigationStore((state) => state.snapshot);
-  const { playbackMode } = usePlaybackMode();
   const useAuthenticatedStream =
     isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
-  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, streamEnabled, playbackMode);
-  const bootstrap = useSabrBootstrap(
-    sourceUrl,
-    useAuthenticatedStream,
-    streamEnabled,
-    playbackMode,
-  );
+  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, streamEnabled);
+  const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, streamEnabled);
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
   const previewMatches =
@@ -53,7 +46,7 @@ function WatchPage() {
   );
   const activeStream = selectProgressiveWatchStream(
     streamQuery.isPlaceholderData ? undefined : streamQuery.data,
-    playbackMode === "sabr" ? bootstrap.data : undefined,
+    bootstrap.data,
     publicParam,
     previewRelated,
   );

@@ -5,8 +5,8 @@ import { buildNicoHlsManifest } from "./nico-hls-manifest";
 import { detectProvider } from "./provider";
 import { proxyDashManifest } from "./proxy";
 import { hasCompatibleMp4, pickCompatibleProgressiveSrc } from "./stream-compatibility";
-import { hasLegacyDashPair } from "./stream-delivery";
-import { resolveLegacyFallbackSrc } from "./stream-fallback-src";
+import { hasDirectDashPair } from "./stream-delivery";
+import { resolveDirectSrc } from "./stream-direct-src";
 import type { MediaSrc } from "./vidstack";
 
 type ResolveManifestOptions = {
@@ -36,14 +36,14 @@ export function resolveHlsManifestUrl(stream: VideoStream): string {
   return proxyDashManifest(`${BASE}/streams/hls-manifest?url=${encodeURIComponent(stream.id)}`);
 }
 
-export function shouldUseClassicHls(
+export function shouldUseHls(
   hlsUrl: string | undefined,
   isLive: boolean,
   hlsFailed: boolean,
-  legacyDashPair: boolean,
+  directDashPair: boolean,
 ): boolean {
   return Boolean(
-    hlsUrl && !hlsFailed && (isLive || isSignedHlsManifestUrl(hlsUrl) || !legacyDashPair),
+    hlsUrl && !hlsFailed && (isLive || isSignedHlsManifestUrl(hlsUrl) || !directDashPair),
   );
 }
 
@@ -60,10 +60,9 @@ export function resolveManifestSrc(
   const allowServerManifests = options?.allowServerManifests ?? true;
   const provider = detectProvider(stream.id);
   const safeMaxHeight = qualityFailed ? 720 : 1080;
-  const legacyDashPair = hasLegacyDashPair(stream);
-  const allowLegacyServerManifests = allowServerManifests;
+  const directDashPair = hasDirectDashPair(stream);
 
-  if (shouldUseClassicHls(stream.hlsUrl, isLive, options?.hlsFailed ?? false, legacyDashPair)) {
+  if (shouldUseHls(stream.hlsUrl, isLive, options?.hlsFailed ?? false, directDashPair)) {
     return {
       src: resolveHlsManifestUrl(stream),
       type: "application/x-mpegurl",
@@ -101,8 +100,8 @@ export function resolveManifestSrc(
     provider === "youtube" &&
     options?.enableHighQualityPlayback &&
     !options.highQualityFailed &&
-    allowLegacyServerManifests &&
-    legacyDashPair &&
+    allowServerManifests &&
+    directDashPair &&
     !compatibilityMode
   ) {
     return {
@@ -111,19 +110,19 @@ export function resolveManifestSrc(
     };
   }
 
-  if (!hasCompatibleMp4(stream) && allowLegacyServerManifests) {
+  if (!hasCompatibleMp4(stream) && allowServerManifests) {
     return {
       src: proxyDashManifest(`${BASE}/streams/manifest?url=${encodeURIComponent(stream.id)}`),
       type: "application/dash+xml",
     };
   }
 
-  return resolveLegacyFallbackSrc(
+  return resolveDirectSrc(
     stream,
     safeMaxHeight,
     compactAudioTracks,
     options?.preferredAudioLanguage,
     maxCompactAudioTracks,
-    allowLegacyServerManifests,
+    allowServerManifests,
   );
 }

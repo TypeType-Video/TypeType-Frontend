@@ -11,24 +11,24 @@ function isSabrStream(item: { deliveryMethod?: string | null }): boolean {
   return item.deliveryMethod === "sabr";
 }
 
-export function hasPlayableLegacyUrl(item: DeliveredStream): boolean {
+export function hasPlayableDirectUrl(item: DeliveredStream): boolean {
   return !isSabrStream(item) && item.url.length > 0;
 }
 
-export function legacyVideoOnlyStreams(stream: VideoStream): VideoStreamItem[] {
-  return (stream.videoOnlyStreams ?? []).filter(hasPlayableLegacyUrl);
+export function directVideoOnlyStreams(stream: VideoStream): VideoStreamItem[] {
+  return (stream.videoOnlyStreams ?? []).filter(hasPlayableDirectUrl);
 }
 
-export function legacyAudioStreams(stream: VideoStream): AudioStreamItem[] {
-  return (stream.audioStreams ?? []).filter(hasPlayableLegacyUrl);
+export function directAudioStreams(stream: VideoStream): AudioStreamItem[] {
+  return (stream.audioStreams ?? []).filter(hasPlayableDirectUrl);
 }
 
-export function legacyProgressiveStreams(stream: VideoStream): VideoStreamItem[] {
-  return (stream.videoStreams ?? []).filter(hasPlayableLegacyUrl);
+export function directProgressiveStreams(stream: VideoStream): VideoStreamItem[] {
+  return (stream.videoStreams ?? []).filter(hasPlayableDirectUrl);
 }
 
-export function hasLegacyDashPair(stream: VideoStream): boolean {
-  return legacyVideoOnlyStreams(stream).length > 0 && legacyAudioStreams(stream).length > 0;
+export function hasDirectDashPair(stream: VideoStream): boolean {
+  return directVideoOnlyStreams(stream).length > 0 && directAudioStreams(stream).length > 0;
 }
 
 export function hasSabrPlayback(stream: VideoStream): boolean {

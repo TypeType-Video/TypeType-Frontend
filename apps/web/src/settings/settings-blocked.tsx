@@ -1,29 +1,10 @@
-import { type MouseEvent, useState } from "react";
+import { Plus, X } from "lucide-react";
+import { type FormEvent, type MouseEvent, useState } from "react";
 import { ChannelAvatar } from "../components/channel-avatar";
 import { useBlocked } from "../hooks/use-blocked";
 import type { BlockedItem } from "../types/user";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-
-function XIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      width="8"
-      height="8"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
 
 type ChannelBubbleProps = {
   item: BlockedItem;
@@ -53,7 +34,7 @@ function ChannelBubble({ item, onClick, onRemove }: ChannelBubbleProps) {
         aria-label={`Unblock ${label}`}
         className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-surface-strong hover:bg-danger border border-border-strong text-fg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        <XIcon />
+        <X size={9} strokeWidth={3} />
       </button>
     </div>
   );
@@ -104,16 +85,74 @@ function BlockedChannelModal({ item, onUnblock, onClose }: ModalProps) {
 }
 
 export function SettingsBlocked() {
-  const { channels, videos, removeChannel, removeVideo } = useBlocked();
+  const { channels, videos, keywords, addKeyword, removeChannel, removeKeyword, removeVideo } =
+    useBlocked();
   const [selected, setSelected] = useState<BlockedItem | null>(null);
+  const [keyword, setKeyword] = useState("");
 
   const channelList = channels.data ?? [];
   const videoList = videos.data ?? [];
+  const keywordList = keywords.data ?? [];
 
-  if (channelList.length === 0 && videoList.length === 0) return null;
+  function submitKeyword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = keyword.trim();
+    if (!value) return;
+    addKeyword.mutate(value, { onSuccess: () => setKeyword("") });
+  }
 
   return (
     <>
+      <section className="flex flex-col gap-3">
+        <p className={SECTION_LABEL}>Blocked keywords</p>
+        <div className="overflow-hidden rounded-xl border border-border bg-surface">
+          <form
+            onSubmit={submitKeyword}
+            className="flex items-center gap-2 border-b border-border px-4 py-3"
+          >
+            <input
+              type="text"
+              value={keyword}
+              maxLength={100}
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="Keyword"
+              aria-label="Keyword to block"
+              className="h-9 min-w-0 flex-1 rounded-md border border-border-strong bg-app px-3 text-sm text-fg outline-none placeholder:text-fg-soft focus:border-fg-soft"
+            />
+            <button
+              type="submit"
+              disabled={!keyword.trim() || addKeyword.isPending}
+              aria-label="Add blocked keyword"
+              title="Add blocked keyword"
+              className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-fg text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Plus size={16} />
+            </button>
+          </form>
+          {keywordList.length === 0 ? (
+            <p className="px-4 py-3 text-xs text-fg-soft">No blocked keywords</p>
+          ) : (
+            <div className="divide-y divide-border">
+              {keywordList.map((item) => (
+                <div key={item.keyword} className="flex items-center gap-3 px-4 py-2.5">
+                  <span className="min-w-0 flex-1 truncate text-xs text-fg-muted">
+                    {item.keyword}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeKeyword.mutate(item.keyword)}
+                    aria-label={`Unblock ${item.keyword}`}
+                    title={`Unblock ${item.keyword}`}
+                    className="flex-shrink-0 rounded p-1 text-fg-soft transition-colors hover:bg-surface-strong hover:text-fg"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
       {channelList.length > 0 && (
         <section className="flex flex-col gap-3">
           <p className={SECTION_LABEL}>Blocked channels</p>
@@ -145,7 +184,7 @@ export function SettingsBlocked() {
                   aria-label={`Unblock ${item.url}`}
                   className="flex-shrink-0 text-fg-soft hover:text-fg transition-colors p-1 rounded hover:bg-surface-strong"
                 >
-                  <XIcon />
+                  <X size={12} />
                 </button>
               </div>
             ))}

@@ -25,6 +25,7 @@ type Props = {
   autoplay: boolean;
   initialVolume: number;
   initialMuted: boolean;
+  defaultPlaybackSpeed: number;
   defaultAudioLanguage?: string;
   preferOriginalLanguage?: boolean;
   originalAudioTrackId?: string | null;
@@ -61,6 +62,7 @@ export function ShortsPlayerStage({
   autoplay,
   initialVolume,
   initialMuted,
+  defaultPlaybackSpeed,
   defaultAudioLanguage,
   preferOriginalLanguage,
   originalAudioTrackId,
@@ -130,6 +132,7 @@ export function ShortsPlayerStage({
                 subtitles={stream.subtitles}
                 initialVolume={initialVolume}
                 initialMuted={initialMuted}
+                defaultPlaybackSpeed={defaultPlaybackSpeed}
                 settingsReady={settingsReady}
                 autoplay={shouldAutoplay}
                 defaultAudioLanguage={defaultAudioLanguage}

@@ -28,6 +28,7 @@ type Props = {
   settingsReady?: boolean;
   autoplay?: boolean;
   defaultAudioLanguage?: string;
+  defaultPlaybackSpeed?: number;
   preferOriginalLanguage?: boolean;
   originalAudioTrackId?: string | null;
   preferredDefaultAudioTrackId?: string | null;
@@ -49,6 +50,7 @@ export function ShortsVideoPlayer({
   settingsReady = false,
   autoplay = true,
   defaultAudioLanguage,
+  defaultPlaybackSpeed,
   preferOriginalLanguage,
   originalAudioTrackId,
   preferredDefaultAudioTrackId,
@@ -133,6 +135,7 @@ export function ShortsVideoPlayer({
           }}
         />
         <PlayerDefaults
+          defaultPlaybackSpeed={defaultPlaybackSpeed}
           defaultAudioLanguage={defaultAudioLanguage || undefined}
           preferOriginalLanguage={shouldPreferOriginalLanguage}
           requireOriginalLanguage

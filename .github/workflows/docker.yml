@@ -30,7 +30,7 @@ jobs:
       metadata-json: ${{ steps.meta.outputs.json }}
       version: ${{ steps.info.outputs.version }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7.0.1
 
       - uses: oven-sh/setup-bun@v2.2.0
         with:
@@ -58,7 +58,7 @@ jobs:
 
       - name: Extract image metadata
         id: meta
-        uses: docker/metadata-action@v6.0.0
+        uses: docker/metadata-action@v6.2.0
         with:
           images: ${{ steps.info.outputs.image }}
           tags: |
@@ -84,28 +84,28 @@ jobs:
           - platform: linux/arm64
             arch: arm64
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7.0.1
 
       - name: Isolate Docker credentials
         run: echo "DOCKER_CONFIG=$RUNNER_TEMP/docker-config" >> "$GITHUB_ENV"
 
-      - uses: docker/login-action@v4.1.0
+      - uses: docker/login-action@v4.5.2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v4.1.0
+      - uses: docker/setup-qemu-action@v4.2.0
         if: matrix.arch == 'arm64'
         with:
           platforms: arm64
           cache-image: false
 
-      - uses: docker/setup-buildx-action@v4.0.0
+      - uses: docker/setup-buildx-action@v4.2.0
 
       - name: Build and push platform image
         id: build
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.3.0
         with:
           context: .
           build-args: |
@@ -158,13 +158,13 @@ jobs:
           pattern: frontend-digest-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
 
-      - uses: docker/login-action@v4.1.0
+      - uses: docker/login-action@v4.5.2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-buildx-action@v4.0.0
+      - uses: docker/setup-buildx-action@v4.2.0
 
       - name: Publish manifest list
         id: manifest

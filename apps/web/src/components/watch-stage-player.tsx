@@ -1,9 +1,10 @@
-import { type MutableRefObject, type ReactNode, useRef } from "react";
+import { type MutableRefObject, type ReactNode, useEffect, useRef } from "react";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem, SubtitleItem } from "../types/api";
 import type { CaptionStyles, SettingsItem } from "../types/user";
+import { PlayerPlaybackSpeedDefault } from "./player-defaults";
 import { VideoPlayer } from "./video-player";
 import { WatchPlayerCrossfade } from "./watch-player-crossfade";
 
@@ -47,7 +48,12 @@ type Props = {
 
 export function WatchStagePlayer(props: Props) {
   const settings = props.settings;
-  const playbackRatePreference = useRef(new SabrPlaybackRatePreference());
+  const playbackRatePreference = useRef(
+    new SabrPlaybackRatePreference(settings.defaultPlaybackSpeed),
+  );
+  useEffect(() => {
+    playbackRatePreference.current.setPreferredRate(settings.defaultPlaybackSpeed);
+  }, [settings.defaultPlaybackSpeed]);
   return (
     <WatchPlayerCrossfade
       audioOnly={props.audioOnly}
@@ -79,7 +85,15 @@ export function WatchStagePlayer(props: Props) {
         settingsReady={props.settingsReady}
         autoplay={props.autoplay}
         originalAudioLocale={props.originalLocale}
-        overlay={props.overlay}
+        overlay={
+          <>
+            <PlayerPlaybackSpeedDefault
+              defaultPlaybackSpeed={settings.defaultPlaybackSpeed}
+              preference={playbackRatePreference.current}
+            />
+            {props.overlay}
+          </>
+        }
         captionStyles={settings.captionStyles}
         onCaptionStylesChange={props.onCaptionStylesChange}
         onVolumeChange={props.onVolumeChange}

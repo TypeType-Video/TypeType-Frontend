@@ -7,7 +7,11 @@ export function Toast({ message }: Props) {
     ? "border-emerald-500/40 bg-gradient-to-r from-emerald-600/90 to-emerald-500/80 text-white"
     : "border-border-strong bg-surface-strong/95 text-fg";
   return (
-    <div className="fixed bottom-6 left-0 right-0 flex justify-center z-[9999] pointer-events-none">
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed bottom-6 left-0 right-0 flex justify-center z-[9999] pointer-events-none"
+    >
       <div
         key={message}
         className={`rounded-full border px-4 py-2 text-xs shadow-lg backdrop-blur [animation:toast-fade-in_0.2s_ease-out] ${shell}`}

@@ -1,14 +1,9 @@
 import { API_BASE as BASE } from "./env";
-import type { PlaybackMode } from "./playback-mode";
 import { detectProvider } from "./provider";
 
-function effectivePlaybackMode(url: string, playbackMode: PlaybackMode): PlaybackMode {
-  return playbackMode === "sabr" && detectProvider(url) === "youtube" ? "sabr" : "legacy";
-}
-
-export function streamEndpoint(url: string, playbackMode: PlaybackMode): string {
+export function streamEndpoint(url: string): string {
   const provider = detectProvider(url);
-  const path = providerStreamPath(provider, effectivePlaybackMode(url, playbackMode));
+  const path = providerStreamPath(provider);
   return `${BASE}${path}?url=${encodeURIComponent(url)}`;
 }
 
@@ -17,22 +12,18 @@ export function sabrBootstrapEndpoint(url: string): string | null {
   return `${BASE}/streams/youtube/sabr/bootstrap?url=${encodeURIComponent(url)}`;
 }
 
-function providerStreamPath(
-  provider: ReturnType<typeof detectProvider>,
-  playbackMode: PlaybackMode,
-) {
-  if (provider === "youtube") return `/streams/youtube/${playbackMode}`;
+function providerStreamPath(provider: ReturnType<typeof detectProvider>) {
+  if (provider === "youtube") return "/streams/youtube/sabr";
   if (provider === "nicovideo") return "/streams/niconico";
   if (provider === "bilibili") return "/streams/bilibili";
-  return "/streams/youtube/legacy";
+  throw new Error("Unsupported video provider");
 }
 
 export function streamQueryKey(
   url: string,
   authenticated: boolean,
-  playbackMode: PlaybackMode,
-): readonly ["stream", string, "auth" | "anon", PlaybackMode] {
-  return ["stream", url, authenticated ? "auth" : "anon", effectivePlaybackMode(url, playbackMode)];
+): readonly ["stream", string, "auth" | "anon"] {
+  return ["stream", url, authenticated ? "auth" : "anon"];
 }
 
 export function sabrBootstrapQueryKey(
