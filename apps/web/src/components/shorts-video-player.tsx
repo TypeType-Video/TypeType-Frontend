@@ -1,25 +1,16 @@
-import { useEffect, useState } from "react";
-import { isIosDevice } from "../lib/ios-device";
-import { PLAYBACK_RATES } from "../lib/playback-rates";
+import { useEffect, useRef, useState } from "react";
+import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
+import type { SabrPlaybackConfig } from "../lib/sabr-source";
+import { sabrMediaSrc } from "../lib/sabr-vidstack-loader";
 import type { MediaSrc } from "../lib/vidstack";
-import {
-  DefaultVideoLayout,
-  defaultLayoutIcons,
-  MediaPlayer,
-  MediaProvider,
-  Track,
-} from "../lib/vidstack";
 import type { SubtitleItem } from "../types/api";
-import { AudioTrackSelector } from "./audio-track-selector";
-import { MediaSessionSync } from "./media-session-sync";
-import { PlayerDefaults } from "./player-defaults";
-import { buildSafeSubtitleTracks } from "./subtitle-track-utils";
+import { PlayerDefaults, PlayerPlaybackSpeedDefault } from "./player-defaults";
 import { Toast } from "./toast";
-import { onProviderChange } from "./video-player-core";
-import { VolumeRestorer } from "./volume-restorer";
+import { VideoPlayer } from "./video-player";
 
-type Props = {
-  src: MediaSrc;
+type PlaybackProps = { config: SabrPlaybackConfig; src?: never } | { config?: null; src: MediaSrc };
+
+type Props = PlaybackProps & {
   title?: string;
   poster?: string;
   subtitles?: SubtitleItem[];
@@ -41,6 +32,7 @@ type Props = {
 };
 
 export function ShortsVideoPlayer({
+  config,
   src,
   title,
   poster,
@@ -50,7 +42,7 @@ export function ShortsVideoPlayer({
   settingsReady = false,
   autoplay = true,
   defaultAudioLanguage,
-  defaultPlaybackSpeed,
+  defaultPlaybackSpeed = 1,
   preferOriginalLanguage,
   originalAudioTrackId,
   preferredDefaultAudioTrackId,
@@ -61,11 +53,12 @@ export function ShortsVideoPlayer({
   onError,
   onEnded,
 }: Props) {
-  const ios = isIosDevice();
-  const srcKey = typeof src === "string" ? src : String(src.src);
-  const subtitleTracks = buildSafeSubtitleTracks(subtitles);
-  const shouldPreferOriginalLanguage = preferOriginalLanguage ?? true;
   const [toast, setToast] = useState<string | null>(null);
+  const playbackRate = useRef(new SabrPlaybackRatePreference(defaultPlaybackSpeed));
+
+  useEffect(() => {
+    playbackRate.current.setPreferredRate(defaultPlaybackSpeed);
+  }, [defaultPlaybackSpeed]);
 
   useEffect(() => {
     if (!toast) return;
@@ -74,88 +67,46 @@ export function ShortsVideoPlayer({
   }, [toast]);
 
   return (
-    <div style={{ position: "absolute", inset: 0, backgroundColor: "black" }}>
-      <MediaPlayer
-        key={srcKey}
-        src={src}
+    <div className="absolute inset-0 bg-black">
+      <VideoPlayer
+        src={config ? sabrMediaSrc(config.videoId) : src}
+        sabrConfig={config}
+        sabrPlaybackRatePreference={playbackRate.current}
+        layoutMode="shorts"
+        hideCinemaMode
         title={title}
         poster={poster}
-        viewType="video"
-        streamType="on-demand"
-        logLevel="warn"
-        crossOrigin
-        playsInline
-        {...(ios ? { "webkit-playsinline": "true" } : {})}
-        autoPlay={autoplay}
-        storage={null}
-        onProviderChange={onProviderChange}
-        onError={() => onError?.()}
-        onEnded={() => onEnded?.()}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          "--media-object-fit": "cover",
-        }}
-      >
-        <MediaProvider
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-          mediaProps={{
-            style: {
-              position: "absolute",
-              inset: "0",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            },
-          }}
-        >
-          {subtitleTracks.map((s) => (
-            <Track
-              key={s.key}
-              kind="subtitles"
-              src={s.src}
-              label={s.label}
-              lang={s.lang}
-              type="vtt"
+        subtitles={subtitles}
+        initialVolume={initialVolume}
+        initialMuted={initialMuted}
+        settingsReady={settingsReady}
+        autoplay={autoplay}
+        originalAudioLocale={originalAudioLocale}
+        className="shorts-video-player"
+        mediaClassName="shorts-video-media"
+        overlay={
+          <>
+            <PlayerDefaults
+              defaultAudioLanguage={defaultAudioLanguage}
+              preferOriginalLanguage={preferOriginalLanguage}
+              requireOriginalLanguage
+              onOriginalLanguageUnavailable={() => setToast("Original audio unavailable")}
+              originalAudioTrackId={originalAudioTrackId}
+              preferredDefaultAudioTrackId={preferredDefaultAudioTrackId}
+              originalAudioLocale={originalAudioLocale}
+              defaultSubtitleLanguage={defaultSubtitleLanguage}
+              subtitlesEnabled={subtitlesEnabled}
             />
-          ))}
-        </MediaProvider>
-        <DefaultVideoLayout
-          icons={defaultLayoutIcons}
-          playbackRates={PLAYBACK_RATES}
-          translations={{ Captions: "Subtitles" }}
-          smallLayoutWhen
-          noModal
-          menuContainer="body"
-          menuGroup="bottom"
-          slots={{
-            settingsMenuItemsStart: <AudioTrackSelector />,
-          }}
-        />
-        <PlayerDefaults
-          defaultPlaybackSpeed={defaultPlaybackSpeed}
-          defaultAudioLanguage={defaultAudioLanguage || undefined}
-          preferOriginalLanguage={shouldPreferOriginalLanguage}
-          requireOriginalLanguage
-          onOriginalLanguageUnavailable={() => {
-            setToast("Original audio unavailable");
-          }}
-          originalAudioTrackId={originalAudioTrackId}
-          preferredDefaultAudioTrackId={preferredDefaultAudioTrackId}
-          originalAudioLocale={originalAudioLocale}
-          defaultSubtitleLanguage={defaultSubtitleLanguage}
-          subtitlesEnabled={subtitlesEnabled}
-        />
-        <VolumeRestorer
-          initialVolume={initialVolume}
-          initialMuted={initialMuted}
-          settingsReady={settingsReady}
-          onVolumeChange={onVolumeChange}
-        />
-        <MediaSessionSync title={title} artwork={poster} />
-      </MediaPlayer>
+            <PlayerPlaybackSpeedDefault
+              defaultPlaybackSpeed={defaultPlaybackSpeed}
+              preference={playbackRate.current}
+            />
+          </>
+        }
+        onVolumeChange={onVolumeChange}
+        onError={onError}
+        onEnded={onEnded}
+      />
       <Toast message={toast} />
     </div>
   );

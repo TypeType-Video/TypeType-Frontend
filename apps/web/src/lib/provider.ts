@@ -1,4 +1,4 @@
-type Provider = "youtube" | "nicovideo" | "bilibili" | "unknown";
+export type Provider = "youtube" | "nicovideo" | "bilibili" | "unknown";
 
 export function detectProvider(url: string): Provider {
   if (url.includes("youtube.com") || url.includes("youtu.be")) return "youtube";

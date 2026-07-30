@@ -92,6 +92,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
 
   return (
     <ShortsPlayerStage
+      key={active.id}
       sectionClass={sectionClass}
       playerRef={playerRef}
       commentsOpen={commentsOpen}
@@ -108,6 +109,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       autoplay={settings.autoplay}
       initialVolume={settings.volume}
       initialMuted={settings.muted}
+      defaultQuality={settings.defaultQuality}
       defaultPlaybackSpeed={settings.defaultPlaybackSpeed}
       defaultAudioLanguage={settings.defaultAudioLanguage || undefined}
       preferOriginalLanguage={settings.preferOriginalLanguage}
