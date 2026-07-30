@@ -10,10 +10,12 @@ import { PlayerTrackButton } from "./player-track-button";
 import { PlayerVolumeControl } from "./player-volume-control";
 import { QualitySelector } from "./quality-selector";
 import { SabrTimeSlider } from "./sabr-time-slider";
+import { ShortsPlayerLayout } from "./shorts-player-layout";
 
 type Props = {
   audioOnly?: boolean;
   hideCinemaMode?: boolean;
+  layoutMode?: "default" | "shorts";
   audioUsesVideoProvider?: boolean;
   sabr?: boolean;
   sabrVideo?: HTMLVideoElement | null;
@@ -27,6 +29,7 @@ type Props = {
 export function VideoPlayerLayout({
   audioOnly = false,
   hideCinemaMode = false,
+  layoutMode = "default",
   audioUsesVideoProvider = false,
   sabr = false,
   sabrVideo = null,
@@ -36,6 +39,17 @@ export function VideoPlayerLayout({
   onPreviousVideo,
   onNextVideo,
 }: Props) {
+  if (layoutMode === "shorts") {
+    return (
+      <ShortsPlayerLayout
+        sabr={sabr}
+        video={sabrVideo}
+        seeking={seeking}
+        originalAudioLocale={originalAudioLocale}
+      />
+    );
+  }
+
   if (audioOnly) {
     const timePair = (
       <div className="typetype-audio-time-pair">

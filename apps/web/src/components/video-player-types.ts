@@ -29,6 +29,7 @@ export type VideoPlayerProps = {
   autoplay?: boolean;
   audioOnly?: boolean;
   hideCinemaMode?: boolean;
+  layoutMode?: "default" | "shorts";
   originalAudioLocale?: string | null;
   overlay?: ReactNode;
   captionStyles?: CaptionStyles;

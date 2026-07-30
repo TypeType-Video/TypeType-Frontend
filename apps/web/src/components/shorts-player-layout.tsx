@@ -1,0 +1,43 @@
+import { PLAYBACK_RATES } from "../lib/playback-rates";
+import { DefaultVideoLayout, defaultLayoutIcons } from "../lib/vidstack";
+import { AudioTrackSelector } from "./audio-track-selector";
+import { FormatSelector } from "./format-selector";
+import { PlayerVolumeControl } from "./player-volume-control";
+import { QualitySelector } from "./quality-selector";
+import { SabrTimeSlider } from "./sabr-time-slider";
+
+type Props = {
+  sabr: boolean;
+  video: HTMLVideoElement | null;
+  seeking: boolean;
+  originalAudioLocale?: string | null;
+};
+
+export function ShortsPlayerLayout({ sabr, video, seeking, originalAudioLocale }: Props) {
+  return (
+    <DefaultVideoLayout
+      className="typetype-shorts-layout"
+      icons={defaultLayoutIcons}
+      playbackRates={PLAYBACK_RATES}
+      smallLayoutWhen={false}
+      translations={{ Captions: "Subtitles" }}
+      noModal
+      menuContainer="body"
+      menuGroup="bottom"
+      slots={{
+        timeSlider: sabr ? <SabrTimeSlider seeking={seeking} video={video} /> : undefined,
+        settingsMenuItemsStart: (
+          <>
+            <AudioTrackSelector originalLocale={originalAudioLocale} sabr={sabr} />
+            <QualitySelector />
+            <FormatSelector />
+          </>
+        ),
+        beforeFullscreenButton: <PlayerVolumeControl />,
+        pipButton: null,
+        title: null,
+        chapterTitle: null,
+      }}
+    />
+  );
+}

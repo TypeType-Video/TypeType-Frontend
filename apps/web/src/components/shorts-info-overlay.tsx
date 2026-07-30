@@ -102,7 +102,7 @@ export function ShortsInfoOverlay({ stream, variant = "overlay", className }: Pr
 
   return (
     <div
-      className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-3 pb-3 pt-20 sm:px-4 sm:pb-4 ${className ?? ""}`}
+      className={`shorts-info-overlay pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-3 pb-3 pt-20 sm:px-4 sm:pb-4 ${className ?? ""}`}
     >
       <div className="max-w-[calc(100%-4.5rem)]">
         <div className="flex items-center gap-2">

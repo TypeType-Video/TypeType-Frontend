@@ -21,7 +21,11 @@ export function ShortsActionButton({
   const iconClass = compact ? "h-4 w-4" : "h-6 w-6";
   const rootClass = compact
     ? "flex flex-col items-center gap-0.5 text-white/90 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-    : "flex flex-col items-center gap-1 text-white/90 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
+    : "flex flex-col items-center gap-1 text-fg-soft transition-colors hover:text-fg disabled:cursor-not-allowed disabled:opacity-50";
+  const idleClass = compact
+    ? "border-white/20 bg-black/55 hover:border-white/40 hover:bg-black/75"
+    : "border-border-strong bg-surface hover:bg-surface-strong";
+  const activeClass = compact ? "border-white/80 bg-white text-black" : "border-fg bg-fg text-app";
   return (
     <button
       type="button"
@@ -32,15 +36,13 @@ export function ShortsActionButton({
     >
       <div
         className={`flex ${sizeClass} items-center justify-center rounded-full border transition-colors ${
-          active
-            ? "border-border/80 bg-fg text-app"
-            : "border-border-strong/80 bg-surface/80 hover:border-border-strong hover:bg-surface-strong"
+          active ? activeClass : idleClass
         }`}
       >
         <Icon className={iconClass} />
       </div>
       <span
-        className={compact ? "sr-only" : "text-[10px] sm:text-[11px] leading-tight text-white/90"}
+        className={compact ? "sr-only" : "text-[10px] leading-tight text-fg-muted sm:text-[11px]"}
       >
         {stateLabel ?? label}
       </span>
