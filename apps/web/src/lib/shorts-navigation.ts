@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const WHEEL_THRESHOLD = 14;
+const WHEEL_THRESHOLD = 48;
 const WHEEL_RESET_MS = 180;
-const WHEEL_LOCK_MS = 70;
-const WHEEL_MAX_STEPS = 2;
 const SWIPE_THRESHOLD = 30;
 const SWIPE_MIN_DISTANCE = 10;
 const SWIPE_VELOCITY_THRESHOLD = 0.24;
@@ -103,16 +101,16 @@ export function useShortsNavigation(
       if (now - wheelLastAtRef.current > WHEEL_RESET_MS) wheelAccumRef.current = 0;
       wheelLastAtRef.current = now;
       wheelAccumRef.current += deltaY;
-      if (now < wheelLockedUntilRef.current) return;
+      if (now < wheelLockedUntilRef.current) {
+        wheelAccumRef.current = 0;
+        wheelLockedUntilRef.current = now + WHEEL_RESET_MS;
+        return;
+      }
       if (Math.abs(wheelAccumRef.current) < WHEEL_THRESHOLD) return;
-      const steps = Math.min(
-        WHEEL_MAX_STEPS,
-        Math.max(1, Math.floor(Math.abs(wheelAccumRef.current) / WHEEL_THRESHOLD)),
-      );
-      const moved = moveBy(wheelAccumRef.current > 0 ? steps : -steps, "user");
+      const moved = moveBy(wheelAccumRef.current > 0 ? 1 : -1, "user");
       wheelAccumRef.current = 0;
       if (!moved) return;
-      wheelLockedUntilRef.current = now + WHEEL_LOCK_MS;
+      wheelLockedUntilRef.current = now + WHEEL_RESET_MS;
     },
     [moveBy],
   );

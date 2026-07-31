@@ -103,14 +103,11 @@ export function ShortsPlayerStage({
 
   return (
     <section className={sectionClass}>
-      <div className="mx-auto grid h-full min-h-0 w-full max-w-[90rem] items-center gap-5 lg:grid-cols-[minmax(15rem,1fr)_auto_4rem]">
-        <div className="hidden justify-self-end lg:block">
-          <ShortsInfoOverlay stream={current} variant="panel" />
-        </div>
-        <div className="flex h-full min-h-0 w-full items-center justify-center">
+      <div className="flex h-full min-h-0 w-full items-center justify-center">
+        <div className="shorts-stage relative max-h-full max-w-full">
           <div
             ref={playerRef}
-            className="shorts-shell shorts-frame relative max-w-full overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl"
+            className="shorts-shell shorts-frame relative overflow-hidden rounded-lg bg-black shadow-xl"
             onWheel={(event) => !commentsOpen && onWheel(event)}
             onTouchStart={(event) =>
               !commentsOpen && onTouchStart(event.touches[0]?.clientY ?? null, event.target)
@@ -151,25 +148,31 @@ export function ShortsPlayerStage({
                 onEnded={onAutoNext}
               />
             )}
-            <div className="pointer-events-none lg:hidden">
-              <ShortsInfoOverlay stream={current} />
-            </div>
-            <ShortsActions
-              stream={active}
-              onOpenComments={onOpenComments}
-              showComments={showComments}
-              className="absolute bottom-24 right-2 z-30 lg:hidden"
-              compact
-            />
+            {current.title && (
+              <div className="pointer-events-none">
+                <ShortsInfoOverlay stream={current} />
+              </div>
+            )}
+            {current.title && (
+              <ShortsActions
+                stream={current}
+                onOpenComments={onOpenComments}
+                showComments={showComments}
+                className="absolute bottom-24 right-2 z-30 lg:hidden"
+                compact
+              />
+            )}
           </div>
-        </div>
-        <div className="hidden flex-col items-center gap-4 justify-self-start lg:flex">
-          <ShortsActions
-            stream={active}
-            onOpenComments={onOpenComments}
-            showComments={showComments}
-          />
-          <ShortsNavigation onPrev={onPrev} onNext={onNext} hasPrev={hasPrev} hasNext={hasNext} />
+          <div className="absolute bottom-3 left-full ml-4 hidden flex-col items-center gap-4 lg:flex">
+            {current.title && (
+              <ShortsActions
+                stream={current}
+                onOpenComments={onOpenComments}
+                showComments={showComments}
+              />
+            )}
+            <ShortsNavigation onPrev={onPrev} onNext={onNext} hasPrev={hasPrev} hasNext={hasNext} />
+          </div>
         </div>
       </div>
       {showComments && (

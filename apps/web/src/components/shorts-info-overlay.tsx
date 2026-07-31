@@ -8,11 +8,10 @@ import { Toast } from "./toast";
 
 type Props = {
   stream: VideoStream;
-  variant?: "overlay" | "panel";
   className?: string;
 };
 
-export function ShortsInfoOverlay({ stream, variant = "overlay", className }: Props) {
+export function ShortsInfoOverlay({ stream, className }: Props) {
   const { isAuthed } = useAuth();
   const { add, remove, isSubscribed } = useSubscriptions();
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -48,57 +47,11 @@ export function ShortsInfoOverlay({ stream, variant = "overlay", className }: Pr
     }
   }
 
-  const panelButtonClass = `rounded-full px-4 py-1.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-    subscribed
-      ? "border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
-      : "bg-fg text-app hover:bg-white"
-  }`;
-
   const overlayButtonClass = `ml-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
     subscribed
       ? "border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
       : "bg-fg text-app hover:bg-white"
   }`;
-
-  if (variant === "panel") {
-    return (
-      <div className={`w-[min(34rem,36vw)] max-w-[34rem] ${className ?? ""}`}>
-        <p className="line-clamp-3 break-words text-xl font-semibold leading-tight text-fg lg:text-2xl">
-          {stream.title}
-        </p>
-        <div className="mt-4 flex items-center gap-3">
-          <ChannelLink url={stream.channelUrl}>
-            <ChannelAvatar
-              src={stream.channelAvatar}
-              name={stream.channelName}
-              className="h-12 w-12"
-            />
-          </ChannelLink>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <ChannelLink url={stream.channelUrl}>
-                <p className="line-clamp-2 break-words text-base font-medium text-fg lg:text-lg">
-                  {stream.channelName}
-                </p>
-              </ChannelLink>
-              {stream.channelUrl && (
-                <button
-                  type="button"
-                  onClick={handleSubscribe}
-                  disabled={add.isPending || remove.isPending}
-                  aria-pressed={subscribed}
-                  className={panelButtonClass}
-                >
-                  {subscribed ? "Subscribed" : "Subscribe"}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-        <Toast message={toastMsg} />
-      </div>
-    );
-  }
 
   return (
     <div

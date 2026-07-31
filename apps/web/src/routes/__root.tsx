@@ -140,11 +140,17 @@ function RootLayout() {
   }
 
   if (shortsPage) {
+    const shortsMainClass = `transition-[margin] duration-200 ${
+      isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
+    }`;
     return (
       <div className="min-h-screen bg-app text-fg">
         <Navbar />
         <Sidebar />
-        <main style={{ paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" }}>
+        <main
+          className={shortsMainClass}
+          style={{ paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" }}
+        >
           <Outlet />
         </main>
       </div>
