@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import { ShortsPlayerStage } from "../components/shorts-player-stage";
 import { ShortsShellLoader } from "../components/shorts-shell-loader";
-import { useMobile } from "../hooks/use-mobile";
+import { useAuth } from "../hooks/use-auth";
+import { useInstance } from "../hooks/use-instance";
 import { useSettings } from "../hooks/use-settings";
 import { useShortsActiveStream } from "../hooks/use-shorts-active-stream";
 import { useShortsFeed } from "../hooks/use-shorts-feed";
 import { useShortsPrefetch } from "../hooks/use-shorts-prefetch";
+import { useShortsRouteFeed } from "../hooks/use-shorts-route-feed";
 import { useShortsRouteSync } from "../hooks/use-shorts-route-sync";
 import { useVolumeSync } from "../hooks/use-volume-sync";
 import {
@@ -14,33 +16,48 @@ import {
   getPreferredDefaultAudioTrackId,
 } from "../lib/audio-track";
 import { useShortsNavigation } from "../lib/shorts-navigation";
-import { useUiStore } from "../stores/ui-store";
 
 type Props = {
   targetUrl?: string;
 };
 
 export function ShortsPlayerShell({ targetUrl }: Props) {
-  const isMobile = useMobile();
-  const { shorts, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useShortsFeed();
-  const { settings, update, query: settingsQuery } = useSettings();
-  const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
+  const feed = useShortsFeed();
+  const shorts = useShortsRouteFeed(feed.shorts, targetUrl);
+  const { authReady, isAuthed } = useAuth();
+  const { data: instance, isPending: instancePending } = useInstance();
+  const { settings, update, settingsReady } = useSettings();
   const playerRef = useRef<HTMLDivElement>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const settingsReady =
-    (settingsQuery.isSuccess && !settingsQuery.isPlaceholderData) || settingsQuery.isError;
+  const useAuthenticatedStream =
+    isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
 
   const handleAutoNext = () => {
     moveBy(1, "auto");
   };
   const { index, moveBy, moveTo, onWheel, onTouchStart, onTouchEnd } = useShortsNavigation(
     shorts.length,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
+    feed.hasNextPage,
+    feed.isFetchingNextPage,
+    feed.fetchNextPage,
   );
-  const { active, activeId, stream, streamQuery, current, errorMessage, isMemberOnlyShort } =
-    useShortsActiveStream({ shorts, index });
+  const {
+    active,
+    activeId,
+    stream,
+    current,
+    streamLoading,
+    streamError,
+    retry,
+    errorMessage,
+    isMemberOnlyShort,
+  } = useShortsActiveStream({
+    shorts,
+    index,
+    useAuthenticatedStream,
+    enabled: streamEnabled,
+  });
   const originalAudioTrackId = getOriginalAudioTrackId(stream);
   const preferredDefaultAudioTrackId = getPreferredDefaultAudioTrackId(stream);
   const originalAudioLocale = getOriginalAudioLocale(stream);
@@ -54,18 +71,15 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
     targetUrl,
     shorts,
     index,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage: () => void fetchNextPage(),
     moveTo,
     activeId,
     onActiveChange: () => setCommentsOpen(false),
   });
 
-  const sectionClass = `h-[calc(100svh-4.5rem)] overflow-hidden px-2 pb-2 pt-1 sm:px-4 sm:pb-4 sm:pt-3 ${
-    isMobile ? "pl-2" : sidebarCollapsed ? "md:pl-16" : "md:pl-52"
-  }`;
-  if (isLoading) return <ShortsShellLoader sectionClass={sectionClass} />;
+  const sectionClass = "shorts-viewport overflow-hidden p-2 sm:p-3 lg:p-4";
+  if (feed.isLoading && shorts.length === 0) {
+    return <ShortsShellLoader sectionClass={sectionClass} />;
+  }
   if (!active) {
     return (
       <div className="flex items-center justify-center pt-24">
@@ -74,7 +88,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
     );
   }
   const hasPrev = index > 0;
-  const hasNext = index < shorts.length - 1 || hasNextPage;
+  const hasNext = index < shorts.length - 1 || feed.hasNextPage;
 
   const handleWheel = (e: React.WheelEvent) => {
     const target = e.target as HTMLElement;
@@ -99,8 +113,8 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       active={active}
       current={current}
       stream={stream}
-      streamLoading={streamQuery.isLoading}
-      streamError={streamQuery.isError}
+      streamLoading={streamLoading}
+      streamError={streamError}
       errorMessage={errorMessage}
       isMemberOnlyShort={isMemberOnlyShort}
       hasPrev={hasPrev}
@@ -121,7 +135,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       showComments={!settings.hideComments}
       onOpenComments={() => setCommentsOpen(true)}
       onCloseComments={() => setCommentsOpen(false)}
-      onRetry={() => streamQuery.refetch()}
+      onRetry={retry}
       onNext={() => moveBy(1, "user")}
       onAutoNext={handleAutoNext}
       onPrev={() => moveBy(-1, "user")}

@@ -3,8 +3,8 @@ import { useAuth } from "../hooks/use-auth";
 import { useFavoriteStatus } from "../hooks/use-favorite-status";
 import { useShareUrl } from "../hooks/use-share-url";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
+import { shortsRouteKey, toPublicShortsUrl } from "../lib/shorts-route";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
-import { toPublicWatchUrl } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
 import { ShortsActionButton } from "./shorts-action-button";
 
@@ -37,7 +37,7 @@ export function ShortsActions({
 
   function requireAuth(): boolean {
     if (isAuthed) return true;
-    const redirect = `/shorts?v=${encodeURIComponent(stream.id)}`;
+    const redirect = `/shorts?v=${encodeURIComponent(shortsRouteKey(stream.id))}`;
     window.location.assign(`/login?redirect=${encodeURIComponent(redirect)}`);
     return false;
   }
@@ -57,7 +57,7 @@ export function ShortsActions({
   }
 
   function handleShare() {
-    void share(toPublicWatchUrl(stream.id, window.location.origin));
+    void share(toPublicShortsUrl(stream.id, window.location.origin));
   }
 
   return (
