@@ -1,8 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { normalizeBlockedKeyword, titleMatchesBlockedKeyword } from "../lib/blocked-keyword-filter";
+import {
+  type BlockableVideo,
+  type BlockedChannelIdentity,
+  createBlockedContentMatcher,
+} from "../lib/blocked-content";
 import type { ChannelResultItem } from "../types/api";
 import type { PublicPlaylistInfo } from "../types/playlist";
-import type { VideoStream } from "../types/stream";
 import { useAuth } from "./use-auth";
 import { useBlocked } from "./use-blocked";
 
@@ -10,63 +13,69 @@ export function useBlockedFilter() {
   const { isAuthed } = useAuth();
   const { channels, videos, keywords } = useBlocked();
 
-  const blockedChannelUrls = useMemo(
-    () => new Set((channels.data ?? []).map((item) => item.url)),
-    [channels.data],
-  );
-  const blockedVideoUrls = useMemo(
-    () => new Set((videos.data ?? []).map((item) => item.url)),
-    [videos.data],
-  );
-  const blockedChannelNames = useMemo(
-    () => new Set((channels.data ?? []).map((item) => item.name?.toLowerCase()).filter(Boolean)),
-    [channels.data],
-  );
-  const blockedKeywords = useMemo(
+  const matcher = useMemo(
     () =>
-      (keywords.data ?? [])
-        .map((item) => normalizeBlockedKeyword(item.keyword))
-        .filter((keyword) => keyword.length > 0),
-    [keywords.data],
+      createBlockedContentMatcher(
+        isAuthed ? (channels.data ?? []) : [],
+        isAuthed ? (videos.data ?? []) : [],
+        isAuthed ? (keywords.data ?? []).map((item) => item.keyword) : [],
+      ),
+    [channels.data, isAuthed, keywords.data, videos.data],
   );
 
   const isBlocked = useCallback(
-    (stream: VideoStream): boolean => {
-      if (blockedVideoUrls.has(stream.id)) return true;
-      if (stream.channelUrl && blockedChannelUrls.has(stream.channelUrl)) return true;
-      return titleMatchesBlockedKeyword(stream.title, blockedKeywords);
-    },
-    [blockedChannelUrls, blockedKeywords, blockedVideoUrls],
+    (stream: BlockableVideo): boolean => matcher.isVideoBlocked(stream),
+    [matcher],
   );
 
   const filter = useCallback(
-    (streams: VideoStream[]): VideoStream[] => {
-      if (!isAuthed) return streams;
-      return streams.filter((s) => !isBlocked(s));
-    },
-    [isAuthed, isBlocked],
+    <T extends BlockableVideo>(streams: T[]): T[] => matcher.filterVideos(streams),
+    [matcher],
+  );
+
+  const isChannelIdentityBlocked = useCallback(
+    (channel: BlockedChannelIdentity): boolean => matcher.isChannelBlocked(channel),
+    [matcher],
+  );
+
+  const findBlockedChannel = useCallback(
+    (channel: BlockedChannelIdentity) => matcher.findBlockedChannel(channel),
+    [matcher],
   );
 
   const isChannelBlocked = useCallback(
-    (channel: ChannelResultItem): boolean => blockedChannelUrls.has(channel.url),
-    [blockedChannelUrls],
+    (channel: ChannelResultItem): boolean => isChannelIdentityBlocked(channel),
+    [isChannelIdentityBlocked],
+  );
+
+  const isVideoExplicitlyBlocked = useCallback(
+    (video: Pick<BlockableVideo, "id" | "url">): boolean => matcher.isVideoExplicitlyBlocked(video),
+    [matcher],
+  );
+
+  const findBlockedVideo = useCallback(
+    (video: Pick<BlockableVideo, "id" | "url">) => matcher.findBlockedVideo(video),
+    [matcher],
   );
 
   const isPlaylistBlocked = useCallback(
     (playlist: PublicPlaylistInfo): boolean => {
-      const uploader = playlist.uploaderName.trim().toLowerCase();
-      return uploader.length > 0 && blockedChannelNames.has(uploader);
+      return isChannelIdentityBlocked({ name: playlist.uploaderName });
     },
-    [blockedChannelNames],
+    [isChannelIdentityBlocked],
   );
 
   return {
     filter,
+    findBlockedChannel,
+    findBlockedVideo,
     isBlocked,
     isChannelBlocked,
+    isChannelIdentityBlocked,
     isPlaylistBlocked,
-    blockedChannelUrls,
-    blockedKeywords,
-    blockedVideoUrls,
+    isVideoExplicitlyBlocked,
+    blockedChannelUrls: matcher.channelUrls,
+    blockedKeywords: matcher.normalizedKeywords,
+    blockedVideoUrls: matcher.videoUrls,
   };
 }

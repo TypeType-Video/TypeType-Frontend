@@ -12,10 +12,6 @@ import {
 } from "../lib/api-collections";
 import { useAuth } from "./use-auth";
 
-const CHANNELS_KEY = ["blocked-channels"];
-const KEYWORDS_KEY = ["blocked-keywords"];
-const VIDEOS_KEY = ["blocked-videos"];
-
 type BlockChannelArgs = {
   url: string;
   name?: string;
@@ -30,22 +26,26 @@ type BlockVideoArgs = {
 
 export function useBlocked() {
   const qc = useQueryClient();
-  const { authReady, isAuthed } = useAuth();
+  const { authReady, isAuthed, me } = useAuth();
+  const owner = isAuthed ? (me?.id ?? "authenticated") : "signed-out";
+  const channelsKey = ["blocked-channels", owner] as const;
+  const keywordsKey = ["blocked-keywords", owner] as const;
+  const videosKey = ["blocked-videos", owner] as const;
 
   const channels = useQuery({
-    queryKey: CHANNELS_KEY,
+    queryKey: channelsKey,
     queryFn: fetchBlockedChannels,
     enabled: authReady && isAuthed,
     staleTime: 5 * 60 * 1000,
   });
   const videos = useQuery({
-    queryKey: VIDEOS_KEY,
+    queryKey: videosKey,
     queryFn: fetchBlockedVideos,
     enabled: authReady && isAuthed,
     staleTime: 5 * 60 * 1000,
   });
   const keywords = useQuery({
-    queryKey: KEYWORDS_KEY,
+    queryKey: keywordsKey,
     queryFn: fetchBlockedKeywords,
     enabled: authReady && isAuthed,
     staleTime: 5 * 60 * 1000,
@@ -54,34 +54,34 @@ export function useBlocked() {
   const addChannel = useMutation({
     mutationFn: ({ url, name, thumbnailUrl, global }: BlockChannelArgs) =>
       isAuthed ? blockChannel(url, name, thumbnailUrl, global) : Promise.resolve(),
-    onSuccess: () => qc.invalidateQueries({ queryKey: CHANNELS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: channelsKey }),
   });
 
   const removeChannel = useMutation({
     mutationFn: (url: string) => (isAuthed ? unblockChannel(url) : Promise.resolve()),
-    onSuccess: () => qc.invalidateQueries({ queryKey: CHANNELS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: channelsKey }),
   });
 
   const addVideo = useMutation({
     mutationFn: ({ url, global }: BlockVideoArgs) =>
       isAuthed ? blockVideo(url, global) : Promise.resolve(),
-    onSuccess: () => qc.invalidateQueries({ queryKey: VIDEOS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: videosKey }),
   });
 
   const removeVideo = useMutation({
     mutationFn: (url: string) => (isAuthed ? unblockVideo(url) : Promise.resolve()),
-    onSuccess: () => qc.invalidateQueries({ queryKey: VIDEOS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: videosKey }),
   });
 
   const addKeyword = useMutation({
     mutationFn: (keyword: string) =>
       isAuthed ? blockKeyword(keyword).then(() => undefined) : Promise.resolve(),
-    onSuccess: () => qc.invalidateQueries({ queryKey: KEYWORDS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: keywordsKey }),
   });
 
   const removeKeyword = useMutation({
     mutationFn: (keyword: string) => (isAuthed ? unblockKeyword(keyword) : Promise.resolve()),
-    onSuccess: () => qc.invalidateQueries({ queryKey: KEYWORDS_KEY }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: keywordsKey }),
   });
 
   return {

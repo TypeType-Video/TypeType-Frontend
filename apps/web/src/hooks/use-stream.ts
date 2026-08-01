@@ -11,10 +11,12 @@ import {
   sabrBootstrapQueryKey,
   streamQueryKey,
 } from "../lib/stream-request";
+import { useAuthStore } from "../stores/auth-store";
 
 export function streamQueryOptions(url: string, useAuthenticatedStream = false, enabled = true) {
+  const ownerId = useAuthenticatedStream ? useAuthStore.getState().me?.id : null;
   return queryOptions({
-    queryKey: streamQueryKey(url, useAuthenticatedStream),
+    queryKey: streamQueryKey(url, useAuthenticatedStream, ownerId),
     queryFn: ({ signal }) =>
       fetchStream(
         url,
@@ -62,8 +64,10 @@ export function useStream(url: string, useAuthenticatedStream = false, enabled =
 }
 
 export function useSabrBootstrap(url: string, useAuthenticatedStream = false, enabled = true) {
+  const authenticatedOwnerId = useAuthStore((state) => state.me?.id);
+  const ownerId = useAuthenticatedStream ? authenticatedOwnerId : null;
   return useQuery({
-    queryKey: sabrBootstrapQueryKey(url, useAuthenticatedStream),
+    queryKey: sabrBootstrapQueryKey(url, useAuthenticatedStream, ownerId),
     queryFn: ({ signal }) =>
       fetchSabrBootstrap(
         url,
