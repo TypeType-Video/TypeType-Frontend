@@ -103,14 +103,23 @@ export type SearchPageResponse = {
   isCorrectedSearch: boolean;
 };
 
-type SearchFilterOption = {
+export type SearchFilterOption = {
   value: string;
   label: string;
+  isDefault?: boolean;
+};
+
+export type SearchFilterGroup = {
+  key: string;
+  label: string;
+  multiSelect: boolean;
+  options: SearchFilterOption[];
 };
 
 export type SearchFiltersResponse = {
   contentFilters: SearchFilterOption[];
   sortFilters: SearchFilterOption[];
+  filterGroups?: SearchFilterGroup[];
 };
 
 export type HomeRecommendationsResponse = {

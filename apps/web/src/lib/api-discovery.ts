@@ -5,8 +5,13 @@ import { optionalBearer } from "./optional-bearer";
 
 export type ChannelSort = "latest" | "popular" | "oldest";
 
-export function fetchSearchFilters(service: number): Promise<SearchFiltersResponse> {
-  return request(`${BASE}/search/filters?service=${service}`);
+export function fetchSearchFilters(
+  service: number,
+  contentFilter?: string,
+): Promise<SearchFiltersResponse> {
+  const params = new URLSearchParams({ service: String(service) });
+  if (contentFilter) params.set("contentFilter", contentFilter);
+  return request(`${BASE}/search/filters?${params}`);
 }
 
 export function fetchSearch(
@@ -14,12 +19,12 @@ export function fetchSearch(
   service: number,
   nextpage?: string,
   contentFilter?: string,
-  sortFilter?: string,
+  filters: readonly string[] = [],
 ): Promise<SearchPageResponse> {
   const params = new URLSearchParams({ q, service: String(service) });
   if (nextpage) params.set("nextpage", nextpage);
   if (contentFilter) params.set("contentFilter", contentFilter);
-  if (sortFilter) params.set("sortFilter", sortFilter);
+  for (const filter of filters) params.append("filter", filter);
   return request(`${BASE}/search?${params}`, optionalBearer());
 }
 

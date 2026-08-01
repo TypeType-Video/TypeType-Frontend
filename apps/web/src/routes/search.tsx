@@ -11,15 +11,24 @@ import { useSearchFilters } from "../hooks/use-search-filters";
 import { useSettings } from "../hooks/use-settings";
 
 function SearchPage() {
-  const { q, service, contentFilter, sortFilter } = Route.useSearch();
+  const {
+    q,
+    service,
+    contentFilter,
+    filters: selectedFilters = [],
+    sortFilter,
+  } = Route.useSearch();
   const navigate = useNavigate();
-  const filters = useSearchFilters(service);
+  const filters = useSearchFilters(service, contentFilter);
+  const searchFilters = [...selectedFilters, ...(sortFilter ? [sortFilter] : [])].filter(
+    (value, index, values) => values.indexOf(value) === index,
+  );
   const { settings } = useSettings();
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useSearch(
     q,
     service,
     contentFilter,
-    sortFilter,
+    searchFilters,
   );
   const { filter, isChannelBlocked, isPlaylistBlocked } = useBlockedFilter();
 
@@ -59,20 +68,23 @@ function SearchPage() {
   }
 
   function setContentFilter(value: string | undefined) {
-    navigate({ to: "/search", search: { q, service, contentFilter: value, sortFilter } });
+    navigate({ to: "/search", search: { q, service, contentFilter: value } });
   }
 
-  function setSortFilter(value: string | undefined) {
-    navigate({ to: "/search", search: { q, service, contentFilter, sortFilter: value } });
+  function setSearchFilters(values: string[]) {
+    navigate({
+      to: "/search",
+      search: { q, service, contentFilter, ...(values.length > 0 ? { filters: values } : {}) },
+    });
   }
 
   const filterBar = filters.data ? (
     <SearchFilterBar
       filters={filters.data}
       contentFilter={contentFilter}
-      sortFilter={sortFilter}
+      selectedFilters={searchFilters}
       onContentChange={setContentFilter}
-      onSortChange={setSortFilter}
+      onFiltersChange={setSearchFilters}
     />
   ) : null;
 
@@ -131,11 +143,19 @@ function SearchPage() {
 }
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q : "",
-    service: typeof search.service === "number" ? search.service : 0,
-    ...(typeof search.contentFilter === "string" ? { contentFilter: search.contentFilter } : {}),
-    ...(typeof search.sortFilter === "string" ? { sortFilter: search.sortFilter } : {}),
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const filters = Array.isArray(search.filters)
+      ? search.filters.filter((value): value is string => typeof value === "string")
+      : typeof search.filters === "string"
+        ? [search.filters]
+        : [];
+    return {
+      q: typeof search.q === "string" ? search.q : "",
+      service: typeof search.service === "number" ? search.service : 0,
+      ...(typeof search.contentFilter === "string" ? { contentFilter: search.contentFilter } : {}),
+      ...(filters.length > 0 ? { filters } : {}),
+      ...(typeof search.sortFilter === "string" ? { sortFilter: search.sortFilter } : {}),
+    };
+  },
   component: SearchPage,
 });
