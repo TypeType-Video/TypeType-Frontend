@@ -7,6 +7,7 @@ import { useWatchPlayerEvents } from "./use-watch-player-events";
 
 type Args = {
   stream: VideoStream;
+  related: VideoStream[];
   settings: SettingsItem;
   settingsReady: boolean;
   isLive: boolean;
@@ -29,7 +30,7 @@ export function useWatchPlaybackFlow(args: Args) {
     nextVideo: args.nextVideo,
     list: args.list,
     shuffle: args.shuffle,
-    related: args.stream.related,
+    related: args.related,
   });
   const preloadAutoplay = useWatchAutoplayPreload({
     durationMs: args.stream.duration * 1000,

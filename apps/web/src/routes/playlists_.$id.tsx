@@ -6,6 +6,7 @@ import { PlaylistActions } from "../components/playlist-actions";
 import { PlaylistGrid } from "../components/playlist-grid";
 import { PlaylistRenameModal } from "../components/playlist-rename-modal";
 import { PlaylistSortMenu } from "../components/playlist-sort-menu";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { usePlaylist } from "../hooks/use-playlist";
 import { usePlaylists } from "../hooks/use-playlists";
 import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
@@ -18,6 +19,7 @@ function PlaylistDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { remove, removeVideo, rename, reorder } = usePlaylists();
+  const { filter } = useBlockedFilter();
   const { data: playlist, isPending } = usePlaylist(id);
   const [renaming, setRenaming] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<PlaylistVideoItem | null>(null);
@@ -45,7 +47,8 @@ function PlaylistDetailPage() {
     );
   }
 
-  const videos = playlist.videos ?? [];
+  const allVideos = playlist.videos ?? [];
+  const videos = filter(allVideos);
   const count = videos.length;
   const sortedVideos = sortPlaylistVideos(videos, sortMode);
   const reorderable = sortMode === "manual";
@@ -116,7 +119,11 @@ function PlaylistDetailPage() {
       </div>
       {count === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
-          <p className="text-fg-muted text-sm">No videos in this playlist yet.</p>
+          <p className="text-fg-muted text-sm">
+            {allVideos.length > 0
+              ? "All videos in this playlist are blocked."
+              : "No videos in this playlist yet."}
+          </p>
           <p className="text-fg-soft text-xs">
             Save videos from the watch page using the Save button.
           </p>

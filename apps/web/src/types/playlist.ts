@@ -8,6 +8,7 @@ export type WatchPlaylistItem = {
   title: string;
   thumbnail: string;
   channelName?: string;
+  channelUrl?: string;
 };
 
 export type PublicPlaylistInfo = {

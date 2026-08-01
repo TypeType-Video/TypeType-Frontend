@@ -25,12 +25,11 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
   const feed = useShortsFeed();
   const shorts = useShortsRouteFeed(feed.shorts, targetUrl);
   const { authReady, isAuthed } = useAuth();
-  const { data: instance, isPending: instancePending } = useInstance();
+  const { isPending: instancePending } = useInstance();
   const { settings, update, settingsReady } = useSettings();
   const playerRef = useRef<HTMLDivElement>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const useAuthenticatedStream =
-    isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
 
   const handleAutoNext = () => {

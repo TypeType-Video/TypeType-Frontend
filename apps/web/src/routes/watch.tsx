@@ -27,11 +27,10 @@ function WatchPage() {
   const sourceUrl = toWatchSourceUrl(v);
   const publicParam = toPublicWatchParam(sourceUrl);
   const { authReady, isAuthed } = useAuth();
-  const { data: instance, isPending: instancePending } = useInstance();
+  const { isPending: instancePending } = useInstance();
   const { settings, settingsReady } = useSettings();
   const navigationSnapshot = useWatchNavigationStore((state) => state.snapshot);
-  const useAuthenticatedStream =
-    isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
   const streamQuery = useStream(sourceUrl, useAuthenticatedStream, streamEnabled);
   const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, streamEnabled);

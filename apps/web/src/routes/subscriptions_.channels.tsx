@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SubscriptionChannelList } from "../components/subscription-channel-list";
 import { SubscriptionsHeader } from "../components/subscriptions-header";
 import { VideoGridSkeleton } from "../components/video-grid-skeleton";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { SUBSCRIPTION_FEED_KEY } from "../hooks/use-subscription-feed";
 import { SUBSCRIPTIONS_KEY, useSubscriptions } from "../hooks/use-subscriptions";
 import { fetchSubscriptionFeed, fetchSubscriptions } from "../lib/api-user";
@@ -16,7 +17,10 @@ function nextSubscriptionPage(last: Awaited<ReturnType<typeof fetchSubscriptionF
 function SubscriptionChannelsPage() {
   const queryClient = useQueryClient();
   const { query } = useSubscriptions();
-  const subscriptions = query.data ?? [];
+  const { isChannelIdentityBlocked } = useBlockedFilter();
+  const subscriptions = (query.data ?? []).filter(
+    (item) => !isChannelIdentityBlocked({ url: item.channelUrl, name: item.name }),
+  );
 
   function prefetchChannels() {
     void queryClient.prefetchQuery({

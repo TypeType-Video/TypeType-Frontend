@@ -41,7 +41,7 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
     fetchNextPage,
   } = useChannel(sourceUrl, sort, searchQuery, live);
   const { add, remove, isSubscribed } = useSubscriptions();
-  const { filter } = useBlockedFilter();
+  const { filter, isChannelIdentityBlocked } = useBlockedFilter();
   useDocumentTitle(meta?.name);
 
   const subscribed = isSubscribed(sourceUrl);
@@ -93,6 +93,14 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
           Retry
         </button>
       </div>
+    );
+  }
+  if (meta && isChannelIdentityBlocked({ url: sourceUrl, name: meta.name })) {
+    return (
+      <FamilyListEmptyState
+        title="This channel is blocked"
+        description="Unblock it from Settings to see this channel again."
+      />
     );
   }
 

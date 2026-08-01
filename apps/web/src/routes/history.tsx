@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ConfirmModal } from "../components/confirm-modal";
 import { HistoryCard } from "../components/history-card";
 import type { FilterState } from "../components/history-filter";
@@ -8,6 +8,7 @@ import { HistoryFilter } from "../components/history-filter";
 import { ScrollSentinel } from "../components/scroll-sentinel";
 import { Toast } from "../components/toast";
 import { useAuth } from "../hooks/use-auth";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHistory } from "../hooks/use-history";
 import { fetchHistory } from "../lib/api-user";
 import type { HistoryItem } from "../types/user";
@@ -53,6 +54,7 @@ function rangeFromFilter(filter: FilterState | null): DateRange {
 
 function HistoryPage() {
   const { isAuthed } = useAuth();
+  const { filter: filterBlocked } = useBlockedFilter();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<FilterState | null>(null);
   const [pendingRemoveItem, setPendingRemoveItem] = useState<HistoryItem | null>(null);
@@ -81,14 +83,17 @@ function HistoryPage() {
     staleTime: 30_000,
   });
 
-  const filtered = filter !== null ? dedupeByUrl(allItemsQuery.data?.items ?? []) : items;
-  const filteredTotal = filter !== null ? filtered.length : total;
+  const unblocked = useMemo(
+    () => filterBlocked(filter !== null ? dedupeByUrl(allItemsQuery.data?.items ?? []) : items),
+    [allItemsQuery.data?.items, filter, filterBlocked, items],
+  );
+  const filteredTotal = filter !== null ? unblocked.length : total;
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex-1 min-w-0">
         <div className="grid grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((item: HistoryItem) => (
+          {unblocked.map((item: HistoryItem) => (
             <HistoryCard key={item.id} item={item} onRemove={() => setPendingRemoveItem(item)} />
           ))}
         </div>

@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { useMobile } from "../hooks/use-mobile";
 import { usePlayerError } from "../hooks/use-player-error";
@@ -35,6 +36,7 @@ export function WatchLayout({
   const isMobile = useMobile();
   const save = useSaveProgress(stream.id);
   const { settings, update, settingsReady } = useSettings();
+  const { filter } = useBlockedFilter();
   const branding = useDeArrowBranding(stream.id, stream.title, stream.thumbnail, stream.duration);
   const displayStream = { ...stream, ...branding };
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
@@ -42,7 +44,10 @@ export function WatchLayout({
   const { on: bulletCommentsOn } = useDanmakuStore();
   const { isNicoNico, bulletComments } = useWatchBulletComments(stream.id, settings.hideComments);
   const sponsor = useWatchSponsorBlock(stream, settings);
-  const relatedStreams = settings.hideRelatedVideos ? [] : (stream.related ?? []);
+  const relatedStreams = useMemo(
+    () => (settings.hideRelatedVideos ? [] : filter(stream.related ?? [])),
+    [filter, settings.hideRelatedVideos, stream.related],
+  );
   const playlist = useWatchPlaylist(list, shuffle, currentParam);
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
   const seekRef = useRef<((seconds: number) => void) | null>(null);
@@ -55,6 +60,7 @@ export function WatchLayout({
   );
   const { autoplay, playerEvents } = useWatchPlaybackFlow({
     stream,
+    related: relatedStreams,
     settings,
     settingsReady,
     isLive,
