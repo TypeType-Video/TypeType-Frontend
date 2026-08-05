@@ -43,14 +43,13 @@ const video = {
   },
 } as HTMLVideoElement;
 
-registerSabrVidstackControls(video, {
-  play: async () => {},
-  pause: () => {},
-  seek: sabrSeek,
-});
-
 test("keeps the video SABR slider interactive while a seek is pending", () => {
   sabrSeek.mockClear();
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: sabrSeek,
+  });
   renderToStaticMarkup(<SabrTimeSlider seeking video={video} />);
 
   expect(sliderProps.disabled).toBeUndefined();
@@ -61,10 +60,16 @@ test("keeps the video SABR slider interactive while a seek is pending", () => {
   onDragEnd(80);
 
   expect(sabrSeek).toHaveBeenCalledWith(480);
+  unregister();
 });
 
 test("keeps the audio SABR slider interactive while a seek is pending", () => {
   sabrSeek.mockClear();
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: sabrSeek,
+  });
   renderToStaticMarkup(<AudioTimeSlider seeking video={video} />);
 
   expect(sliderProps.disabled).toBeUndefined();
@@ -76,4 +81,5 @@ test("keeps the audio SABR slider interactive while a seek is pending", () => {
 
   expect(sabrSeek).toHaveBeenCalledWith(120);
   expect(remoteSeek).not.toHaveBeenCalled();
+  unregister();
 });
