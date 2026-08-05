@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { copyText } from "../lib/copy-text";
 
 type ResetTokenModalProps = {
   email: string;
@@ -8,14 +9,7 @@ type ResetTokenModalProps = {
 };
 
 export function ResetTokenModal({ email, token, onClose, onCopied }: ResetTokenModalProps) {
-  useEffect(() => {
-    navigator.clipboard
-      .writeText(token)
-      .then(() => {
-        onCopied();
-      })
-      .catch(() => {});
-  }, [token, onCopied]);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "manual">("idle");
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -25,10 +19,13 @@ export function ResetTokenModal({ email, token, onClose, onCopied }: ResetTokenM
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(token).then(() => {
+  const handleCopy = async () => {
+    if (await copyText(token)) {
+      setCopyState("copied");
       onCopied();
-    });
+      return;
+    }
+    setCopyState("manual");
   };
 
   return (
@@ -52,18 +49,29 @@ export function ResetTokenModal({ email, token, onClose, onCopied }: ResetTokenM
           <p className="text-sm text-fg-muted mt-1">{email}</p>
         </div>
 
-        <div className="mb-4 p-3 rounded-lg bg-app border border-border">
-          <p className="text-xs font-mono text-fg break-all">{token}</p>
-        </div>
+        <textarea
+          readOnly
+          value={token}
+          aria-label="Password reset token"
+          onFocus={(event) => event.currentTarget.select()}
+          className="mb-4 block h-24 w-full resize-none rounded-lg border border-border bg-app p-3 font-mono text-xs text-fg"
+        />
 
-        <div className="mb-3 text-xs text-emerald-200 bg-emerald-950/30 border border-emerald-800/50 p-2 rounded">
-          Token copied to clipboard automatically
-        </div>
+        {copyState === "copied" && (
+          <div className="mb-3 rounded border border-emerald-800/50 bg-emerald-950/30 p-2 text-xs text-emerald-200">
+            Token copied to clipboard
+          </div>
+        )}
+        {copyState === "manual" && (
+          <div className="mb-3 rounded border border-border-strong bg-surface-strong p-2 text-xs text-fg-muted">
+            Clipboard access is unavailable. Select the token above and copy it manually.
+          </div>
+        )}
 
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={handleCopy}
+            onClick={() => void handleCopy()}
             className="flex-1 h-9 rounded-md border border-border-strong bg-surface-strong px-3 text-sm font-medium text-fg hover:border-border-strong hover:bg-surface-soft transition-colors"
           >
             Copy token
