@@ -1,5 +1,4 @@
-import { toApiUrl } from "../lib/env";
-import { getOpenMojiUrl, pickOpenMojiCode } from "../lib/openmoji";
+import { getAdminUserAvatarUrl } from "../lib/admin-user-avatar";
 import type { AuthUser } from "../types/auth";
 
 type AdminUserAvatarProps = {
@@ -8,13 +7,7 @@ type AdminUserAvatarProps = {
 };
 
 export function AdminUserAvatar({ user, className }: AdminUserAvatarProps) {
-  const seed = `${user.id}:${user.email}`;
-  const avatarUrl =
-    user.avatarType === "emoji" && typeof user.avatarCode === "string" && user.avatarCode.length > 0
-      ? getOpenMojiUrl(user.avatarCode)
-      : user.avatarUrl
-        ? toApiUrl(user.avatarUrl)
-        : getOpenMojiUrl(pickOpenMojiCode(seed));
+  const avatarUrl = getAdminUserAvatarUrl(user);
 
   return (
     <div
