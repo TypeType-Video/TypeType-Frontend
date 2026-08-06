@@ -1,12 +1,14 @@
 import { describe, expect, test } from "bun:test";
 
-Object.defineProperty(globalThis, "localStorage", {
-  value: {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-  },
-});
+if (!("localStorage" in globalThis)) {
+  Object.defineProperty(globalThis, "localStorage", {
+    value: {
+      getItem: () => null,
+      setItem: () => undefined,
+      removeItem: () => undefined,
+    },
+  });
+}
 
 const { parseComponentVersion } = await import("../src/lib/api-version");
 

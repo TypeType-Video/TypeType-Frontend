@@ -22,13 +22,17 @@ function providerStreamPath(provider: ReturnType<typeof detectProvider>) {
 export function streamQueryKey(
   url: string,
   authenticated: boolean,
-): readonly ["stream", string, "auth" | "anon"] {
-  return ["stream", url, authenticated ? "auth" : "anon"];
+  ownerId?: string | null,
+): readonly ["stream", string, string] {
+  const scope = authenticated && ownerId ? `auth:${ownerId}` : authenticated ? "auth" : "anon";
+  return ["stream", url, scope];
 }
 
 export function sabrBootstrapQueryKey(
   url: string,
   authenticated: boolean,
-): readonly ["stream-bootstrap", string, "auth" | "anon"] {
-  return ["stream-bootstrap", url, authenticated ? "auth" : "anon"];
+  ownerId?: string | null,
+): readonly ["stream-bootstrap", string, string] {
+  const scope = authenticated && ownerId ? `auth:${ownerId}` : authenticated ? "auth" : "anon";
+  return ["stream-bootstrap", url, scope];
 }

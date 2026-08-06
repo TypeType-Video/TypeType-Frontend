@@ -1,7 +1,7 @@
 import { useAuthStore } from "../stores/auth-store";
 import { ApiError } from "./api";
 import { recordApiError } from "./api-error-log";
-import { refreshSession } from "./auth-session";
+import { isRefreshSessionRejected, refreshSession } from "./auth-session";
 import { extractRequestId, recordClientEvent } from "./client-debug-log";
 import { sanitizeDebugText, sanitizeRequestPath } from "./debug-sanitize";
 import { normalizeApiPayload } from "./text-normalize";
@@ -20,32 +20,15 @@ function shouldLogStatus(status: number, options: AuthedOptions | undefined): bo
   return !(options?.silentStatuses ?? []).includes(status);
 }
 
-export async function authed(
+async function fetchAuthed(
   url: string,
-  init?: RequestInit,
-  options?: AuthedOptions,
+  init: RequestInit | undefined,
+  token: string,
+  method: string,
+  path: string,
 ): Promise<Response> {
-  const method = init?.method ?? "GET";
-  const path = sanitizeRequestPath(url);
-  let token = useAuthStore.getState().token;
-  if (!token) {
-    recordClientEvent("auth.missing_token_try_refresh", { method, path });
-    try {
-      token = await refreshSession();
-    } catch {
-      useAuthStore.getState().setSignedOut();
-      recordApiError({
-        endpoint: url,
-        status: 401,
-        code: "AUTH_REQUIRED",
-        message: "Authentication required",
-      });
-      throw new ApiError("Authentication required", 401);
-    }
-  }
-  let res: Response;
   try {
-    res = await fetch(url, withBearer(init, token));
+    return await fetch(url, withBearer(init, token));
   } catch (error) {
     const message = error instanceof Error ? error.message : "network_error";
     recordApiError({
@@ -61,38 +44,66 @@ export async function authed(
     });
     throw error;
   }
+}
+
+function rejectExpiredSession(message: "Authentication required" | "Session expired"): never {
+  useAuthStore.getState().setSignedOut();
+  recordApiError({
+    endpoint: "/auth/refresh",
+    status: 401,
+    code: message === "Session expired" ? "SESSION_EXPIRED" : "AUTH_REQUIRED",
+    message,
+  });
+  throw new ApiError(message, 401);
+}
+
+export async function authed(
+  url: string,
+  init?: RequestInit,
+  options?: AuthedOptions,
+): Promise<Response> {
+  const method = init?.method ?? "GET";
+  const path = sanitizeRequestPath(url);
+  let token = useAuthStore.getState().token;
+  if (!token) {
+    recordClientEvent("auth.missing_token_try_refresh", { method, path });
+    try {
+      token = await refreshSession();
+    } catch (error) {
+      if (isRefreshSessionRejected(error)) rejectExpiredSession("Authentication required");
+      throw error;
+    }
+  }
+  const res = await fetchAuthed(url, init, token, method, path);
   if (res.status === 401) {
     recordClientEvent("auth.unauthorized_retry", { method, path });
+    let retryToken: string;
     try {
-      const retryToken = await refreshSession();
-      const retryRes = await fetch(url, withBearer(init, retryToken));
-      if (!retryRes.ok && shouldLogStatus(retryRes.status, options)) {
-        recordApiError({
-          endpoint: url,
-          status: retryRes.status,
-          code: "AUTH_RETRY_ERROR",
-          message: "Retry request failed",
-          requestId: extractRequestId(retryRes.headers),
-        });
-        recordClientEvent("auth.retry_error", {
-          method,
-          path,
-          status: retryRes.status,
-          requestId: extractRequestId(retryRes.headers),
-        });
+      retryToken = await refreshSession();
+    } catch (error) {
+      if (isRefreshSessionRejected(error)) {
+        recordClientEvent("auth.session_expired", { method, path });
+        rejectExpiredSession("Session expired");
       }
-      return retryRes;
-    } catch {
-      useAuthStore.getState().setSignedOut();
+      throw error;
+    }
+    const retryRes = await fetchAuthed(url, init, retryToken, method, path);
+    if (!retryRes.ok && shouldLogStatus(retryRes.status, options)) {
       recordApiError({
         endpoint: url,
-        status: 401,
-        code: "SESSION_EXPIRED",
-        message: "Session expired",
+        status: retryRes.status,
+        code: "AUTH_RETRY_ERROR",
+        message: "Retry request failed",
+        requestId: extractRequestId(retryRes.headers),
       });
-      recordClientEvent("auth.session_expired", { method, path });
-      throw new ApiError("Session expired", 401);
+      recordClientEvent("auth.retry_error", {
+        method,
+        path,
+        status: retryRes.status,
+        requestId: extractRequestId(retryRes.headers),
+      });
     }
+    return retryRes;
   }
   if (!res.ok && shouldLogStatus(res.status, options)) {
     recordApiError({

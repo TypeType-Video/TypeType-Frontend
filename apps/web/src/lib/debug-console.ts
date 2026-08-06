@@ -4,8 +4,12 @@ type DebugDetails = Record<string, string | number | boolean | null | undefined>
 
 function enabled(): boolean {
   if (import.meta.env.DEV) return true;
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem("typetype-debug-console") === "1";
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") return false;
+  try {
+    return window.localStorage.getItem("typetype-debug-console") === "1";
+  } catch {
+    return false;
+  }
 }
 
 function sanitizeDetails(details: DebugDetails | undefined): DebugDetails | undefined {

@@ -7,6 +7,7 @@ import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
 import { usePlaylistOrderStore } from "../stores/playlist-order-store";
 import type { WatchPlaylistItem } from "../types/playlist";
+import { useBlockedFilter } from "./use-blocked-filter";
 import { usePlaylist } from "./use-playlist";
 import { usePlaylists } from "./use-playlists";
 import { usePublicPlaylist } from "./use-public-playlist";
@@ -28,6 +29,7 @@ export function useWatchPlaylist(
   currentParam: string,
 ): WatchPlaylist {
   const navigate = useNavigate();
+  const { filter } = useBlockedFilter();
   const managedList = list && isManagedPlaylistId(list) ? list : "";
   const publicListUrl =
     list && !isManagedPlaylistId(list) ? `https://www.youtube.com/playlist?list=${list}` : "";
@@ -47,6 +49,7 @@ export function useWatchPlaylist(
         title: item.title,
         thumbnail: item.thumbnail,
         channelName: item.channelName,
+        channelUrl: item.channelUrl,
       }))
     : (publicPlaylist.data?.pages.flatMap((page) => page.streams) ?? []).map((item, index) => ({
         key: `${index}-${item.id}`,
@@ -54,8 +57,11 @@ export function useWatchPlaylist(
         title: item.title,
         thumbnail: item.thumbnail,
         channelName: item.channelName,
+        channelUrl: item.channelUrl,
       }));
-  const arranged = !isManaged && customOrder ? applyCustomOrder(base, customOrder) : base;
+  const visibleBase = filter(base);
+  const arranged =
+    !isManaged && customOrder ? applyCustomOrder(visibleBase, customOrder) : visibleBase;
   const videos = shuffle ? shuffleByKey(arranged, shuffle) : arranged;
   const inPlaylist = Boolean(list) && videos.length > 0;
   const currentIdx = inPlaylist
@@ -121,8 +127,14 @@ export function useWatchPlaylist(
           })
         }
         onReorder={(items) => {
-          if (isManaged && list) reorder.mutate({ id: list, order: items.map((v) => v.url) });
-          else if (list)
+          if (isManaged && list) {
+            const reordered = [...items];
+            const visibleKeys = new Set(visibleBase.map((item) => item.key));
+            const fullOrder = base.map((item) =>
+              visibleKeys.has(item.key) ? (reordered.shift() ?? item).url : item.url,
+            );
+            reorder.mutate({ id: list, order: fullOrder });
+          } else if (list)
             setOrder(
               list,
               items.map((v) => v.key),

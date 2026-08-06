@@ -1,4 +1,4 @@
-import { toApiUrl } from "../lib/env";
+import { getAdminUserAvatarUrl } from "../lib/admin-user-avatar";
 import { getOpenMojiUrl, pickOpenMojiCode } from "../lib/openmoji";
 import type { AdminSession } from "../types/admin";
 import type { AuthUser } from "../types/auth";
@@ -26,9 +26,7 @@ function initials(value: string): string {
 }
 
 function avatarUrl(user: AuthUser | undefined, session: AdminSession): string | null {
-  if (user?.avatarType === "emoji" && user.avatarCode) return getOpenMojiUrl(user.avatarCode);
-  if (user?.avatarUrl) return toApiUrl(user.avatarUrl);
-  if (user) return getOpenMojiUrl(pickOpenMojiCode(`${user.id}:${user.email}`));
+  if (user) return getAdminUserAvatarUrl(user);
   if (session.userId) return getOpenMojiUrl(pickOpenMojiCode(session.userId));
   return null;
 }

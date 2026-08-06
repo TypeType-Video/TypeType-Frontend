@@ -14,11 +14,16 @@ type SearchPage = {
   isCorrectedSearch: boolean;
 };
 
-export function useSearch(q: string, service: number, contentFilter?: string, sortFilter?: string) {
+export function useSearch(
+  q: string,
+  service: number,
+  contentFilter?: string,
+  filters: readonly string[] = [],
+) {
   return useInfiniteQuery({
-    queryKey: ["search", q, service, contentFilter ?? "", sortFilter ?? ""],
+    queryKey: ["search", q, service, contentFilter ?? "", filters],
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
-      const response = await fetchSearch(q, service, pageParam, contentFilter, sortFilter);
+      const response = await fetchSearch(q, service, pageParam, contentFilter, filters);
       return {
         streams: response.items.map(mapVideoItem),
         channels: response.channels ?? [],

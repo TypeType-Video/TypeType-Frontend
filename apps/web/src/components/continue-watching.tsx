@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHistory } from "../hooks/use-history";
 import { isVideoInProgress } from "../lib/watch-progress";
 import { ContinueCard } from "./continue-card";
@@ -6,10 +8,15 @@ const MAX_ITEMS = 12;
 
 export function ContinueWatching() {
   const { items } = useHistory();
-  const displayed = items
-    .filter((h) => isVideoInProgress(h.progress, h.duration))
-    .sort((a, b) => b.watchedAt - a.watchedAt)
-    .slice(0, MAX_ITEMS);
+  const { filter } = useBlockedFilter();
+  const displayed = useMemo(
+    () =>
+      filter(items)
+        .filter((h) => isVideoInProgress(h.progress, h.duration))
+        .sort((a, b) => b.watchedAt - a.watchedAt)
+        .slice(0, MAX_ITEMS),
+    [filter, items],
+  );
   if (displayed.length === 0) return null;
 
   return (

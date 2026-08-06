@@ -21,13 +21,12 @@ export function useWatchAutoplayPreload({ durationMs, enabled, target }: Args) {
   const queryClient = useQueryClient();
   const token = useAuthStore((state) => state.token);
   const { authReady, isAuthed } = useAuth();
-  const { data: instance, isPending: instancePending } = useInstance();
-  const { settings, settingsReady } = useSettings();
+  const { isPending: instancePending } = useInstance();
+  const { settingsReady } = useSettings();
   const preloadedRef = useRef(new Set<string>());
   const activeRef = useRef<AbortController | null>(null);
   const activeTargetIdRef = useRef("");
-  const useAuthenticatedStream =
-    isAuthed && (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const useAuthenticatedStream = isAuthed;
   const ready = authReady && !instancePending && (!isAuthed || settingsReady);
   const targetId = target?.id ?? "";
 

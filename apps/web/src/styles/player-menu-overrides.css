@@ -19,6 +19,13 @@
   --media-cue-bg: rgb(0 0 0 / var(--media-user-text-bg-opacity, 0.7));
 }
 
+.vds-captions [data-part="cue-display"] {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
 @media (pointer: coarse) {
   .vds-video-layout[data-lg] .vds-volume-slider {
     margin-left: var(--gap, 10px);

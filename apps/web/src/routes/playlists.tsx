@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ConfirmModal } from "../components/confirm-modal";
 import { LibraryCollectionCard } from "../components/library-collection-card";
 import { PlaylistCard } from "../components/playlist-card";
@@ -8,6 +8,7 @@ import { PlaylistsEmptyState } from "../components/playlists-empty-state";
 import { PlaylistsPageHeader } from "../components/playlists-page-header";
 import { SavedPlaylistsSection } from "../components/saved-playlists-section";
 import { Toast } from "../components/toast";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useFavoriteStreams } from "../hooks/use-favorite-streams";
 import { usePlaylists } from "../hooks/use-playlists";
 import { useSavedPlaylists } from "../hooks/use-saved-playlists";
@@ -17,10 +18,21 @@ import type { SavedPlaylistItem } from "../types/playlist";
 function PlaylistsPage() {
   const { query, create, remove } = usePlaylists();
   const savedPlaylists = useSavedPlaylists();
-  const favorites = useFavoriteStreams({ limit: 1 });
+  const favorites = useFavoriteStreams();
   const watchLater = useWatchLaterStreams();
   const playlists = query.data ?? [];
-  const saved = savedPlaylists.items;
+  const { filter, isPlaylistBlocked } = useBlockedFilter();
+  const visibleFavorites = useMemo(() => filter(favorites.videos), [favorites.videos, filter]);
+  const visibleWatchLater = useMemo(() => filter(watchLater.videos), [filter, watchLater.videos]);
+  const visiblePlaylists = useMemo(
+    () =>
+      playlists.map((playlist) => {
+        const videos = filter(playlist.videos ?? []);
+        return { ...playlist, videos, videoCount: videos.length };
+      }),
+    [filter, playlists],
+  );
+  const saved = savedPlaylists.items.filter((playlist) => !isPlaylistBlocked(playlist));
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmIds, setConfirmIds] = useState<string[] | null>(null);
@@ -70,7 +82,8 @@ function PlaylistsPage() {
       : confirmIds.length === 1
         ? `Delete "${playlists.find((p) => p.id === confirmIds[0])?.name ?? "this playlist"}"?`
         : `Delete ${confirmIds.length} playlists?`;
-  const hasLocalCollections = playlists.length > 0 || favorites.count > 0 || watchLater.count > 0;
+  const hasLocalCollections =
+    playlists.length > 0 || visibleFavorites.length > 0 || visibleWatchLater.length > 0;
 
   return (
     <div className="flex flex-col gap-6 pt-2 sm:pt-4 [animation:page-fade-in_0.2s_ease-out]">
@@ -91,16 +104,16 @@ function PlaylistsPage() {
           <LibraryCollectionCard
             kind="favorites"
             title="Favorites"
-            count={favorites.count}
-            thumbnail={favorites.videos[0]?.thumbnail}
+            count={visibleFavorites.length}
+            thumbnail={visibleFavorites[0]?.thumbnail}
           />
           <LibraryCollectionCard
             kind="watch-later"
             title="Watch later"
-            count={watchLater.count}
-            thumbnail={watchLater.videos[0]?.thumbnail}
+            count={visibleWatchLater.length}
+            thumbnail={visibleWatchLater[0]?.thumbnail}
           />
-          {playlists.map((playlist, index) => (
+          {visiblePlaylists.map((playlist, index) => (
             <div
               key={playlist.id}
               className="animate-card-pop-in"

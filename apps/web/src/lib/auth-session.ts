@@ -17,6 +17,10 @@ type RegisterPayload = {
 
 let refreshInFlight: Promise<string> | null = null;
 
+export function isRefreshSessionRejected(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 401;
+}
+
 async function hydrateSession(token: string): Promise<AuthMe> {
   const me = await fetchMe(token);
   useAuthStore.getState().setSession(token, me);
@@ -48,8 +52,12 @@ export async function bootstrapSession(): Promise<void> {
       try {
         await refreshSession();
         return;
-      } catch {
-        setSignedOut();
+      } catch (refreshError) {
+        if (isRefreshSessionRejected(refreshError) || !me) {
+          setSignedOut();
+          return;
+        }
+        setSession(token, me);
         return;
       }
     }

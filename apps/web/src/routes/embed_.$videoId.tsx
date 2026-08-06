@@ -46,7 +46,7 @@ function EmbedPage() {
     isGuest,
     settingsReady: false,
   });
-  const { settings, settingsReady } = useSettings({
+  const { settingsReady } = useSettings({
     forceAnonymous: !accessWithoutSettings.sessionEnabled,
   });
   const access = resolveEmbedAccess({
@@ -57,9 +57,7 @@ function EmbedPage() {
     isGuest,
     settingsReady,
   });
-  const useAuthenticatedStream =
-    access.sessionEnabled &&
-    (settings.accessMode === "allow_list" || instance?.guestAllowed === false);
+  const useAuthenticatedStream = access.sessionEnabled;
   const streamQuery = useStream(sourceUrl, useAuthenticatedStream, access.streamEnabled);
   const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, access.streamEnabled);
   const publicParam = toPublicWatchParam(sourceUrl);

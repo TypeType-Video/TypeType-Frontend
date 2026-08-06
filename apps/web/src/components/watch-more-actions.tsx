@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useBlocked } from "../hooks/use-blocked";
+import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
 import { goto } from "../lib/route-redirect";
 import { watchLaterResultLabel } from "../lib/watch-later-labels";
@@ -19,11 +20,15 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
   const [menuOpen, setMenuOpen] = useState(false);
   const menuAnchorRef = useRef<HTMLButtonElement>(null);
   const watchLater = useWatchLaterPlaylist();
-  const { channels, videos, addChannel, removeChannel, addVideo, removeVideo } = useBlocked();
-  const channelBlocked =
-    !!stream.channelUrl &&
-    (channels.data ?? []).some((blocked) => blocked.url === stream.channelUrl);
-  const videoBlocked = (videos.data ?? []).some((blocked) => blocked.url === stream.id);
+  const { addChannel, removeChannel, addVideo, removeVideo } = useBlocked();
+  const { findBlockedChannel, findBlockedVideo } = useBlockedFilter();
+  const blockedChannel = findBlockedChannel({
+    url: stream.channelUrl,
+    name: stream.channelName,
+  });
+  const blockedVideo = findBlockedVideo(stream);
+  const channelBlocked = blockedChannel !== undefined;
+  const videoBlocked = blockedVideo !== undefined;
 
   function ensureAuth(): boolean {
     if (isAuthed) return true;
@@ -34,7 +39,7 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
   function toggleVideoBlock() {
     if (!ensureAuth()) return;
     if (videoBlocked) {
-      removeVideo.mutate(stream.id);
+      removeVideo.mutate(blockedVideo?.url ?? stream.id);
       onSaved("Video unblocked");
       return;
     }
@@ -45,7 +50,7 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
   function toggleChannelBlock() {
     if (!stream.channelUrl || !ensureAuth()) return;
     if (channelBlocked) {
-      removeChannel.mutate(stream.channelUrl);
+      removeChannel.mutate(blockedChannel?.url ?? stream.channelUrl);
       onSaved("Channel unblocked");
       return;
     }
