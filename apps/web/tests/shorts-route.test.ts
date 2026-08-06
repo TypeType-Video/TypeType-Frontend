@@ -3,6 +3,7 @@ import {
   createShortsRouteEntry,
   mergeShortsRouteEntries,
   resolveShortsRouteTarget,
+  shortsPathRedirectSearch,
   toPublicShortsUrl,
 } from "../src/lib/shorts-route";
 import type { VideoStream } from "../src/types/stream";
@@ -29,6 +30,11 @@ test("canonicalizes a YouTube Shorts URL to a public video id", () => {
   expect(toPublicShortsUrl("https://youtube.com/shorts/2-J9d2VbA6o", "https://example.com")).toBe(
     "https://example.com/shorts?v=2-J9d2VbA6o",
   );
+});
+
+test("redirects a Shorts path id to canonical route search", () => {
+  expect(shortsPathRedirectSearch("2-J9d2VbA6o")).toEqual({ v: "2-J9d2VbA6o" });
+  expect(shortsPathRedirectSearch("invalid")).toBeNull();
 });
 
 test("keeps direct route entries stable and replaces placeholders with feed metadata", () => {

@@ -20,6 +20,11 @@ export function shortsRouteKey(value: string): string {
   return resolveShortsRouteTarget(value)?.publicParam ?? value.trim();
 }
 
+export function shortsPathRedirectSearch(value: string): { v: string } | null {
+  const target = resolveShortsRouteTarget(value);
+  return target ? { v: target.publicParam } : null;
+}
+
 export function createShortsRouteEntry(value: string | undefined): VideoStream | null {
   const target = resolveShortsRouteTarget(value);
   if (!target) return null;
