@@ -9,6 +9,7 @@ type Props = {
 
 export function NotificationToastPreview({ side, variant, animationKey, onClose }: Props) {
   const sideClass = side === "left" ? "notification-toast-left" : "notification-toast-right";
+  const grouped = variant === "grouped";
 
   return (
     <aside
@@ -18,71 +19,50 @@ export function NotificationToastPreview({ side, variant, animationKey, onClose 
       aria-atomic="true"
       className={`notification-toast-preview ${sideClass}`}
     >
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-accent/15 text-accent">
-          <BellRing size={15} aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold text-fg">
-            {variant === "single" ? "New upload" : "3 new uploads"}
-          </p>
-          <p className="text-[11px] text-fg-muted">From your subscriptions</p>
-        </div>
+      <div className="flex items-center">
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-fg-muted hover:bg-surface-strong hover:text-fg"
+          className="flex min-w-0 flex-1 items-center gap-2.5 p-2 text-left hover:bg-surface-strong/70"
+        >
+          {grouped ? (
+            <span className="relative h-11 w-12 shrink-0" aria-hidden="true">
+              <span className="absolute right-0 top-0 h-9 w-10 rounded-md border border-border-strong bg-surface-soft" />
+              <span className="absolute bottom-0 left-0 flex h-9 w-10 items-center justify-center rounded-md border border-border-strong bg-[#09090b]">
+                <img src="/logo.svg" alt="" className="h-5 w-5" />
+              </span>
+            </span>
+          ) : (
+            <span className="flex h-11 w-12 shrink-0 items-center justify-center rounded-md border border-border bg-[#09090b]">
+              <img src="/logo.svg" alt="" className="h-6 w-6" />
+            </span>
+          )}
+
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase text-accent">
+              <BellRing size={11} aria-hidden="true" />
+              {grouped ? "3 new uploads" : "New upload"}
+            </span>
+            <span className="mt-0.5 block truncate text-[13px] font-medium leading-tight text-fg">
+              {grouped ? "New videos are waiting" : "A new TypeType preview is ready"}
+            </span>
+            <span className="mt-1 flex items-center gap-1.5 text-[11px] text-fg-muted">
+              <span className="truncate">{grouped ? "3 channels" : "TypeType"}</span>
+              <span className="text-fg-soft">Just now</span>
+            </span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="mr-1.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-soft hover:bg-surface-strong hover:text-fg"
           aria-label="Dismiss notification"
           title="Dismiss"
         >
-          <X size={16} aria-hidden="true" />
+          <X size={14} aria-hidden="true" />
         </button>
       </div>
-
-      {variant === "single" ? (
-        <button
-          type="button"
-          onClick={onClose}
-          className="grid w-full grid-cols-[7rem_1fr] gap-3 p-3 text-left hover:bg-surface-strong/70 sm:grid-cols-[8rem_1fr]"
-        >
-          <span className="flex aspect-video w-full items-center justify-center rounded-md border border-border bg-[#09090b]">
-            <img src="/logo.svg" alt="" className="h-9 w-9" />
-          </span>
-          <div className="min-w-0 self-center">
-            <p className="line-clamp-2 text-sm font-medium leading-snug text-fg">
-              A new TypeType preview is ready
-            </p>
-            <div className="mt-2 flex min-w-0 items-center gap-2">
-              <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-surface-soft text-[10px] font-semibold text-fg">
-                T
-              </span>
-              <span className="truncate text-xs text-fg-muted">TypeType</span>
-              <span className="shrink-0 text-xs text-fg-soft">Just now</span>
-            </div>
-          </div>
-        </button>
-      ) : (
-        <div className="flex items-center gap-3 p-3">
-          <div className="relative h-[4.5rem] w-28 shrink-0">
-            <div className="absolute left-2 top-0 h-14 w-24 rounded-md border border-border-strong bg-surface-soft" />
-            <div className="absolute left-1 top-2 h-14 w-24 rounded-md border border-border-strong bg-surface-strong" />
-            <div className="absolute left-0 top-4 flex h-14 w-24 items-center justify-center rounded-md border border-border-strong bg-[#09090b]">
-              <img src="/logo.svg" alt="" className="h-7 w-7" />
-            </div>
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium leading-snug text-fg">
-              New videos are waiting for you
-            </p>
-            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-fg-muted">
-              TypeType and 2 other channels just published.
-            </p>
-            <span className="mt-2 inline-block text-xs font-medium text-accent">
-              Open notifications
-            </span>
-          </div>
-        </div>
-      )}
     </aside>
   );
 }
