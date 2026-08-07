@@ -23,7 +23,6 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PodcastsRouteImport } from './routes/podcasts'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as PlaylistRouteImport } from './routes/playlist'
-import { Route as NotificationPreviewRouteImport } from './routes/notification-preview'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ImportRouteImport } from './routes/import'
 import { Route as HistoryRouteImport } from './routes/history'
@@ -110,11 +109,6 @@ const PlaylistsRoute = PlaylistsRouteImport.update({
 const PlaylistRoute = PlaylistRouteImport.update({
   id: '/playlist',
   path: '/playlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationPreviewRoute = NotificationPreviewRouteImport.update({
-  id: '/notification-preview',
-  path: '/notification-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -212,7 +206,6 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/import': typeof ImportRouteWithChildren
   '/login': typeof LoginRoute
-  '/notification-preview': typeof NotificationPreviewRoute
   '/playlist': typeof PlaylistRoute
   '/playlists': typeof PlaylistsRoute
   '/podcasts': typeof PodcastsRoute
@@ -245,7 +238,6 @@ export interface FileRoutesByTo {
   '/hide-everything': typeof HideEverythingRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/notification-preview': typeof NotificationPreviewRoute
   '/playlist': typeof PlaylistRoute
   '/playlists': typeof PlaylistsRoute
   '/podcasts': typeof PodcastsRoute
@@ -280,7 +272,6 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/import': typeof ImportRouteWithChildren
   '/login': typeof LoginRoute
-  '/notification-preview': typeof NotificationPreviewRoute
   '/playlist': typeof PlaylistRoute
   '/playlists': typeof PlaylistsRoute
   '/podcasts': typeof PodcastsRoute
@@ -316,7 +307,6 @@ export interface FileRouteTypes {
     | '/history'
     | '/import'
     | '/login'
-    | '/notification-preview'
     | '/playlist'
     | '/playlists'
     | '/podcasts'
@@ -349,7 +339,6 @@ export interface FileRouteTypes {
     | '/hide-everything'
     | '/history'
     | '/login'
-    | '/notification-preview'
     | '/playlist'
     | '/playlists'
     | '/podcasts'
@@ -383,7 +372,6 @@ export interface FileRouteTypes {
     | '/history'
     | '/import'
     | '/login'
-    | '/notification-preview'
     | '/playlist'
     | '/playlists'
     | '/podcasts'
@@ -418,7 +406,6 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   ImportRoute: typeof ImportRouteWithChildren
   LoginRoute: typeof LoginRoute
-  NotificationPreviewRoute: typeof NotificationPreviewRoute
   PlaylistRoute: typeof PlaylistRoute
   PlaylistsRoute: typeof PlaylistsRoute
   PodcastsRoute: typeof PodcastsRoute
@@ -539,13 +526,6 @@ declare module '@tanstack/react-router' {
       path: '/playlist'
       fullPath: '/playlist'
       preLoaderRoute: typeof PlaylistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notification-preview': {
-      id: '/notification-preview'
-      path: '/notification-preview'
-      fullPath: '/notification-preview'
-      preLoaderRoute: typeof NotificationPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -694,7 +674,6 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   ImportRoute: ImportRouteWithChildren,
   LoginRoute: LoginRoute,
-  NotificationPreviewRoute: NotificationPreviewRoute,
   PlaylistRoute: PlaylistRoute,
   PlaylistsRoute: PlaylistsRoute,
   PodcastsRoute: PodcastsRoute,

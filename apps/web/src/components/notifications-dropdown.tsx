@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useMobile } from "../hooks/use-mobile";
 import { useNotifications } from "../hooks/use-notifications";
+import { useUiStore } from "../stores/ui-store";
 import { NotificationBellIcon } from "./notification-bell-icon";
 import { NotificationRow } from "./notification-row";
 import { ScrollSentinel } from "./scroll-sentinel";
 
 export function NotificationsDropdown() {
-  const [open, setOpen] = useState(false);
+  const open = useUiStore((state) => state.notificationCenterOpen);
+  const close = useUiStore((state) => state.closeNotificationCenter);
+  const toggle = useUiStore((state) => state.toggleNotificationCenter);
   const isMobile = useMobile();
   const rootRef = useRef<HTMLDivElement>(null);
   const [scrollRoot, setScrollRoot] = useState<HTMLDivElement | null>(null);
@@ -30,12 +33,16 @@ export function NotificationsDropdown() {
   }, [open, hasLoaded]);
 
   useEffect(() => {
+    if (!enabled) close();
+  }, [close, enabled]);
+
+  useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(event.target as Node)) close();
     }
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
-  }, []);
+  }, [close]);
 
   if (!enabled) return null;
 
@@ -43,7 +50,7 @@ export function NotificationsDropdown() {
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggle}
         className="relative inline-flex h-9 w-9 items-center justify-center text-fg-muted hover:text-fg"
         aria-label="Notifications"
       >
@@ -96,7 +103,7 @@ export function NotificationsDropdown() {
               <NotificationRow
                 key={`${item.type}-${item.video.id}-${item.createdAt}`}
                 item={item}
-                onOpen={() => setOpen(false)}
+                onOpen={close}
               />
             ))}
             {hasLoaded && (
