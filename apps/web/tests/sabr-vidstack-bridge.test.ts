@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  isSabrPlaybackEventTransient,
   registerSabrVidstackControls,
   requestSabrSeek,
   requestSabrVidstackPlayback,
@@ -91,6 +92,24 @@ test("sends only explicit SABR seek requests to registered MSE controls", () => 
 
   expect(requestSabrSeek(video, 95)).toBe(true);
   expect(positions).toEqual([95]);
+});
+
+test("identifies only player-owned transient media events", () => {
+  let transient = true;
+  const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+    isApplyingTransientMediaState: () => transient,
+  });
+
+  expect(isSabrPlaybackEventTransient(video)).toBe(true);
+  transient = false;
+  expect(isSabrPlaybackEventTransient(video)).toBe(false);
+
+  unregister();
+  expect(isSabrPlaybackEventTransient(video)).toBe(false);
 });
 
 test("routes SponsorBlock seeks through registered SABR controls", () => {

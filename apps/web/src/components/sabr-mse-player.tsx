@@ -164,6 +164,7 @@ export function SabrMsePlayer({
         runSabrSeek(engine, targetMs, seekingRef, reportError, latestHandlers().onSeekStateChange);
       },
       isTransitioning: () => seekingRef.current,
+      isApplyingTransientMediaState: () => engine.isApplyingTransientMediaState(),
     });
     void engine
       .load()

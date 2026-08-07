@@ -4,16 +4,12 @@ import { bindSabrVideoProvider } from "../src/lib/sabr-vidstack-provider";
 
 function setupProvider(currentTime = 0, paused = true, ended = false) {
   const positions: number[] = [];
-  let onPlaying: (() => void) | null = null;
   const video = {
     autoplay: false,
     currentTime,
     ended,
     paused,
     pause: () => {},
-    addEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
-      if (type === "playing" && typeof listener === "function") onPlaying = listener;
-    },
   } as unknown as HTMLVideoElement;
   const provider = { video } as Parameters<typeof bindSabrVideoProvider>[0];
   const unregister = registerSabrVidstackControls(video, {
@@ -22,7 +18,7 @@ function setupProvider(currentTime = 0, paused = true, ended = false) {
     seek: (seconds) => positions.push(seconds),
   });
   bindSabrVideoProvider(provider);
-  return { onPlaying: () => onPlaying?.(), positions, provider, unregister };
+  return { positions, provider, unregister };
 }
 
 test("routes Vidstack provider seeks through SABR controls", () => {
@@ -41,6 +37,7 @@ test("ignores Vidstack's initial playback reset after a saved-position resume", 
   const { positions, provider, unregister } = setupProvider(486.792, false);
 
   try {
+    void provider.play();
     provider.setCurrentTime(0);
     provider.setCurrentTime(47.897);
 
@@ -50,11 +47,25 @@ test("ignores Vidstack's initial playback reset after a saved-position resume", 
   }
 });
 
-test("allows a real seek to zero after playback starts", () => {
-  const { onPlaying, positions, provider, unregister } = setupProvider(486.792, false);
+test("ignores the initial reset while native Safari playback still reports paused", () => {
+  const { positions, provider, unregister } = setupProvider(486.792, true);
 
   try {
-    onPlaying();
+    void provider.play();
+    provider.setCurrentTime(0);
+
+    expect(positions).toEqual([]);
+  } finally {
+    unregister();
+  }
+});
+
+test("allows a real seek to zero after the initial reset is consumed", () => {
+  const { positions, provider, unregister } = setupProvider(486.792, false);
+
+  try {
+    void provider.play();
+    provider.setCurrentTime(0);
     provider.setCurrentTime(0);
 
     expect(positions).toEqual([0]);
