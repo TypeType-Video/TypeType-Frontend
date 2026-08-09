@@ -1,6 +1,7 @@
 import { formatViews } from "../lib/format";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
+import { RssShortcut } from "./rss-shortcut";
 import { VerifiedBadgeIcon } from "./watch-icons";
 
 type Props = {
@@ -27,8 +28,8 @@ export function ChannelPageHeader({
   return (
     <div className="flex flex-col gap-4">
       {bannerUrl && <img src={bannerUrl} alt="" className="h-32 w-full rounded-lg object-cover" />}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
           <ChannelAvatar src={avatarUrl} name={name} className="h-14 w-14" />
           <div className="flex flex-col">
             <h1 className="flex items-center gap-1.5 text-lg font-semibold text-fg">
@@ -40,6 +41,7 @@ export function ChannelPageHeader({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <AllowChannelButton url={sourceUrl} name={name} thumbnailUrl={avatarUrl} compact />
+          {subscribed && <RssShortcut channelUrl={sourceUrl} />}
           <button
             type="button"
             onClick={onSubscribe}
