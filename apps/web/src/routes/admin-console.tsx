@@ -4,6 +4,7 @@ import { AdminAllowListSection } from "../components/admin-allow-list-section";
 import { AdminBugReportsSection } from "../components/admin-bug-reports-section";
 import { AdminConsoleHeader } from "../components/admin-console-header";
 import { AdminConsoleNav } from "../components/admin-console-nav";
+import { AdminRssSection } from "../components/admin-rss-section";
 import { AdminSessionsSection } from "../components/admin-sessions-section";
 import { AdminSettingsSection } from "../components/admin-settings-section";
 import { AdminUsersSection } from "../components/admin-users-section";
@@ -18,7 +19,7 @@ import {
 import { goto } from "../lib/route-redirect";
 
 function availableSections(isAdmin: boolean, isModerator: boolean): AdminSection[] {
-  if (isAdmin) return ["settings", "allow-list", "users", "sessions", "issues"];
+  if (isAdmin) return ["settings", "allow-list", "users", "sessions", "rss", "issues"];
   if (isModerator) return ["issues"];
   return [];
 }
@@ -28,6 +29,7 @@ function sectionLabel(section: AdminSection): string {
   if (section === "issues") return "Issues";
   if (section === "users") return "Users";
   if (section === "sessions") return "Sessions";
+  if (section === "rss") return "RSS";
   return "Settings";
 }
 
@@ -82,6 +84,9 @@ function AdminConsolePage() {
         <AdminUsersSection enabled={isAdmin} currentUserId={me?.id ?? null} onToast={setToast} />
       )}
       {activeSection === "sessions" && isAdmin && <AdminSessionsSection enabled={isAdmin} />}
+      {activeSection === "rss" && isAdmin && (
+        <AdminRssSection enabled={isAdmin} onToast={setToast} />
+      )}
       {activeSection === "issues" && (
         <AdminBugReportsSection enabled={canAccessAdmin} isAdmin={isAdmin} onToast={setToast} />
       )}

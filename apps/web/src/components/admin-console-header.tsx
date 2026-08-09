@@ -9,6 +9,7 @@ const TITLES: Record<AdminSection, string> = {
   "allow-list": "Allow List",
   users: "User Management",
   sessions: "Active Sessions",
+  rss: "Private RSS",
   issues: "Issue Triage",
 };
 
@@ -17,6 +18,7 @@ const DESCRIPTIONS: Record<AdminSection, string> = {
   "allow-list": "Control which channels are available in allow-list mode.",
   users: "Roles, suspension, and account recovery tools.",
   sessions: "Connected clients, playback state, and recent activity.",
+  rss: "Availability, resource limits, account access, and private feeds.",
   issues: "Bug reports, diagnostics, status updates, and GitHub sync.",
 };
 
