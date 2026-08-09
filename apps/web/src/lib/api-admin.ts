@@ -28,6 +28,12 @@ function isAdminSettings(value: unknown): value is AdminSettings {
     typeof record.localLoginEnabled === "boolean" &&
     typeof record.oidcAutoRedirect === "boolean" &&
     typeof record.youtubeRemoteLoginEnabled === "boolean" &&
+    typeof record.rssEnabled === "boolean" &&
+    (record.rssPublicBaseUrl === null || typeof record.rssPublicBaseUrl === "string") &&
+    typeof record.rssMaxFeedsPerUser === "number" &&
+    typeof record.rssMaxItems === "number" &&
+    typeof record.rssMinimumPollMinutes === "number" &&
+    typeof record.rssRateLimitPerMinute === "number" &&
     (record.accessMode === "unrestricted" || record.accessMode === "allow_list")
   );
 }

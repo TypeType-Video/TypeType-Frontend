@@ -14,6 +14,12 @@ export type AdminSettings = {
   oidcAutoRedirect: boolean;
   youtubeRemoteLoginEnabled: boolean;
   accessMode: AccessMode;
+  rssEnabled: boolean;
+  rssPublicBaseUrl: string | null;
+  rssMaxFeedsPerUser: number;
+  rssMaxItems: number;
+  rssMinimumPollMinutes: number;
+  rssRateLimitPerMinute: number;
 };
 
 type AdminSessionNowPlaying = {
