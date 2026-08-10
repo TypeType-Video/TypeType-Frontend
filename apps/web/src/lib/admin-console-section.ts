@@ -1,4 +1,4 @@
-export type AdminSection = "settings" | "allow-list" | "users" | "sessions" | "issues";
+export type AdminSection = "settings" | "allow-list" | "users" | "sessions" | "rss" | "issues";
 
 const ADMIN_SECTION_KEY = "typetype-admin-section";
 
@@ -8,6 +8,7 @@ export function isAdminSection(value: unknown): value is AdminSection {
     value === "allow-list" ||
     value === "users" ||
     value === "sessions" ||
+    value === "rss" ||
     value === "issues"
   );
 }

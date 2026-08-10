@@ -136,6 +136,7 @@ export type SettingsItem = {
   hideRelatedVideos: boolean;
   hideComments: boolean;
   hideShorts: boolean;
+  hideSubscriptionLiveStreams: boolean;
   accessMode: AccessMode;
   captionStyles: CaptionStyles;
 };

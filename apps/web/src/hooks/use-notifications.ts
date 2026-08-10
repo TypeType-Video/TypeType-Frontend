@@ -7,7 +7,7 @@ import {
 import { useAuth } from "./use-auth";
 
 const KEY = ["notifications"];
-const UNREAD_KEY = ["notifications-unread-count"];
+export const NOTIFICATIONS_UNREAD_KEY = ["notifications-unread-count"];
 const PAGE_SIZE = 20;
 
 export function useNotifications(open: boolean) {
@@ -16,7 +16,7 @@ export function useNotifications(open: boolean) {
   const enabled = authReady && isAuthed && !isGuest;
 
   const unreadQuery = useQuery({
-    queryKey: UNREAD_KEY,
+    queryKey: NOTIFICATIONS_UNREAD_KEY,
     queryFn: () => fetchUnreadNotificationsCount(),
     enabled,
     refetchInterval: enabled ? 90_000 : false,
@@ -41,7 +41,7 @@ export function useNotifications(open: boolean) {
     mutationFn: () => markAllNotificationsRead(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: KEY });
-      qc.invalidateQueries({ queryKey: UNREAD_KEY });
+      qc.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_KEY });
     },
   });
 

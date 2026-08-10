@@ -6,10 +6,21 @@ const NotificationsDropdown = lazy(() =>
   })),
 );
 
+const NotificationToastHost = lazy(() =>
+  import("./notification-toast-host").then((module) => ({
+    default: module.NotificationToastHost,
+  })),
+);
+
 export function NavbarNotifications() {
   return (
-    <Suspense fallback={null}>
-      <NotificationsDropdown />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <NotificationsDropdown />
+      </Suspense>
+      <Suspense fallback={null}>
+        <NotificationToastHost />
+      </Suspense>
+    </>
   );
 }

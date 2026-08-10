@@ -77,5 +77,6 @@ export function useBlockedFilter() {
     blockedChannelUrls: matcher.channelUrls,
     blockedKeywords: matcher.normalizedKeywords,
     blockedVideoUrls: matcher.videoUrls,
+    ready: channels.isSuccess && videos.isSuccess && keywords.isSuccess,
   };
 }

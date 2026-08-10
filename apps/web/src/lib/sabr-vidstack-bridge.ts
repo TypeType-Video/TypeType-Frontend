@@ -3,6 +3,7 @@ export type SabrVidstackControls = {
   pause: (userInitiated?: boolean) => void;
   seek: (seconds: number) => void;
   isTransitioning?: () => boolean;
+  isApplyingTransientMediaState?: () => boolean;
 };
 
 const controlsByVideo = new WeakMap<HTMLVideoElement, SabrVidstackControls>();
@@ -24,6 +25,10 @@ export function registerSabrVidstackControls(
 
 function getSabrVidstackControls(video: HTMLVideoElement): SabrVidstackControls | null {
   return controlsByVideo.get(video) ?? null;
+}
+
+export function isSabrPlaybackEventTransient(video: HTMLVideoElement): boolean {
+  return getSabrVidstackControls(video)?.isApplyingTransientMediaState?.() === true;
 }
 
 export function requestSabrSeek(video: HTMLVideoElement, seconds: number): boolean {

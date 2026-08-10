@@ -39,7 +39,9 @@ export function useSubscriptionFeed(): Result {
   useEffect(() => {
     if (
       query.error instanceof ApiError &&
-      query.error.code === "subscription_feed_stale_generation"
+      ["subscription_feed_invalid_cursor", "subscription_feed_stale_generation"].includes(
+        query.error.code ?? "",
+      )
     ) {
       void queryClient.resetQueries({ queryKey: SUBSCRIPTION_FEED_KEY, exact: true });
     }

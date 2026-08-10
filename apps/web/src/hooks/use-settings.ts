@@ -47,6 +47,7 @@ const DEFAULTS: SettingsItem = {
   hideRelatedVideos: false,
   hideComments: false,
   hideShorts: false,
+  hideSubscriptionLiveStreams: false,
   accessMode: "unrestricted",
   captionStyles: EMPTY_CAPTION_STYLES,
 };
@@ -104,6 +105,9 @@ export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {})
     onSuccess: (data, _patch, context) => {
       const current = qc.getQueryData<SettingsItem>(KEY);
       qc.setQueryData(KEY, { ...DEFAULTS, ...current, ...data, ...context?.patch });
+      if (context?.patch.hideSubscriptionLiveStreams !== undefined) {
+        void qc.resetQueries({ queryKey: ["subscription-feed"] });
+      }
     },
     onError: (err, _patch, context) => {
       if (context?.previous) qc.setQueryData(KEY, context.previous);

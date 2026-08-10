@@ -13,6 +13,7 @@ const HIDE_KEYS = [
   "hideRelatedVideos",
   "hideComments",
   "hideShorts",
+  "hideSubscriptionLiveStreams",
 ] as const;
 
 function useHideEverythingTrigger() {
@@ -38,6 +39,7 @@ type ToggleKey = Extract<
   | "hideRelatedVideos"
   | "hideComments"
   | "hideShorts"
+  | "hideSubscriptionLiveStreams"
 >;
 
 type ToggleOption = {
@@ -92,6 +94,12 @@ const DISCOVERY_OPTIONS: ToggleOption[] = [
     label: "Shorts surface",
     description: "Hide Shorts navigation and block the Shorts page.",
     area: "Shorts",
+  },
+  {
+    key: "hideSubscriptionLiveStreams",
+    label: "Live streams",
+    description: "Hide active and scheduled live streams from the subscriptions feed.",
+    area: "Subscriptions",
   },
 ];
 

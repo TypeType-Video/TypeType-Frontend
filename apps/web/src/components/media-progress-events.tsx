@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { isSabrPlaybackEventTransient } from "../lib/sabr-vidstack-bridge";
 import { useMediaPlayer } from "../lib/vidstack";
 
 type Props = {
@@ -59,14 +60,17 @@ export function MediaProgressEvents({
 
       const update = () => onTimeUpdateRef.current?.(toPositionMs(media));
       const readPosition = () => toPositionMs(media);
+      const suppressPlaybackEvent = () =>
+        suppressPlaybackEventsRef.current ||
+        (media instanceof HTMLVideoElement && isSabrPlaybackEventTransient(media));
       const play = () => {
         update();
-        if (suppressPlaybackEventsRef.current) return;
+        if (suppressPlaybackEvent()) return;
         onPlayRef.current?.();
       };
       const pause = () => {
         update();
-        if (suppressPlaybackEventsRef.current) return;
+        if (suppressPlaybackEvent()) return;
         onPauseRef.current?.();
       };
       const seeked = () => {

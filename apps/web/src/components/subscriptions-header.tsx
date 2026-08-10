@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { RssShortcut } from "./rss-shortcut";
 
 type Props = {
   active: "videos" | "channels";
@@ -23,7 +24,7 @@ export function SubscriptionsHeader({ active, count, onVideosIntent, onChannelsI
           {count} {count === 1 ? "channel" : "channels"} followed
         </p>
       </div>
-      <nav className="flex gap-6" aria-label="Subscription views">
+      <nav className="flex items-center gap-6" aria-label="Subscription views">
         <Link
           to="/subscriptions"
           preload="intent"
@@ -44,6 +45,7 @@ export function SubscriptionsHeader({ active, count, onVideosIntent, onChannelsI
         >
           Channels
         </Link>
+        <RssShortcut />
       </nav>
     </header>
   );
