@@ -1,6 +1,6 @@
 {
   "name": "@typetype/frontend",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "devDependencies": {
     "@biomejs/biome": "^2.5.7",
     "knip": "^6.32.0",
