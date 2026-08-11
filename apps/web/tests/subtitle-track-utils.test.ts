@@ -22,14 +22,10 @@ test("uses caption variants instead of numeric duplicate language labels", () =>
   ]);
 
   expect(tracks.map((track) => track.label)).toEqual(["English (CC1)", "English (DTVCC1)"]);
-  expect(tracks.every((track) => new URL(track.src).searchParams.get("format") === "vtt")).toBe(
-    true,
-  );
-  expect(tracks.every((track) => new URL(track.src).hostname === "typetype.test")).toBe(true);
-  expect(
-    tracks.every((track) => new URL(track.src).pathname === "/api/subtitles/youtube/abcdefghijk"),
-  ).toBe(true);
-  expect(tracks.every((track) => !track.src.includes("secret"))).toBe(true);
+  expect(tracks.every((track) => new URL(track.src).searchParams.get("fmt") === "vtt")).toBe(true);
+  expect(tracks.every((track) => new URL(track.src).hostname === "www.youtube.com")).toBe(true);
+  expect(tracks.every((track) => new URL(track.src).pathname === "/api/timedtext")).toBe(true);
+  expect(tracks.every((track) => track.src.includes("sig=secret"))).toBe(true);
 });
 
 test("preserves generated and translated YouTube subtitle selection", () => {
@@ -44,10 +40,11 @@ test("preserves generated and translated YouTube subtitle selection", () => {
   ]);
 
   const src = new URL(track?.src ?? "");
-  expect(src.searchParams.get("language")).toBe("fr");
-  expect(src.searchParams.get("sourceLanguage")).toBe("en");
-  expect(src.searchParams.get("translation")).toBe("fr");
-  expect(src.searchParams.get("variant")).toBe("auto");
+  expect(src.hostname).toBe("m.youtube.com");
+  expect(src.searchParams.get("fmt")).toBe("vtt");
+  expect(src.searchParams.get("lang")).toBe("en");
+  expect(src.searchParams.get("kind")).toBe("asr");
+  expect(src.searchParams.get("tlang")).toBe("fr");
 });
 
 test("keeps non YouTube subtitle tracks on the generic proxy", () => {
