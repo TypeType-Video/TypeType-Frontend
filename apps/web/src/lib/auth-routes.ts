@@ -24,6 +24,7 @@ const PROTECTED_PREFIXES = [
   "/youtube-session",
 ];
 const AUTH_PAGES = ["/login", "/register", "/reset-password", "/auth/oidc/callback"];
+const OIDC_CALLBACK_PAGE = "/auth/oidc/callback";
 
 export function requiresAuth(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
@@ -42,6 +43,10 @@ export function isAdminRoute(pathname: string): boolean {
 
 export function isAuthPage(pathname: string): boolean {
   return AUTH_PAGES.some((page) => pathname === page || pathname.startsWith(`${page}/`));
+}
+
+export function shouldEnforceBootstrapRegistration(pathname: string): boolean {
+  return pathname !== OIDC_CALLBACK_PAGE;
 }
 
 export function sanitizeRedirect(value: string | undefined): RedirectTarget {
