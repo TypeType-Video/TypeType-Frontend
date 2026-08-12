@@ -42,7 +42,7 @@ export function NotificationToastHost() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { authReady, isAuthed, isGuest, me } = useAuth();
-  const { isBlocked, ready: blockedFilterReady } = useBlockedFilter();
+  const { isHidden, ready: visibilityFilterReady } = useBlockedFilter();
   const openNotificationCenter = useUiStore((state) => state.openNotificationCenter);
   const owner = me?.id ?? null;
   const enabled = authReady && isAuthed && !isGuest && owner !== null;
@@ -66,7 +66,7 @@ export function NotificationToastHost() {
   }, [owner]);
 
   useEffect(() => {
-    if (!enabled || !owner || !query.data || !blockedFilterReady) return;
+    if (!enabled || !owner || !query.data || !visibilityFilterReady) return;
     queryClient.setQueryData(NOTIFICATIONS_UNREAD_KEY, {
       unreadCount: query.data.unreadCount,
     });
@@ -81,9 +81,9 @@ export function NotificationToastHost() {
     const next = advanceNotificationToastCursor(current, query.data.items);
     cursorRef.current = { owner, cursor: next };
     writeCursor(owner, next);
-    const visibleItems = newItems.filter((item) => !isBlocked(item.video));
+    const visibleItems = newItems.filter((item) => !isHidden(item.video));
     if (visibleItems.length > 0) setItems(visibleItems);
-  }, [blockedFilterReady, enabled, isBlocked, owner, query.data, queryClient]);
+  }, [enabled, isHidden, owner, query.data, queryClient, visibilityFilterReady]);
 
   useEffect(() => {
     if (items.length === 0 || paused) return;

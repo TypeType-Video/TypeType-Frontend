@@ -48,6 +48,7 @@ const DEFAULTS: SettingsItem = {
   hideComments: false,
   hideShorts: false,
   hideSubscriptionLiveStreams: false,
+  hideMembersOnlyContent: false,
   accessMode: "unrestricted",
   captionStyles: EMPTY_CAPTION_STYLES,
 };
@@ -105,7 +106,10 @@ export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {})
     onSuccess: (data, _patch, context) => {
       const current = qc.getQueryData<SettingsItem>(KEY);
       qc.setQueryData(KEY, { ...DEFAULTS, ...current, ...data, ...context?.patch });
-      if (context?.patch.hideSubscriptionLiveStreams !== undefined) {
+      if (
+        context?.patch.hideSubscriptionLiveStreams !== undefined ||
+        context?.patch.hideMembersOnlyContent !== undefined
+      ) {
         void qc.resetQueries({ queryKey: ["subscription-feed"] });
       }
     },
