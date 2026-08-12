@@ -4,9 +4,12 @@ import { bindSabrVideoProvider } from "../src/lib/sabr-vidstack-provider";
 
 function setupProvider(currentTime = 0, paused = true, ended = false) {
   const positions: number[] = [];
+  const events = new EventTarget();
   const video = {
+    addEventListener: events.addEventListener.bind(events),
     autoplay: false,
     currentTime,
+    dispatchEvent: events.dispatchEvent.bind(events),
     ended,
     paused,
     pause: () => {},
@@ -42,6 +45,64 @@ test("ignores Vidstack's initial playback reset after a saved-position resume", 
     provider.setCurrentTime(47.897);
 
     expect(positions).toEqual([47.897]);
+  } finally {
+    unregister();
+  }
+});
+
+test("keeps the initial reset guard through resume positioning", async () => {
+  const { positions, provider, unregister } = setupProvider(11.2, true);
+
+  try {
+    provider.setCurrentTime(11.2);
+    provider.video.currentTime = 15.064;
+    provider.setCurrentTime(15.064);
+    await provider.play();
+    provider.setCurrentTime(0);
+
+    expect(positions).toEqual([11.2, 15.064]);
+  } finally {
+    unregister();
+  }
+});
+
+test("keeps the initial reset guard after a technical pause", async () => {
+  const { positions, provider, unregister } = setupProvider(15.064, true);
+
+  try {
+    await provider.play();
+    await provider.pause();
+    provider.setCurrentTime(0);
+
+    expect(positions).toEqual([]);
+  } finally {
+    unregister();
+  }
+});
+
+test("keeps the initial reset guard when Vidstack reloads its provider", async () => {
+  const { positions, provider, unregister } = setupProvider(15.064, true);
+
+  try {
+    await provider.play();
+    provider.video.currentTime = 0;
+    const replacement = bindSabrVideoProvider({ video: provider.video } as typeof provider);
+    replacement.setCurrentTime(0);
+
+    expect(positions).toEqual([]);
+  } finally {
+    unregister();
+  }
+});
+
+test("ignores a queued reset after resume positioning but before play", () => {
+  const { positions, provider, unregister } = setupProvider(15.064, true);
+
+  try {
+    provider.video.dispatchEvent(new Event("seeked"));
+    provider.setCurrentTime(0);
+
+    expect(positions).toEqual([]);
   } finally {
     unregister();
   }
