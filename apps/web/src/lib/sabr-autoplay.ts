@@ -48,16 +48,18 @@ export class SabrAutoplayAttempt {
 }
 
 export class SabrAutoplayDeadline {
-  private timer: number | undefined;
+  private timer: ReturnType<typeof globalThis.setTimeout> | undefined;
+  private readonly onExpire: () => void;
+  private readonly timeoutMs: number;
 
-  constructor(
-    private readonly onExpire: () => void,
-    private readonly timeoutMs = 1_000,
-  ) {}
+  constructor(onExpire: () => void, timeoutMs = 1_000) {
+    this.onExpire = onExpire;
+    this.timeoutMs = timeoutMs;
+  }
 
   arm(): void {
     this.clear();
-    this.timer = window.setTimeout(() => {
+    this.timer = globalThis.setTimeout(() => {
       this.timer = undefined;
       this.onExpire();
     }, this.timeoutMs);
@@ -65,7 +67,7 @@ export class SabrAutoplayDeadline {
 
   clear(): void {
     if (this.timer === undefined) return;
-    window.clearTimeout(this.timer);
+    globalThis.clearTimeout(this.timer);
     this.timer = undefined;
   }
 }

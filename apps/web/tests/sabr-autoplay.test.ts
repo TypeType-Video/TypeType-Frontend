@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { isAutoplayPolicyError, SabrAutoplayAttempt } from "../src/lib/sabr-autoplay";
+import {
+  isAutoplayPolicyError,
+  SabrAutoplayAttempt,
+  SabrAutoplayDeadline,
+} from "../src/lib/sabr-autoplay";
 
 test("stops automatic playback retries after a browser policy rejection", () => {
   expect(isAutoplayPolicyError(new DOMException("Play is not allowed", "NotAllowedError"))).toBe(
@@ -29,6 +33,19 @@ test("expires a browser playback attempt that remains pending", () => {
   expect(attempt.isConfirmed).toBe(true);
   expect(attempt.begin()).toBe(false);
   expect(attempt.expire()).toBe(false);
+});
+
+test("cancels an armed autoplay deadline", async () => {
+  let expirations = 0;
+  const deadline = new SabrAutoplayDeadline(() => {
+    expirations += 1;
+  }, 5);
+
+  deadline.arm();
+  deadline.clear();
+  await Bun.sleep(10);
+
+  expect(expirations).toBe(0);
 });
 
 test("stops autoplay after a browser policy rejection", () => {
