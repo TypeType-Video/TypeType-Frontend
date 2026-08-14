@@ -140,7 +140,7 @@ export function SabrMsePlayer({
       void playEngine()
         .then(() => {
           autoplayDeadline.clear();
-          autoplayAttempt.resolve();
+          if (!autoplayAttempt.resolve()) engine.pause();
         })
         .catch((error: unknown) => {
           autoplayDeadline.clear();

@@ -21,9 +21,11 @@ export class SabrAutoplayAttempt {
     return true;
   }
 
-  resolve(): void {
+  resolve(): boolean {
     this.pending = false;
+    if (this.confirmed) return false;
     this.confirmed = true;
+    return true;
   }
 
   expire(): boolean {

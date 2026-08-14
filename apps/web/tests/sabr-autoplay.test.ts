@@ -31,8 +31,17 @@ test("expires a browser playback attempt that remains pending", () => {
 
   expect(attempt.expire()).toBe(true);
   expect(attempt.isConfirmed).toBe(true);
+  expect(attempt.resolve()).toBe(false);
   expect(attempt.begin()).toBe(false);
   expect(attempt.expire()).toBe(false);
+});
+
+test("accepts playback that resolves before the deadline", () => {
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+
+  expect(attempt.resolve()).toBe(true);
+  expect(attempt.isConfirmed).toBe(true);
 });
 
 test("cancels an armed autoplay deadline", async () => {
