@@ -40,8 +40,7 @@ export function isSabrVideoSupported(
 }
 
 function qualityLabel(video: VideoStreamItem): string {
-  if (video.height > 0) return `${video.height}p`;
-  return video.resolution || `itag ${video.itag}`;
+  return video.resolution || (video.height > 0 ? `${video.height}p` : `itag ${video.itag}`);
 }
 
 export function sabrQualityOptions(stream: VideoStream): SabrQualityOption[] {
