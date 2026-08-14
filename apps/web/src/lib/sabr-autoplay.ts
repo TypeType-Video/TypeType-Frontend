@@ -52,7 +52,7 @@ export class SabrAutoplayDeadline {
   private readonly onExpire: () => void;
   private readonly timeoutMs: number;
 
-  constructor(onExpire: () => void, timeoutMs = 1_000) {
+  constructor(onExpire: () => void, timeoutMs = 250) {
     this.onExpire = onExpire;
     this.timeoutMs = timeoutMs;
   }
