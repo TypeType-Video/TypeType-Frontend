@@ -55,11 +55,12 @@ test("pauses a late playback event until user playback is allowed", () => {
     removeEventListener: (_type: "play", next: () => void) => {
       if (listener === next) listener = () => {};
     },
+    closest: () => null,
   };
   const attempt = new SabrAutoplayAttempt();
   attempt.begin();
   attempt.expire();
-  const unguard = guardAutoplay(target, attempt, () => {
+  const unguard = guardAutoplay(target as unknown as HTMLVideoElement, attempt, () => {
     pauses += 1;
   });
 
