@@ -4,6 +4,7 @@ import type { AudioStreamItem, VideoStreamItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
 import { type CodecFamily, codecFamily } from "./quality-utils";
 import { pickSabrAudio } from "./sabr-audio";
+import { sabrQualityTier } from "./sabr-quality-tier";
 
 type SabrCandidate = VideoStreamItem | AudioStreamItem;
 type SabrSelection = {
@@ -77,11 +78,13 @@ export function defaultSabrItag(
 ): number | null {
   if (options.length === 0) return null;
   const defaultHeight = defaultQuality ? Number.parseInt(defaultQuality, 10) : 720;
-  const targetHeight = options.find(
-    (option) => option.height <= (Number.isFinite(defaultHeight) ? defaultHeight : 720),
-  )?.height;
+  const limit = Number.isFinite(defaultHeight) ? defaultHeight : 720;
+  const targetHeight = Math.max(
+    0,
+    ...options.map(sabrQualityTier).filter((height) => height <= limit),
+  );
   const preferred = ["H.264", "VP9", "AV1"].flatMap((codec) =>
-    options.filter((option) => option.height === targetHeight && option.codec === codec),
+    options.filter((option) => sabrQualityTier(option) === targetHeight && option.codec === codec),
   )[0];
   return preferred?.itag ?? options.at(-1)?.itag ?? null;
 }

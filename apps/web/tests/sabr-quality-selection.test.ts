@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import type { CodecFamily } from "../src/lib/quality-utils";
 import {
-  maxSabrCodecHeight,
+  maxSabrCodecLabel,
   sabrCodecOptions,
   sabrResolutionOptions,
   selectSabrCodec,
@@ -47,11 +47,27 @@ test("switches sabr codec at the current resolution", () => {
 
   expect(selectSabrCodec(options, selected, "AV1")?.itag).toBe(398);
   expect(sabrCodecOptions(options)).toEqual(["H.264", "VP9", "AV1"]);
-  expect(maxSabrCodecHeight(options, "H.264")).toBe(1080);
+  expect(maxSabrCodecLabel(options, "H.264")).toBe("1080p");
 });
 
 test("falls back to the nearest lower resolution for a codec", () => {
   const selected = option(401, 2160, "AV1");
 
   expect(selectSabrCodec(options, selected, "H.264")?.itag).toBe(137);
+});
+
+test("groups portrait streams by their canonical quality tier", () => {
+  const portrait = [
+    { ...option(399, 1920, "AV1"), label: "1080p", width: 1080 },
+    { ...option(398, 1280, "AV1"), label: "720p", width: 720 },
+    { ...option(397, 854, "AV1"), label: "480p", width: 480 },
+    { ...option(396, 480, "AV1"), label: "480p", width: 270 },
+  ];
+
+  expect(sabrResolutionOptions(portrait, portrait[0]).map((item) => item.label)).toEqual([
+    "1080p",
+    "720p",
+    "480p",
+  ]);
+  expect(maxSabrCodecLabel(portrait, "AV1")).toBe("1080p");
 });

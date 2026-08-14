@@ -1,4 +1,5 @@
 import type { SabrQualityOption } from "../stores/sabr-quality-store";
+import { sabrQualityTier } from "./sabr-quality-tier";
 import { defaultSabrItag } from "./sabr-source";
 
 export type SabrCodecProbe = (
@@ -52,7 +53,8 @@ export async function bestSabrItag(
   if (!probe || fallback === null) return fallback;
   const fallbackOption = options.find((option) => option.itag === fallback);
   if (!fallbackOption) return fallback;
-  const candidates = options.filter((option) => option.height === fallbackOption.height);
+  const fallbackTier = sabrQualityTier(fallbackOption);
+  const candidates = options.filter((option) => sabrQualityTier(option) === fallbackTier);
   const scored = (await Promise.all(candidates.map((option) => scoreOption(option, probe)))).filter(
     (item): item is ScoredOption => item !== null,
   );
