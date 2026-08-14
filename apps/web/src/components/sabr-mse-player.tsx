@@ -5,6 +5,7 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
+import { isAutoplayPolicyError } from "../lib/sabr-autoplay";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
@@ -140,8 +141,12 @@ export function SabrMsePlayer({
       if (!latestHandlers().autoplay && !pendingPlayRef.current) return;
       autoplayStartTime = video.currentTime;
       autoplayStartedRef.current = true;
-      void playEngine().catch(() => {
-        autoplayStartedRef.current = false;
+      void playEngine().catch((error: unknown) => {
+        if (isAutoplayPolicyError(error)) {
+          pendingPlayRef.current = false;
+          autoplayConfirmedRef.current = true;
+          video.autoplay = false;
+        } else autoplayStartedRef.current = false;
       });
     };
     video.addEventListener("canplay", startAutoplay);
