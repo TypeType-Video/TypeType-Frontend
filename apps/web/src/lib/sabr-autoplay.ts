@@ -68,9 +68,20 @@ export function guardAutoplay(
   const stopExpiredPlayback = () => {
     if (attempt.isExpired) pause();
   };
+  const root = video.closest(".typetype-player-surface");
+  const allowPlayback = (event: Event) => {
+    if (
+      event.target === video ||
+      event.target === root ||
+      (event.target instanceof Element && event.target.closest(".vds-play-button"))
+    )
+      attempt.allow();
+  };
   video.addEventListener("play", stopExpiredPlayback);
+  root?.addEventListener("click", allowPlayback, true);
   return () => {
     video.removeEventListener("play", stopExpiredPlayback);
+    root?.removeEventListener("click", allowPlayback, true);
   };
 }
 

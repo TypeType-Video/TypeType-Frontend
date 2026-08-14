@@ -151,7 +151,6 @@ export function SabrMsePlayer({
     const autoplayTimer = window.setInterval(startAutoplay, 250);
     const unregisterControls = registerSabrVidstackControls(video, {
       play: () => {
-        autoplayAttempt.allow();
         pendingPlayRef.current = true;
         video.autoplay = true;
         if (!engineLoaded) return Promise.resolve();

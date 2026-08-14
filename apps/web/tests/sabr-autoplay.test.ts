@@ -73,6 +73,37 @@ test("pauses a late playback event until user playback is allowed", () => {
   expect(pauses).toBe(1);
 });
 
+test("allows late playback only after a player surface click", () => {
+  let playListener = () => {};
+  let clickListener = (_event: Event) => {};
+  let pauses = 0;
+  const root = {
+    addEventListener: (_type: "click", next: (event: Event) => void) => {
+      clickListener = next;
+    },
+    removeEventListener: () => {},
+  };
+  const target = {
+    addEventListener: (_type: "play", next: () => void) => {
+      playListener = next;
+    },
+    removeEventListener: () => {},
+    closest: () => root,
+  };
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+  attempt.expire();
+  guardAutoplay(target as unknown as HTMLVideoElement, attempt, () => {
+    pauses += 1;
+  });
+
+  playListener();
+  clickListener({ target: root } as unknown as Event);
+  playListener();
+
+  expect(pauses).toBe(1);
+});
+
 test("cancels an armed autoplay deadline", async () => {
   let expirations = 0;
   const deadline = new SabrAutoplayDeadline(() => {
