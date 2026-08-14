@@ -1,3 +1,5 @@
+import { isSabrPlaybackEventTransient } from "./sabr-vidstack-bridge";
+
 export function isAutoplayPolicyError(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -66,7 +68,7 @@ export function guardAutoplay(
   pause: () => void,
 ): () => void {
   const stopExpiredPlayback = () => {
-    if (attempt.isExpired) pause();
+    if (attempt.isExpired && !isSabrPlaybackEventTransient(video)) pause();
   };
   const root = video.closest(".typetype-player-surface");
   const allowPlayback = (event: Event) => {

@@ -5,6 +5,7 @@ import {
   SabrAutoplayAttempt,
   SabrAutoplayDeadline,
 } from "../src/lib/sabr-autoplay";
+import { registerSabrVidstackControls } from "../src/lib/sabr-vidstack-bridge";
 
 test("stops automatic playback retries after a browser policy rejection", () => {
   expect(isAutoplayPolicyError(new DOMException("Play is not allowed", "NotAllowedError"))).toBe(
@@ -69,6 +70,39 @@ test("pauses a late playback event until user playback is allowed", () => {
   listener();
   unguard();
   listener();
+
+  expect(pauses).toBe(1);
+});
+
+test("allows transient seek playback after autoplay expires", () => {
+  let listener = () => {};
+  let pauses = 0;
+  let transient = true;
+  const target = {
+    addEventListener: (_type: "play", next: () => void) => {
+      listener = next;
+    },
+    removeEventListener: () => {},
+    closest: () => null,
+  };
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+  attempt.expire();
+  const video = target as unknown as HTMLVideoElement;
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+    isApplyingTransientMediaState: () => transient,
+  });
+  guardAutoplay(video, attempt, () => {
+    pauses += 1;
+  });
+
+  listener();
+  transient = false;
+  listener();
+  unregister();
 
   expect(pauses).toBe(1);
 });
