@@ -5,7 +5,7 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
-import { isAutoplayPolicyError } from "../lib/sabr-autoplay";
+import { SabrAutoplayAttempt } from "../lib/sabr-autoplay";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
@@ -35,8 +35,6 @@ export function SabrMsePlayer({
   const engineRef = useRef<TypeTypeMsePlayer | null>(null);
   const qualityRef = useRef<TypeTypeMseQuality | null>(null);
   const pendingPlayRef = useRef(false);
-  const autoplayStartedRef = useRef(false);
-  const autoplayConfirmedRef = useRef(false);
   const seekingRef = useRef(false);
   const errorReportedRef = useRef(false);
   const attachedVideoRef = useRef(false);
@@ -85,6 +83,7 @@ export function SabrMsePlayer({
     errorReportedRef.current = false;
     const replacingVideo = attachedVideoRef.current;
     attachedVideoRef.current = true;
+    const autoplayAttempt = new SabrAutoplayAttempt();
     const initialConfig = latestConfig();
     const engine = new TypeTypeMsePlayer(video, {
       endpoint: toAbsoluteApiUrl(""),
@@ -126,28 +125,19 @@ export function SabrMsePlayer({
     playbackRate.initialize(video);
     video.addEventListener("volumechange", volumeChange);
     video.addEventListener("ratechange", playbackRateChange);
-    let autoplayStartTime = 0;
     let engineLoaded = false;
     const startAutoplay = () => {
-      if (!engineLoaded || autoplayConfirmedRef.current || video.readyState < 3) return;
-      if (autoplayStartedRef.current) {
-        if (!video.paused && video.currentTime >= autoplayStartTime + 0.25) {
-          autoplayConfirmedRef.current = true;
-        } else if (video.paused) {
-          autoplayStartedRef.current = false;
-        }
-        return;
-      }
+      if (!engineLoaded || video.readyState < 3) return;
       if (!latestHandlers().autoplay && !pendingPlayRef.current) return;
-      autoplayStartTime = video.currentTime;
-      autoplayStartedRef.current = true;
-      void playEngine().catch((error: unknown) => {
-        if (isAutoplayPolicyError(error)) {
-          pendingPlayRef.current = false;
-          autoplayConfirmedRef.current = true;
-          video.autoplay = false;
-        } else autoplayStartedRef.current = false;
-      });
+      if (!autoplayAttempt.begin()) return;
+      void playEngine()
+        .then(() => autoplayAttempt.resolve())
+        .catch((error: unknown) => {
+          if (!autoplayAttempt.reject(error)) {
+            pendingPlayRef.current = false;
+            video.autoplay = false;
+          }
+        });
     };
     video.addEventListener("canplay", startAutoplay);
     const autoplayTimer = window.setInterval(startAutoplay, 250);
@@ -158,9 +148,9 @@ export function SabrMsePlayer({
         return playEngine();
       },
       pause: (userInitiated = false) => {
-        if (!userInitiated && pendingPlayRef.current && !autoplayConfirmedRef.current) return;
+        if (!userInitiated && pendingPlayRef.current && !autoplayAttempt.isConfirmed) return;
         pendingPlayRef.current = false;
-        autoplayConfirmedRef.current = true;
+        autoplayAttempt.resolve();
         video.autoplay = false;
         return engine.pause();
       },
@@ -198,8 +188,7 @@ export function SabrMsePlayer({
       engineRef.current = null;
       setEngineReady(false);
       pendingPlayRef.current = false;
-      autoplayStartedRef.current = false;
-      autoplayConfirmedRef.current = false;
+      autoplayAttempt.reset();
       cancelPendingSabrSeek(seekingRef);
       seekingRef.current = false;
       latestHandlers().onSeekStateChange(false);
