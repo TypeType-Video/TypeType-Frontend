@@ -5,14 +5,13 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
-import { SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
+import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
 import { registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
 import { useAuthStore } from "../stores/auth-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
-
 export function SabrMsePlayer({
   config,
   playbackRatePreference,
@@ -118,10 +117,7 @@ export function SabrMsePlayer({
       playbackRate.apply(video, false);
       playbackRateSettled = true;
     };
-    const playEngine = () =>
-      engine.play().then(() => {
-        settlePlaybackRate();
-      });
+    const playEngine = () => engine.play().then(settlePlaybackRate);
     playbackRate.initialize(video);
     video.addEventListener("volumechange", volumeChange);
     video.addEventListener("ratechange", playbackRateChange);
@@ -132,6 +128,7 @@ export function SabrMsePlayer({
       video.autoplay = false;
       engine.pause();
     });
+    const unguardAutoplay = guardAutoplay(video, autoplayAttempt, () => engine.pause());
     const startAutoplay = () => {
       if (!engineLoaded || video.readyState < 3) return;
       if (!latestHandlers().autoplay && !pendingPlayRef.current) return;
@@ -154,6 +151,8 @@ export function SabrMsePlayer({
     const autoplayTimer = window.setInterval(startAutoplay, 250);
     const unregisterControls = registerSabrVidstackControls(video, {
       play: () => {
+        if (navigator.userActivation?.isActive !== false && autoplayAttempt.isExpired)
+          autoplayAttempt.allow();
         pendingPlayRef.current = true;
         video.autoplay = true;
         return playEngine();
@@ -190,6 +189,7 @@ export function SabrMsePlayer({
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
       offError();
+      unguardAutoplay();
       unregisterControls();
       video.removeEventListener("volumechange", volumeChange);
       video.removeEventListener("ratechange", playbackRateChange);

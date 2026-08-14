@@ -9,10 +9,15 @@ export function isAutoplayPolicyError(error: unknown): boolean {
 
 export class SabrAutoplayAttempt {
   private confirmed = false;
+  private expired = false;
   private pending = false;
 
   get isConfirmed(): boolean {
     return this.confirmed;
+  }
+
+  get isExpired(): boolean {
+    return this.expired;
   }
 
   begin(): boolean {
@@ -32,7 +37,12 @@ export class SabrAutoplayAttempt {
     if (this.confirmed || !this.pending) return false;
     this.pending = false;
     this.confirmed = true;
+    this.expired = true;
     return true;
+  }
+
+  allow(): void {
+    this.expired = false;
   }
 
   reject(error: unknown): boolean {
@@ -45,8 +55,26 @@ export class SabrAutoplayAttempt {
 
   reset(): void {
     this.confirmed = false;
+    this.expired = false;
     this.pending = false;
   }
+}
+
+type AutoplayEventTarget = {
+  addEventListener: (type: "play", listener: () => void) => void;
+  removeEventListener: (type: "play", listener: () => void) => void;
+};
+
+export function guardAutoplay(
+  target: AutoplayEventTarget,
+  attempt: SabrAutoplayAttempt,
+  pause: () => void,
+): () => void {
+  const stopExpiredPlayback = () => {
+    if (attempt.isExpired) pause();
+  };
+  target.addEventListener("play", stopExpiredPlayback);
+  return () => target.removeEventListener("play", stopExpiredPlayback);
 }
 
 export class SabrAutoplayDeadline {

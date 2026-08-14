@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  guardAutoplay,
   isAutoplayPolicyError,
   SabrAutoplayAttempt,
   SabrAutoplayDeadline,
@@ -42,6 +43,33 @@ test("accepts playback that resolves before the deadline", () => {
 
   expect(attempt.resolve()).toBe(true);
   expect(attempt.isConfirmed).toBe(true);
+});
+
+test("pauses a late playback event until user playback is allowed", () => {
+  let listener = () => {};
+  let pauses = 0;
+  const target = {
+    addEventListener: (_type: "play", next: () => void) => {
+      listener = next;
+    },
+    removeEventListener: (_type: "play", next: () => void) => {
+      if (listener === next) listener = () => {};
+    },
+  };
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+  attempt.expire();
+  const unguard = guardAutoplay(target, attempt, () => {
+    pauses += 1;
+  });
+
+  listener();
+  attempt.allow();
+  listener();
+  unguard();
+  listener();
+
+  expect(pauses).toBe(1);
 });
 
 test("cancels an armed autoplay deadline", async () => {
