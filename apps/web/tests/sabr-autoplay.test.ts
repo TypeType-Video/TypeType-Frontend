@@ -109,11 +109,11 @@ test("allows transient seek playback after autoplay expires", () => {
 
 test("allows late playback only after a player surface click", () => {
   let playListener = () => {};
-  let clickListener = (_event: Event) => {};
+  const rootListeners = new Map<string, (event: Event) => void>();
   let pauses = 0;
   const root = {
-    addEventListener: (_type: "click", next: (event: Event) => void) => {
-      clickListener = next;
+    addEventListener: (type: string, next: (event: Event) => void) => {
+      rootListeners.set(type, next);
     },
     removeEventListener: () => {},
   };
@@ -132,7 +132,38 @@ test("allows late playback only after a player surface click", () => {
   });
 
   playListener();
-  clickListener({ target: root } as unknown as Event);
+  rootListeners.get("click")?.({ target: root } as unknown as Event);
+  playListener();
+
+  expect(pauses).toBe(1);
+});
+
+test("allows touch playback without a compatibility click", () => {
+  let playListener = () => {};
+  const rootListeners = new Map<string, (event: Event) => void>();
+  let pauses = 0;
+  const root = {
+    addEventListener: (type: string, next: (event: Event) => void) => {
+      rootListeners.set(type, next);
+    },
+    removeEventListener: () => {},
+  };
+  const target = {
+    addEventListener: (_type: "play", next: () => void) => {
+      playListener = next;
+    },
+    removeEventListener: () => {},
+    closest: () => root,
+  };
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+  attempt.expire();
+  guardAutoplay(target as unknown as HTMLVideoElement, attempt, () => {
+    pauses += 1;
+  });
+
+  playListener();
+  rootListeners.get("pointerup")?.({ target: root } as unknown as Event);
   playListener();
 
   expect(pauses).toBe(1);

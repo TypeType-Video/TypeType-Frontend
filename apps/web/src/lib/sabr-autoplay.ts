@@ -80,9 +80,11 @@ export function guardAutoplay(
       attempt.allow();
   };
   video.addEventListener("play", stopExpiredPlayback);
+  root?.addEventListener("pointerup", allowPlayback, true);
   root?.addEventListener("click", allowPlayback, true);
   return () => {
     video.removeEventListener("play", stopExpiredPlayback);
+    root?.removeEventListener("pointerup", allowPlayback, true);
     root?.removeEventListener("click", allowPlayback, true);
   };
 }
