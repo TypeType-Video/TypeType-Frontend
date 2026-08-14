@@ -21,6 +21,16 @@ test("keeps one autoplay attempt while browser playback is pending", () => {
   expect(attempt.isConfirmed).toBe(false);
 });
 
+test("expires a browser playback attempt that remains pending", () => {
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+
+  expect(attempt.expire()).toBe(true);
+  expect(attempt.isConfirmed).toBe(true);
+  expect(attempt.begin()).toBe(false);
+  expect(attempt.expire()).toBe(false);
+});
+
 test("stops autoplay after a browser policy rejection", () => {
   const attempt = new SabrAutoplayAttempt();
   attempt.begin();

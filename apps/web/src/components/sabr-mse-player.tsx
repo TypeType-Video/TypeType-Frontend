@@ -5,7 +5,7 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
-import { SabrAutoplayAttempt } from "../lib/sabr-autoplay";
+import { SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
@@ -126,13 +126,24 @@ export function SabrMsePlayer({
     video.addEventListener("volumechange", volumeChange);
     video.addEventListener("ratechange", playbackRateChange);
     let engineLoaded = false;
+    const autoplayDeadline = new SabrAutoplayDeadline(() => {
+      if (!autoplayAttempt.expire()) return;
+      pendingPlayRef.current = false;
+      video.autoplay = false;
+      engine.pause();
+    });
     const startAutoplay = () => {
       if (!engineLoaded || video.readyState < 3) return;
       if (!latestHandlers().autoplay && !pendingPlayRef.current) return;
       if (!autoplayAttempt.begin()) return;
+      autoplayDeadline.arm();
       void playEngine()
-        .then(() => autoplayAttempt.resolve())
+        .then(() => {
+          autoplayDeadline.clear();
+          autoplayAttempt.resolve();
+        })
         .catch((error: unknown) => {
+          autoplayDeadline.clear();
           if (!autoplayAttempt.reject(error)) {
             pendingPlayRef.current = false;
             video.autoplay = false;
@@ -184,6 +195,7 @@ export function SabrMsePlayer({
       video.removeEventListener("ratechange", playbackRateChange);
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);
+      autoplayDeadline.clear();
       engine.destroy();
       engineRef.current = null;
       setEngineReady(false);
