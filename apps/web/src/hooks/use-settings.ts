@@ -23,6 +23,7 @@ const DEFAULTS: SettingsItem = {
   audioOnlyPlayback: false,
   volume: 1,
   muted: false,
+  notificationPopupsEnabled: true,
   subtitlesEnabled: false,
   defaultSubtitleLanguage: "",
   defaultAudioLanguage: "",

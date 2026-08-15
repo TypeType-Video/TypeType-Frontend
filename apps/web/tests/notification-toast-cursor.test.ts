@@ -4,6 +4,7 @@ import {
   createNotificationToastCursor,
   findNewNotificationItems,
   parseNotificationToastCursor,
+  visibleNotificationToastItems,
 } from "../src/lib/notification-toast-cursor";
 import type { NotificationItem } from "../src/types/notifications";
 
@@ -78,6 +79,13 @@ describe("notification toast cursor", () => {
   test("never moves the cursor backwards", () => {
     const cursor = createNotificationToastCursor([notification("latest", 500)], 0);
     expect(advanceNotificationToastCursor(cursor, [notification("stale", 100)])).toEqual(cursor);
+  });
+
+  test("keeps popup notifications silent when the preference is disabled", () => {
+    const item = notification("muted", 500);
+
+    expect(visibleNotificationToastItems([item], false, () => false)).toEqual([]);
+    expect(visibleNotificationToastItems([item], true, () => false)).toEqual([item]);
   });
 
   test("rejects malformed persisted cursors", () => {

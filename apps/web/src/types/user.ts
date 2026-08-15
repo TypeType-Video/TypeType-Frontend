@@ -112,6 +112,7 @@ export type SettingsItem = {
   audioOnlyPlayback: boolean;
   volume: number;
   muted: boolean;
+  notificationPopupsEnabled: boolean;
   subtitlesEnabled: boolean;
   defaultSubtitleLanguage: string;
   defaultAudioLanguage: string;
