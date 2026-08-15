@@ -16,6 +16,8 @@ import {
   getPreferredDefaultAudioTrackId,
 } from "../lib/audio-track";
 import { useShortsNavigation } from "../lib/shorts-navigation";
+import { toPublicWatchParam } from "../lib/watch-url";
+import { youtubeSessionReturnToForShorts } from "../lib/youtube-session-route";
 
 type Props = {
   targetUrl?: string;
@@ -51,6 +53,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
     retry,
     errorMessage,
     isMemberOnlyShort,
+    needsYoutubeSession,
   } = useShortsActiveStream({
     shorts,
     index,
@@ -116,6 +119,11 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       streamError={streamError}
       errorMessage={errorMessage}
       isMemberOnlyShort={isMemberOnlyShort}
+      youtubeSessionReturnTo={
+        needsYoutubeSession
+          ? youtubeSessionReturnToForShorts(toPublicWatchParam(activeId))
+          : undefined
+      }
       hasPrev={hasPrev}
       hasNext={hasNext}
       settingsReady={settingsReady}

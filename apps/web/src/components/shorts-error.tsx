@@ -1,22 +1,37 @@
+import { Link } from "@tanstack/react-router";
+import { YoutubeIcon } from "./youtube-icon";
+
 type Props = {
   message: string;
   onRetry: () => void;
   onNext: () => void;
+  youtubeSessionReturnTo?: string;
 };
 
-export function ShortsError({ message, onRetry, onNext }: Props) {
+export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }: Props) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 p-5">
       <div className="flex max-w-sm flex-col items-center gap-3 text-center">
         <p className="text-sm text-fg">{message}</p>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onRetry}
-            className="h-9 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
-          >
-            Retry
-          </button>
+          {youtubeSessionReturnTo ? (
+            <Link
+              to="/youtube-session"
+              search={{ returnTo: youtubeSessionReturnTo }}
+              className="inline-flex h-9 items-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
+            >
+              <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
+              Connect with YouTube
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="h-9 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
+            >
+              Retry
+            </button>
+          )}
           <button
             type="button"
             onClick={onNext}

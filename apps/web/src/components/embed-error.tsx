@@ -15,6 +15,7 @@ type EmbedErrorProps = {
   image?: string;
   availability?: VideoAvailability;
   poster?: string;
+  watchUrl?: string;
 };
 
 export function EmbedError({
@@ -24,6 +25,7 @@ export function EmbedError({
   image,
   availability,
   poster,
+  watchUrl,
 }: EmbedErrorProps) {
   const availabilityCopy = availability ? videoAvailabilityCopy(availability, message) : null;
   const displayedMessage = availabilityCopy?.message ?? message;
@@ -83,6 +85,16 @@ export function EmbedError({
           >
             Retry
           </button>
+        )}
+        {watchUrl && (
+          <a
+            href={watchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+          >
+            Connect YouTube on TypeType
+          </a>
         )}
       </div>
     </div>

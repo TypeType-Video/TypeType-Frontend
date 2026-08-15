@@ -1,7 +1,7 @@
 import { isStreamUnavailableError } from "../hooks/use-stream";
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
-import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
+import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
 import { resolveVideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
 import { youtubeSessionReturnToForWatch } from "../lib/youtube-session-route";
 import { StreamError } from "./stream-error";
@@ -22,7 +22,7 @@ export function WatchStreamError({ error, publicParam, list, shuffle, poster, on
     error.message ===
       "Error occurs when fetching the page. Try increase the loading timeout in Settings.";
   const availability = genericExtractorError ? "members_only" : resolveVideoAvailability(error);
-  const needsYoutubeSession = isYoutubeSessionReconnectError(error);
+  const needsYoutubeSession = isYoutubeSessionActionError(error);
   const familyListBlocked = isChannelNotAllowedError(error);
   const youtubeSessionReturnTo = needsYoutubeSession
     ? youtubeSessionReturnToForWatch(publicParam, list, shuffle)
@@ -34,7 +34,7 @@ export function WatchStreamError({ error, publicParam, list, shuffle, poster, on
     : familyListBlocked
       ? FAMILY_LIST_BLOCKED_MESSAGE
       : needsYoutubeSession
-        ? "Connect YouTube to load this browser-only video."
+        ? "Connect YouTube to access this video."
         : error instanceof ApiError && (error.status === 400 || error.status === 422)
           ? error.message
           : isStreamUnavailableError(error)

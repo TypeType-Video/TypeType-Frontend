@@ -23,6 +23,7 @@ export function ShortsPlayerStage({
   streamError,
   errorMessage,
   isMemberOnlyShort,
+  youtubeSessionReturnTo,
   hasPrev,
   hasNext,
   settingsReady,
@@ -122,7 +123,12 @@ export function ShortsPlayerStage({
               </div>
             )}
             {state !== "loading" && state !== "ready" && (
-              <ShortsError message={playbackMessage} onRetry={retry} onNext={onNext} />
+              <ShortsError
+                message={playbackMessage}
+                onRetry={retry}
+                onNext={onNext}
+                youtubeSessionReturnTo={youtubeSessionReturnTo}
+              />
             )}
             {stream && playbackProps && state === "ready" && (
               <ShortsVideoPlayer
