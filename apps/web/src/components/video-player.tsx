@@ -173,6 +173,7 @@ export function VideoPlayer({
         artwork={poster}
         canSeek={canSeek}
         isLive={streamType === "live"}
+        sabrVideo={sabrState.video}
         onPreviousTrack={onPreviousVideo}
         onNextTrack={onNextVideo}
       />
