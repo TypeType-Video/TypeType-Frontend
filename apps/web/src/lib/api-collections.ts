@@ -10,6 +10,7 @@ import { ApiError } from "./api";
 import { authed, authedJson } from "./authed";
 
 import { API_BASE as BASE } from "./env";
+import { progressWriteQueue } from "./progress-write-queue";
 
 async function throwIfFailed(res: Response, fallback: string): Promise<void> {
   if (res.ok) return;
@@ -18,6 +19,7 @@ async function throwIfFailed(res: Response, fallback: string): Promise<void> {
 }
 
 export async function fetchProgress(videoUrl: string): Promise<ProgressItem> {
+  await progressWriteQueue.settle(videoUrl);
   const res = await authed(`${BASE}/progress/${encodeURIComponent(videoUrl)}`, undefined, {
     silentStatuses: [404],
   });
@@ -32,16 +34,18 @@ export async function updateProgress(
   position: number,
   keepalive = false,
 ): Promise<void> {
-  const res = await authed(`${BASE}/progress/${encodeURIComponent(videoUrl)}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ position: Math.round(position) }),
-    keepalive,
+  return progressWriteQueue.enqueue(videoUrl, async () => {
+    const res = await authed(`${BASE}/progress/${encodeURIComponent(videoUrl)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ position: Math.round(position) }),
+      keepalive,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: "update failed" }));
+      throw new ApiError((body as { error: string }).error, res.status);
+    }
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ error: "update failed" }));
-    throw new ApiError((body as { error: string }).error, res.status);
-  }
 }
 
 export function fetchBlockedChannels(): Promise<BlockedItem[]> {
