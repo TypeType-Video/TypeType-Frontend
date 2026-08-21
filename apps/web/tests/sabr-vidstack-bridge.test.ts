@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  consumeSabrSeekTarget,
   isSabrPlaybackEventTransient,
   registerSabrVidstackControls,
   requestSabrSeek,
@@ -150,6 +151,36 @@ test("sends only explicit SABR seek requests to registered MSE controls", () => 
 
   expect(requestSabrSeek(video, 95)).toBe(true);
   expect(positions).toEqual([95]);
+  expect(consumeSabrSeekTarget(video)).toBe(95_000);
+  expect(consumeSabrSeekTarget(video)).toBeNull();
+});
+
+test("keeps the latest explicit SABR seek target for progress persistence", () => {
+  const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
+  registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+  });
+
+  requestSabrSeek(video, 95);
+  requestSabrSeek(video, 12.25);
+
+  expect(consumeSabrSeekTarget(video)).toBe(12_250);
+});
+
+test("clears an explicit seek target when its controls are removed", () => {
+  const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+  });
+
+  requestSabrSeek(video, 95);
+  unregister();
+
+  expect(consumeSabrSeekTarget(video)).toBeNull();
 });
 
 test("identifies only player-owned transient media events", () => {

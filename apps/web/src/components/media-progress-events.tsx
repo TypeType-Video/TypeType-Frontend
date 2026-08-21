@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
-import { isSabrPlaybackEventTransient } from "../lib/sabr-vidstack-bridge";
+import { resolveMediaProgressPosition } from "../lib/media-progress-position";
+import { consumeSabrSeekTarget, isSabrPlaybackEventTransient } from "../lib/sabr-vidstack-bridge";
 import { useMediaPlayer } from "../lib/vidstack";
 
 type Props = {
@@ -58,7 +59,18 @@ export function MediaProgressEvents({
       const media = rootElement.querySelector<HTMLMediaElement>("video,audio");
       if (!media) return false;
 
-      const update = () => onTimeUpdateRef.current?.(toPositionMs(media));
+      const video = media instanceof HTMLVideoElement ? media : null;
+      const reportPosition = (requestedPositionMs: number | null = null) => {
+        const positionMs = resolveMediaProgressPosition(
+          video,
+          toPositionMs(media),
+          requestedPositionMs,
+        );
+        if (positionMs === null) return false;
+        onTimeUpdateRef.current?.(positionMs);
+        return true;
+      };
+      const update = () => reportPosition();
       const readPosition = () => toPositionMs(media);
       const suppressPlaybackEvent = () =>
         suppressPlaybackEventsRef.current ||
@@ -74,11 +86,12 @@ export function MediaProgressEvents({
         onPauseRef.current?.();
       };
       const seeked = () => {
-        update();
+        const requestedPositionMs = video ? consumeSabrSeekTarget(video) : null;
+        if (!reportPosition(requestedPositionMs)) return;
         onSeekedRef.current?.();
       };
       const seeking = () => {
-        update();
+        if (!update()) return;
         onSeekingRef.current?.(toPositionMs(media));
       };
       const ended = () => {
