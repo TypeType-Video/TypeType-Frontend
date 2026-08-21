@@ -6,6 +6,14 @@ type WatchResumeInput = {
   durationSeconds: number;
 };
 
+export function shouldWaitForWatchProgress(
+  authenticated: boolean,
+  pending: boolean,
+  fetching: boolean,
+): boolean {
+  return authenticated && (pending || fetching);
+}
+
 export function resolveWatchStartTime(input: WatchResumeInput): number | null {
   if (input.authenticated && input.progressPending) return null;
 

@@ -12,6 +12,7 @@ export function useProgress(videoUrl: string) {
       isAuthed ? fetchProgress(videoUrl) : Promise.resolve({ videoUrl, position: 0, updatedAt: 0 }),
     retry: false,
     staleTime: Infinity,
+    refetchOnMount: "always",
     enabled: authReady && videoUrl.length > 0,
   });
 }
