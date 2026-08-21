@@ -11,8 +11,10 @@ export function useProgress(videoUrl: string) {
     queryFn: () =>
       isAuthed ? fetchProgress(videoUrl) : Promise.resolve({ videoUrl, position: 0, updatedAt: 0 }),
     retry: false,
-    staleTime: Infinity,
+    staleTime: 0,
     refetchOnMount: "always",
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
     enabled: authReady && videoUrl.length > 0,
   });
 }
