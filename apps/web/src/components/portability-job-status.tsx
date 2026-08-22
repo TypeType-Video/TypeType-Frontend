@@ -1,4 +1,5 @@
-import { AlertTriangle, CheckCircle2, LoaderCircle, X } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Copy, LoaderCircle, X } from "lucide-react";
+import { useState } from "react";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import { categoryLabel } from "../lib/portability-catalog";
 
@@ -28,9 +29,27 @@ function stateLabel(job: PortabilityJob): string {
 }
 
 export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
+  const [copied, setCopied] = useState(false);
   const percent = progressPercent(job);
   const active = ACTIVE.has(job.state);
   const Icon = active ? LoaderCircle : job.state === "failed" ? AlertTriangle : CheckCircle2;
+  const reference = [
+    `Job: ${job.id}`,
+    job.requestId ? `Request: ${job.requestId}` : null,
+    job.errorCode ? `Code: ${job.errorCode}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  async function copyReference() {
+    try {
+      await navigator.clipboard.writeText(reference);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  }
   return (
     <section aria-live="polite" className="border border-border bg-surface px-4 py-4">
       <div className="flex items-start justify-between gap-3">
@@ -48,7 +67,23 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
                 {job.progress.unit}
               </p>
             )}
-            {job.errorCode && <p className="mt-1 text-xs text-danger">{job.errorCode}</p>}
+            {job.state === "failed" && (
+              <div className="mt-1.5 text-xs text-danger">
+                <p>{job.errorMessage ?? "Portability operation failed"}</p>
+                <div className="mt-1 flex items-center gap-1.5 text-fg-soft">
+                  <code className="truncate">{job.errorCode ?? "portability_failed"}</code>
+                  <button
+                    type="button"
+                    title="Copy support reference"
+                    aria-label="Copy support reference"
+                    onClick={() => void copyReference()}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-fg-muted hover:text-fg"
+                  >
+                    {copied ? <Check size={13} /> : <Copy size={13} />}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         {active && onCancel && (

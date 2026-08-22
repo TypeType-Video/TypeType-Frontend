@@ -64,6 +64,7 @@ export type PortabilityJob = {
   state: PortabilityJobState;
   createdAt: number;
   updatedAt: number;
+  requestId: string | null;
   preview: PortabilityPreview | null;
   result: Partial<Record<PortabilityCategory, number>> | null;
   progress: {
@@ -73,7 +74,13 @@ export type PortabilityJob = {
     total: number | null;
   } | null;
   errorCode: string | null;
+  errorMessage: string | null;
 };
+
+type PortabilityJobReport = Pick<
+  PortabilityJob,
+  "id" | "state" | "requestId" | "preview" | "result" | "errorCode" | "errorMessage"
+>;
 
 async function portabilityResponse<T>(response: Response): Promise<T> {
   const payload = await response.json().catch(() => null);
@@ -92,11 +99,14 @@ export async function getPortabilityFormats(): Promise<PortabilityFormatDescript
   return portabilityResponse(await authed(`${API_BASE}/portability/formats`));
 }
 
-export async function startPortabilityImport(file: File): Promise<PortabilityJob> {
+export async function startPortabilityImport(file: File, format: string): Promise<PortabilityJob> {
   const body = new FormData();
   body.append("file", file);
   return portabilityResponse(
-    await authed(`${API_BASE}/portability/imports`, { method: "POST", body }),
+    await authed(`${API_BASE}/portability/imports?format=${encodeURIComponent(format)}`, {
+      method: "POST",
+      body,
+    }),
   );
 }
 
@@ -147,15 +157,55 @@ function artifactName(response: Response): string {
   return disposition.match(/filename="?([^";]+)"?/i)?.[1] ?? "typetype-export";
 }
 
-export async function downloadPortabilityArtifact(id: string): Promise<void> {
-  const response = await authed(`${API_BASE}/portability/jobs/${id}/artifact`);
-  if (!response.ok) await portabilityResponse(response);
-  const url = URL.createObjectURL(await response.blob());
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = artifactName(response);
+  anchor.download = filename;
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+type SavePickerWindow = Window & {
+  showSaveFilePicker?: (options: {
+    suggestedName: string;
+    types: { description: string; accept: Record<string, string[]> }[];
+  }) => Promise<FileSystemFileHandle>;
+};
+
+export async function downloadPortabilityArtifact(
+  id: string,
+  suggestedName: string,
+): Promise<void> {
+  const picker = (window as SavePickerWindow).showSaveFilePicker;
+  const handle = picker
+    ? await picker({
+        suggestedName,
+        types: [
+          {
+            description: "Backup archive",
+            accept: { "application/octet-stream": [".zip", ".json", ".db", ".opml"] },
+          },
+        ],
+      })
+    : null;
+  const response = await authed(`${API_BASE}/portability/jobs/${id}/artifact`);
+  if (!response.ok) await portabilityResponse(response);
+  if (handle && response.body) {
+    const writable = await handle.createWritable();
+    await response.body.pipeTo(writable);
+    return;
+  }
+  downloadBlob(await response.blob(), artifactName(response));
+}
+
+export async function downloadPortabilityReport(id: string): Promise<void> {
+  const response = await authed(`${API_BASE}/portability/jobs/${id}/report`);
+  const report = await portabilityResponse<PortabilityJobReport>(response);
+  downloadBlob(
+    new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }),
+    `typetype-portability-${id}.json`,
+  );
 }

@@ -16,7 +16,7 @@ export function usePortabilityJob(id: string | null) {
     queryFn: () => getPortabilityJob(id as string),
     enabled: id !== null,
     refetchInterval: (current) =>
-      current.state.data && TERMINAL_STATES.has(current.state.data.state) ? false : 500,
+      current.state.data && TERMINAL_STATES.has(current.state.data.state) ? false : 1_000,
   });
   const cancel = useMutation({
     mutationFn: () => cancelPortabilityJob(id as string),
