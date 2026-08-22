@@ -124,18 +124,20 @@ export function SettingsBackup() {
         </div>
       </section>
       <section className="flex flex-col gap-3">
-        <p className={SECTION_LABEL}>Migration</p>
+        <p className={SECTION_LABEL}>Data portability</p>
         <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-sm text-fg">Import from YouTube or PipePipe</span>
-            <span className="text-xs text-fg-soft">Open the dedicated import page.</span>
+            <span className="text-sm text-fg">Move data between supported apps</span>
+            <span className="text-xs text-fg-soft">
+              Preview imports or create a compatible export.
+            </span>
           </div>
           <button
             type="button"
             onClick={() => goto("/import")}
             className="h-9 w-full rounded-md bg-surface-strong px-3 text-xs text-fg-muted transition-colors hover:text-fg sm:w-auto"
           >
-            Open import
+            Open data transfer
           </button>
         </div>
       </section>

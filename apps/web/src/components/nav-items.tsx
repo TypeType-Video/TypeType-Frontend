@@ -57,13 +57,14 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Import",
+    label: "Data transfer",
     to: "/import",
     icon: (
       <>
-        <path d="M12 3v12" />
-        <path d="M8 11l4 4 4-4" />
-        <path d="M4 19h16" />
+        <path d="M8 3v12" />
+        <path d="M4 11l4 4 4-4" />
+        <path d="M16 21V9" />
+        <path d="M12 13l4-4 4 4" />
       </>
     ),
   },
