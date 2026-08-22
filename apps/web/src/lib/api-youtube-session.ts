@@ -16,8 +16,11 @@ export type YoutubeRemoteBrowserSession = {
   expiresAt: number;
 };
 
-export function isYoutubeSessionReconnectError(error: unknown): boolean {
-  return error instanceof ApiError && error.code === "youtube_session_needs_reconnect";
+export function isYoutubeSessionActionError(error: unknown): boolean {
+  return (
+    error instanceof ApiError &&
+    (error.code === "youtube_session_required" || error.code === "youtube_session_needs_reconnect")
+  );
 }
 
 export function fetchYoutubeSessionStatus(): Promise<YoutubeSessionState> {

@@ -13,7 +13,7 @@ import { useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { videoAvailabilityCopy } from "../lib/video-availability";
-import { resolveWatchStartTime } from "../lib/watch-resume";
+import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
 import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 
@@ -62,7 +62,11 @@ function WatchPage() {
   const addToHistoryRef = useRef(add.mutate);
   addToHistoryRef.current = add.mutate;
   const historyAddedForRef = useRef<string | null>(null);
-  const resumePending = isAuthed && progressFetch.isPending;
+  const resumePending = shouldWaitForWatchProgress(
+    isAuthed,
+    progressFetch.isPending,
+    progressFetch.isFetching,
+  );
 
   useEffect(() => {
     if (v.trim() && publicParam !== v.trim()) {
@@ -125,7 +129,7 @@ function WatchPage() {
   const startTime =
     resolveWatchStartTime({
       authenticated: isAuthed,
-      progressPending: progressFetch.isPending,
+      progressPending: resumePending,
       savedPositionMs: progressFetch.data?.position,
       serverPositionSeconds: activeStream.startPosition,
       durationSeconds: activeStream.duration,

@@ -4,14 +4,17 @@ import {
   type BlockedChannelIdentity,
   createBlockedContentMatcher,
 } from "../lib/blocked-content";
+import { filterMembersOnlyContent, isMembersOnlyContentHidden } from "../lib/video-visibility";
 import type { ChannelResultItem } from "../types/api";
 import type { PublicPlaylistInfo } from "../types/playlist";
 import { useAuth } from "./use-auth";
 import { useBlocked } from "./use-blocked";
+import { useSettings } from "./use-settings";
 
 export function useBlockedFilter() {
   const { isAuthed } = useAuth();
   const { channels, videos, keywords } = useBlocked();
+  const { settings, settingsReady } = useSettings();
 
   const matcher = useMemo(
     () =>
@@ -29,8 +32,16 @@ export function useBlockedFilter() {
   );
 
   const filter = useCallback(
-    <T extends BlockableVideo>(streams: T[]): T[] => matcher.filterVideos(streams),
-    [matcher],
+    <T extends BlockableVideo>(streams: T[]): T[] =>
+      filterMembersOnlyContent(matcher.filterVideos(streams), settings.hideMembersOnlyContent),
+    [matcher, settings.hideMembersOnlyContent],
+  );
+
+  const isHidden = useCallback(
+    (stream: BlockableVideo): boolean =>
+      matcher.isVideoBlocked(stream) ||
+      isMembersOnlyContentHidden(stream, settings.hideMembersOnlyContent),
+    [matcher, settings.hideMembersOnlyContent],
   );
 
   const isChannelIdentityBlocked = useCallback(
@@ -70,6 +81,7 @@ export function useBlockedFilter() {
     findBlockedChannel,
     findBlockedVideo,
     isBlocked,
+    isHidden,
     isChannelBlocked,
     isChannelIdentityBlocked,
     isPlaylistBlocked,
@@ -77,6 +89,6 @@ export function useBlockedFilter() {
     blockedChannelUrls: matcher.channelUrls,
     blockedKeywords: matcher.normalizedKeywords,
     blockedVideoUrls: matcher.videoUrls,
-    ready: channels.isSuccess && videos.isSuccess && keywords.isSuccess,
+    ready: settingsReady && channels.isSuccess && videos.isSuccess && keywords.isSuccess,
   };
 }

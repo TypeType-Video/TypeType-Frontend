@@ -8,7 +8,7 @@ import {
   keyboardSeekOffset,
   nextKeyboardSeekTarget,
 } from "../components/player-hotkeys-utils";
-import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
+import { requestSabrSeek, requestSabrVidstackPlayback } from "../lib/sabr-vidstack-bridge";
 import { useMediaPlayer, useMediaRemote, useMediaState } from "../lib/vidstack";
 import { useHoldFastForward } from "./use-hold-fast-forward";
 
@@ -36,6 +36,10 @@ export function usePlayerKeyboard(canSeek: boolean, sabrVideo: HTMLVideoElement 
 
   useEffect(() => {
     function togglePaused() {
+      if (sabrVideo) {
+        void requestSabrVidstackPlayback(sabrVideo, pausedRef.current, true).catch(() => {});
+        return;
+      }
       if (pausedRef.current) void Promise.resolve(remote.play()).catch(() => {});
       else void Promise.resolve(remote.pause()).catch(() => {});
     }

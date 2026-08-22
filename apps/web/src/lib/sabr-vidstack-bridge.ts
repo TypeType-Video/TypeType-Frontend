@@ -8,6 +8,7 @@ export type SabrVidstackControls = {
 
 const controlsByVideo = new WeakMap<HTMLVideoElement, SabrVidstackControls>();
 const pendingPlaybackByVideo = new WeakMap<HTMLVideoElement, boolean>();
+const pendingSeekTargetByVideo = new WeakMap<HTMLVideoElement, number>();
 
 export function registerSabrVidstackControls(
   video: HTMLVideoElement,
@@ -19,7 +20,9 @@ export function registerSabrVidstackControls(
   if (pendingPlayback === true) void controls.play().catch(() => {});
   else if (pendingPlayback === false) controls.pause();
   return () => {
-    if (controlsByVideo.get(video) === controls) controlsByVideo.delete(video);
+    if (controlsByVideo.get(video) !== controls) return;
+    controlsByVideo.delete(video);
+    pendingSeekTargetByVideo.delete(video);
   };
 }
 
@@ -33,9 +36,22 @@ export function isSabrPlaybackEventTransient(video: HTMLVideoElement): boolean {
 
 export function requestSabrSeek(video: HTMLVideoElement, seconds: number): boolean {
   const controls = getSabrVidstackControls(video);
-  if (!controls) return false;
-  controls.seek(seconds);
+  if (!controls || !Number.isFinite(seconds)) return false;
+  const target = Math.max(0, seconds);
+  pendingSeekTargetByVideo.set(video, target);
+  try {
+    controls.seek(target);
+  } catch (error) {
+    pendingSeekTargetByVideo.delete(video);
+    throw error;
+  }
   return true;
+}
+
+export function consumeSabrSeekTarget(video: HTMLVideoElement): number | null {
+  const target = pendingSeekTargetByVideo.get(video);
+  pendingSeekTargetByVideo.delete(video);
+  return target === undefined ? null : Math.round(target * 1000);
 }
 
 export function requestSabrVidstackPlayback(
@@ -44,7 +60,9 @@ export function requestSabrVidstackPlayback(
   userInitiated = false,
 ): Promise<void> {
   const controls = getSabrVidstackControls(video);
-  if (!playing && !userInitiated && controls?.isTransitioning?.()) return Promise.resolve();
+  const hidden = typeof document !== "undefined" && document.visibilityState === "hidden";
+  if (!playing && !userInitiated && (hidden || controls?.isTransitioning?.()))
+    return Promise.resolve();
   video.autoplay = playing;
   if (!controls) {
     pendingPlaybackByVideo.set(video, playing);

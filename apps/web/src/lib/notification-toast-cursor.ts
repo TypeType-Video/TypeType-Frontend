@@ -39,6 +39,14 @@ export function findNewNotificationItems(
   );
 }
 
+export function visibleNotificationToastItems(
+  items: NotificationItem[],
+  popupsEnabled: boolean,
+  isHidden: (item: NotificationItem["video"]) => boolean,
+): NotificationItem[] {
+  return popupsEnabled ? items.filter((item) => !isHidden(item.video)) : [];
+}
+
 export function advanceNotificationToastCursor(
   cursor: NotificationToastCursor,
   items: NotificationItem[],

@@ -1,5 +1,6 @@
 import { useSettings } from "../hooks/use-settings";
 import { SettingsDiscoveryToggles } from "./settings-content-toggles";
+import { ROW, ToggleSwitch } from "./settings-toggle-switch";
 
 const LANDING_OPTIONS = [
   { value: "home", label: "Home" },
@@ -35,6 +36,25 @@ export function SettingsLandingPage() {
             </option>
           ))}
         </select>
+      </div>
+      <p className="px-1 pt-2 text-xs font-medium text-fg-soft uppercase tracking-wider">
+        Notifications
+      </p>
+      <div className="rounded-xl border border-border bg-surface">
+        <div className={ROW}>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm text-fg">Notification popups</span>
+            <span className="text-xs text-fg-soft">
+              Show a popup when a subscribed channel publishes a video.
+            </span>
+          </div>
+          <ToggleSwitch
+            checked={settings.notificationPopupsEnabled}
+            onClick={() =>
+              update.mutate({ notificationPopupsEnabled: !settings.notificationPopupsEnabled })
+            }
+          />
+        </div>
       </div>
       <div className="divide-y divide-border rounded-xl border border-border bg-surface">
         <SettingsDiscoveryToggles />

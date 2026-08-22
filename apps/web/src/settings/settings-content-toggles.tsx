@@ -14,6 +14,7 @@ const HIDE_KEYS = [
   "hideComments",
   "hideShorts",
   "hideSubscriptionLiveStreams",
+  "hideMembersOnlyContent",
 ] as const;
 
 function useHideEverythingTrigger() {
@@ -40,6 +41,7 @@ type ToggleKey = Extract<
   | "hideComments"
   | "hideShorts"
   | "hideSubscriptionLiveStreams"
+  | "hideMembersOnlyContent"
 >;
 
 type ToggleOption = {
@@ -100,6 +102,12 @@ const DISCOVERY_OPTIONS: ToggleOption[] = [
     label: "Live streams",
     description: "Hide active and scheduled live streams from the subscriptions feed.",
     area: "Subscriptions",
+  },
+  {
+    key: "hideMembersOnlyContent",
+    label: "Members-only videos",
+    description: "Hide videos that require a paid YouTube channel membership.",
+    area: "Discovery",
   },
 ];
 

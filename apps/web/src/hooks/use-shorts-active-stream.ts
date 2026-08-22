@@ -1,4 +1,5 @@
 import { ApiError } from "../lib/api";
+import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { detectProvider } from "../lib/provider";
 import { toPublicWatchParam } from "../lib/watch-url";
@@ -38,6 +39,7 @@ export function useShortsActiveStream({ shorts, index, useAuthenticatedStream, e
   const errorMessage =
     failed && error instanceof ApiError ? error.message : "Couldn't load this short.";
   const isMemberOnlyShort = isMemberOnlyApiError(error);
+  const needsYoutubeSession = isYoutubeSessionActionError(error);
 
   return {
     active,
@@ -52,5 +54,6 @@ export function useShortsActiveStream({ shorts, index, useAuthenticatedStream, e
     current,
     errorMessage,
     isMemberOnlyShort,
+    needsYoutubeSession,
   };
 }

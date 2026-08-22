@@ -45,6 +45,7 @@ export function HideEverythingToggle() {
       hideComments: true,
       hideShorts: true,
       hideSubscriptionLiveStreams: true,
+      hideMembersOnlyContent: true,
     });
     allowHideEverything();
     navigate({ to: "/hide-everything" });

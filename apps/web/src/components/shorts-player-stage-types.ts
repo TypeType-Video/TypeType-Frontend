@@ -11,6 +11,7 @@ export type ShortsPlayerStageProps = {
   streamError: boolean;
   errorMessage: string;
   isMemberOnlyShort: boolean;
+  youtubeSessionReturnTo?: string;
   hasPrev: boolean;
   hasNext: boolean;
   settingsReady: boolean;

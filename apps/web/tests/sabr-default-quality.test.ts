@@ -23,6 +23,16 @@ test("respects the preferred sabr resolution above 720p", () => {
   expect(defaultSabrItag(options, "2160p")).toBe(401);
 });
 
+test("selects portrait video by canonical quality instead of encoded height", () => {
+  const portrait = [
+    { ...option(399, 1920), label: "1080p", width: 1080 },
+    { ...option(398, 1280), label: "720p", width: 720 },
+    { ...option(397, 854), label: "480p", width: 480 },
+  ];
+
+  expect(defaultSabrItag(portrait, "720p")).toBe(398);
+});
+
 test("chooses automatic quality from display and network constraints", () => {
   expect(automaticSabrQuality(1080, 1)).toBe("1080p");
   expect(automaticSabrQuality(1440, 2)).toBe("2160p");

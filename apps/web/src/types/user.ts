@@ -112,6 +112,7 @@ export type SettingsItem = {
   audioOnlyPlayback: boolean;
   volume: number;
   muted: boolean;
+  notificationPopupsEnabled: boolean;
   subtitlesEnabled: boolean;
   defaultSubtitleLanguage: string;
   defaultAudioLanguage: string;
@@ -137,6 +138,7 @@ export type SettingsItem = {
   hideComments: boolean;
   hideShorts: boolean;
   hideSubscriptionLiveStreams: boolean;
+  hideMembersOnlyContent: boolean;
   accessMode: AccessMode;
   captionStyles: CaptionStyles;
 };

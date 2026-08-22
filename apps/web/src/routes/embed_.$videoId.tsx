@@ -9,7 +9,7 @@ import { useSettings } from "../hooks/use-settings";
 import { isStreamUnavailableError, useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
-import { isYoutubeSessionReconnectError } from "../lib/api-youtube-session";
+import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
@@ -92,7 +92,7 @@ function EmbedPage() {
     const availability = genericExtractorError
       ? "members_only"
       : resolveVideoAvailability(activeError);
-    const needsYoutubeSession = isYoutubeSessionReconnectError(activeError);
+    const needsYoutubeSession = isYoutubeSessionActionError(activeError);
     const familyListBlocked = isChannelNotAllowedError(activeError);
     const message = availability
       ? activeError instanceof Error
@@ -101,7 +101,7 @@ function EmbedPage() {
       : familyListBlocked
         ? FAMILY_LIST_BLOCKED_MESSAGE
         : needsYoutubeSession
-          ? "Connect YouTube to load this browser-only video."
+          ? "Connect YouTube to access this video."
           : activeError instanceof ApiError &&
               (activeError.status === 400 || activeError.status === 422)
             ? activeError.message
@@ -113,6 +113,7 @@ function EmbedPage() {
         message={message}
         availability={availability ?? undefined}
         poster={availabilityPoster}
+        watchUrl={needsYoutubeSession ? watchUrl : undefined}
         onRetry={
           availability || needsYoutubeSession || familyListBlocked
             ? undefined

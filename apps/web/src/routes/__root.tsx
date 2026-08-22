@@ -11,7 +11,12 @@ import { useInstance } from "../hooks/use-instance";
 import { useMobile } from "../hooks/use-mobile";
 import { useRegisterStatus } from "../hooks/use-register-status";
 import { useSessionActivityReporting } from "../hooks/use-session-activity-reporting";
-import { isAdminRoute, isAuthPage, requiresAuth } from "../lib/auth-routes";
+import {
+  isAdminRoute,
+  isAuthPage,
+  requiresAuth,
+  shouldEnforceBootstrapRegistration,
+} from "../lib/auth-routes";
 import { bootstrapSession } from "../lib/auth-session";
 import { isEmbeddedFrame } from "../lib/embed-access";
 import { applyTheme } from "../lib/theme";
@@ -79,7 +84,7 @@ function RootLayout() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (registerStatus.data?.bootstrapAvailable) {
+    if (registerStatus.data?.bootstrapAvailable && shouldEnforceBootstrapRegistration(pathname)) {
       setSignedOut();
       if (pathname !== "/register") {
         const redirect = isAuthPage(pathname)

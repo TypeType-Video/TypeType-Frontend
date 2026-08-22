@@ -28,7 +28,7 @@ function readMessage(payload: unknown, fallback: string): string {
 }
 
 export async function fetchRegisterStatus(): Promise<RegisterStatus> {
-  const res = await fetch(`${BASE}/auth/register/status`);
+  const res = await fetch(`${BASE}/auth/register/status`, { cache: "no-store" });
   const payload = await res.json().catch(() => null);
   if (!res.ok) {
     throw new ApiError(readMessage(payload, "Unable to read registration status"), res.status);

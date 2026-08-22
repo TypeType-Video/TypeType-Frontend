@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { requestSabrVidstackPlayback } from "../lib/sabr-vidstack-bridge";
 import { useMediaRemote, useMediaState } from "../lib/vidstack";
 import { MediaSessionPositionSync } from "./media-session-position-sync";
 
@@ -8,6 +9,7 @@ type Props = {
   artwork?: string;
   canSeek?: boolean;
   isLive?: boolean;
+  sabrVideo?: HTMLVideoElement | null;
   onPreviousTrack?: () => void;
   onNextTrack?: () => void;
 };
@@ -28,6 +30,7 @@ export function MediaSessionSync({
   artwork,
   canSeek = true,
   isLive = false,
+  sabrVideo = null,
   onPreviousTrack,
   onNextTrack,
 }: Props) {
@@ -55,11 +58,17 @@ export function MediaSessionSync({
   useEffect(() => {
     if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
     const session = navigator.mediaSession;
+    const setPlayback = (playing: boolean) => {
+      const request = sabrVideo
+        ? requestSabrVidstackPlayback(sabrVideo, playing, true)
+        : Promise.resolve(playing ? remote.play() : remote.pause());
+      void request.catch(() => {});
+    };
     safeSetActionHandler(session, "play", () => {
-      void Promise.resolve(remote.play()).catch(() => {});
+      setPlayback(true);
     });
     safeSetActionHandler(session, "pause", () => {
-      void Promise.resolve(remote.pause()).catch(() => {});
+      setPlayback(false);
     });
     if (canSeek) {
       safeSetActionHandler(session, "seekbackward", (details) => {
@@ -80,7 +89,7 @@ export function MediaSessionSync({
       });
     }
     safeSetActionHandler(session, "stop", () => {
-      void Promise.resolve(remote.pause()).catch(() => {});
+      setPlayback(false);
     });
     safeSetActionHandler(session, "previoustrack", isLive ? null : (onPreviousTrack ?? null));
     safeSetActionHandler(session, "nexttrack", isLive ? null : (onNextTrack ?? null));
@@ -94,7 +103,7 @@ export function MediaSessionSync({
       safeSetActionHandler(session, "previoustrack", null);
       safeSetActionHandler(session, "nexttrack", null);
     };
-  }, [canSeek, isLive, onPreviousTrack, onNextTrack, remote]);
+  }, [canSeek, isLive, onPreviousTrack, onNextTrack, remote, sabrVideo]);
 
   useEffect(() => {
     if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;

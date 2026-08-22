@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  consumeSabrSeekTarget,
   isSabrPlaybackEventTransient,
   registerSabrVidstackControls,
   requestSabrSeek,
@@ -61,6 +62,64 @@ test("ignores technical pauses during SABR transitions", async () => {
   expect(pauses).toBe(0);
 });
 
+test("ignores technical pauses while Safari has hidden the page", async () => {
+  let pauses = 0;
+  const video = { autoplay: true, pause: () => {} } as HTMLVideoElement;
+  const previousDocument = globalThis.document;
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: { visibilityState: "hidden" },
+  });
+
+  try {
+    registerSabrVidstackControls(video, {
+      play: async () => {},
+      pause: () => {
+        pauses += 1;
+      },
+      seek: () => {},
+    });
+    await requestSabrVidstackPlayback(video, false);
+
+    expect(video.autoplay).toBe(true);
+    expect(pauses).toBe(0);
+  } finally {
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: previousDocument,
+    });
+  }
+});
+
+test("applies explicit pauses while Safari has hidden the page", async () => {
+  let pauses = 0;
+  const video = { autoplay: true, pause: () => {} } as HTMLVideoElement;
+  const previousDocument = globalThis.document;
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: { visibilityState: "hidden" },
+  });
+
+  try {
+    registerSabrVidstackControls(video, {
+      play: async () => {},
+      pause: () => {
+        pauses += 1;
+      },
+      seek: () => {},
+    });
+    await requestSabrVidstackPlayback(video, false, true);
+
+    expect(video.autoplay).toBe(false);
+    expect(pauses).toBe(1);
+  } finally {
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: previousDocument,
+    });
+  }
+});
+
 test("applies user pauses during SABR transitions", async () => {
   let pauses = 0;
   const video = { autoplay: true, pause: () => {} } as HTMLVideoElement;
@@ -92,6 +151,36 @@ test("sends only explicit SABR seek requests to registered MSE controls", () => 
 
   expect(requestSabrSeek(video, 95)).toBe(true);
   expect(positions).toEqual([95]);
+  expect(consumeSabrSeekTarget(video)).toBe(95_000);
+  expect(consumeSabrSeekTarget(video)).toBeNull();
+});
+
+test("keeps the latest explicit SABR seek target for progress persistence", () => {
+  const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
+  registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+  });
+
+  requestSabrSeek(video, 95);
+  requestSabrSeek(video, 12.25);
+
+  expect(consumeSabrSeekTarget(video)).toBe(12_250);
+});
+
+test("clears an explicit seek target when its controls are removed", () => {
+  const video = { autoplay: false, pause: () => {} } as HTMLVideoElement;
+  const unregister = registerSabrVidstackControls(video, {
+    play: async () => {},
+    pause: () => {},
+    seek: () => {},
+  });
+
+  requestSabrSeek(video, 95);
+  unregister();
+
+  expect(consumeSabrSeekTarget(video)).toBeNull();
 });
 
 test("identifies only player-owned transient media events", () => {

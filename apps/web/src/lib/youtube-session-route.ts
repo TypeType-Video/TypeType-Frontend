@@ -11,8 +11,12 @@ export function youtubeSessionReturnToForWatch(
   return `/watch?${params.toString()}`;
 }
 
+export function youtubeSessionReturnToForShorts(v: string): string {
+  return `/shorts?${new URLSearchParams({ v }).toString()}`;
+}
+
 export function sanitizeYoutubeSessionReturnTo(value: unknown): string | undefined {
-  if (typeof value !== "string" || value.length > 800 || !value.startsWith("/watch?")) {
+  if (typeof value !== "string" || value.length > 800) {
     return undefined;
   }
   let url: URL;
@@ -21,8 +25,11 @@ export function sanitizeYoutubeSessionReturnTo(value: unknown): string | undefin
   } catch {
     return undefined;
   }
+  if (url.origin !== "https://typetype.invalid") return undefined;
   const v = url.searchParams.get("v")?.trim();
   if (!v) return undefined;
+  if (url.pathname === "/shorts") return youtubeSessionReturnToForShorts(v);
+  if (url.pathname !== "/watch") return undefined;
   return youtubeSessionReturnToForWatch(
     v,
     url.searchParams.get("list") ?? undefined,

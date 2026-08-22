@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { NOTIFICATIONS_UNREAD_KEY } from "../hooks/use-notifications";
+import { useSettings } from "../hooks/use-settings";
 import { fetchNotifications } from "../lib/api-notifications";
 import {
   advanceNotificationToastCursor,
@@ -11,6 +12,7 @@ import {
   findNewNotificationItems,
   type NotificationToastCursor,
   parseNotificationToastCursor,
+  visibleNotificationToastItems,
 } from "../lib/notification-toast-cursor";
 import { watchRouteSearch } from "../lib/watch-url";
 import { useUiStore } from "../stores/ui-store";
@@ -42,7 +44,8 @@ export function NotificationToastHost() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { authReady, isAuthed, isGuest, me } = useAuth();
-  const { isBlocked, ready: blockedFilterReady } = useBlockedFilter();
+  const { isHidden, ready: visibilityFilterReady } = useBlockedFilter();
+  const { settings, settingsReady } = useSettings();
   const openNotificationCenter = useUiStore((state) => state.openNotificationCenter);
   const owner = me?.id ?? null;
   const enabled = authReady && isAuthed && !isGuest && owner !== null;
@@ -66,7 +69,7 @@ export function NotificationToastHost() {
   }, [owner]);
 
   useEffect(() => {
-    if (!enabled || !owner || !query.data || !blockedFilterReady) return;
+    if (!enabled || !owner || !query.data || !visibilityFilterReady || !settingsReady) return;
     queryClient.setQueryData(NOTIFICATIONS_UNREAD_KEY, {
       unreadCount: query.data.unreadCount,
     });
@@ -81,9 +84,23 @@ export function NotificationToastHost() {
     const next = advanceNotificationToastCursor(current, query.data.items);
     cursorRef.current = { owner, cursor: next };
     writeCursor(owner, next);
-    const visibleItems = newItems.filter((item) => !isBlocked(item.video));
+    const visibleItems = visibleNotificationToastItems(
+      newItems,
+      settings.notificationPopupsEnabled,
+      isHidden,
+    );
+    if (!settings.notificationPopupsEnabled) setItems([]);
     if (visibleItems.length > 0) setItems(visibleItems);
-  }, [blockedFilterReady, enabled, isBlocked, owner, query.data, queryClient]);
+  }, [
+    enabled,
+    isHidden,
+    owner,
+    query.data,
+    queryClient,
+    settings.notificationPopupsEnabled,
+    settingsReady,
+    visibilityFilterReady,
+  ]);
 
   useEffect(() => {
     if (items.length === 0 || paused) return;

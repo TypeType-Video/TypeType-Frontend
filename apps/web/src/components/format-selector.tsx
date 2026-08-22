@@ -4,7 +4,7 @@ import { useDashPlayerSnapshot } from "../lib/dash-player-store";
 import { dashTrackGroups, maxTrackHeight, selectDashTrack } from "../lib/dash-video";
 import { activeFamily, type CodecFamily, codecFamily, groupByFamily } from "../lib/quality-utils";
 import {
-  maxSabrCodecHeight,
+  maxSabrCodecLabel,
   sabrCodecOptions,
   selectSabrCodec,
 } from "../lib/sabr-quality-selection";
@@ -60,7 +60,7 @@ export function FormatSelector() {
           <DefaultMenuRadioGroup
             value={selected.codec}
             options={codecs.map((codec) => ({
-              label: `${codec} ${maxSabrCodecHeight(sabrOptions, codec)}p`,
+              label: `${codec} ${maxSabrCodecLabel(sabrOptions, codec)}`,
               value: codec,
             }))}
             onChange={onSabrChange}

@@ -35,6 +35,10 @@ jobs:
             exit 1
           fi
 
+          if [[ "$GITHUB_REF" == "refs/heads/dev" ]]; then
+            exit 0
+          fi
+
           tag="v$version"
           tag_sha="$(git ls-remote --tags origin "refs/tags/$tag" | cut -f1)"
           if [[ -z "$tag_sha" ]]; then
