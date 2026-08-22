@@ -4,14 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
   downloadPortabilityArtifact,
+  downloadPortabilityReport,
   type PortabilityCategory,
   type PortabilityFormatDescriptor,
   type PortabilityJob,
   startPortabilityExport,
 } from "../lib/api-portability";
-import { FORMAT_NAMES } from "../lib/portability-catalog";
 import { PortabilityCategorySelector } from "./portability-category-selector";
-import { PortabilityFormatIcon } from "./portability-format-icon";
+import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
 
@@ -59,9 +59,11 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
     },
   });
   const download = useMutation({
-    mutationFn: () => downloadPortabilityArtifact(jobId as string),
+    mutationFn: () =>
+      downloadPortabilityArtifact(jobId as string, `typetype-export.${format.defaultExtension}`),
     onSuccess: () => setToast("Export download started"),
   });
+  const report = useMutation({ mutationFn: () => downloadPortabilityReport(jobId as string) });
 
   useEffect(() => {
     if (jobId) localStorage.setItem(STORAGE_KEY, jobId);
@@ -92,28 +94,17 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
   }
 
   if (!format) return <p className="text-sm text-fg-muted">No export format is available.</p>;
-  const failure = job.error ?? generate.error ?? download.error;
+  const failure = job.error ?? generate.error ?? download.error ?? report.error;
   return (
     <div className="flex flex-col gap-5">
       {!jobId && (
         <>
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-medium uppercase text-fg-soft">Destination format</span>
-            <span className="flex h-11 items-center gap-3 border border-border bg-surface px-3 focus-within:border-fg-soft">
-              <PortabilityFormatIcon format={format.format} className="h-6 w-6 shrink-0" />
-              <select
-                value={format.format}
-                onChange={(event) => setFormatName(event.target.value)}
-                className="h-full min-w-0 flex-1 bg-transparent text-sm text-fg outline-none"
-              >
-                {exportFormats.map((item) => (
-                  <option key={item.format} value={item.format}>
-                    {FORMAT_NAMES[item.format] ?? item.format} (.{item.defaultExtension})
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
+          <PortabilityFormatPicker
+            label="Destination format"
+            formats={exportFormats}
+            value={format.format}
+            onChange={setFormatName}
+          />
           <PortabilityCategorySelector
             available={available}
             selected={selected}
@@ -175,6 +166,14 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               className="inline-flex h-9 items-center justify-center gap-2 border border-border px-3 text-xs text-fg-muted hover:text-fg"
             >
               <RefreshCw size={13} /> New export
+            </button>
+            <button
+              type="button"
+              disabled={report.isPending}
+              onClick={() => report.mutate()}
+              className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg disabled:opacity-40"
+            >
+              Download report
             </button>
           </div>
         </div>
