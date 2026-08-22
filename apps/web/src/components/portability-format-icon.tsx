@@ -1,4 +1,4 @@
-import { Archive, Rss, Smartphone } from "lucide-react";
+import { Archive, Rss } from "lucide-react";
 import { siInvidious, siLibretube, siNewpipe, siPiped, siYoutube } from "simple-icons";
 
 type Props = {
@@ -9,22 +9,29 @@ type Props = {
 const BRAND_PATHS: Record<string, string> = {
   invidious: siInvidious.path,
   libretube: siLibretube.path,
-  materialious: siInvidious.path,
   newpipe: siNewpipe.path,
   piped: siPiped.path,
-  "youtube-local": siYoutube.path,
   "youtube-takeout": siYoutube.path,
 };
 
+const OFFICIAL_ASSETS: Record<string, string> = {
+  flow: "/portability-formats/flow.png",
+  grayjay: "/portability-formats/grayjay.png",
+  materialious: "/portability-formats/materialious.png",
+  skytube: "/portability-formats/skytube.png",
+  viewtube: "/portability-formats/viewtube.png",
+  "youtube-local": "/portability-formats/youtube-local.ico",
+};
+
 export function PortabilityFormatIcon({ format, className = "h-5 w-5" }: Props) {
-  if (format === "typetype" || format === "pipepipe") {
-    return (
-      <img
-        src={format === "typetype" ? "/logo.svg" : "/pipepipe-logo.png"}
-        alt=""
-        className={`${className} object-contain`}
-      />
-    );
+  const asset =
+    format === "typetype"
+      ? "/logo.svg"
+      : format === "pipepipe"
+        ? "/pipepipe-logo.png"
+        : OFFICIAL_ASSETS[format];
+  if (asset) {
+    return <img src={asset} alt="" className={`${className} object-contain`} />;
   }
   const path = BRAND_PATHS[format];
   if (path) {
@@ -35,8 +42,5 @@ export function PortabilityFormatIcon({ format, className = "h-5 w-5" }: Props) 
     );
   }
   if (format === "opml") return <Rss aria-hidden="true" className={className} />;
-  if (["flow", "grayjay", "skytube"].includes(format)) {
-    return <Smartphone aria-hidden="true" className={className} />;
-  }
   return <Archive aria-hidden="true" className={className} />;
 }
