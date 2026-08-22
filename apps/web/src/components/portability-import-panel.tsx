@@ -1,16 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileUp, RefreshCw } from "lucide-react";
-import { type DragEvent, useEffect, useRef, useState } from "react";
+import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
   applyPortabilityImport,
+  downloadPortabilityReport,
   type PortabilityCategory,
+  type PortabilityFormatDescriptor,
   type PortabilityJob,
   startPortabilityImport,
 } from "../lib/api-portability";
 import { FORMAT_NAMES } from "../lib/portability-catalog";
 import { PortabilityCategorySelector } from "./portability-category-selector";
 import { PortabilityFormatIcon } from "./portability-format-icon";
+import { PortabilityFormatPicker } from "./portability-format-picker";
+import { PortabilityImportGuide } from "./portability-import-guide";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
 
@@ -20,9 +24,21 @@ function savedJob(): string | null {
   return typeof window === "undefined" ? null : window.localStorage.getItem(STORAGE_KEY);
 }
 
-export function PortabilityImportPanel() {
+export function PortabilityImportPanel({ formats }: { formats: PortabilityFormatDescriptor[] }) {
   const input = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const importFormats = useMemo(
+    () =>
+      formats.filter((format) =>
+        format.capabilities.some((item) => item.directions.includes("import")),
+      ),
+    [formats],
+  );
+  const [formatName, setFormatName] = useState(
+    importFormats.find((format) => format.format === "typetype")?.format ??
+      importFormats[0]?.format ??
+      "typetype",
+  );
   const [jobId, setJobId] = useState<string | null>(savedJob);
   const [selected, setSelected] = useState<Set<PortabilityCategory>>(new Set());
   const [duplicatePolicy, setDuplicatePolicy] = useState<"skip" | "replace">("skip");
@@ -30,8 +46,9 @@ export function PortabilityImportPanel() {
   const [toast, setToast] = useState<string | null>(null);
   const previousState = useRef<string | null>(null);
   const job = usePortabilityJob(jobId);
+  const format = importFormats.find((item) => item.format === formatName) ?? importFormats[0];
   const upload = useMutation({
-    mutationFn: startPortabilityImport,
+    mutationFn: (file: File) => startPortabilityImport(file, format.format),
     onSuccess: (started) => {
       setJobId(started.id);
       queryClient.setQueryData(["portability-job", started.id], started);
@@ -42,6 +59,7 @@ export function PortabilityImportPanel() {
     onSuccess: (updated) =>
       queryClient.setQueryData<PortabilityJob>(["portability-job", jobId], updated),
   });
+  const report = useMutation({ mutationFn: () => downloadPortabilityReport(jobId as string) });
 
   useEffect(() => {
     if (jobId) window.localStorage.setItem(STORAGE_KEY, jobId);
@@ -86,12 +104,21 @@ export function PortabilityImportPanel() {
     apply.reset();
   }
 
+  if (!format) return <p className="text-sm text-fg-muted">No import format is available.</p>;
+
   const preview = job.data?.preview;
-  const failure = upload.error ?? job.error ?? apply.error;
+  const failure = upload.error ?? job.error ?? apply.error ?? report.error;
   return (
     <div className="flex flex-col gap-5">
       {!jobId && (
         <>
+          <PortabilityFormatPicker
+            label="Import from"
+            formats={importFormats}
+            value={format.format}
+            onChange={setFormatName}
+          />
+          <PortabilityImportGuide format={format.format} />
           <button
             type="button"
             onClick={() => input.current?.click()}
@@ -107,8 +134,8 @@ export function PortabilityImportPanel() {
             <FileUp size={24} className="text-fg" />
             <span className="mt-3 text-sm font-medium text-fg">Choose or drop a backup</span>
             <span className="mt-1 max-w-md text-xs text-fg-soft">
-              Formats are detected automatically. Large archives are analyzed without loading them
-              into memory.
+              Drop the original .{format.defaultExtension} file. Nothing is imported until you
+              review the preview.
             </span>
           </button>
           <input
@@ -205,13 +232,23 @@ export function PortabilityImportPanel() {
       )}
 
       {job.data && ["completed", "failed", "cancelled"].includes(job.data.state) && (
-        <button
-          type="button"
-          onClick={reset}
-          className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
-        >
-          Start another import
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <button
+            type="button"
+            onClick={reset}
+            className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
+          >
+            Start another import
+          </button>
+          <button
+            type="button"
+            disabled={report.isPending}
+            onClick={() => report.mutate()}
+            className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg disabled:opacity-40"
+          >
+            Download report
+          </button>
+        </div>
       )}
       {jobId && !job.data && job.error && (
         <button

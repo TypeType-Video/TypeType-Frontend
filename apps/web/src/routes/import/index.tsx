@@ -33,12 +33,10 @@ function DataPortabilityPage() {
       </div>
 
       <main className="border-t border-border pt-5">
-        {mode === "import" && <PortabilityImportPanel />}
+        {mode === "import" && formats.data && <PortabilityImportPanel formats={formats.data} />}
         {mode === "export" && formats.data && <PortabilityExportPanel formats={formats.data} />}
-        {mode === "export" && formats.isPending && (
-          <p className="text-sm text-fg-muted">Loading supported formats...</p>
-        )}
-        {mode === "export" && formats.error && (
+        {formats.isPending && <p className="text-sm text-fg-muted">Loading supported formats...</p>}
+        {formats.error && (
           <p role="alert" className="text-sm text-danger">
             {formats.error.message}
           </p>
