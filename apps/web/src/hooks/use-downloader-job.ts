@@ -95,6 +95,9 @@ export function useDownloaderJob() {
   const isFailed = status === "failed";
   const stage: DownloaderJobStage | null = createError ? "failed" : (job?.stage ?? null);
   const progressPercent = typeof job?.progressPercent === "number" ? job.progressPercent : null;
+  const downloadedBytes = typeof job?.downloadedBytes === "number" ? job.downloadedBytes : null;
+  const totalBytes = typeof job?.totalBytes === "number" ? job.totalBytes : null;
+  const etaSeconds = typeof job?.etaSeconds === "number" ? job.etaSeconds : null;
   const resolved = job?.resolved ?? null;
   const errorCode = downloaderErrorCode(createError) ?? job?.errorCode ?? null;
   const tokenFetchMs = typeof job?.tokenFetchMs === "number" ? job.tokenFetchMs : null;
@@ -138,6 +141,9 @@ export function useDownloaderJob() {
     status,
     stage,
     progressPercent,
+    downloadedBytes,
+    totalBytes,
+    etaSeconds,
     resolved,
     tokenFetchMs,
     ytdlpMs,

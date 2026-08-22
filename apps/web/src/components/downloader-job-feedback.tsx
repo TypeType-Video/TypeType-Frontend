@@ -9,6 +9,11 @@ import {
   shouldShowDownloaderProgress,
 } from "../lib/downloader-display";
 import { DOWNLOADER_INSUFFICIENT_STORAGE_CODE } from "../lib/downloader-errors";
+import {
+  estimateTransferRate,
+  formatEta,
+  formatTransferBytes,
+} from "../lib/downloader-transfer-display";
 import type {
   DownloaderJobStage,
   DownloaderJobStatus,
@@ -20,6 +25,9 @@ type Props = {
   status: DownloaderJobStatus | null;
   stage: DownloaderJobStage | null;
   progressPercent: number | null;
+  downloadedBytes: number | null;
+  totalBytes: number | null;
+  etaSeconds: number | null;
   resolved: DownloaderResolvedSelection | null;
   errorCode: string | null;
   errorText: string | null;
@@ -60,6 +68,9 @@ export function DownloaderJobFeedback({
   status,
   stage,
   progressPercent,
+  downloadedBytes,
+  totalBytes,
+  etaSeconds,
   resolved,
   errorCode,
   errorText,
@@ -88,6 +99,16 @@ export function DownloaderJobFeedback({
   const showClear = canClear && typeof onClear === "function";
   const showProgress = shouldShowDownloaderProgress(status, forceWaiting) && !failed && !cancelled;
   const showPercent = typeof progressPercent === "number" && status === "running";
+  const rate = estimateTransferRate(downloadedBytes, totalBytes, etaSeconds);
+  const transferDetails = [
+    downloadedBytes === null
+      ? null
+      : totalBytes === null
+        ? formatTransferBytes(downloadedBytes)
+        : `${formatTransferBytes(downloadedBytes)} of ${formatTransferBytes(totalBytes)}`,
+    rate === null ? null : `${formatTransferBytes(rate)}/s`,
+    etaSeconds === null ? null : formatEta(etaSeconds),
+  ].filter((value): value is string => value !== null);
 
   if (!status && !forceWaiting && !resolvedLabel && !visibleError) return null;
 
@@ -138,6 +159,9 @@ export function DownloaderJobFeedback({
             style={{ width: `${progress}%` }}
           />
         </div>
+      )}
+      {status === "running" && transferDetails.length > 0 && (
+        <p className="mt-2 font-mono text-[11px] text-fg-soft">{transferDetails.join(" · ")}</p>
       )}
       {status === "running" && (
         <div className="mt-3 grid grid-cols-3 gap-2">

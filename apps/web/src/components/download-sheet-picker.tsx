@@ -25,11 +25,13 @@ export function DownloadSheetPicker({ mode, options, selectedId, onSelect, onMod
           active={mode === "video"}
           onClick={() => onMode("video")}
           label="Video"
+          mode="video"
         />
         <DownloadModeButton
           active={mode === "audio"}
           onClick={() => onMode("audio")}
           label="Audio"
+          mode="audio"
         />
       </div>
       {!showAllFormats && (

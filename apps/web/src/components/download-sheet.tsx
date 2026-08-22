@@ -150,6 +150,9 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
             status={downloader.status}
             stage={downloader.stage}
             progressPercent={downloader.progressPercent}
+            downloadedBytes={downloader.downloadedBytes}
+            totalBytes={downloader.totalBytes}
+            etaSeconds={downloader.etaSeconds}
             resolved={downloader.resolved}
             errorCode={downloader.errorCode}
             errorText={artifactError ?? errorText}
