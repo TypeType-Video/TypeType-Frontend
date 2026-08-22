@@ -1,6 +1,7 @@
 type NavItem = {
   label: string;
   to: string;
+  activePaths?: string[];
   icon: React.ReactNode;
   adminOnly?: boolean;
 };
@@ -59,6 +60,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: "Data transfer",
     to: "/import",
+    activePaths: ["/export"],
     icon: (
       <>
         <path d="M8 3v12" />

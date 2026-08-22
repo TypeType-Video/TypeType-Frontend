@@ -115,23 +115,26 @@ export function Sidebar({ overlay = false }: Props) {
       )}
       <aside className={baseClasses}>
         <div className={`flex flex-col gap-1 ${sectionPadding}`}>
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              search={item.to === "/admin-console" ? adminSearch : undefined}
-              activeOptions={item.to === "/" ? { exact: true } : undefined}
-              className={`${BTN_BASE} ${itemLayout}`}
-              onClick={isMobile ? closeMobileSidebar : undefined}
-              activeProps={{ className: BTN_ACTIVE }}
-              inactiveProps={{ className: BTN_INACTIVE }}
-            >
-              <NavIcon label={item.label}>{item.icon}</NavIcon>
-              {(!visualCollapsed || isMobile) && (
-                <span className="text-sm font-medium">{item.label}</span>
-              )}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const aliasActive = item.activePaths?.includes(loc.pathname) ?? false;
+            return (
+              <Link
+                key={item.label}
+                to={item.to}
+                search={item.to === "/admin-console" ? adminSearch : undefined}
+                activeOptions={item.to === "/" ? { exact: true } : undefined}
+                className={`${BTN_BASE} ${itemLayout} ${aliasActive ? BTN_ACTIVE : ""}`}
+                onClick={isMobile ? closeMobileSidebar : undefined}
+                activeProps={{ className: BTN_ACTIVE }}
+                inactiveProps={{ className: aliasActive ? "" : BTN_INACTIVE }}
+              >
+                <NavIcon label={item.label}>{item.icon}</NavIcon>
+                {(!visualCollapsed || isMobile) && (
+                  <span className="text-sm font-medium">{item.label}</span>
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         <div className={`mt-4 ${sectionPadding} border-t border-border pt-4 flex flex-col gap-1`}>
