@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ImportRouteHeading } from "../../components/import-route-heading";
 import { Toast } from "../../components/toast";
@@ -110,7 +111,7 @@ function YoutubeImportPage() {
         to="/import"
         className="inline-flex w-fit items-center gap-1 text-xs text-fg-soft hover:text-fg-muted"
       >
-        <span>←</span> Back to import sources
+        <ArrowLeft size={13} aria-hidden="true" /> Back to import sources
       </Link>
       <ImportRouteHeading
         label="YouTube Takeout"

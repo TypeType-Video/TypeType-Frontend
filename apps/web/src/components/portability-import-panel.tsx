@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FileUp, RefreshCw } from "lucide-react";
+import { ArchiveRestore, FileUp, RefreshCw } from "lucide-react";
 import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
@@ -110,6 +110,13 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   const failure = upload.error ?? job.error ?? apply.error ?? report.error;
   return (
     <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <ArchiveRestore size={20} className="shrink-0 text-fg" aria-hidden="true" />
+        <div>
+          <h2 className="text-sm font-semibold text-fg">Import data</h2>
+          <p className="text-xs text-fg-soft">Preview and choose what to restore.</p>
+        </div>
+      </div>
       {!jobId && (
         <>
           <PortabilityFormatPicker

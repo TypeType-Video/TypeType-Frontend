@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, RefreshCw } from "lucide-react";
+import { DatabaseBackup, FileDown, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
@@ -97,6 +97,13 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
   const failure = job.error ?? generate.error ?? download.error ?? report.error;
   return (
     <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <DatabaseBackup size={20} className="shrink-0 text-fg" aria-hidden="true" />
+        <div>
+          <h2 className="text-sm font-semibold text-fg">Export data</h2>
+          <p className="text-xs text-fg-soft">Choose a destination and create a portable backup.</p>
+        </div>
+      </div>
       {!jobId && (
         <>
           <PortabilityFormatPicker
@@ -158,7 +165,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               onClick={() => download.mutate()}
               className="inline-flex h-9 items-center justify-center gap-2 bg-fg px-4 text-xs font-medium text-app hover:opacity-90 disabled:opacity-40"
             >
-              <Download size={14} /> Download export
+              <FileDown size={14} /> Download export
             </button>
             <button
               type="button"

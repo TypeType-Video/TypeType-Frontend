@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { FileDown, FileUp } from "lucide-react";
 import { useState } from "react";
 import { PortabilityExportPanel } from "../../components/portability-export-panel";
 import { PortabilityImportPanel } from "../../components/portability-import-panel";
@@ -25,10 +25,10 @@ function DataPortabilityPage() {
 
       <div className="grid grid-cols-2 border border-border bg-surface p-1" role="tablist">
         <ModeButton active={mode === "import"} onClick={() => setMode("import")}>
-          <ArrowDownToLine size={15} /> Import
+          <FileUp size={15} /> Import
         </ModeButton>
         <ModeButton active={mode === "export"} onClick={() => setMode("export")}>
-          <ArrowUpFromLine size={15} /> Export
+          <FileDown size={15} /> Export
         </ModeButton>
       </div>
 
