@@ -2,9 +2,9 @@ import { ApiError } from "./api";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
 
-export type PortabilityDirection = "import" | "export";
+type PortabilityDirection = "import" | "export";
 export type PortabilityFidelity = "complete" | "partial";
-export type PortabilityJobState =
+type PortabilityJobState =
   | "queued"
   | "analyzing"
   | "ready"
@@ -38,14 +38,14 @@ export type PortabilityFormatDescriptor = {
   contentType: string;
 };
 
-export type PortabilityIssue = {
+type PortabilityIssue = {
   category: PortabilityCategory | null;
   code: string;
   message: string;
   count: number;
 };
 
-export type PortabilityPreview = {
+type PortabilityPreview = {
   detection: {
     format: string;
     formatVersion: string | null;
