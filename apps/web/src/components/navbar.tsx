@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Heart, Search } from "lucide-react";
+import { DollarSign, Search } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useAuthToasts } from "../hooks/use-auth-toasts";
@@ -70,7 +70,7 @@ export function Navbar() {
             title="Support TypeType"
             className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-fg-muted hover:bg-surface-strong hover:text-fg"
           >
-            <Heart size={15} />
+            <DollarSign size={15} />
             <span className="hidden sm:inline">Support</span>
           </a>
         </div>
