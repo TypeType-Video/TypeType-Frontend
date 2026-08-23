@@ -9,6 +9,7 @@ import { FormatSelector } from "./format-selector";
 import { PlayerTrackButton } from "./player-track-button";
 import { PlayerVolumeControl } from "./player-volume-control";
 import { QualitySelector } from "./quality-selector";
+import { SabrCurrentTime } from "./sabr-current-time";
 import { SabrTimeSlider } from "./sabr-time-slider";
 import { ShortsPlayerLayout } from "./shorts-player-layout";
 
@@ -53,7 +54,11 @@ export function VideoPlayerLayout({
   if (audioOnly) {
     const timePair = (
       <div className="typetype-audio-time-pair">
-        <Time type="current" />
+        {sabr ? (
+          <SabrCurrentTime transitioning={seeking} video={sabrVideo} />
+        ) : (
+          <Time type="current" />
+        )}
         <span>/</span>
         <Time type="duration" />
       </div>
@@ -124,6 +129,9 @@ export function VideoPlayerLayout({
       smallLayoutWhen={({ height }) => height < 380}
       translations={{ Captions: "Subtitles" }}
       slots={{
+        currentTime: sabr ? (
+          <SabrCurrentTime transitioning={seeking} video={sabrVideo} />
+        ) : undefined,
         timeSlider: sabr ? (
           <SabrTimeSlider seeking={seeking} thumbnails={thumbnailVtt} video={sabrVideo} />
         ) : undefined,

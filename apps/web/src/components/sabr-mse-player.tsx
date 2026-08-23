@@ -1,9 +1,9 @@
 import { TypeTypeMsePlayer, type TypeTypeMseQuality } from "@typetype/mse";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLatestValue } from "../hooks/use-latest-value";
+import { useSabrErrorReporter } from "../hooks/use-sabr-error-reporter";
 import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
-import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
 import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
@@ -44,25 +44,12 @@ export function SabrMsePlayer({
   const latestStartTime = useLatestValue(startTime);
   const latestHandlers = useLatestValue({
     autoplay,
-    onError,
     onSeekStateChange,
     onSeekReady,
     onPositionReaderChange,
     onVolumeChange,
   });
-  const reportError = useCallback(
-    (error: unknown, recoveryPositionMs?: number) => {
-      if (errorReportedRef.current) return;
-      errorReportedRef.current = true;
-      const message = error instanceof Error ? error.message : String(error);
-      recordClientEvent("player.sabr_engine_error", {
-        error: message,
-        recoveryPositionMs,
-      });
-      latestHandlers().onError(recoveryPositionMs);
-    },
-    [latestHandlers],
-  );
+  const reportError = useSabrErrorReporter(errorReportedRef, onError);
   const latestEngineHandlers = useCallback(() => {
     const handlers = latestHandlers();
     return {
@@ -70,7 +57,18 @@ export function SabrMsePlayer({
       onSeekStateChange: handlers.onSeekStateChange,
     };
   }, [latestHandlers, reportError]);
-  useSabrQualitySwitch(config, engineReady, engineRef, qualityRef, seekingRef);
+  const setQualityTransitioning = useCallback(
+    (transitioning: boolean) => latestHandlers().onSeekStateChange(transitioning),
+    [latestHandlers],
+  );
+  useSabrQualitySwitch(
+    config,
+    engineReady,
+    engineRef,
+    qualityRef,
+    seekingRef,
+    setQualityTransitioning,
+  );
   useSabrModeSwitch(config.audioOnly === true, engineRef, seekingRef, latestEngineHandlers);
   useEffect(() => {
     if (!video || !settingsReady) return;
