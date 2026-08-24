@@ -1,5 +1,7 @@
+import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useClientLocale } from "../hooks/use-client-locale";
+import { useInstance } from "../hooks/use-instance";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { formatPublishedDate, formatSubscribers, formatViews } from "../lib/format";
 import type { VideoStream } from "../types/stream";
@@ -16,6 +18,7 @@ type Props = {
 
 export function WatchInfo({ stream }: Props) {
   const locale = useClientLocale();
+  const instance = useInstance();
   const { add, remove, isSubscribed } = useSubscriptions();
   const subscribed = stream.channelUrl ? isSubscribed(stream.channelUrl) : false;
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -63,7 +66,8 @@ export function WatchInfo({ stream }: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <h1 className="text-base font-semibold text-fg leading-snug">{stream.title}</h1>
-        <span className="text-sm text-fg-muted flex-shrink-0 mt-0.5">
+        <span className="mt-0.5 flex flex-shrink-0 items-center gap-1.5 text-sm text-fg-muted">
+          <Eye className="size-4" aria-hidden="true" />
           {formatViews(stream.views)}
         </span>
       </div>
@@ -105,12 +109,14 @@ export function WatchInfo({ stream }: Props) {
           <WatchLikeDislike stream={stream} />
           {stream.channelUrl && (
             <>
-              <AllowChannelButton
-                url={stream.channelUrl}
-                name={stream.channelName}
-                thumbnailUrl={stream.rawChannelAvatar}
-                compact
-              />
+              {instance.data?.parentalControlsEnabled === true && (
+                <AllowChannelButton
+                  url={stream.channelUrl}
+                  name={stream.channelName}
+                  thumbnailUrl={stream.rawChannelAvatar}
+                  compact
+                />
+              )}
               <button
                 type="button"
                 onClick={handleSubscribe}
