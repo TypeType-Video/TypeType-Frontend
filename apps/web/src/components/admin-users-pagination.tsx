@@ -22,7 +22,7 @@ export function AdminUsersPagination({
   onNext,
 }: AdminUsersPaginationProps) {
   return (
-    <section className="flex min-h-11 items-center justify-between gap-3 border-y border-border px-1 py-1.5 text-xs text-fg-muted">
+    <section className="flex min-h-10 items-center justify-between gap-3 px-1 text-xs text-fg-muted">
       <p>
         {pageStart}-{pageEnd} of {total}
       </p>
@@ -33,7 +33,7 @@ export function AdminUsersPagination({
           onClick={onPrev}
           aria-label="Previous page"
           title="Previous page"
-          className="grid size-8 place-items-center rounded-full text-fg transition-colors hover:bg-surface-strong disabled:opacity-35"
+          className="grid size-8 place-items-center rounded-md border border-border text-fg transition-colors hover:bg-surface disabled:opacity-35"
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
         </button>
@@ -46,7 +46,7 @@ export function AdminUsersPagination({
           onClick={onNext}
           aria-label="Next page"
           title="Next page"
-          className="grid size-8 place-items-center rounded-full text-fg transition-colors hover:bg-surface-strong disabled:opacity-35"
+          className="grid size-8 place-items-center rounded-md border border-border text-fg transition-colors hover:bg-surface disabled:opacity-35"
         >
           <ChevronRight className="size-4" aria-hidden="true" />
         </button>

@@ -69,7 +69,7 @@ function adminItems(): Record<AdminSection, SectionShellItem<AdminSection>> {
 
 function AdminConsolePage() {
   useInterfaceLocale();
-  const { isAdmin, isModerator, me } = useAuth();
+  const { isAdmin, isModerator } = useAuth();
   const { section } = Route.useSearch();
   const navigate = useNavigate({ from: "/admin-console" });
   const [toast, setToast] = useState<string | null>(null);
@@ -115,7 +115,7 @@ function AdminConsolePage() {
         <AdminAllowListSection enabled={isAdmin} onToast={setToast} />
       )}
       {activeSection === "users" && isAdmin && (
-        <AdminUsersSection enabled={isAdmin} currentUserId={me?.id ?? null} onToast={setToast} />
+        <AdminUsersSection enabled={isAdmin} onToast={setToast} />
       )}
       {activeSection === "sessions" && isAdmin && <AdminSessionsSection enabled={isAdmin} />}
       {activeSection === "rss" && isAdmin && (

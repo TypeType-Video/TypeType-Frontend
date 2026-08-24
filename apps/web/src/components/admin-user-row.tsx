@@ -1,65 +1,73 @@
-import type { AuthUser } from "../types/auth";
+import { MoreHorizontal } from "lucide-react";
+import type { AuthRole, AuthUser } from "../types/auth";
 import { AdminUserAvatar } from "./admin-user-avatar";
 
 type AdminUserRowProps = {
   user: AuthUser;
-  selected: boolean;
   createdAtLabel: string;
   onSelect: (id: string) => void;
 };
 
-function roleClass(role: AuthUser["role"]): string {
+function roleClass(role: AuthRole): string {
   if (role === "admin") return "bg-sky-500";
   if (role === "moderator") return "bg-amber-500";
-  return "bg-fg-soft";
+  return "bg-zinc-400 dark:bg-zinc-500";
 }
 
-export function AdminUserRow({ user, selected, createdAtLabel, onSelect }: AdminUserRowProps) {
+export function AdminUserRow({ user, createdAtLabel, onSelect }: AdminUserRowProps) {
   const displayName = user.name.trim().length > 0 ? user.name : user.email;
+  const statusLabel = user.suspended ? "Suspended" : "Active";
+  const statusClass = user.suspended ? "bg-danger" : "bg-emerald-500";
 
   return (
-    <button
-      type="button"
-      aria-label={`Select ${displayName}`}
-      aria-pressed={selected}
-      onClick={() => onSelect(user.id)}
-      className={`w-full border-l-2 px-3 py-3 text-left transition-colors ${
-        selected ? "border-accent bg-accent/5" : "border-transparent hover:bg-surface/50"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <AdminUserAvatar user={user} className="h-9 w-9" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-fg">{displayName}</p>
-          <p className="truncate text-xs text-fg-muted">{user.email}</p>
-        </div>
-        <div className="hidden shrink-0 items-center gap-4 text-xs text-fg-muted sm:flex">
-          <span className="flex items-center gap-1.5 capitalize">
-            <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} aria-hidden="true" />
-            {user.role}
-          </span>
-          <span>{createdAtLabel}</span>
-          {user.suspended && (
-            <span className="flex items-center gap-1.5 text-danger-strong">
-              <span className="size-1.5 rounded-full bg-danger" aria-hidden="true" />
-              suspended
+    <tr className="transition-colors hover:bg-surface/35">
+      <td className="min-w-0 px-3 py-3 sm:px-4">
+        <button
+          type="button"
+          onClick={() => onSelect(user.id)}
+          className="flex w-full min-w-0 items-center gap-3 text-left"
+        >
+          <AdminUserAvatar user={user} className="h-9 w-9 shrink-0" />
+          <span className="min-w-0">
+            <span className="block truncate font-medium text-fg">{displayName}</span>
+            <span className="block truncate text-xs text-fg-muted">{user.email}</span>
+            <span className="mt-1 flex items-center gap-3 text-[11px] capitalize text-fg-soft sm:hidden">
+              <span className="flex items-center gap-1.5">
+                <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} />
+                {user.role}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className={`size-1.5 rounded-full ${statusClass}`} />
+                {statusLabel}
+              </span>
             </span>
-          )}
-        </div>
-      </div>
-      <div className="mt-2 flex items-center gap-3 pl-12 text-[11px] text-fg-soft sm:hidden">
-        <span className="flex items-center gap-1.5 capitalize">
-          <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} aria-hidden="true" />
+          </span>
+        </button>
+      </td>
+      <td className="hidden px-3 py-3 sm:table-cell">
+        <span className="flex items-center gap-2 capitalize text-fg-muted">
+          <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} />
           {user.role}
         </span>
-        <span>{createdAtLabel}</span>
-        {user.suspended && (
-          <span className="flex items-center gap-1.5 text-danger-strong">
-            <span className="size-1.5 rounded-full bg-danger" aria-hidden="true" />
-            suspended
-          </span>
-        )}
-      </div>
-    </button>
+      </td>
+      <td className="hidden px-3 py-3 md:table-cell">
+        <span className="flex items-center gap-2 text-fg-muted">
+          <span className={`size-1.5 rounded-full ${statusClass}`} />
+          {statusLabel}
+        </span>
+      </td>
+      <td className="hidden px-3 py-3 text-fg-muted lg:table-cell">{createdAtLabel}</td>
+      <td className="px-2 py-3 text-right">
+        <button
+          type="button"
+          onClick={() => onSelect(user.id)}
+          aria-label={`Manage ${displayName}`}
+          title={`Manage ${displayName}`}
+          className="grid size-8 place-items-center rounded-full text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
+        >
+          <MoreHorizontal className="size-4" aria-hidden="true" />
+        </button>
+      </td>
+    </tr>
   );
 }
