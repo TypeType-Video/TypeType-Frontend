@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { AdminSettings } from "../types/admin";
+import { ToggleSwitch } from "./toggle-switch";
 
 type Props = {
   value: AdminSettings;
@@ -32,18 +33,11 @@ export function AdminRssPolicy({ value, saved, pending, onChange, onSave }: Prop
             Disabling RSS keeps existing feed configuration intact.
           </p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-label="Enable private RSS feeds"
-          aria-checked={value.rssEnabled}
+        <ToggleSwitch
+          checked={value.rssEnabled}
+          ariaLabel="Enable private RSS feeds"
           onClick={() => onChange({ ...value, rssEnabled: !value.rssEnabled })}
-          className={`relative h-5 w-10 shrink-0 rounded-full transition-colors ${value.rssEnabled ? "bg-fg" : "bg-surface-soft"}`}
-        >
-          <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-surface transition-transform ${value.rssEnabled ? "translate-x-5" : "translate-x-0"}`}
-          />
-        </button>
+        />
       </div>
       <label className="block space-y-1.5">
         <span className="text-xs font-medium text-fg-muted">Public instance URL</span>

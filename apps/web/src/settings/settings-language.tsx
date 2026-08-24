@@ -1,4 +1,5 @@
 import { InterfaceLanguagePicker } from "../components/interface-language-picker";
+import { ToggleSwitch } from "../components/toggle-switch";
 import { useSettings } from "../hooks/use-settings";
 import { m } from "../paraglide/messages.js";
 import { LanguageDropdown } from "./language-dropdown";
@@ -6,27 +7,6 @@ import { LanguageDropdown } from "./language-dropdown";
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
 const CARD = "bg-surface rounded-md border border-border divide-y divide-border";
 const ROW = "flex items-center justify-between px-4 py-4";
-
-type ToggleProps = {
-  checked: boolean;
-  onClick: () => void;
-};
-
-function Toggle({ checked, onClick }: ToggleProps) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={onClick}
-      className={`relative ml-6 h-5 w-10 flex-shrink-0 rounded-full border transition-colors duration-200 ${checked ? "border-fg bg-fg" : "border-border-strong bg-surface-strong"}`}
-    >
-      <span
-        className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full transition-all duration-200 ${checked ? "translate-x-5 bg-surface" : "translate-x-0 bg-fg-muted"}`}
-      />
-    </button>
-  );
-}
 
 export function SettingsLanguage() {
   const { settings, update } = useSettings();
@@ -50,8 +30,9 @@ export function SettingsLanguage() {
                 {m.settings_subtitle_default_description()}
               </span>
             </div>
-            <Toggle
+            <ToggleSwitch
               checked={settings.subtitlesEnabled}
+              className="ml-6"
               onClick={() => update.mutate({ subtitlesEnabled: !settings.subtitlesEnabled })}
             />
           </div>
@@ -95,8 +76,9 @@ export function SettingsLanguage() {
                 {m.settings_original_audio_description()}
               </span>
             </div>
-            <Toggle
+            <ToggleSwitch
               checked={settings.preferOriginalLanguage}
+              className="ml-6"
               onClick={() =>
                 update.mutate({ preferOriginalLanguage: !settings.preferOriginalLanguage })
               }

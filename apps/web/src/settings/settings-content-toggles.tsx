@@ -118,7 +118,7 @@ function ToggleRows({ options }: { options: ToggleOption[] }) {
       <div className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-fg text-sm">{option.label}</span>
-          <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[10px] text-fg-soft">
+          <span className="rounded bg-surface-soft px-2 py-0.5 text-[10px] text-fg-soft">
             {option.area}
           </span>
         </div>

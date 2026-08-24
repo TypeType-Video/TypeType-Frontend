@@ -1,5 +1,6 @@
 import { m } from "../paraglide/messages.js";
 import type { AccessMode } from "../types/user";
+import { ToggleSwitch } from "./toggle-switch";
 
 const ROW = "flex min-h-14 items-center justify-between gap-4 py-3";
 
@@ -40,22 +41,7 @@ export function AdminToggleRow({ label, description, checked, onChange }: Toggle
         <p className="text-sm font-medium text-fg">{label}</p>
         <p className="mt-0.5 text-xs text-fg-soft">{description}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-label={label}
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full border transition-colors ${
-          checked ? "border-fg bg-fg" : "border-border-strong bg-surface-strong"
-        }`}
-      >
-        <span
-          className={`absolute left-0.5 top-0.5 size-5 rounded-full transition-transform ${
-            checked ? "translate-x-5 bg-app" : "bg-fg-muted"
-          }`}
-        />
-      </button>
+      <ToggleSwitch checked={checked} ariaLabel={label} onClick={() => onChange(!checked)} />
     </div>
   );
 }

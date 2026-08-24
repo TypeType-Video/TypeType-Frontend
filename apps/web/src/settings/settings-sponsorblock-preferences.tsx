@@ -1,3 +1,4 @@
+import { ToggleSwitch } from "../components/toggle-switch";
 import { useSettings } from "../hooks/use-settings";
 import { SPONSORBLOCK_CATEGORIES, type SponsorBlockCategory } from "../lib/sponsorblock-settings";
 import type { SponsorBlockCategoryAction, SponsorBlockMode } from "../types/user";
@@ -117,27 +118,17 @@ function ExtraToggles() {
     ["sponsorBlockMuteInsteadOfSkip", "Mute segments instead of skipping"],
   ] as const;
   return toggles.map(([key, label]) => (
-    <button
+    <div
       key={key}
-      type="button"
-      role="switch"
-      aria-checked={settings[key]}
-      onClick={() => update.mutate({ [key]: !settings[key] })}
       className="flex items-center justify-between gap-3 px-4 py-3 text-left text-sm text-fg"
     >
       <span>{label}</span>
-      <span
-        className={`h-5 w-10 rounded-full p-0.5 transition-colors ${
-          settings[key] ? "bg-fg" : "bg-surface-soft"
-        }`}
-      >
-        <span
-          className={`block h-4 w-4 rounded-full transition-transform ${
-            settings[key] ? "translate-x-5 bg-surface" : "bg-surface-soft"
-          }`}
-        />
-      </span>
-    </button>
+      <ToggleSwitch
+        checked={settings[key]}
+        ariaLabel={label}
+        onClick={() => update.mutate({ [key]: !settings[key] })}
+      />
+    </div>
   ));
 }
 

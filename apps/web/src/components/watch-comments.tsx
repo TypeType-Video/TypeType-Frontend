@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useInfiniteComments } from "../hooks/use-infinite-comments";
+import { ScrollSentinel } from "./scroll-sentinel";
 import { WatchCommentSkeleton } from "./watch-comment-skeleton";
 import { WatchCommentsLazyList } from "./watch-comments-lazy-list";
 
@@ -49,16 +50,10 @@ export function WatchComments({ videoUrl, onSeekTimestamp }: Props) {
             onSeekTimestamp={onSeekTimestamp}
           />
           {showSkeletons && SKELETON_KEYS.map((k) => <WatchCommentSkeleton key={k} />)}
-          {canLoadMore && !isLoading && (
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={isFetchingNextPage}
-              className="w-fit rounded-md border border-border-strong bg-surface px-3 py-1.5 text-xs text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg disabled:cursor-not-allowed disabled:text-fg-soft"
-            >
-              {isFetchingNextPage ? "Loading..." : "Load more comments"}
-            </button>
-          )}
+          <ScrollSentinel
+            onIntersect={loadMore}
+            enabled={canLoadMore && !isLoading && !isFetchingNextPage}
+          />
         </div>
       )}
     </div>
