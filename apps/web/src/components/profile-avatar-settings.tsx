@@ -1,26 +1,17 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useAvatar } from "../hooks/use-avatar";
 import { getOpenMojiUrl } from "../lib/openmoji";
 import { OPENMOJI_CATALOG } from "../lib/openmoji-catalog";
+import { m } from "../paraglide/messages.js";
 import { CustomAvatarUpload } from "./custom-avatar-upload";
 import { Toast } from "./toast";
 
-const CARD = "bg-surface rounded-xl border border-border overflow-hidden divide-y divide-border";
 const SCROLL_STEP = 220;
 
 function normalizeTerm(value: string): string {
   return value.trim().toLowerCase();
-}
-
-function ArrowIcon({ right }: { right: boolean }) {
-  const d = right ? "m9 6 6 6-6 6" : "m15 6-6 6 6 6";
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-      <title>{right ? "Right arrow" : "Left arrow"}</title>
-      <path d={d} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
 }
 
 export function ProfileAvatarSettings() {
@@ -46,14 +37,14 @@ export function ProfileAvatarSettings() {
   if (!me || me.id.startsWith("guest:")) return null;
 
   return (
-    <section className="flex flex-col gap-3">
-      <p className="text-xs font-medium text-fg-soft uppercase tracking-wider px-1">Avatar</p>
-      <div className={CARD}>
+    <section data-interface-copy className="border-b border-border py-6 sm:py-8">
+      <h2 className="text-base font-semibold text-fg">{m.avatar_title()}</h2>
+      <div className="min-w-0 max-w-3xl">
         <CustomAvatarUpload onMessage={setToast} />
-        <div className="px-4 py-4 flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-3 py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-fg">
-              Emojis from{" "}
+              {m.avatar_emoji_source()}{" "}
               <a
                 href="https://openmoji.org"
                 target="_blank"
@@ -66,23 +57,16 @@ export function ProfileAvatarSettings() {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search emojis"
-              className="h-8 w-40 rounded-md border border-border-strong bg-app px-2 text-xs text-fg"
+              placeholder={m.avatar_search()}
+              aria-label={m.avatar_search()}
+              className="h-9 min-w-0 w-full rounded-sm border border-border-strong bg-app px-2.5 text-xs text-fg sm:w-48"
             />
           </div>
-          <div className="flex items-center gap-2 overflow-hidden rounded-lg border border-border bg-app/70 p-2">
-            <button
-              type="button"
-              aria-label="Scroll emoji list left"
-              disabled={busy}
-              onClick={() => scroll("left")}
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-border-strong bg-surface text-fg-muted transition-colors hover:border-border-strong hover:text-fg disabled:opacity-50"
-            >
-              <ArrowIcon right={false} />
-            </button>
+          <div className="grid min-w-0 grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 border-y border-border py-3">
+            <ScrollButton direction="left" disabled={busy} onClick={() => scroll("left")} />
             <div
               ref={listRef}
-              className="min-w-0 flex-1 overflow-x-auto"
+              className="min-w-0 overflow-x-auto"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               <div className="flex gap-2 py-1">
@@ -94,16 +78,16 @@ export function ProfileAvatarSettings() {
                       type="button"
                       disabled={busy}
                       title={`${item.label} (${item.code})`}
-                      onClick={() => {
+                      onClick={() =>
                         emoji.mutate(item.code, {
-                          onSuccess: () => setToast("Avatar updated"),
-                          onError: () => setToast("Unable to update avatar"),
-                        });
-                      }}
-                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border p-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 ${
+                          onSuccess: () => setToast(m.avatar_updated()),
+                          onError: () => setToast(m.avatar_update_failed()),
+                        })
+                      }
+                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-sm border p-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 ${
                         selected
-                          ? "border-border bg-fg/20 ring-1 ring-border"
-                          : "border-border-strong bg-surface hover:border-border-strong"
+                          ? "border-fg-soft bg-fg/10"
+                          : "border-border-strong hover:border-fg-soft"
                       }`}
                     >
                       <img src={getOpenMojiUrl(item.code)} alt={item.label} className="h-7 w-7" />
@@ -112,34 +96,50 @@ export function ProfileAvatarSettings() {
                 })}
               </div>
             </div>
-            <button
-              type="button"
-              aria-label="Scroll emoji list right"
-              disabled={busy}
-              onClick={() => scroll("right")}
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-border-strong bg-surface text-fg-muted transition-colors hover:border-border-strong hover:text-fg disabled:opacity-50"
-            >
-              <ArrowIcon right={true} />
-            </button>
+            <ScrollButton direction="right" disabled={busy} onClick={() => scroll("right")} />
           </div>
         </div>
-        <div className="px-4 py-4 flex justify-end">
+        <div className="flex justify-stretch sm:justify-end">
           <button
             type="button"
             disabled={busy}
-            onClick={() => {
+            onClick={() =>
               clear.mutate(undefined, {
-                onSuccess: () => setToast("Avatar cleared"),
-                onError: () => setToast("Unable to clear avatar"),
-              });
-            }}
-            className="h-9 rounded-md border border-border-strong bg-surface px-3 text-xs text-fg disabled:opacity-50"
+                onSuccess: () => setToast(m.avatar_updated()),
+                onError: () => setToast(m.avatar_clear_failed()),
+              })
+            }
+            className="h-9 w-full rounded-sm border border-border-strong px-3 text-xs text-fg transition-colors hover:border-fg-soft disabled:opacity-50 sm:w-auto"
           >
-            Clear
+            {m.avatar_clear()}
           </button>
         </div>
       </div>
       <Toast message={toast} />
     </section>
+  );
+}
+
+function ScrollButton({
+  direction,
+  disabled,
+  onClick,
+}: {
+  direction: "left" | "right";
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const right = direction === "right";
+  const Icon = right ? ChevronRight : ChevronLeft;
+  return (
+    <button
+      type="button"
+      aria-label={right ? m.avatar_scroll_right() : m.avatar_scroll_left()}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex h-8 w-8 items-center justify-center rounded-sm border border-border-strong text-fg-muted transition-colors hover:border-fg-soft hover:text-fg disabled:opacity-50"
+    >
+      <Icon className="size-4" aria-hidden="true" />
+    </button>
   );
 }
