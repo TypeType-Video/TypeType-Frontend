@@ -1,4 +1,4 @@
-import { RefreshCw } from "lucide-react";
+import { ExternalLink, RefreshCw } from "lucide-react";
 import { useVersionInfo } from "../hooks/use-version-info";
 import type { ComponentVersion, VersionComponent } from "../lib/api-version";
 
@@ -50,6 +50,15 @@ export function SettingsAbout() {
           </div>
         ))}
       </div>
+      <a
+        href="/THIRD_PARTY_NOTICES.txt"
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex min-h-10 items-center gap-2 self-start rounded-md px-2 text-sm text-fg-muted transition-colors hover:bg-surface hover:text-fg"
+      >
+        Third-party notices
+        <ExternalLink className="size-4" aria-hidden="true" />
+      </a>
     </section>
   );
 }
