@@ -1,15 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Bug, ListChecks, MonitorDot, Radio, ServerCog, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminAllowListSection } from "../components/admin-allow-list-section";
 import { AdminBugReportsSection } from "../components/admin-bug-reports-section";
-import { AdminConsoleHeader } from "../components/admin-console-header";
-import { AdminConsoleNav } from "../components/admin-console-nav";
 import { AdminRssSection } from "../components/admin-rss-section";
 import { AdminSessionsSection } from "../components/admin-sessions-section";
 import { AdminSettingsSection } from "../components/admin-settings-section";
 import { AdminUsersSection } from "../components/admin-users-section";
+import { SectionShell, type SectionShellItem } from "../components/section-shell";
 import { Toast } from "../components/toast";
 import { useAuth } from "../hooks/use-auth";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   type AdminSection,
   getStoredAdminSection,
@@ -17,6 +18,7 @@ import {
   rememberAdminSection,
 } from "../lib/admin-console-section";
 import { goto } from "../lib/route-redirect";
+import { m } from "../paraglide/messages.js";
 
 function availableSections(isAdmin: boolean, isModerator: boolean): AdminSection[] {
   if (isAdmin) return ["settings", "allow-list", "users", "sessions", "rss", "issues"];
@@ -24,22 +26,57 @@ function availableSections(isAdmin: boolean, isModerator: boolean): AdminSection
   return [];
 }
 
-function sectionLabel(section: AdminSection): string {
-  if (section === "allow-list") return "Allow list";
-  if (section === "issues") return "Issues";
-  if (section === "users") return "Users";
-  if (section === "sessions") return "Sessions";
-  if (section === "rss") return "RSS";
-  return "Settings";
+function adminItems(): Record<AdminSection, SectionShellItem<AdminSection>> {
+  return {
+    settings: {
+      key: "settings",
+      label: m.admin_instance_label(),
+      description: m.admin_instance_description(),
+      icon: ServerCog,
+    },
+    "allow-list": {
+      key: "allow-list",
+      label: m.admin_parental_label(),
+      description: m.admin_parental_description(),
+      icon: ListChecks,
+    },
+    users: {
+      key: "users",
+      label: m.admin_users_label(),
+      description: m.admin_users_description(),
+      icon: Users,
+    },
+    sessions: {
+      key: "sessions",
+      label: m.admin_sessions_label(),
+      description: m.admin_sessions_description(),
+      icon: MonitorDot,
+    },
+    rss: {
+      key: "rss",
+      label: "RSS",
+      description: m.admin_rss_description(),
+      icon: Radio,
+    },
+    issues: {
+      key: "issues",
+      label: m.admin_reports_label(),
+      description: m.admin_reports_description(),
+      icon: Bug,
+    },
+  };
 }
 
 function AdminConsolePage() {
+  useInterfaceLocale();
   const { isAdmin, isModerator, me } = useAuth();
   const { section } = Route.useSearch();
   const navigate = useNavigate({ from: "/admin-console" });
   const [toast, setToast] = useState<string | null>(null);
   const canAccessAdmin = isAdmin || isModerator;
   const sections = availableSections(isAdmin, isModerator);
+  const localizedItems = adminItems();
+  const items = sections.map((item) => localizedItems[item]);
   const activeSection = sections.includes(section) ? section : (sections[0] ?? "issues");
 
   useEffect(() => {
@@ -64,16 +101,13 @@ function AdminConsolePage() {
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-5 pt-2 [animation:page-fade-in_0.2s_ease-out]">
-      <AdminConsoleNav
-        items={sections.map((key) => ({
-          key,
-          label: sectionLabel(key),
-        }))}
-        active={activeSection}
-        onSelect={(next) => navigate({ search: { section: next } })}
-      />
-      <AdminConsoleHeader section={activeSection} />
+    <SectionShell
+      title={m.admin_console_title()}
+      subtitle={m.admin_console_subtitle()}
+      items={items}
+      active={activeSection}
+      onSelect={(next) => navigate({ search: { section: next } })}
+    >
       {activeSection === "settings" && isAdmin && (
         <AdminSettingsSection enabled={isAdmin} onToast={setToast} />
       )}
@@ -91,7 +125,7 @@ function AdminConsolePage() {
         <AdminBugReportsSection enabled={canAccessAdmin} isAdmin={isAdmin} onToast={setToast} />
       )}
       <Toast message={toast} />
-    </div>
+    </SectionShell>
   );
 }
 
