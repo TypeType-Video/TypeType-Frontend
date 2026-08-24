@@ -95,6 +95,14 @@ export function toPublicWatchParam(sourceUrl: string): string {
   );
 }
 
+export function watchServiceId(sourceUrl: string, fallback: number): number {
+  const value = sourceUrl.trim();
+  if (youtubeVideoId(value)) return 0;
+  if (NICONICO_VIDEO_ID_PATTERN.test(value) || niconicoVideoIdFromUrl(value)) return 1;
+  if (BILIBILI_WATCH_PARAM_PATTERN.test(value) || bilibiliWatchParamFromUrl(value)) return 2;
+  return fallback;
+}
+
 export function watchRouteSearch(sourceUrl: string): WatchRouteSearch {
   return { v: toPublicWatchParam(sourceUrl) };
 }

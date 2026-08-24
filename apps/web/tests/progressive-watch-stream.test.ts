@@ -18,6 +18,14 @@ test("replaces bootstrap with full metadata without changing stream identity", (
   expect(selectProgressiveWatchStream(full, current, "f6f3PhauXyg", related)).toBe(full);
 });
 
+test("keeps navigation recommendations when full metadata has none", () => {
+  const full = { ...current, description: "Full metadata", related: [] };
+  expect(selectProgressiveWatchStream(full, current, "f6f3PhauXyg", related)).toEqual({
+    ...full,
+    related,
+  });
+});
+
 test("never renders stale placeholder data for another video", () => {
   expect(selectProgressiveWatchStream(previous, undefined, "f6f3PhauXyg", related)).toBeUndefined();
 });

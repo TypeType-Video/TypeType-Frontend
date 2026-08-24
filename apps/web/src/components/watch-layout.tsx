@@ -14,6 +14,7 @@ import { useWatchVttAssets } from "../hooks/use-watch-layout-assets";
 import { useWatchPlaybackFlow } from "../hooks/use-watch-playback-flow";
 import { useWatchPlayerSourceState } from "../hooks/use-watch-player-source-state";
 import { useWatchPlaylist } from "../hooks/use-watch-playlist";
+import { useWatchRecommendations } from "../hooks/use-watch-recommendations";
 import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { useWatchToast } from "../hooks/use-watch-toast";
 import { getOriginalAudioLocale } from "../lib/audio-track";
@@ -44,10 +45,12 @@ export function WatchLayout({
   const { on: bulletCommentsOn } = useDanmakuStore();
   const { isNicoNico, bulletComments } = useWatchBulletComments(stream.id, settings.hideComments);
   const sponsor = useWatchSponsorBlock(stream, settings);
-  const relatedStreams = useMemo(
-    () => (settings.hideRelatedVideos ? [] : filter(stream.related ?? [])),
-    [filter, settings.hideRelatedVideos, stream.related],
+  const recommendations = useWatchRecommendations(
+    stream,
+    settings.defaultService,
+    settings.hideRelatedVideos,
   );
+  const relatedStreams = useMemo(() => filter(recommendations), [filter, recommendations]);
   const playlist = useWatchPlaylist(list, shuffle, currentParam);
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
   const seekRef = useRef<((seconds: number) => void) | null>(null);
