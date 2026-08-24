@@ -66,8 +66,8 @@ export function NotificationsDropdown() {
         <div
           className={
             isMobile
-              ? "fixed left-2 right-2 top-16 z-50 overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl"
-              : "absolute right-0 top-full z-50 mt-2 w-[calc(100vw-1rem)] max-w-[26rem] overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl"
+              ? "fixed left-2 right-2 top-16 z-50 overflow-hidden rounded-md border border-border-strong bg-surface shadow-2xl"
+              : "absolute right-0 top-full z-50 mt-2 w-[calc(100vw-1rem)] max-w-[26rem] overflow-hidden rounded-md border border-border-strong bg-surface shadow-2xl"
           }
         >
           <div className="flex items-center justify-between border-b border-border px-3 py-2">

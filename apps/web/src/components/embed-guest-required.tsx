@@ -17,7 +17,7 @@ export function EmbedGuestRequired({ watchUrl }: EmbedGuestRequiredProps) {
           href={watchUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+          className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
         >
           Go to video
         </a>

@@ -30,14 +30,14 @@ export function PlayerError({ onRetry }: Props) {
         <button
           type="button"
           onClick={onRetry}
-          className="px-5 py-2 rounded-full bg-fg text-app text-sm font-medium transition-opacity hover:opacity-85 cursor-pointer"
+          className="cursor-pointer rounded-md bg-fg px-5 py-2 text-sm font-medium text-app transition-opacity hover:opacity-85"
         >
           Retry
         </button>
         <button
           type="button"
           onClick={() => router.history.back()}
-          className="px-5 py-2 rounded-full bg-surface-strong hover:bg-surface-soft text-fg text-sm font-medium transition-colors cursor-pointer"
+          className="cursor-pointer rounded-md bg-surface-strong px-5 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-soft"
         >
           Go back
         </button>

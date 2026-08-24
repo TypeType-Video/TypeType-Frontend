@@ -34,7 +34,11 @@ function LanguageFlag({ locale }: { locale: Locale }) {
   );
 }
 
-export function InterfaceLanguagePicker() {
+type Props = {
+  compact?: boolean;
+};
+
+export function InterfaceLanguagePicker({ compact = false }: Props) {
   const { locale, setLocale } = useInterfaceLocale();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -56,21 +60,29 @@ export function InterfaceLanguagePicker() {
   }, [open]);
 
   return (
-    <div ref={rootRef} className="relative ml-4 shrink-0">
+    <div ref={rootRef} className="relative shrink-0">
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${m.settings_ui_language_label()}: ${languageName(locale)}`}
         onClick={() => setOpen((current) => !current)}
-        className="flex h-9 w-36 items-center gap-2 rounded-md border border-border-strong bg-surface-strong px-2.5 text-xs text-fg transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong"
+        className={`flex h-9 items-center rounded-md border border-border-strong bg-surface-strong text-xs text-fg transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong ${
+          compact ? "w-10 justify-center px-2" : "w-40 gap-2 px-2.5"
+        }`}
       >
         <LanguageFlag locale={locale} />
-        <span className="min-w-0 flex-1 truncate text-left">{languageName(locale)}</span>
-        <ChevronDown
-          className={`size-3.5 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
-          aria-hidden="true"
-        />
+        {!compact && (
+          <>
+            <span data-interface-copy className="min-w-0 flex-1 truncate text-left">
+              {languageName(locale)}
+            </span>
+            <ChevronDown
+              className={`size-3.5 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </>
+        )}
       </button>
       <div
         role="listbox"
@@ -94,7 +106,9 @@ export function InterfaceLanguagePicker() {
             className="flex min-h-9 w-full items-center gap-2 rounded px-2 text-left text-xs text-fg-muted transition-colors hover:bg-surface-soft hover:text-fg"
           >
             <LanguageFlag locale={option} />
-            <span className="flex-1">{languageName(option)}</span>
+            <span data-interface-copy className="flex-1">
+              {languageName(option)}
+            </span>
             {locale === option && <Check className="size-3.5 text-fg" aria-hidden="true" />}
           </button>
         ))}

@@ -134,7 +134,7 @@ export function DownloaderJobFeedback({
               type="button"
               onClick={onCancel}
               disabled={cancelPending}
-              className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-md border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
             >
               {cancelPending ? "Cancelling..." : "Cancel"}
             </button>
@@ -144,7 +144,7 @@ export function DownloaderJobFeedback({
               type="button"
               onClick={onClear}
               disabled={clearPending}
-              className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-md border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
             >
               {clearPending ? "Clearing..." : "Clear"}
             </button>

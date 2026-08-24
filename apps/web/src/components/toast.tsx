@@ -14,7 +14,7 @@ export function Toast({ message }: Props) {
     >
       <div
         key={message}
-        className={`rounded-full border px-4 py-2 text-xs shadow-lg backdrop-blur [animation:toast-fade-in_0.2s_ease-out] ${shell}`}
+        className={`rounded-md border px-4 py-2 text-xs shadow-lg backdrop-blur [animation:toast-fade-in_0.2s_ease-out] ${shell}`}
       >
         {message}
       </div>

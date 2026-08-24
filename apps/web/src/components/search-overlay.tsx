@@ -128,7 +128,7 @@ export function SearchOverlay({ onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-fg hover:bg-surface-strong"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-fg hover:bg-surface-strong"
             aria-label="Back"
           >
             <ArrowLeft size={20} />
@@ -144,7 +144,7 @@ export function SearchOverlay({ onClose }: Props) {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search videos, channels..."
-            className="h-10 min-w-0 flex-1 rounded-full bg-surface-strong px-4 text-base text-fg placeholder:text-fg-soft focus:outline-none"
+            className="h-10 min-w-0 flex-1 rounded-md bg-surface-strong px-4 text-base text-fg placeholder:text-fg-soft focus:outline-none"
           />
         </form>
         <div className="min-h-0 flex-1 overflow-hidden px-2 pt-2">
@@ -156,7 +156,7 @@ export function SearchOverlay({ onClose }: Props) {
             onScroll={handleHistoryScroll}
             onClearAll={() => setConfirmClearOpen(true)}
             onSelect={submitTerm}
-            className="max-h-full overflow-y-auto scroll-smooth rounded-xl border border-border bg-surface"
+            className="max-h-full overflow-y-auto scroll-smooth rounded-md border border-border bg-surface"
           />
         </div>
       </div>

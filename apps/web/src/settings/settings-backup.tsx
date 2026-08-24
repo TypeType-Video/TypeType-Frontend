@@ -74,7 +74,7 @@ export function SettingsBackup() {
     <div className="flex flex-col gap-5">
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>TypeType backup</p>
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <div className="overflow-hidden rounded-md border border-border bg-surface">
           <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-border px-4 py-4 sm:grid-cols-2">
             {CATEGORIES.map((category) => (
               <label
@@ -125,7 +125,7 @@ export function SettingsBackup() {
       </section>
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>Data portability</p>
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-3 rounded-md border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
             <span className="text-sm text-fg">Move data between supported apps</span>
             <span className="text-xs text-fg-soft">

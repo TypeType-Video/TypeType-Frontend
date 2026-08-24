@@ -38,7 +38,7 @@ export function SettingsAbout() {
           <RefreshCw className={`size-4 ${query.isFetching ? "animate-spin" : ""}`} />
         </button>
       </div>
-      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-surface">
         {COMPONENTS.map(({ key, label }) => (
           <div key={key} className="flex min-h-20 items-start justify-between gap-4 px-4 py-3.5">
             <span className="pt-0.5 text-sm text-fg">{label}</span>

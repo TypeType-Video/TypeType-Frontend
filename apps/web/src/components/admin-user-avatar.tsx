@@ -11,7 +11,7 @@ export function AdminUserAvatar({ user, className }: AdminUserAvatarProps) {
 
   return (
     <div
-      className={`${className} overflow-hidden rounded-xl border border-border-strong bg-surface-strong`}
+      className={`${className} overflow-hidden rounded-md border border-border-strong bg-surface-strong`}
     >
       <img
         src={avatarUrl}

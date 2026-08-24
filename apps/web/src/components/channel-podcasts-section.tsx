@@ -33,7 +33,7 @@ export function ChannelPodcastsSection({ channelUrl, channelAvatar }: Props) {
             type="button"
             onClick={() => query.fetchNextPage()}
             disabled={query.isFetchingNextPage}
-            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:opacity-60"
+            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:opacity-60"
           >
             {query.isFetchingNextPage ? "Loading..." : "Load more"}
           </button>

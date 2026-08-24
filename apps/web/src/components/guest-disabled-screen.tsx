@@ -29,14 +29,14 @@ export function GuestDisabledScreen() {
         <Link
           to="/register"
           search={{ redirect: undefined }}
-          className="cursor-pointer rounded-full border border-white/50 bg-white/70 px-5 py-2.5 text-center font-medium text-fg text-sm shadow-lg backdrop-blur transition-colors hover:bg-white/85 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/15"
+          className="cursor-pointer rounded-md border border-white/50 bg-white/70 px-5 py-2.5 text-center text-sm font-medium text-fg shadow-lg backdrop-blur transition-colors hover:bg-white/85 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/15"
         >
           Create account
         </Link>
         <Link
           to="/login"
           search={{ redirect: undefined }}
-          className="cursor-pointer rounded-full border border-border-strong bg-surface/70 px-5 py-2.5 text-center font-medium text-fg-muted text-sm shadow-lg backdrop-blur transition-colors hover:bg-surface-strong hover:text-fg"
+          className="cursor-pointer rounded-md border border-border-strong bg-surface/70 px-5 py-2.5 text-center text-sm font-medium text-fg-muted shadow-lg backdrop-blur transition-colors hover:bg-surface-strong hover:text-fg"
         >
           Sign in
         </Link>

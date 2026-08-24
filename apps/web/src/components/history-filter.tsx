@@ -101,7 +101,7 @@ export function HistoryFilter({
             <button
               type="button"
               onClick={onClearHistory}
-              className="rounded-full border border-danger/40 px-2.5 py-1 text-[11px] text-danger transition-colors hover:border-danger hover:text-danger-strong"
+              className="rounded-md border border-danger/40 px-2.5 py-1 text-[11px] text-danger transition-colors hover:border-danger hover:text-danger-strong"
             >
               Clear all
             </button>

@@ -21,7 +21,7 @@ export function AdminUserRow({ user, selected, createdAtLabel, onSelect }: Admin
     <button
       type="button"
       onClick={() => onSelect(user.id)}
-      className={`w-full rounded-2xl border bg-surface p-3 text-left transition-colors ${
+      className={`w-full rounded-md border bg-surface p-3 text-left transition-colors ${
         selected
           ? "border-border-strong ring-1 ring-border-strong/60"
           : "border-border hover:border-border-strong"

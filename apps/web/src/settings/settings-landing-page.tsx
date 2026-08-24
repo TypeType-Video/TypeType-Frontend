@@ -17,7 +17,7 @@ export function SettingsLandingPage() {
   return (
     <section className="flex flex-col gap-3">
       <p className="px-1 text-xs font-medium text-fg-soft uppercase tracking-wider">Startup</p>
-      <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col items-start gap-3 rounded-md border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-fg">Default landing page</span>
           <span className="text-xs text-fg-soft">
@@ -40,7 +40,7 @@ export function SettingsLandingPage() {
       <p className="px-1 pt-2 text-xs font-medium text-fg-soft uppercase tracking-wider">
         Notifications
       </p>
-      <div className="rounded-xl border border-border bg-surface">
+      <div className="rounded-md border border-border bg-surface">
         <div className={ROW}>
           <div className="flex flex-col gap-1">
             <span className="text-sm text-fg">Notification popups</span>
@@ -56,7 +56,7 @@ export function SettingsLandingPage() {
           />
         </div>
       </div>
-      <div className="divide-y divide-border rounded-xl border border-border bg-surface">
+      <div className="divide-y divide-border rounded-md border border-border bg-surface">
         <SettingsDiscoveryToggles />
       </div>
     </section>

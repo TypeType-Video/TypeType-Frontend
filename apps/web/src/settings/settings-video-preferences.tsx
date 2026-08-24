@@ -2,7 +2,7 @@ import { SettingsWatchToggles } from "./settings-content-toggles";
 import { SettingsSponsorBlockPreferences } from "./settings-sponsorblock-preferences";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-xl border border-border divide-y divide-border";
+const CARD = "bg-surface rounded-md border border-border divide-y divide-border";
 
 export function SettingsVideoPreferences() {
   return (

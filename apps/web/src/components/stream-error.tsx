@@ -67,7 +67,7 @@ export function StreamError({
           <button
             type="button"
             onClick={onRetry}
-            className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+            className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
             Retry
           </button>
@@ -76,7 +76,7 @@ export function StreamError({
           <Link
             to="/youtube-session"
             search={{ returnTo: youtubeSessionReturnTo }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
             <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
             <span>Connect with YouTube</span>
@@ -86,7 +86,7 @@ export function StreamError({
           <Link
             to="/admin-console"
             search={{ section: "allow-list" }}
-            className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+            className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
             Open allow list
           </Link>
@@ -94,7 +94,7 @@ export function StreamError({
         <button
           type="button"
           onClick={() => router.history.back()}
-          className="px-5 py-2 rounded-full bg-surface-strong hover:bg-surface-soft text-fg text-sm font-medium transition-colors cursor-pointer"
+          className="cursor-pointer rounded-md bg-surface-strong px-5 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-soft"
         >
           Go back
         </button>

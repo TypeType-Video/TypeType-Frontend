@@ -33,7 +33,7 @@ export function AdminUserDetailPanel({
     : "border-danger/60 bg-danger/30 text-danger-strong hover:border-danger";
 
   return (
-    <aside className="rounded-3xl border border-border bg-surface p-5 lg:sticky lg:top-16 h-fit [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)]">
+    <aside className="h-fit rounded-md border border-border bg-surface p-5 [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)] lg:sticky lg:top-16">
       <div className="flex items-center gap-3">
         <AdminUserAvatar user={user} className="h-11 w-11" />
         <div className="min-w-0">
@@ -44,7 +44,7 @@ export function AdminUserDetailPanel({
       <p className="mt-2 text-[11px] text-fg-soft break-all">{user.id}</p>
       <AdminUserIdentityForm user={user} disabled={busy} onMessage={onMessage} />
 
-      <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-app p-1">
+      <div className="mt-4 grid grid-cols-3 gap-1 rounded-md border border-border bg-app p-1">
         {ROLE_OPTIONS.map((role) => (
           <button
             key={`${user.id}-${role}`}
@@ -71,7 +71,7 @@ export function AdminUserDetailPanel({
         </button>
 
         {actionsOpen && (
-          <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-border-strong bg-surface p-2 shadow-2xl [animation:admin-actions-pop_0.18s_cubic-bezier(0.22,1,0.36,1)]">
+          <div className="absolute right-0 z-20 mt-2 w-52 rounded-md border border-border-strong bg-surface p-2 shadow-2xl [animation:admin-actions-pop_0.18s_cubic-bezier(0.22,1,0.36,1)]">
             <button
               type="button"
               disabled={busy}

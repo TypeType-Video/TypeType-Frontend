@@ -20,7 +20,7 @@ export function ThemeToggleButton({ className }: Props) {
       onClick={toggleTheme}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
       title={theme === "dark" ? "Light mode" : "Dark mode"}
-      className={`relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface-strong text-fg transition-colors duration-200 hover:bg-surface-soft ${className ?? ""}`}
+      className={`relative inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-strong text-fg transition-colors duration-200 hover:bg-surface-soft ${className ?? ""}`}
     >
       <span className="relative block h-4 w-4">
         <Sun

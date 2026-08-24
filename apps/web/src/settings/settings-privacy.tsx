@@ -8,7 +8,7 @@ import { useSubscriptions } from "../hooks/use-subscriptions";
 import { ToggleSwitch } from "./settings-toggle-switch";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-xl border border-border overflow-hidden divide-y divide-border";
+const CARD = "bg-surface rounded-md border border-border overflow-hidden divide-y divide-border";
 const ROW = "flex items-center justify-between px-4 py-4";
 
 type ActiveModal = "history" | "subscriptions" | "search-history" | null;

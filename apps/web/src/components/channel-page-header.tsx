@@ -46,7 +46,7 @@ export function ChannelPageHeader({
             type="button"
             onClick={onSubscribe}
             aria-pressed={subscribed}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
               subscribed
                 ? "bg-surface-strong text-fg ring-1 ring-border-strong hover:bg-surface-soft"
                 : "bg-fg text-app hover:bg-fg-strong"

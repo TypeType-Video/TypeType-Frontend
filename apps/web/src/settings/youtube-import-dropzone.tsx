@@ -20,7 +20,7 @@ export function YoutubeImportDropzone({ disabled, onSelectFiles }: Props) {
 
   return (
     <label
-      className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-6 text-center transition-colors ${zoneTone}`}
+      className={`flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed px-4 py-6 text-center transition-colors ${zoneTone}`}
       onDragEnter={(e) => {
         e.preventDefault();
         if (!disabled) setOver(true);

@@ -54,7 +54,7 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="inline-flex h-8 items-center rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft"
           >
             Sign in
           </a>
@@ -98,14 +98,14 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="inline-flex h-8 items-center rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft"
           >
             Sign in
           </a>
           <button
             type="button"
             onClick={() => goto("/")}
-            className="hidden sm:inline-flex h-8 items-center justify-center px-3 text-xs rounded-full bg-surface hover:bg-surface-strong text-fg-muted"
+            className="hidden h-8 items-center justify-center rounded-md bg-surface px-3 text-xs text-fg-muted hover:bg-surface-strong sm:inline-flex"
           >
             Browse
           </button>
@@ -126,14 +126,14 @@ export function NavbarAccountControls({
             <>
               <a
                 href={loginHref()}
-                className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+                className="inline-flex h-8 items-center rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft"
               >
                 Login
               </a>
               <Link
                 to="/register"
                 search={{ redirect: undefined }}
-                className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-fg text-app hover:bg-fg/90"
+                className="inline-flex h-8 items-center rounded-md bg-fg px-3 text-xs text-app hover:bg-fg/90"
               >
                 Register
               </Link>
@@ -143,7 +143,7 @@ export function NavbarAccountControls({
             <Link
               to="/settings"
               search={{ section: getStoredSettingsSection() }}
-              className="hidden sm:inline-flex h-8 px-3 items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+              className="hidden h-8 items-center rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft sm:inline-flex"
             >
               Account
             </Link>
@@ -152,7 +152,7 @@ export function NavbarAccountControls({
             <Link
               to="/admin-console"
               search={{ section: getStoredAdminSection() }}
-              className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+              className="inline-flex h-8 items-center rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft"
             >
               Admin
             </Link>
@@ -160,7 +160,7 @@ export function NavbarAccountControls({
           <button
             type="button"
             onClick={() => void handleSignOut()}
-            className="h-8 px-3 text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="h-8 rounded-md bg-surface-strong px-3 text-xs text-fg hover:bg-surface-soft"
           >
             Sign out
           </button>

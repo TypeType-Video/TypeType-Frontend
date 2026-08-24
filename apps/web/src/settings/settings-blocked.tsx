@@ -60,7 +60,7 @@ function BlockedChannelModal({ item, onUnblock, onClose }: ModalProps) {
         className="absolute inset-0 bg-black/60"
         onClick={onClose}
       />
-      <div className="relative bg-surface border border-border rounded-2xl p-6 flex flex-col items-center gap-4 w-64">
+      <div className="relative flex w-64 flex-col items-center gap-4 rounded-md border border-border bg-surface p-6">
         <ChannelAvatar src={item.thumbnailUrl ?? ""} name={label} className="w-16 h-16" />
         <p className="text-sm text-fg font-medium text-center break-all">{label}</p>
         <div className="flex gap-2 w-full">
@@ -105,7 +105,7 @@ export function SettingsBlocked() {
     <>
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>Blocked keywords</p>
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <div className="overflow-hidden rounded-md border border-border bg-surface">
           <form
             onSubmit={submitKeyword}
             className="flex items-center gap-2 border-b border-border px-4 py-3"
@@ -174,7 +174,7 @@ export function SettingsBlocked() {
       {videoList.length > 0 && (
         <section className="flex flex-col gap-3">
           <p className={SECTION_LABEL}>Blocked videos</p>
-          <div className="bg-surface rounded-xl border border-border overflow-hidden divide-y divide-border">
+          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-surface">
             {videoList.map((item) => (
               <div key={item.url} className="flex items-center gap-3 px-4 py-2.5">
                 <span className="text-xs text-fg-muted truncate flex-1 min-w-0">{item.url}</span>

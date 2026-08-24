@@ -28,7 +28,7 @@ export function YoutubeImportJobSummary({ job, preview, report }: Props) {
   if (!job) return null;
 
   return (
-    <div className="rounded-xl border border-border/70 bg-surface/90">
+    <div className="rounded-md border border-border/70 bg-surface/90">
       <div className="px-4 py-4 text-xs text-fg-muted">
         <p>
           <span className="text-fg-soft">Import ID:</span> {job.jobId}

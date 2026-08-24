@@ -29,10 +29,10 @@ export function SectionShell<Key extends string>({
   const CurrentIcon = current?.icon;
 
   return (
-    <div className="min-w-0 [animation:page-fade-in_0.2s_ease-out]">
-      <header className="mb-6 border-b border-border pb-5">
-        <h1 className="text-xl font-semibold text-fg">{title}</h1>
-        <p className="mt-1 max-w-2xl text-sm text-fg-muted">{subtitle}</p>
+    <div className="min-w-0 pt-5 [animation:page-fade-in_0.2s_ease-out] sm:pt-8">
+      <header data-interface-copy className="mb-7 border-b border-border pb-6">
+        <h1 className="text-2xl font-bold text-fg">{title}</h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-6 text-fg-muted">{subtitle}</p>
       </header>
       <div className="mb-5 lg:hidden">
         <label htmlFor="section-navigation" className="sr-only">
@@ -42,7 +42,7 @@ export function SectionShell<Key extends string>({
           id="section-navigation"
           value={active}
           onChange={(event) => onSelect(event.target.value as Key)}
-          className="h-10 w-full rounded-md border border-border-strong bg-surface px-3 text-sm text-fg"
+          className="h-11 w-full rounded-sm border border-border-strong bg-surface px-3 text-sm text-fg"
         >
           {items.map((item) => (
             <option key={item.key} value={item.key}>
@@ -51,12 +51,12 @@ export function SectionShell<Key extends string>({
           ))}
         </select>
       </div>
-      <div className="grid min-w-0 gap-7 lg:grid-cols-[220px_minmax(0,1fr)]">
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[228px_minmax(0,1fr)] lg:gap-10">
         <nav
           className="hidden border-r border-border pr-4 lg:block"
           aria-label={`${title} sections`}
         >
-          <div className="sticky top-20 space-y-1">
+          <div data-interface-copy className="sticky top-20 space-y-0.5">
             {items.map((item) => {
               const Icon = item.icon;
               const selected = item.key === active;
@@ -66,10 +66,10 @@ export function SectionShell<Key extends string>({
                   type="button"
                   aria-current={selected ? "page" : undefined}
                   onClick={() => onSelect(item.key)}
-                  className={`grid min-h-11 w-full grid-cols-[20px_1fr] items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors ${
+                  className={`grid min-h-11 w-full grid-cols-[20px_1fr] items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors ${
                     selected
-                      ? "bg-surface-strong text-fg"
-                      : "text-fg-muted hover:bg-surface hover:text-fg"
+                      ? "border-accent bg-surface text-fg"
+                      : "border-transparent text-fg-muted hover:border-border-strong hover:bg-surface/60 hover:text-fg"
                   }`}
                 >
                   <Icon className="size-4" aria-hidden="true" />
@@ -80,14 +80,14 @@ export function SectionShell<Key extends string>({
           </div>
         </nav>
         <main className="min-w-0">
-          <header className="mb-5">
+          <header data-interface-copy className="mb-6">
             <div className="flex items-center gap-2">
               {CurrentIcon && <CurrentIcon className="size-5 text-fg-muted" aria-hidden="true" />}
               <h2 className="text-lg font-semibold text-fg">{current?.label}</h2>
             </div>
             <p className="mt-1 text-sm text-fg-muted">{current?.description}</p>
           </header>
-          {children}
+          <div data-interface-copy>{children}</div>
         </main>
       </div>
     </div>

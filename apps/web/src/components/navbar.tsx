@@ -7,6 +7,7 @@ import { useMobile } from "../hooks/use-mobile";
 import { useSearchShortcut } from "../hooks/use-search-shortcut";
 import { isAuthPage } from "../lib/auth-routes";
 import { useUiStore } from "../stores/ui-store";
+import { InterfaceLanguagePicker } from "./interface-language-picker";
 import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
@@ -58,7 +59,7 @@ export function Navbar() {
           />
           <Link to="/" className="flex min-w-0 shrink items-center gap-2">
             <img src="/logo.svg" alt="TypeType" width={28} height={28} />
-            <span className="max-w-28 truncate text-fg text-sm font-semibold tracking-widest sm:max-w-none">
+            <span className="hidden max-w-28 truncate text-fg text-sm font-semibold tracking-widest min-[430px]:inline sm:max-w-none">
               TYPETYPE
             </span>
           </Link>
@@ -79,7 +80,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
+            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
             aria-label="Search"
           >
             <Search size={18} />
@@ -89,6 +90,7 @@ export function Navbar() {
         {canOpenSearch && !isMobile && <NavbarSearch />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          <InterfaceLanguagePicker compact={isMobile} />
           <NavbarNotifications />
           <NavbarAccountControls
             status={status}

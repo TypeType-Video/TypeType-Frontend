@@ -5,7 +5,7 @@ import { DEFAULT_PLAYBACK_SPEED_OPTIONS, playbackSpeedLabel } from "../lib/playb
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-xl border border-border divide-y divide-border";
+const CARD = "bg-surface rounded-md border border-border divide-y divide-border";
 
 const QUALITY_OPTIONS = [
   { label: "Auto", value: "auto" },
