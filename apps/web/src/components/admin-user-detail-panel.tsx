@@ -46,7 +46,7 @@ export function AdminUserDetailPanel({
         aria-label="Close user details"
         className="absolute inset-0 bg-black/35 backdrop-blur-[1px]"
       />
-      <aside className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-border bg-app shadow-2xl [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)]">
+      <aside className="absolute inset-y-0 right-0 flex w-full max-w-md origin-right flex-col border-l border-border bg-app shadow-2xl [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)]">
         <header className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <h3 className="font-semibold text-fg">User details</h3>
