@@ -1,30 +1,40 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  Ban,
+  CircleHelp,
+  Download,
+  Gauge,
+  House,
+  Languages,
+  Radio,
+  Server,
+  Shield,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useEffect } from "react";
+import { SectionShell, type SectionShellItem } from "../components/section-shell";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
-import { useSettings } from "../hooks/use-settings";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   getStoredSettingsSection,
   isSettingsSection,
   rememberSettingsSection,
   type SettingsSection,
 } from "../lib/settings-section";
+import { m } from "../paraglide/messages.js";
 import { SettingsAbout } from "../settings/settings-about";
 import { SettingsBackup } from "../settings/settings-backup";
 import { SettingsBlocked } from "../settings/settings-blocked";
 import { SettingsLandingPage } from "../settings/settings-landing-page";
 import { SettingsLanguage } from "../settings/settings-language";
-import { SettingsNav } from "../settings/settings-nav";
 import { SettingsPlayback } from "../settings/settings-playback";
 import { SettingsPrivacy } from "../settings/settings-privacy";
 import { SettingsRss } from "../settings/settings-rss";
 import { SettingsService } from "../settings/settings-service";
 import { SettingsVideoPreferences } from "../settings/settings-video-preferences";
 
-type Item = {
-  key: SettingsSection;
-  label: string;
-};
+type Item = SectionShellItem<SettingsSection>;
 
 type SettingsSearch = {
   section: SettingsSection;
@@ -32,39 +42,91 @@ type SettingsSearch = {
   compose?: boolean;
 };
 
-const BASE_ITEMS: Item[] = [
-  { key: "playback", label: "Playback" },
-  { key: "video", label: "Video" },
-  { key: "home", label: "Interface" },
-  { key: "service", label: "Service" },
-  { key: "import", label: "Import" },
-  { key: "privacy", label: "Privacy" },
-  { key: "blocked", label: "Blocked" },
-  { key: "about", label: "About" },
-];
+function baseItems(): Item[] {
+  return [
+    {
+      key: "playback",
+      label: m.settings_playback_label(),
+      description: m.settings_playback_description(),
+      icon: Gauge,
+    },
+    {
+      key: "video",
+      label: m.settings_video_label(),
+      description: m.settings_video_description(),
+      icon: SlidersHorizontal,
+    },
+    {
+      key: "home",
+      label: m.settings_interface_label(),
+      description: m.settings_interface_description(),
+      icon: House,
+    },
+    {
+      key: "service",
+      label: m.settings_services_label(),
+      description: m.settings_services_description(),
+      icon: Server,
+    },
+    {
+      key: "import",
+      label: m.settings_data_label(),
+      description: m.settings_data_description(),
+      icon: Download,
+    },
+    {
+      key: "privacy",
+      label: m.settings_privacy_label(),
+      description: m.settings_privacy_description(),
+      icon: Shield,
+    },
+    {
+      key: "blocked",
+      label: m.settings_blocked_label(),
+      description: m.settings_blocked_description(),
+      icon: Ban,
+    },
+    {
+      key: "about",
+      label: m.settings_about_label(),
+      description: m.settings_about_description(),
+      icon: CircleHelp,
+    },
+  ];
+}
 
-function settingsItems(showLanguage: boolean, showRss: boolean): Item[] {
-  const items = showLanguage
-    ? [
-        BASE_ITEMS[0],
-        BASE_ITEMS[1],
-        BASE_ITEMS[2],
-        { key: "language", label: "Language" } as Item,
-        ...BASE_ITEMS.slice(3),
-      ]
-    : [...BASE_ITEMS];
-  if (showRss) items.splice(items.length - 1, 0, { key: "rss", label: "RSS" });
+function settingsItems(showRss: boolean): Item[] {
+  const base = baseItems();
+  const items = [
+    base[0],
+    base[1],
+    base[2],
+    {
+      key: "language",
+      label: m.settings_language_label(),
+      description: m.settings_language_description(),
+      icon: Languages,
+    } as Item,
+    ...base.slice(3),
+  ];
+  if (showRss)
+    items.splice(items.length - 1, 0, {
+      key: "rss",
+      label: "RSS",
+      description: m.settings_rss_description(),
+      icon: Radio,
+    });
   return items;
 }
 
 function SettingsPage() {
-  const { settings } = useSettings();
+  useInterfaceLocale();
   const { authReady, isAuthed, isGuest } = useAuth();
   const instance = useInstance();
   const { section, rssChannel, compose } = Route.useSearch();
   const navigate = useNavigate({ from: "/settings" });
   const showRss = instance.data?.rss.enabled === true && isAuthed && !isGuest;
-  const items = settingsItems(settings.defaultService === 0, showRss);
+  const items = settingsItems(showRss);
   const pendingRssDecision = section === "rss" && (!authReady || instance.isPending);
   const activeSection = pendingRssDecision
     ? "rss"
@@ -82,17 +144,17 @@ function SettingsPage() {
   }, [activeSection]);
 
   return (
-    <div className="flex flex-col gap-5 [animation:page-fade-in_0.2s_ease-out]">
-      <h1 className="text-lg font-semibold text-fg">Settings</h1>
-      <SettingsNav
-        items={items}
-        active={activeSection}
-        onSelect={(next) => navigate({ search: { section: next } })}
-      />
+    <SectionShell
+      title={m.settings_title()}
+      subtitle={m.settings_subtitle()}
+      items={items}
+      active={activeSection}
+      onSelect={(next) => navigate({ search: { section: next } })}
+    >
       {activeSection === "playback" && <SettingsPlayback />}
       {activeSection === "video" && <SettingsVideoPreferences />}
       {activeSection === "home" && <SettingsLandingPage />}
-      {activeSection === "language" && settings.defaultService === 0 && <SettingsLanguage />}
+      {activeSection === "language" && <SettingsLanguage />}
       {activeSection === "service" && <SettingsService />}
       {activeSection === "import" && <SettingsBackup />}
       {activeSection === "privacy" && <SettingsPrivacy />}
@@ -106,7 +168,7 @@ function SettingsPage() {
         </div>
       )}
       {activeSection === "about" && <SettingsAbout />}
-    </div>
+    </SectionShell>
   );
 }
 

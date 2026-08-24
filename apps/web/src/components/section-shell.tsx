@@ -1,0 +1,95 @@
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+
+export type SectionShellItem<Key extends string> = {
+  key: Key;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+};
+
+type Props<Key extends string> = {
+  title: string;
+  subtitle: string;
+  items: SectionShellItem<Key>[];
+  active: Key;
+  onSelect: (key: Key) => void;
+  children: ReactNode;
+};
+
+export function SectionShell<Key extends string>({
+  title,
+  subtitle,
+  items,
+  active,
+  onSelect,
+  children,
+}: Props<Key>) {
+  const current = items.find((item) => item.key === active) ?? items[0];
+  const CurrentIcon = current?.icon;
+
+  return (
+    <div className="min-w-0 [animation:page-fade-in_0.2s_ease-out]">
+      <header className="mb-6 border-b border-border pb-5">
+        <h1 className="text-xl font-semibold text-fg">{title}</h1>
+        <p className="mt-1 max-w-2xl text-sm text-fg-muted">{subtitle}</p>
+      </header>
+      <div className="mb-5 lg:hidden">
+        <label htmlFor="section-navigation" className="sr-only">
+          {title} section
+        </label>
+        <select
+          id="section-navigation"
+          value={active}
+          onChange={(event) => onSelect(event.target.value as Key)}
+          className="h-10 w-full rounded-md border border-border-strong bg-surface px-3 text-sm text-fg"
+        >
+          {items.map((item) => (
+            <option key={item.key} value={item.key}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid min-w-0 gap-7 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <nav
+          className="hidden border-r border-border pr-4 lg:block"
+          aria-label={`${title} sections`}
+        >
+          <div className="sticky top-20 space-y-1">
+            {items.map((item) => {
+              const Icon = item.icon;
+              const selected = item.key === active;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  aria-current={selected ? "page" : undefined}
+                  onClick={() => onSelect(item.key)}
+                  className={`grid min-h-11 w-full grid-cols-[20px_1fr] items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors ${
+                    selected
+                      ? "bg-surface-strong text-fg"
+                      : "text-fg-muted hover:bg-surface hover:text-fg"
+                  }`}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+        <main className="min-w-0">
+          <header className="mb-5">
+            <div className="flex items-center gap-2">
+              {CurrentIcon && <CurrentIcon className="size-5 text-fg-muted" aria-hidden="true" />}
+              <h2 className="text-lg font-semibold text-fg">{current?.label}</h2>
+            </div>
+            <p className="mt-1 text-sm text-fg-muted">{current?.description}</p>
+          </header>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
