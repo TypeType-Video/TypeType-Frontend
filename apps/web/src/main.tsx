@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { NotFoundPage } from "./components/not-found-page";
 import { PageSpinner } from "./components/page-spinner";
 import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
 import { ApiError } from "./lib/api";
@@ -17,6 +18,7 @@ document.documentElement.dir = getTextDirection();
 
 const router = createRouter({
   routeTree,
+  defaultNotFoundComponent: NotFoundPage,
   defaultPendingComponent: PageSpinner,
   scrollRestoration: true,
 });

@@ -80,5 +80,9 @@
   "settings_ui_language_description": "Langue utilisée par TypeType sur cet appareil.",
   "settings_ui_language_label": "Langue de l'interface",
   "settings_video_description": "Visibilité du contenu et comportement de SponsorBlock.",
-  "settings_video_label": "Vidéo"
+  "settings_video_label": "Vidéo",
+  "not_found_title": "Cette page est hors champ",
+  "not_found_description": "L'adresse est peut-être incorrecte, ou la page a été déplacée.",
+  "not_found_back": "Retour",
+  "not_found_home": "Accueil"
 }

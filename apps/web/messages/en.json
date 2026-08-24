@@ -80,5 +80,9 @@
   "settings_ui_language_description": "Language used by TypeType on this device.",
   "settings_ui_language_label": "Interface language",
   "settings_video_description": "Content visibility and SponsorBlock behavior.",
-  "settings_video_label": "Video"
+  "settings_video_label": "Video",
+  "not_found_title": "This page is out of frame",
+  "not_found_description": "The address may be incorrect, or the page may have moved.",
+  "not_found_back": "Go back",
+  "not_found_home": "Home"
 }
