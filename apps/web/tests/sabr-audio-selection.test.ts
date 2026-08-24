@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { defaultSabrAudioTrackId, sabrAudioOptions } from "../src/lib/sabr-audio";
 import { resolveSabrPlaybackConfig } from "../src/lib/sabr-source";
+import { useSabrAudioStore } from "../src/stores/sabr-audio-store";
 import type { AudioStreamItem, VideoStreamItem } from "../src/types/api";
 import type { VideoStream } from "../src/types/stream";
 
@@ -54,8 +55,8 @@ test("exposes backend audio names without generic duplicate labels", () => {
   ]);
 });
 
-test("matches the preferred language and switches the sabr track id", () => {
-  expect(defaultSabrAudioTrackId(stream, "fr-FR")).toBe("fr-FR.1");
+test("matches the preferred language when original audio is not required", () => {
+  expect(defaultSabrAudioTrackId(stream, "fr-FR", false)).toBe("fr-FR.1");
   const config = withManagedMediaSource(() => resolveSabrPlaybackConfig(stream, 137, "fr-FR.1"));
   expect(config?.audioTrackId).toBe("fr-FR.1");
   const audioOnly = withManagedMediaSource(() =>
@@ -63,6 +64,39 @@ test("matches the preferred language and switches the sabr track id", () => {
   );
   expect(audioOnly?.audioOnly).toBe(true);
   expect(audioOnly?.key.endsWith(":audio")).toBe(true);
+});
+
+test("keeps the original track ahead of the preferred interface language", () => {
+  expect(defaultSabrAudioTrackId(stream, "fr-FR", true)).toBe("en-US.4");
+});
+
+test("uses the original stream marker when the explicit original id is absent", () => {
+  const withoutOriginalId = {
+    ...stream,
+    originalAudioTrackId: undefined,
+    preferredDefaultAudioTrackId: "fr-FR.1",
+  } as VideoStream;
+
+  expect(defaultSabrAudioTrackId(withoutOriginalId, "fr-FR", true)).toBe("en-US.4");
+});
+
+test("falls back to the preferred language when no original track is available", () => {
+  const withoutOriginal = {
+    ...stream,
+    originalAudioTrackId: undefined,
+    audioStreams: [audio("de-DE.1", "German", "de"), audio("fr-FR.1", "French", "fr")],
+  } as VideoStream;
+
+  expect(defaultSabrAudioTrackId(withoutOriginal, "fr-FR", true)).toBe("fr-FR.1");
+});
+
+test("preserves a valid manual track when the original fallback is reapplied", () => {
+  const options = sabrAudioOptions(stream);
+  useSabrAudioStore.getState().setOptions(stream.id, options, "en-US.4");
+  useSabrAudioStore.getState().selectTrack(stream.id, "fr-FR.1");
+  useSabrAudioStore.getState().setOptions(stream.id, options, "en-US.4");
+
+  expect(useSabrAudioStore.getState().selectedTrackId).toBe("fr-FR.1");
 });
 
 test("marks live playback sessions for the MSE engine", () => {

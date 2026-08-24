@@ -60,6 +60,7 @@ export function ShortsPlayerStage({
     youtube && Boolean(stream),
     defaultQuality,
     defaultAudioLanguage,
+    preferOriginalLanguage,
   );
   const manifestSrc =
     stream && !youtube

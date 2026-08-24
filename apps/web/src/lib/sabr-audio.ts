@@ -35,8 +35,13 @@ export function sabrAudioOptions(stream: VideoStream): SabrAudioOption[] {
 export function defaultSabrAudioTrackId(
   stream: VideoStream,
   preferredLanguage?: string,
+  preferOriginalLanguage = false,
 ): string | null {
   const candidates = audioCandidates(stream);
+  const originalMatch = candidates.find(
+    (item) => item.audioTrackId === stream.originalAudioTrackId || item.isOriginal,
+  );
+  if (preferOriginalLanguage && originalMatch?.audioTrackId) return originalMatch.audioTrackId;
   const preferred = normalizeLanguage(preferredLanguage);
   const languageMatch = preferred
     ? candidates.find((item) => {

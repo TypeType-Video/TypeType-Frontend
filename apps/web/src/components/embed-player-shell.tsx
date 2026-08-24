@@ -73,6 +73,7 @@ export function EmbedPlayerShell({
     player.sabrEnabled,
     settings.defaultQuality,
     settings.defaultAudioLanguage,
+    settings.preferOriginalLanguage,
     false,
   );
 

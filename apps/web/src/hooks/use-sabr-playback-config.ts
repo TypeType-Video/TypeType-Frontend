@@ -17,6 +17,7 @@ export function useSabrPlaybackConfig(
   enabled: boolean,
   defaultQuality?: string,
   defaultAudioLanguage?: string,
+  preferOriginalLanguage = false,
   audioOnly = false,
 ): SabrPlaybackConfig | null {
   const authScope = useAuthStore((state) => (state.token ? (state.me?.id ?? "auth") : "guest"));
@@ -31,8 +32,8 @@ export function useSabrPlaybackConfig(
   const options = useMemo(() => sabrQualityOptions(stream), [stream]);
   const audioOptions = useMemo(() => sabrAudioOptions(stream), [stream]);
   const fallbackTrackId = useMemo(
-    () => defaultSabrAudioTrackId(stream, defaultAudioLanguage),
-    [defaultAudioLanguage, stream],
+    () => defaultSabrAudioTrackId(stream, defaultAudioLanguage, preferOriginalLanguage),
+    [defaultAudioLanguage, preferOriginalLanguage, stream],
   );
   const effectiveTrackId = selectedTrackId ?? fallbackTrackId;
   const preferredQuality = resolvePreferredQuality(defaultQuality);

@@ -86,6 +86,7 @@ export function WatchLayout({
     player.sabrEnabled,
     settings.defaultQuality,
     settings.defaultAudioLanguage,
+    settings.preferOriginalLanguage,
     audioOnly.active,
   );
   const { toast, setToast } = useWatchToast(audioOnly.unavailable);
