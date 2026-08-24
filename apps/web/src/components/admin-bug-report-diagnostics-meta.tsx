@@ -18,6 +18,16 @@ export function AdminBugReportDiagnosticsMeta({ report }: Props) {
       <p title={report.context.userAgent || ""}>
         User agent: {shorten(report.context.userAgent || "unknown", 110)}
       </p>
+      {report.context.viewportWidth && report.context.viewportHeight && (
+        <p>
+          Viewport: {report.context.viewportWidth} x {report.context.viewportHeight}
+          {report.context.devicePixelRatio ? ` @ ${report.context.devicePixelRatio}x` : ""}
+        </p>
+      )}
+      <p>
+        Network: {report.context.online === false ? "offline" : "online"}
+        {report.context.timezone ? ` · ${report.context.timezone}` : ""}
+      </p>
       <p>
         Crash logs: {report.context.crashLogs.length} · API errors:{" "}
         {report.context.apiErrors.length}

@@ -1,9 +1,11 @@
 import type { BugApiErrorItem } from "../types/bug-report";
+import { createBatchedWriter } from "./batched-writer";
 import { sanitizeDebugText, sanitizeRequestPath } from "./debug-sanitize";
 
 const STORAGE_KEY = "typed-api-error-log";
 const MAX_ENTRIES = 100;
 const TTL_MS = 30 * 60 * 1000;
+const FLUSH_DELAY_MS = 250;
 
 type StoredApiErrors = {
   updatedAt: number;
@@ -18,6 +20,9 @@ type ApiErrorInput = {
   requestId?: string | null;
   timestamp?: number;
 };
+
+let cachedErrors: StoredApiErrors | null = null;
+let lifecycleInstalled = false;
 
 function canUseSessionStorage(): boolean {
   return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
@@ -56,6 +61,7 @@ function normalizeEntry(input: ApiErrorInput): BugApiErrorItem {
 }
 
 function readStoredApiErrors(): StoredApiErrors {
+  if (cachedErrors) return cachedErrors;
   if (!canUseSessionStorage()) return { updatedAt: Date.now(), entries: [] };
   const raw = window.sessionStorage.getItem(STORAGE_KEY);
   if (!raw) return { updatedAt: Date.now(), entries: [] };
@@ -66,16 +72,34 @@ function readStoredApiErrors(): StoredApiErrors {
     const entries = Array.isArray(parsed.entries)
       ? parsed.entries.filter(isBugApiErrorItem).map((entry) => normalizeEntry(entry))
       : [];
-    return { updatedAt, entries };
+    cachedErrors = { updatedAt, entries };
+    return cachedErrors;
   } catch {
-    return { updatedAt: Date.now(), entries: [] };
+    cachedErrors = { updatedAt: Date.now(), entries: [] };
+    return cachedErrors;
   }
 }
 
-function writeStoredApiErrors(entries: BugApiErrorItem[]): void {
+const persistence = createBatchedWriter(() => {
+  if (!cachedErrors || !canUseSessionStorage()) return;
+  window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cachedErrors));
+}, FLUSH_DELAY_MS);
+
+function installLifecycleFlush(): void {
+  if (lifecycleInstalled || typeof window === "undefined") return;
+  lifecycleInstalled = true;
+  window.addEventListener("pagehide", persistence.flush);
+}
+
+function writeStoredApiErrors(entries: BugApiErrorItem[], immediate = false): void {
+  cachedErrors = { updatedAt: Date.now(), entries };
   if (!canUseSessionStorage()) return;
-  const payload: StoredApiErrors = { updatedAt: Date.now(), entries };
-  window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  installLifecycleFlush();
+  if (immediate) {
+    persistence.flush();
+    return;
+  }
+  persistence.schedule();
 }
 
 export function recordApiError(input: ApiErrorInput): void {
@@ -86,9 +110,9 @@ export function recordApiError(input: ApiErrorInput): void {
 }
 
 export function getApiErrors(): BugApiErrorItem[] {
-  return readStoredApiErrors().entries;
+  return [...readStoredApiErrors().entries];
 }
 
 export function clearApiErrors(): void {
-  writeStoredApiErrors([]);
+  writeStoredApiErrors([], true);
 }

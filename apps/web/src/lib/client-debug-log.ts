@@ -1,10 +1,12 @@
 import type { CrashLogEntry } from "../types/bug-report";
+import { createBatchedWriter } from "./batched-writer";
 import { debugConsole, sanitizeDebugEvent } from "./debug-console";
 import { sanitizeDebugText } from "./debug-sanitize";
 
 const STORAGE_KEY = "typed-client-debug-log";
 const MAX_ENTRIES = 80;
 const TTL_MS = 30 * 60 * 1000;
+const FLUSH_DELAY_MS = 250;
 const REQUEST_ID_HEADERS = ["x-request-id", "x-correlation-id", "x-trace-id", "request-id"];
 
 type StoredLog = {
@@ -13,6 +15,9 @@ type StoredLog = {
 };
 
 type DebugDetails = Record<string, string | number | boolean | null | undefined>;
+
+let cachedLog: StoredLog | null = null;
+let lifecycleInstalled = false;
 
 function canUseSessionStorage(): boolean {
   return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
@@ -29,6 +34,7 @@ function isCrashLogEntry(value: unknown): value is CrashLogEntry {
 }
 
 function readStoredLog(): StoredLog {
+  if (cachedLog) return cachedLog;
   if (!canUseSessionStorage()) return { updatedAt: Date.now(), entries: [] };
   const raw = window.sessionStorage.getItem(STORAGE_KEY);
   if (!raw) return { updatedAt: Date.now(), entries: [] };
@@ -43,16 +49,34 @@ function readStoredLog(): StoredLog {
           timestamp: entry.timestamp,
         }))
       : [];
-    return { updatedAt, entries };
+    cachedLog = { updatedAt, entries };
+    return cachedLog;
   } catch {
-    return { updatedAt: Date.now(), entries: [] };
+    cachedLog = { updatedAt: Date.now(), entries: [] };
+    return cachedLog;
   }
 }
 
-function writeStoredLog(entries: CrashLogEntry[]): void {
+const persistence = createBatchedWriter(() => {
+  if (!cachedLog || !canUseSessionStorage()) return;
+  window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cachedLog));
+}, FLUSH_DELAY_MS);
+
+function installLifecycleFlush(): void {
+  if (lifecycleInstalled || typeof window === "undefined") return;
+  lifecycleInstalled = true;
+  window.addEventListener("pagehide", persistence.flush);
+}
+
+function writeStoredLog(entries: CrashLogEntry[], immediate = false): void {
+  cachedLog = { updatedAt: Date.now(), entries };
   if (!canUseSessionStorage()) return;
-  const payload: StoredLog = { updatedAt: Date.now(), entries };
-  window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  installLifecycleFlush();
+  if (immediate) {
+    persistence.flush();
+    return;
+  }
+  persistence.schedule();
 }
 
 function pushEntry(entry: CrashLogEntry): void {
@@ -91,11 +115,11 @@ export function recordCrashLog(message: string, stack: string | null): void {
 }
 
 export function getClientDebugLogs(): CrashLogEntry[] {
-  return readStoredLog().entries;
+  return [...readStoredLog().entries];
 }
 
 export function clearClientDebugLogs(): void {
-  writeStoredLog([]);
+  writeStoredLog([], true);
 }
 
 export function extractRequestId(headers: Headers): string | null {
