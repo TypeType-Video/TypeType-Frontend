@@ -9,9 +9,9 @@ type AdminUserRowProps = {
 };
 
 function roleClass(role: AuthUser["role"]): string {
-  if (role === "admin") return "border-sky-800/70 bg-sky-950/40 text-sky-200";
-  if (role === "moderator") return "border-amber-800/70 bg-amber-950/40 text-amber-200";
-  return "border-border-strong bg-surface text-fg-muted";
+  if (role === "admin") return "bg-sky-500";
+  if (role === "moderator") return "bg-amber-500";
+  return "bg-fg-soft";
 }
 
 export function AdminUserRow({ user, selected, createdAtLabel, onSelect }: AdminUserRowProps) {
@@ -20,11 +20,11 @@ export function AdminUserRow({ user, selected, createdAtLabel, onSelect }: Admin
   return (
     <button
       type="button"
+      aria-label={`Select ${displayName}`}
+      aria-pressed={selected}
       onClick={() => onSelect(user.id)}
-      className={`w-full rounded-md border bg-surface p-3 text-left transition-colors ${
-        selected
-          ? "border-border-strong ring-1 ring-border-strong/60"
-          : "border-border hover:border-border-strong"
+      className={`w-full border-l-2 px-3 py-3 text-left transition-colors ${
+        selected ? "border-accent bg-accent/5" : "border-transparent hover:bg-surface/50"
       }`}
     >
       <div className="flex items-center gap-3">
@@ -33,18 +33,29 @@ export function AdminUserRow({ user, selected, createdAtLabel, onSelect }: Admin
           <p className="truncate text-sm font-medium text-fg">{displayName}</p>
           <p className="truncate text-xs text-fg-muted">{user.email}</p>
         </div>
-        <span
-          className={`rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wide ${roleClass(user.role)}`}
-        >
+        <div className="hidden shrink-0 items-center gap-4 text-xs text-fg-muted sm:flex">
+          <span className="flex items-center gap-1.5 capitalize">
+            <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} aria-hidden="true" />
+            {user.role}
+          </span>
+          <span>{createdAtLabel}</span>
+          {user.suspended && (
+            <span className="flex items-center gap-1.5 text-danger-strong">
+              <span className="size-1.5 rounded-full bg-danger" aria-hidden="true" />
+              suspended
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-3 pl-12 text-[11px] text-fg-soft sm:hidden">
+        <span className="flex items-center gap-1.5 capitalize">
+          <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} aria-hidden="true" />
           {user.role}
         </span>
-      </div>
-      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-        <span className="rounded-md border border-border-strong px-2 py-0.5 text-fg-soft">
-          {createdAtLabel}
-        </span>
+        <span>{createdAtLabel}</span>
         {user.suspended && (
-          <span className="rounded-md border border-danger bg-danger/40 px-2 py-0.5 text-danger-strong">
+          <span className="flex items-center gap-1.5 text-danger-strong">
+            <span className="size-1.5 rounded-full bg-danger" aria-hidden="true" />
             suspended
           </span>
         )}

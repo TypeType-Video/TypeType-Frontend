@@ -1,3 +1,4 @@
+import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import type { AuthRole, AuthUser } from "../types/auth";
 import { AdminUserAvatar } from "./admin-user-avatar";
@@ -15,8 +16,8 @@ type AdminUserDetailPanelProps = {
 const ROLE_OPTIONS: AuthRole[] = ["user", "moderator", "admin"];
 
 function roleClass(active: boolean): string {
-  if (active) return "border-fg bg-fg text-app";
-  return "border-border-strong bg-surface text-fg-muted hover:border-border-strong";
+  if (active) return "border-accent text-fg";
+  return "border-transparent text-fg-muted hover:text-fg";
 }
 
 export function AdminUserDetailPanel({
@@ -29,11 +30,12 @@ export function AdminUserDetailPanel({
 }: AdminUserDetailPanelProps) {
   const [actionsOpen, setActionsOpen] = useState(false);
   const suspendClass = user.suspended
-    ? "border-emerald-800/60 bg-emerald-950/30 text-emerald-200 hover:border-emerald-700"
-    : "border-danger/60 bg-danger/30 text-danger-strong hover:border-danger";
+    ? "text-emerald-600 dark:text-emerald-300"
+    : "text-danger-strong";
 
   return (
-    <aside className="h-fit rounded-md border border-border bg-surface p-5 [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)] lg:sticky lg:top-16">
+    <aside className="order-first h-fit border-y border-border py-5 [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)] xl:order-none xl:sticky xl:top-16 xl:border-y-0 xl:border-l xl:py-0 xl:pl-6">
+      <p className="mb-3 text-[11px] font-medium uppercase text-fg-soft">Selected user</p>
       <div className="flex items-center gap-3">
         <AdminUserAvatar user={user} className="h-11 w-11" />
         <div className="min-w-0">
@@ -44,14 +46,15 @@ export function AdminUserDetailPanel({
       <p className="mt-2 text-[11px] text-fg-soft break-all">{user.id}</p>
       <AdminUserIdentityForm user={user} disabled={busy} onMessage={onMessage} />
 
-      <div className="mt-4 grid grid-cols-3 gap-1 rounded-md border border-border bg-app p-1">
+      <div className="mt-4 grid grid-cols-3 border-y border-border py-1">
         {ROLE_OPTIONS.map((role) => (
           <button
             key={`${user.id}-${role}`}
             type="button"
+            aria-pressed={user.role === role}
             disabled={busy || user.role === role}
             onClick={() => onRole(user.id, role)}
-            className={`h-8 rounded-md border text-[11px] uppercase tracking-wide transition-colors disabled:opacity-50 ${roleClass(
+            className={`h-9 border-b-2 text-[11px] uppercase tracking-wide transition-colors disabled:cursor-default ${roleClass(
               user.role === role,
             )}`}
           >
@@ -65,13 +68,15 @@ export function AdminUserDetailPanel({
           type="button"
           aria-expanded={actionsOpen}
           onClick={() => setActionsOpen((open) => !open)}
-          className="ml-auto block h-8 rounded-md border border-border-strong bg-surface px-2.5 text-xs font-medium text-fg transition-all duration-150 hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface-strong"
+          aria-label="User actions"
+          title="User actions"
+          className="ml-auto grid size-9 place-items-center rounded-full text-fg transition-colors hover:bg-surface-strong"
         >
-          Actions
+          <MoreHorizontal className="size-4" aria-hidden="true" />
         </button>
 
         {actionsOpen && (
-          <div className="absolute right-0 z-20 mt-2 w-52 rounded-md border border-border-strong bg-surface p-2 shadow-2xl [animation:admin-actions-pop_0.18s_cubic-bezier(0.22,1,0.36,1)]">
+          <div className="absolute right-0 z-20 mt-2 w-52 rounded-sm border border-border-strong bg-app p-2 shadow-2xl [animation:admin-actions-pop_0.18s_cubic-bezier(0.22,1,0.36,1)]">
             <button
               type="button"
               disabled={busy}
@@ -79,7 +84,7 @@ export function AdminUserDetailPanel({
                 onSuspend(user.id, user.suspended);
                 setActionsOpen(false);
               }}
-              className={`mb-1 h-8 w-full rounded-md border px-2.5 text-left text-xs font-medium transition-colors disabled:opacity-50 ${suspendClass}`}
+              className={`mb-1 h-8 w-full rounded-sm px-2.5 text-left text-xs font-medium transition-colors hover:bg-surface disabled:opacity-50 ${suspendClass}`}
             >
               {user.suspended ? "Unsuspend" : "Suspend"}
             </button>
@@ -90,7 +95,7 @@ export function AdminUserDetailPanel({
                 onReset(user.id, user.email);
                 setActionsOpen(false);
               }}
-              className="h-8 w-full rounded-md border border-border-strong bg-surface px-2.5 text-left text-xs font-medium text-fg transition-colors hover:border-border-strong hover:bg-surface-strong disabled:opacity-50"
+              className="h-8 w-full rounded-sm px-2.5 text-left text-xs font-medium text-fg transition-colors hover:bg-surface disabled:opacity-50"
             >
               Reset token
             </button>

@@ -87,22 +87,22 @@ export function AdminUsersSection({ enabled, currentUserId, onToast }: Props) {
         onNext={() => setPage((value) => Math.min(totalPages, value + 1))}
       />
       {query.isPending && (
-        <section className="rounded-lg border border-border bg-surface/70 p-6 text-center text-sm text-fg-muted">
+        <section className="border-y border-border p-6 text-center text-sm text-fg-muted">
           Loading users...
         </section>
       )}
       {query.isError && (
-        <section className="rounded-lg border border-danger bg-danger/30 p-6 text-center text-sm text-danger-strong">
+        <section className="border-y border-danger/50 p-6 text-center text-sm text-danger-strong">
           Unable to load users right now.
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length === 0 && (
-        <section className="rounded-lg border border-border bg-surface/70 p-6 text-center text-sm text-fg-muted">
+        <section className="border-y border-border p-6 text-center text-sm text-fg-muted">
           No user matches this view.
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length > 0 && (
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <section className="grid min-w-0 grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
           <AdminUserGrid
             users={filtered}
             selectedUserId={selectedUserId}

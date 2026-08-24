@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 type AdminUsersPaginationProps = {
   page: number;
   totalPages: number;
@@ -20,29 +22,33 @@ export function AdminUsersPagination({
   onNext,
 }: AdminUsersPaginationProps) {
   return (
-    <section className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface/70 px-3 py-2 text-xs text-fg-muted">
+    <section className="flex min-h-11 items-center justify-between gap-3 border-y border-border px-1 py-1.5 text-xs text-fg-muted">
       <p>
         {pageStart}-{pageEnd} of {total}
       </p>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           disabled={pending || page <= 1}
           onClick={onPrev}
-          className="h-8 rounded-md border border-border-strong bg-surface px-2.5 text-fg transition-colors hover:border-border-strong disabled:opacity-50"
+          aria-label="Previous page"
+          title="Previous page"
+          className="grid size-8 place-items-center rounded-full text-fg transition-colors hover:bg-surface-strong disabled:opacity-35"
         >
-          Prev
+          <ChevronLeft className="size-4" aria-hidden="true" />
         </button>
-        <span>
+        <span className="min-w-20 text-center">
           Page {page} / {totalPages}
         </span>
         <button
           type="button"
           disabled={pending || page >= totalPages}
           onClick={onNext}
-          className="h-8 rounded-md border border-border-strong bg-surface px-2.5 text-fg transition-colors hover:border-border-strong disabled:opacity-50"
+          aria-label="Next page"
+          title="Next page"
+          className="grid size-8 place-items-center rounded-full text-fg transition-colors hover:bg-surface-strong disabled:opacity-35"
         >
-          Next
+          <ChevronRight className="size-4" aria-hidden="true" />
         </button>
       </div>
     </section>
