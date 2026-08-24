@@ -3,13 +3,17 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { PageSpinner } from "./components/page-spinner";
+import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
 import { ApiError } from "./lib/api";
 import { installConsoleWarningFilter } from "./lib/console-warning-filter";
 import { initErrorCapture } from "./lib/error-capture";
+import { getLocale, getTextDirection } from "./paraglide/runtime.js";
 import { routeTree } from "./routeTree.gen";
 
 installConsoleWarningFilter();
 initErrorCapture();
+document.documentElement.lang = getLocale();
+document.documentElement.dir = getTextDirection();
 
 const router = createRouter({
   routeTree,
@@ -44,7 +48,9 @@ if (!root) {
 }
 
 createRoot(root).render(
-  <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
-  </QueryClientProvider>,
+  <InterfaceLocaleProvider>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </InterfaceLocaleProvider>,
 );

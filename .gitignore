@@ -5,4 +5,5 @@ coverage/
 tmp/
 .DS_Store
 *.tsbuildinfo
+apps/web/src/paraglide/
 .env
