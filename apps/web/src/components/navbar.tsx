@@ -90,7 +90,7 @@ export function Navbar() {
         {canOpenSearch && !isMobile && <NavbarSearch />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          <InterfaceLanguagePicker compact={isMobile} />
+          <InterfaceLanguagePicker />
           <NavbarNotifications />
           <NavbarAccountControls
             status={status}

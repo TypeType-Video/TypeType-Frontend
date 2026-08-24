@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, House } from "lucide-react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { m } from "../paraglide/messages.js";
 import { useThemeStore } from "../stores/theme-store";
 
 export function NotFoundPage() {
+  useInterfaceLocale();
   const theme = useThemeStore((state) => state.theme);
 
   return (

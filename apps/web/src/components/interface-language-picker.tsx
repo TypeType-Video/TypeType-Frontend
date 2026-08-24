@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { m } from "../paraglide/messages.js";
@@ -34,11 +34,7 @@ function LanguageFlag({ locale }: { locale: Locale }) {
   );
 }
 
-type Props = {
-  compact?: boolean;
-};
-
-export function InterfaceLanguagePicker({ compact = false }: Props) {
+export function InterfaceLanguagePicker() {
   const { locale, setLocale } = useInterfaceLocale();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -67,27 +63,14 @@ export function InterfaceLanguagePicker({ compact = false }: Props) {
         aria-expanded={open}
         aria-label={`${m.settings_ui_language_label()}: ${languageName(locale)}`}
         onClick={() => setOpen((current) => !current)}
-        className={`flex h-9 items-center rounded-md border border-border-strong bg-surface-strong text-xs text-fg transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong ${
-          compact ? "w-10 justify-center px-2" : "w-40 gap-2 px-2.5"
-        }`}
+        className="flex h-9 w-10 items-center justify-center rounded-sm border border-transparent text-fg transition-colors hover:border-border hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong"
       >
         <LanguageFlag locale={locale} />
-        {!compact && (
-          <>
-            <span data-interface-copy className="min-w-0 flex-1 truncate text-left">
-              {languageName(locale)}
-            </span>
-            <ChevronDown
-              className={`size-3.5 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
-          </>
-        )}
       </button>
       <div
         role="listbox"
         aria-label={m.settings_ui_language_label()}
-        className={`absolute right-0 top-full z-30 mt-1 w-44 origin-top-right rounded-md border border-border-strong bg-surface-strong p-1 shadow-xl transition-[opacity,transform] duration-150 ${
+        className={`absolute right-0 top-full z-30 mt-1 w-36 origin-top-right rounded-sm border border-border-strong bg-app p-1 shadow-xl transition-[opacity,transform] duration-150 ${
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-1 opacity-0"
@@ -103,7 +86,7 @@ export function InterfaceLanguagePicker({ compact = false }: Props) {
               setOpen(false);
               void setLocale(option);
             }}
-            className="flex min-h-9 w-full items-center gap-2 rounded px-2 text-left text-xs text-fg-muted transition-colors hover:bg-surface-soft hover:text-fg"
+            className="flex min-h-9 w-full items-center gap-2 rounded-sm px-2 text-left text-xs text-fg-muted transition-colors hover:bg-surface hover:text-fg"
           >
             <LanguageFlag locale={option} />
             <span data-interface-copy className="flex-1">
