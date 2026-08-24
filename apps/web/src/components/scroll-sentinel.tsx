@@ -26,5 +26,5 @@ export function ScrollSentinel({ onIntersect, enabled, root }: Props) {
     return () => observer.disconnect();
   }, [enabled, root]);
 
-  return <div ref={ref} />;
+  return <div ref={ref} aria-hidden="true" className="h-px w-full" />;
 }
