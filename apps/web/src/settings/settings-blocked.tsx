@@ -105,10 +105,10 @@ export function SettingsBlocked() {
     <>
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>Blocked keywords</p>
-        <div className="overflow-hidden rounded-md border border-border bg-surface">
+        <div className="border-y border-border">
           <form
             onSubmit={submitKeyword}
-            className="flex items-center gap-2 border-b border-border px-4 py-3"
+            className="flex items-center gap-2 border-b border-border py-3"
           >
             <input
               type="text"
@@ -130,11 +130,11 @@ export function SettingsBlocked() {
             </button>
           </form>
           {keywordList.length === 0 ? (
-            <p className="px-4 py-3 text-xs text-fg-soft">No blocked keywords</p>
+            <p className="py-3 text-xs text-fg-soft">No blocked keywords</p>
           ) : (
             <div className="divide-y divide-border">
               {keywordList.map((item) => (
-                <div key={item.keyword} className="flex items-center gap-3 px-4 py-2.5">
+                <div key={item.keyword} className="flex items-center gap-3 py-2.5">
                   <span className="min-w-0 flex-1 truncate text-xs text-fg-muted">
                     {item.keyword}
                   </span>
@@ -174,9 +174,9 @@ export function SettingsBlocked() {
       {videoList.length > 0 && (
         <section className="flex flex-col gap-3">
           <p className={SECTION_LABEL}>Blocked videos</p>
-          <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-surface">
+          <div className="divide-y divide-border border-y border-border">
             {videoList.map((item) => (
-              <div key={item.url} className="flex items-center gap-3 px-4 py-2.5">
+              <div key={item.url} className="flex items-center gap-3 py-2.5">
                 <span className="text-xs text-fg-muted truncate flex-1 min-w-0">{item.url}</span>
                 <button
                   type="button"

@@ -8,8 +8,8 @@ import { useSubscriptions } from "../hooks/use-subscriptions";
 import { ToggleSwitch } from "./settings-toggle-switch";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-md border border-border overflow-hidden divide-y divide-border";
-const ROW = "flex items-center justify-between px-4 py-4";
+const GROUP = "divide-y divide-border border-y border-border";
+const ROW = "flex min-w-0 items-center justify-between gap-4 py-4";
 
 type ActiveModal = "history" | "subscriptions" | "search-history" | null;
 
@@ -67,7 +67,7 @@ export function SettingsPrivacy() {
   return (
     <section className="flex flex-col gap-3">
       <p className={SECTION_LABEL}>Privacy</p>
-      <div className={CARD}>
+      <div className={GROUP}>
         <div className={ROW}>
           <div className="flex flex-col gap-1">
             <span className="text-sm text-fg">Watch history tracking</span>

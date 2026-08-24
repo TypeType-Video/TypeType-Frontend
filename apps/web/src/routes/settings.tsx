@@ -163,7 +163,7 @@ function SettingsPage() {
         <SettingsRss initialChannel={rssChannel ?? null} openComposer={compose === true} />
       )}
       {activeSection === "rss" && pendingRssDecision && (
-        <div className="rounded-lg border border-border bg-surface px-4 py-5 text-sm text-fg-muted">
+        <div className="border-y border-border py-5 text-sm text-fg-muted">
           Loading RSS settings...
         </div>
       )}

@@ -17,7 +17,7 @@ export function SettingsLandingPage() {
   return (
     <section className="flex flex-col gap-3">
       <p className="px-1 text-xs font-medium text-fg-soft uppercase tracking-wider">Startup</p>
-      <div className="flex flex-col items-start gap-3 rounded-md border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 flex-col items-start gap-3 border-y border-border py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-fg">Default landing page</span>
           <span className="text-xs text-fg-soft">
@@ -28,7 +28,7 @@ export function SettingsLandingPage() {
           aria-label="Default landing page"
           value={settings.defaultLandingPage}
           onChange={(event) => update.mutate({ defaultLandingPage: event.target.value })}
-          className="h-9 w-full rounded-md border border-border-strong bg-surface px-2.5 text-sm text-fg sm:w-48"
+          className="h-9 w-full rounded-sm border border-border-strong bg-app px-2.5 text-sm text-fg sm:w-48"
         >
           {LANDING_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -40,7 +40,7 @@ export function SettingsLandingPage() {
       <p className="px-1 pt-2 text-xs font-medium text-fg-soft uppercase tracking-wider">
         Notifications
       </p>
-      <div className="rounded-md border border-border bg-surface">
+      <div className="border-y border-border">
         <div className={ROW}>
           <div className="flex flex-col gap-1">
             <span className="text-sm text-fg">Notification popups</span>
@@ -56,7 +56,7 @@ export function SettingsLandingPage() {
           />
         </div>
       </div>
-      <div className="divide-y divide-border rounded-md border border-border bg-surface">
+      <div className="divide-y divide-border border-y border-border">
         <SettingsDiscoveryToggles />
       </div>
     </section>

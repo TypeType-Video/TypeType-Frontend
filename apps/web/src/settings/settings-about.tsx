@@ -38,7 +38,7 @@ export function SettingsAbout() {
           <RefreshCw className={`size-4 ${query.isFetching ? "animate-spin" : ""}`} />
         </button>
       </div>
-      <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-surface">
+      <div className="divide-y divide-border border-y border-border">
         {COMPONENTS.map(({ key, label }) => (
           <div key={key} className="flex min-h-20 items-start justify-between gap-4 px-4 py-3.5">
             <span className="pt-0.5 text-sm text-fg">{label}</span>
@@ -54,7 +54,7 @@ export function SettingsAbout() {
         href="/THIRD_PARTY_NOTICES.txt"
         target="_blank"
         rel="noreferrer"
-        className="inline-flex min-h-10 items-center gap-2 self-start rounded-md px-2 text-sm text-fg-muted transition-colors hover:bg-surface hover:text-fg"
+        className="inline-flex min-h-10 items-center gap-2 self-start text-sm text-fg-muted transition-colors hover:text-fg"
       >
         Third-party notices
         <ExternalLink className="size-4" aria-hidden="true" />

@@ -26,7 +26,7 @@ function globalCategoryActions(action: SponsorBlockCategoryAction) {
 function GlobalMode() {
   const { settings, update } = useSettings();
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="flex flex-col gap-3 py-4">
       <div className="flex flex-col gap-1">
         <span className="text-sm text-fg">SponsorBlock behavior</span>
         <span className="text-xs text-fg-soft">
@@ -46,10 +46,10 @@ function GlobalMode() {
                   sponsorBlockCategoryActions: globalCategoryActions(option.value),
                 })
               }
-              className={`rounded-lg border px-3 py-2 text-left transition-colors ${
+              className={`rounded-sm border px-3 py-2 text-left transition-colors ${
                 selected
-                  ? "border-fg bg-surface-strong text-fg"
-                  : "border-border bg-surface text-fg-muted hover:bg-surface-strong hover:text-fg"
+                  ? "border-fg-soft text-fg"
+                  : "border-border text-fg-muted hover:border-fg-soft hover:text-fg"
               }`}
             >
               <span className="block text-xs font-medium">{option.label}</span>
@@ -68,7 +68,7 @@ function CategoryAction({ category }: { category: SponsorBlockCategory }) {
   const { settings, update } = useSettings();
   const value = settings.sponsorBlockCategoryActions[category.id] ?? category.defaultAction;
   return (
-    <div className="grid gap-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-center">
+    <div className="grid gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-center">
       <div className="flex min-w-0 gap-3">
         <span
           className="mt-1 h-3 w-3 flex-shrink-0 rounded-full border border-border"
@@ -79,7 +79,7 @@ function CategoryAction({ category }: { category: SponsorBlockCategory }) {
           <div className="text-xs leading-5 text-fg-soft">{category.description}</div>
         </div>
       </div>
-      <div className="grid grid-cols-3 rounded-lg border border-border bg-surface-soft p-1">
+      <div className="grid grid-cols-3 rounded-sm border border-border p-1">
         {ACTIONS.map((action) => {
           const selected = action.value === value;
           return (
@@ -94,8 +94,8 @@ function CategoryAction({ category }: { category: SponsorBlockCategory }) {
                   },
                 })
               }
-              className={`rounded-md px-2 py-1.5 text-[11px] transition-colors ${
-                selected ? "bg-surface text-fg shadow-sm" : "text-fg-soft hover:text-fg"
+              className={`rounded-sm px-2 py-1.5 text-[11px] transition-colors ${
+                selected ? "bg-fg/10 text-fg" : "text-fg-soft hover:text-fg"
               }`}
             >
               {action.label}
@@ -120,7 +120,7 @@ function ExtraToggles() {
   return toggles.map(([key, label]) => (
     <div
       key={key}
-      className="flex items-center justify-between gap-3 px-4 py-3 text-left text-sm text-fg"
+      className="flex items-center justify-between gap-3 py-3 text-left text-sm text-fg"
     >
       <span>{label}</span>
       <ToggleSwitch
@@ -137,16 +137,16 @@ export function SettingsSponsorBlockPreferences() {
   return (
     <>
       <GlobalMode />
-      <div className="bg-surface-soft/30 px-4 py-2 text-[11px] font-medium uppercase tracking-wider text-fg-soft">
+      <div className="py-2 text-[11px] font-medium uppercase tracking-wider text-fg-soft">
         SponsorBlock categories
       </div>
       {SPONSORBLOCK_CATEGORIES.map((category) => (
         <CategoryAction key={category.id} category={category} />
       ))}
-      <div className="bg-surface-soft/30 px-4 py-2 text-[11px] font-medium uppercase tracking-wider text-fg-soft">
+      <div className="py-2 text-[11px] font-medium uppercase tracking-wider text-fg-soft">
         Advanced display
       </div>
-      <div className="flex items-center justify-between gap-4 px-4 py-3">
+      <div className="flex items-center justify-between gap-4 py-3">
         <span className="text-sm text-fg">Minimum segment duration</span>
         <input
           type="number"
@@ -155,7 +155,7 @@ export function SettingsSponsorBlockPreferences() {
           onChange={(event) =>
             update.mutate({ sponsorBlockMinimumDuration: Number(event.currentTarget.value) })
           }
-          className="w-20 rounded-lg border border-border bg-surface-strong px-2 py-1 text-right text-sm text-fg"
+          className="w-20 rounded-sm border border-border bg-app px-2 py-1 text-right text-sm text-fg"
         />
       </div>
       <ExtraToggles />

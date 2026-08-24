@@ -74,8 +74,8 @@ export function SettingsBackup() {
     <div className="flex flex-col gap-5">
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>TypeType backup</p>
-        <div className="overflow-hidden rounded-md border border-border bg-surface">
-          <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-border px-4 py-4 sm:grid-cols-2">
+        <div className="border-y border-border">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-border py-4 sm:grid-cols-2">
             {CATEGORIES.map((category) => (
               <label
                 key={category.value}
@@ -91,12 +91,12 @@ export function SettingsBackup() {
               </label>
             ))}
           </div>
-          <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row">
+          <div className="flex flex-col gap-2 py-4 sm:flex-row">
             <button
               type="button"
               disabled={categories.length === 0 || exportBackup.isPending}
               onClick={() => exportBackup.mutate()}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-sm bg-fg px-3 text-xs font-medium text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Download size={15} />
               Export selected
@@ -105,7 +105,7 @@ export function SettingsBackup() {
               type="button"
               disabled={importBackup.isPending}
               onClick={() => fileInput.current?.click()}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-strong px-3 text-xs text-fg transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-sm border border-border-strong px-3 text-xs text-fg transition-colors hover:border-fg-soft disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Upload size={15} />
               Restore backup
@@ -118,14 +118,14 @@ export function SettingsBackup() {
               onChange={selectFile}
             />
           </div>
-          <p className="border-t border-border px-4 py-3 text-xs text-fg-soft">
+          <p className="border-t border-border py-3 text-xs text-fg-soft">
             Restoring replaces the categories included in the backup.
           </p>
         </div>
       </section>
       <section className="flex flex-col gap-3">
         <p className={SECTION_LABEL}>Data portability</p>
-        <div className="flex flex-col items-start gap-3 rounded-md border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-col items-start gap-3 border-y border-border py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
             <span className="text-sm text-fg">Move data between supported apps</span>
             <span className="text-xs text-fg-soft">
@@ -135,7 +135,7 @@ export function SettingsBackup() {
           <button
             type="button"
             onClick={() => goto("/import")}
-            className="h-9 w-full rounded-md bg-surface-strong px-3 text-xs text-fg-muted transition-colors hover:text-fg sm:w-auto"
+            className="h-9 w-full rounded-sm border border-border-strong px-3 text-xs text-fg-muted transition-colors hover:border-fg-soft hover:text-fg sm:w-auto"
           >
             Open data transfer
           </button>

@@ -118,9 +118,7 @@ function ToggleRows({ options }: { options: ToggleOption[] }) {
       <div className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-fg text-sm">{option.label}</span>
-          <span className="rounded bg-surface-soft px-2 py-0.5 text-[10px] text-fg-soft">
-            {option.area}
-          </span>
+          <span className="text-[10px] uppercase text-fg-soft">{option.area}</span>
         </div>
         <span className="text-fg-soft text-xs">{option.description}</span>
       </div>
@@ -136,7 +134,7 @@ export function SettingsWatchToggles() {
   useHideEverythingTrigger();
   return (
     <>
-      <div className="bg-surface-soft/30 px-4 py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
+      <div className="py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
         Watch page
       </div>
       <ToggleRows options={WATCH_OPTIONS} />
@@ -148,7 +146,7 @@ export function SettingsDiscoveryToggles() {
   useHideEverythingTrigger();
   return (
     <>
-      <div className="bg-surface-soft/30 px-4 py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
+      <div className="py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
         Discovery surfaces
       </div>
       <ToggleRows options={DISCOVERY_OPTIONS} />

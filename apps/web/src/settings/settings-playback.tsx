@@ -5,7 +5,7 @@ import { DEFAULT_PLAYBACK_SPEED_OPTIONS, playbackSpeedLabel } from "../lib/playb
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-md border border-border divide-y divide-border";
+const GROUP = "divide-y divide-border border-y border-border";
 
 const QUALITY_OPTIONS = [
   { label: "Auto", value: "auto" },
@@ -43,7 +43,7 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 bg-surface-strong border border-border-strong text-fg text-xs rounded-lg px-3 py-1.5 hover:bg-surface-soft transition-colors"
+        className="flex items-center gap-2 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft"
       >
         {value === "auto" ? "Auto" : value}
         <ChevronDown
@@ -52,7 +52,7 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
         />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-surface-strong border border-border-strong rounded-lg overflow-hidden z-10 min-w-[72px] shadow-lg">
+        <div className="absolute right-0 top-full z-10 mt-1 min-w-[72px] overflow-hidden rounded-sm border border-border-strong bg-app shadow-lg">
           {QUALITY_OPTIONS.map((quality) => (
             <button
               key={quality.value}
@@ -63,8 +63,8 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
               }}
               className={`block w-full text-left px-3 py-2 text-xs transition-colors ${
                 quality.value === value
-                  ? "text-fg bg-surface-soft"
-                  : "text-fg-muted hover:bg-surface-soft hover:text-fg"
+                  ? "bg-surface text-fg"
+                  : "text-fg-muted hover:bg-surface hover:text-fg"
               }`}
             >
               {quality.label}
@@ -82,7 +82,7 @@ function SpeedDropdown({ value, onChange }: SpeedDropdownProps) {
       aria-label="Default playback speed"
       value={value}
       onChange={(event) => onChange(Number(event.target.value))}
-      className="ml-6 flex-shrink-0 rounded-lg border border-border-strong bg-surface-strong px-3 py-1.5 text-xs text-fg transition-colors hover:bg-surface-soft"
+      className="flex-shrink-0 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft"
     >
       {DEFAULT_PLAYBACK_SPEED_OPTIONS.map((speed) => (
         <option key={speed} value={speed}>
@@ -103,7 +103,7 @@ export function SettingsPlayback() {
   return (
     <section className="flex flex-col gap-3">
       <p className={SECTION_LABEL}>Playback</p>
-      <div className={CARD}>
+      <div className={GROUP}>
         <PlaybackToggleRow
           title="Autoplay"
           description="Automatically play the next video"
@@ -135,7 +135,7 @@ export function SettingsPlayback() {
           onClick={() => update.mutate({ audioOnlyPlayback: !settings.audioOnlyPlayback })}
         />
         <div className={PLAYBACK_ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="min-w-0 flex flex-col gap-1">
             <span className="text-sm text-fg">Default quality</span>
             <span className="text-xs text-fg-soft">Preferred video resolution</span>
           </div>
@@ -145,7 +145,7 @@ export function SettingsPlayback() {
           />
         </div>
         <div className={PLAYBACK_ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="min-w-0 flex flex-col gap-1">
             <span className="text-sm text-fg">Default playback speed</span>
             <span className="text-xs text-fg-soft">Applied when a video starts</span>
           </div>

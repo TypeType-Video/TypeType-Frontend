@@ -23,9 +23,9 @@ const SERVICES: Service[] = [
   { id: 5, label: "BiliBili", path: siBilibili.path, color: "#00A1D6" },
 ];
 
-const BTN_BASE = "flex items-center h-10 rounded-lg transition-colors w-full";
-const BTN_ACTIVE = "text-fg bg-surface-strong";
-const BTN_INACTIVE = "text-fg-muted hover:text-fg hover:bg-surface-strong";
+const BTN_BASE = "flex h-10 w-full items-center border-l-2 transition-colors";
+const BTN_ACTIVE = "border-accent text-fg";
+const BTN_INACTIVE = "border-transparent text-fg-muted hover:border-border-strong hover:text-fg";
 
 type Props = {
   overlay?: boolean;

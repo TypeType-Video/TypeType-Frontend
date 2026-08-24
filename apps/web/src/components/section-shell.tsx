@@ -42,7 +42,7 @@ export function SectionShell<Key extends string>({
           id="section-navigation"
           value={active}
           onChange={(event) => onSelect(event.target.value as Key)}
-          className="h-11 w-full rounded-sm border border-border-strong bg-surface px-3 text-sm text-fg"
+          className="h-11 w-full rounded-sm border border-border-strong bg-app px-3 text-sm text-fg"
         >
           {items.map((item) => (
             <option key={item.key} value={item.key}>
@@ -68,8 +68,8 @@ export function SectionShell<Key extends string>({
                   onClick={() => onSelect(item.key)}
                   className={`grid min-h-11 w-full grid-cols-[20px_1fr] items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors ${
                     selected
-                      ? "border-accent bg-surface text-fg"
-                      : "border-transparent text-fg-muted hover:border-border-strong hover:bg-surface/60 hover:text-fg"
+                      ? "border-accent text-fg"
+                      : "border-transparent text-fg-muted hover:border-border-strong hover:text-fg"
                   }`}
                 >
                   <Icon className="size-4" aria-hidden="true" />
