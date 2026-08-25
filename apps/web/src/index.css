@@ -20,7 +20,6 @@
 @import "./styles/pixel-scene-loop.css";
 @import "./styles/pixel-intro.css";
 @import "./styles/pixel-dog.css";
-@import "./styles/interface-locale-transition.css";
 
 @keyframes card-pop-in {
   from {
