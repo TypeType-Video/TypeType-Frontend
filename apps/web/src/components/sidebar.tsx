@@ -1,10 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
 import { useAuth } from "../hooks/use-auth";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useMobile } from "../hooks/use-mobile";
 import { useSettings } from "../hooks/use-settings";
 import { getStoredAdminSection } from "../lib/admin-console-section";
 import { logoutSession } from "../lib/auth-session";
+import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import type { ServiceId } from "../types/user";
 import { NAV_ITEMS } from "./nav-items";
@@ -53,6 +55,7 @@ function NavIcon({ children, label }: { children: React.ReactNode; label: string
 }
 
 export function Sidebar({ overlay = false }: Props) {
+  useInterfaceLocale();
   const isMobile = useMobile();
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const mobileOpen = useUiStore((s) => s.mobileSidebarOpen);
@@ -108,7 +111,7 @@ export function Sidebar({ overlay = false }: Props) {
       {isMobile && (
         <button
           type="button"
-          aria-label="Close sidebar"
+          aria-label={m.nav_close_sidebar()}
           className="fixed inset-0 top-14 z-40 bg-black/50"
           onClick={closeMobileSidebar}
         />
@@ -117,9 +120,10 @@ export function Sidebar({ overlay = false }: Props) {
         <div className={`flex flex-col gap-1 ${sectionPadding}`}>
           {navItems.map((item) => {
             const aliasActive = item.activePaths?.includes(loc.pathname) ?? false;
+            const label = item.label();
             return (
               <Link
-                key={item.label}
+                key={item.to}
                 to={item.to}
                 search={item.to === "/admin-console" ? adminSearch : undefined}
                 activeOptions={item.to === "/" ? { exact: true } : undefined}
@@ -128,9 +132,9 @@ export function Sidebar({ overlay = false }: Props) {
                 activeProps={{ className: BTN_ACTIVE }}
                 inactiveProps={{ className: aliasActive ? "" : BTN_INACTIVE }}
               >
-                <NavIcon label={item.label}>{item.icon}</NavIcon>
+                <NavIcon label={label}>{item.icon}</NavIcon>
                 {(!visualCollapsed || isMobile) && (
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <span className="text-sm font-medium">{label}</span>
                 )}
               </Link>
             );
@@ -139,7 +143,9 @@ export function Sidebar({ overlay = false }: Props) {
 
         <div className={`mt-4 ${sectionPadding} border-t border-border pt-4 flex flex-col gap-1`}>
           {(!visualCollapsed || isMobile) && (
-            <p className="text-xs text-fg-soft px-2 mb-1 uppercase tracking-wider">Services</p>
+            <p className="text-xs text-fg-soft px-2 mb-1 uppercase tracking-wider">
+              {m.nav_services()}
+            </p>
           )}
           {SERVICES.map((svc) => (
             <button
@@ -170,7 +176,7 @@ export function Sidebar({ overlay = false }: Props) {
               }}
               className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-border-strong bg-surface text-sm font-medium text-fg hover:bg-surface-strong"
             >
-              Sign out
+              {m.nav_sign_out()}
             </button>
           </div>
         )}
