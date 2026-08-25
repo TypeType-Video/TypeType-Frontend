@@ -10,6 +10,10 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import {
+  type LocaleParticleAnimation,
+  startLocaleParticleAnimation,
+} from "../lib/interface-locale-particles";
+import {
   getLocale,
   getTextDirection,
   type Locale,
@@ -22,8 +26,8 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
-const EXIT_DURATION_MS = 90;
-const ENTER_DURATION_MS = 150;
+const EXIT_DURATION_MS = 140;
+const ENTER_DURATION_MS = 220;
 
 function syncDocumentLocale(locale: Locale): void {
   document.documentElement.lang = locale;
@@ -34,10 +38,12 @@ export function InterfaceLocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
   const transitionTimerRef = useRef<number>(undefined);
   const transitionIdRef = useRef(0);
+  const particleAnimationRef = useRef<LocaleParticleAnimation | null>(null);
 
   useEffect(
     () => () => {
       window.clearTimeout(transitionTimerRef.current);
+      particleAnimationRef.current?.cancel();
       document.documentElement.classList.remove("interface-locale-exit", "interface-locale-enter");
     },
     [],
@@ -47,18 +53,23 @@ export function InterfaceLocaleProvider({ children }: { children: ReactNode }) {
     if (next === getLocale()) return;
     const transitionId = ++transitionIdRef.current;
     const root = document.documentElement;
+    particleAnimationRef.current?.cancel();
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    particleAnimationRef.current = startLocaleParticleAnimation("exit", EXIT_DURATION_MS);
     root.classList.remove("interface-locale-enter");
     root.classList.add("interface-locale-exit");
     await new Promise<void>((resolve) => {
-      window.setTimeout(resolve, EXIT_DURATION_MS);
+      window.setTimeout(resolve, reducedMotion ? 0 : EXIT_DURATION_MS);
     });
     if (transitionId !== transitionIdRef.current) return;
+    particleAnimationRef.current?.cancel();
     await setParaglideLocale(next, { reload: false });
     syncDocumentLocale(next);
     flushSync(() => setLocaleState(next));
     root.classList.remove("interface-locale-exit");
     void root.offsetWidth;
     root.classList.add("interface-locale-enter");
+    particleAnimationRef.current = startLocaleParticleAnimation("enter", ENTER_DURATION_MS);
     window.clearTimeout(transitionTimerRef.current);
     transitionTimerRef.current = window.setTimeout(() => {
       root.classList.remove("interface-locale-enter");
