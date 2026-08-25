@@ -124,7 +124,7 @@
       .toggle.on { border-color: color-mix(in srgb, var(--accent) 75%, var(--line)); background: var(--accent); }
       .toggle.on::after { transform: translateX(18px); background: #fff; }
       .select { min-width: 100px; height: 36px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel); color: var(--fg); padding: 0 10px; }
-      .copy-hidden { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }
+      [data-copy].copy-hidden { color: transparent; -webkit-text-fill-color: transparent; text-shadow: none; }
       .particle-layer { position: fixed; z-index: 100; pointer-events: none; }
       @media (max-width: 700px) {
         .topbar { padding: 0 12px; }
@@ -177,9 +177,9 @@
             <p class="lead" data-copy data-en="Control playback, language and accessibility without leaving your instance." data-fr="Contrôlez la lecture, la langue et l’accessibilité sans quitter votre instance.">Control playback, language and accessibility without leaving your instance.</p>
           </header>
           <div class="tabs">
-            <button class="tab active" data-copy data-en="Playback" data-fr="Lecture">Playback</button>
-            <button class="tab" data-copy data-en="Interface" data-fr="Interface">Interface</button>
-            <button class="tab" data-copy data-en="Privacy" data-fr="Confidentialité">Privacy</button>
+            <button type="button" class="tab active" data-copy data-en="Playback" data-fr="Lecture">Playback</button>
+            <button type="button" class="tab" data-copy data-en="Interface" data-fr="Interface">Interface</button>
+            <button type="button" class="tab" data-copy data-en="Privacy" data-fr="Confidentialité">Privacy</button>
           </div>
           <section class="section">
             <h2 data-copy data-en="Playback" data-fr="Lecture">Playback</h2>
@@ -284,9 +284,6 @@
         canvas.style.top = `${rect.top - padding}px`;
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-        canvas.dataset.particles = String(particles.length);
-        canvas.dataset.firstParticle = JSON.stringify(particles[0] ?? null);
-        canvas.dataset.color = color;
         const context = canvas.getContext("2d");
         context.scale(dpr, dpr);
         document.body.appendChild(canvas);
@@ -304,17 +301,13 @@
         const stagger = 240;
         const movement = duration - stagger;
         return new Promise((resolve) => {
-          let frameCount = 0;
           function frame(now) {
-            frameCount += 1;
             const overall = clamp((now - started) / duration, 0, 1);
             for (const layer of layers) {
               const { context } = layer;
               context.clearRect(0, 0, layer.width, layer.height);
               context.fillStyle = layer.color;
-              context.globalAlpha = phase === "exit" ? Math.pow(1 - overall, 0.72) : ease(overall);
-              layer.canvas.dataset.frames = String(frameCount);
-              layer.canvas.dataset.alpha = String(context.globalAlpha);
+              context.globalAlpha = phase === "exit" ? (1 - overall) ** 0.72 : ease(overall);
               for (const particle of layer.particles) {
                 const local = clamp((now - started - particle.delay * stagger) / movement, 0, 1);
                 const travel = phase === "exit" ? ease(local) : 1 - ease(local);
@@ -366,7 +359,9 @@
         root.dataset.theme = next;
         event.currentTarget.textContent = next === "dark" ? "☼" : "◐";
       });
-      document.querySelectorAll(".toggle").forEach((toggle) => toggle.addEventListener("click", () => toggle.classList.toggle("on")));
+      document.querySelectorAll(".toggle").forEach((toggle) => {
+        toggle.addEventListener("click", () => toggle.classList.toggle("on"));
+      });
       document.addEventListener("pointerdown", (event) => {
         if (!event.target.closest(".language")) { menu.classList.remove("open"); languageButton.setAttribute("aria-expanded", "false"); }
       });
