@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DatabaseBackup, FileDown, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
   downloadPortabilityArtifact,
@@ -16,12 +17,6 @@ import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
 
-const STORAGE_KEY = "typetype-portability-export-job";
-
-function savedJob(): string | null {
-  return typeof window === "undefined" ? null : window.localStorage.getItem(STORAGE_KEY);
-}
-
 export function PortabilityExportPanel({ formats }: { formats: PortabilityFormatDescriptor[] }) {
   const exportFormats = useMemo(
     () =>
@@ -31,7 +26,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
     [formats],
   );
   const [formatName, setFormatName] = useState(exportFormats[0]?.format ?? "typetype");
-  const [jobId, setJobId] = useState<string | null>(savedJob);
+  const [jobId, setJobId] = usePersistedPortabilityJob("typetype-portability-export-job");
   const [selected, setSelected] = useState<Set<PortabilityCategory>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
   const previousState = useRef<string | null>(null);
@@ -66,10 +61,6 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
   });
   const report = useMutation({ mutationFn: () => downloadPortabilityReport(jobId as string) });
   useEffect(() => {
-    if (jobId) localStorage.setItem(STORAGE_KEY, jobId);
-    else localStorage.removeItem(STORAGE_KEY);
-  }, [jobId]);
-  useEffect(() => {
     setSelected(new Set(available));
   }, [available]);
   useEffect(() => {
@@ -85,7 +76,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
     queryClient.removeQueries({ queryKey: ["portability-job", jobId] });
     setJobId(null);
     setToast(m.portability_stale_job_toast());
-  }, [job.missing, jobId, queryClient]);
+  }, [job.missing, jobId, queryClient, setJobId]);
 
   useEffect(() => {
     if (!toast) return;

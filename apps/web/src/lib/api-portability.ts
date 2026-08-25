@@ -45,7 +45,7 @@ type PortabilityIssue = {
   count: number;
 };
 
-type PortabilityPreview = {
+export type PortabilityPreview = {
   detection: {
     format: string;
     formatVersion: string | null;
