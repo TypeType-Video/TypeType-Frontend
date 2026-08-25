@@ -1,6 +1,9 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { defaultLayoutIcons, MuteButton, useMediaState, VolumeSlider } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 
 export function PlayerVolumeControl() {
+  const { locale } = useInterfaceLocale();
   const muted = useMediaState("muted");
   const volume = useMediaState("volume");
   const canSetVolume = useMediaState("canSetVolume");
@@ -13,7 +16,10 @@ export function PlayerVolumeControl() {
 
   return (
     <div className="typetype-mobile-volume-control">
-      <MuteButton className="typetype-mobile-volume-mute" aria-label={muted ? "Unmute" : "Mute"}>
+      <MuteButton
+        className="typetype-mobile-volume-mute"
+        aria-label={muted ? m.player_unmute({}, { locale }) : m.player_mute({}, { locale })}
+      >
         <Icon />
       </MuteButton>
       {canSetVolume ? (
