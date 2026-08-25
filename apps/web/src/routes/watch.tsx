@@ -131,7 +131,7 @@ function WatchPage() {
     resolveWatchStartTime({
       authenticated: isAuthed,
       progressPending: resumePending,
-      savedPositionMs: progressFetch.data?.position,
+      savedPositionSeconds: progressFetch.data?.position,
       serverPositionSeconds: activeStream.startPosition,
       durationSeconds: activeStream.duration,
     }) ?? 0;

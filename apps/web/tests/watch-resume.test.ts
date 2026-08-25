@@ -23,7 +23,7 @@ test("uses saved progress once it is available", () => {
     resolveWatchStartTime({
       authenticated: true,
       progressPending: false,
-      savedPositionMs: 125_000,
+      savedPositionSeconds: 125,
       serverPositionSeconds: 40,
       durationSeconds: 600,
     }),
@@ -43,7 +43,7 @@ test("does not delay guests and rejects positions too close to the end", () => {
     resolveWatchStartTime({
       authenticated: true,
       progressPending: false,
-      savedPositionMs: 580_000,
+      savedPositionSeconds: 580,
       durationSeconds: 600,
     }),
   ).toBe(0);

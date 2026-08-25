@@ -1,7 +1,7 @@
 type WatchResumeInput = {
   authenticated: boolean;
   progressPending: boolean;
-  savedPositionMs?: number;
+  savedPositionSeconds?: number;
   serverPositionSeconds?: number;
   durationSeconds: number;
 };
@@ -18,7 +18,7 @@ export function shouldWaitForWatchProgress(
 export function resolveWatchStartTime(input: WatchResumeInput): number | null {
   if (input.authenticated && input.progressPending) return null;
 
-  const savedPositionMs = input.savedPositionMs ?? 0;
+  const savedPositionMs = (input.savedPositionSeconds ?? 0) * 1000;
   const serverPositionMs = (input.serverPositionSeconds ?? 0) * 1000;
   const resumeMs = savedPositionMs > 0 ? savedPositionMs : serverPositionMs;
   const durationMs = input.durationSeconds * 1000;
