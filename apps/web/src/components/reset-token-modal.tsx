@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { copyText } from "../lib/copy-text";
+import { m } from "../paraglide/messages.js";
 
 type ResetTokenModalProps = {
   email: string;
@@ -45,26 +46,26 @@ export function ResetTokenModal({ email, token, onClose, onCopied }: ResetTokenM
         onKeyDown={() => {}}
       >
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-fg">Password Reset Token</h2>
+          <h2 className="text-lg font-semibold text-fg">{m.admin_users_reset_title()}</h2>
           <p className="text-sm text-fg-muted mt-1">{email}</p>
         </div>
 
         <textarea
           readOnly
           value={token}
-          aria-label="Password reset token"
+          aria-label={m.admin_users_reset_label()}
           onFocus={(event) => event.currentTarget.select()}
           className="mb-4 block h-24 w-full resize-none rounded-lg border border-border bg-app p-3 font-mono text-xs text-fg"
         />
 
         {copyState === "copied" && (
           <div className="mb-3 rounded border border-emerald-800/50 bg-emerald-950/30 p-2 text-xs text-emerald-200">
-            Token copied to clipboard
+            {m.admin_users_token_copied()}
           </div>
         )}
         {copyState === "manual" && (
           <div className="mb-3 rounded border border-border-strong bg-surface-strong p-2 text-xs text-fg-muted">
-            Clipboard access is unavailable. Select the token above and copy it manually.
+            {m.admin_users_clipboard_unavailable()}
           </div>
         )}
 
@@ -74,14 +75,14 @@ export function ResetTokenModal({ email, token, onClose, onCopied }: ResetTokenM
             onClick={() => void handleCopy()}
             className="flex-1 h-9 rounded-md border border-border-strong bg-surface-strong px-3 text-sm font-medium text-fg hover:border-border-strong hover:bg-surface-soft transition-colors"
           >
-            Copy token
+            {m.admin_users_copy_token()}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="flex-1 h-9 rounded-md border border-border-strong bg-surface px-3 text-sm font-medium text-fg hover:border-border-strong hover:bg-surface-strong transition-colors"
           >
-            Close
+            {m.admin_users_close()}
           </button>
         </div>
       </div>

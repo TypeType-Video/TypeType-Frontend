@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useAdminUsers } from "../hooks/use-admin-users";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { type AdminFilter, matchesAdminFilter } from "../lib/admin-console";
+import { m } from "../paraglide/messages.js";
 import { AdminUserDetailPanel } from "./admin-user-detail-panel";
 import { AdminUserGrid } from "./admin-user-grid";
 import { AdminUserToolbar } from "./admin-user-toolbar";
@@ -15,6 +17,7 @@ type Props = {
 };
 
 export function AdminUsersSection({ enabled, onToast }: Props) {
+  const { locale } = useInterfaceLocale();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<AdminFilter>("all");
@@ -64,22 +67,22 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
       />
       {query.isPending && (
         <section className="rounded-md border border-border p-10 text-center text-sm text-fg-muted">
-          Loading users...
+          {m.admin_users_loading()}
         </section>
       )}
       {query.isError && (
         <section className="rounded-md border border-danger/50 p-10 text-center text-sm text-danger-strong">
-          Unable to load users right now.
+          {m.admin_users_load_error()}
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length === 0 && (
         <section className="rounded-md border border-border p-10 text-center text-sm text-fg-muted">
-          No user matches this view.
+          {m.admin_users_empty()}
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length > 0 && (
         <section className="space-y-4">
-          <AdminUserGrid users={filtered} onSelectUser={setSelectedUserId} />
+          <AdminUserGrid users={filtered} locale={locale} onSelectUser={setSelectedUserId} />
           <AdminUsersPagination
             page={currentPage}
             totalPages={totalPages}
@@ -102,9 +105,9 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
             role.mutate(
               { id, role: nextRole },
               {
-                onSuccess: () => onToast(`Role set to ${nextRole}`),
+                onSuccess: () => onToast(m.admin_users_role_updated()),
                 onError: (error) =>
-                  onToast(error instanceof Error ? error.message : "Unable to update role"),
+                  onToast(error instanceof Error ? error.message : m.admin_users_update_failed()),
               },
             );
           }}
@@ -112,9 +115,9 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
             suspend.mutate(
               { id, suspended: !suspendedFlag },
               {
-                onSuccess: () => onToast(!suspendedFlag ? "User suspended" : "User unsuspended"),
+                onSuccess: () => onToast(m.admin_users_suspend_updated()),
                 onError: (error) =>
-                  onToast(error instanceof Error ? error.message : "Unable to update suspension"),
+                  onToast(error instanceof Error ? error.message : m.admin_users_update_failed()),
               },
             );
           }}
@@ -125,7 +128,7 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
                 setResetTokenData({ email, token: result.resetToken });
               },
               onError: (error) =>
-                onToast(error instanceof Error ? error.message : "Unable to generate reset token"),
+                onToast(error instanceof Error ? error.message : m.admin_users_reset_failed()),
             });
           }}
         />
@@ -135,7 +138,7 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
           email={resetTokenData.email}
           token={resetTokenData.token}
           onClose={() => setResetTokenData(null)}
-          onCopied={() => onToast("Token copied to clipboard")}
+          onCopied={() => onToast(m.admin_users_token_copied())}
         />
       )}
     </>

@@ -36,7 +36,7 @@ export function SectionShell<Key extends string>({
       </header>
       <div className="mb-5 lg:hidden">
         <label htmlFor="section-navigation" className="sr-only">
-          {title} section
+          {title}
         </label>
         <select
           id="section-navigation"
@@ -52,10 +52,7 @@ export function SectionShell<Key extends string>({
         </select>
       </div>
       <div className="grid min-w-0 gap-8 lg:grid-cols-[228px_minmax(0,1fr)] lg:gap-10">
-        <nav
-          className="hidden border-r border-border pr-4 lg:block"
-          aria-label={`${title} sections`}
-        >
+        <nav className="hidden border-r border-border pr-4 lg:block" aria-label={title}>
           <div data-interface-copy className="sticky top-20 space-y-0.5">
             {items.map((item) => {
               const Icon = item.icon;

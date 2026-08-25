@@ -1,5 +1,7 @@
 import { KeyRound, ShieldBan, ShieldCheck, X } from "lucide-react";
 import { useEffect } from "react";
+import { adminRoleLabel } from "../lib/admin-console";
+import { m } from "../paraglide/messages.js";
 import type { AuthRole, AuthUser } from "../types/auth";
 import { AdminUserAvatar } from "./admin-user-avatar";
 import { AdminUserIdentityForm } from "./admin-user-identity-form";
@@ -39,24 +41,29 @@ export function AdminUserDetailPanel({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Manage user">
+    <div
+      className="fixed inset-0 z-[80]"
+      role="dialog"
+      aria-modal="true"
+      aria-label={m.admin_users_details()}
+    >
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close user details"
+        aria-label={m.admin_users_close_details()}
         className="absolute inset-0 bg-black/35 backdrop-blur-[1px]"
       />
       <aside className="absolute inset-y-0 right-0 flex w-full max-w-md origin-right flex-col border-l border-border bg-app shadow-2xl [animation:admin-panel-slide-in_0.22s_cubic-bezier(0.22,1,0.36,1)]">
         <header className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h3 className="font-semibold text-fg">User details</h3>
-            <p className="mt-0.5 text-xs text-fg-muted">Manage identity, role and access</p>
+            <h3 className="font-semibold text-fg">{m.admin_users_details()}</h3>
+            <p className="mt-0.5 text-xs text-fg-muted">{m.admin_users_details_description()}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close user details"
-            title="Close"
+            aria-label={m.admin_users_close_details()}
+            title={m.admin_users_close()}
             className="grid size-9 place-items-center rounded-full text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
           >
             <X className="size-4" aria-hidden="true" />
@@ -76,7 +83,7 @@ export function AdminUserDetailPanel({
 
           <section className="mt-6 border-t border-border pt-5">
             <label className="text-xs font-medium text-fg-muted">
-              Role
+              {m.admin_users_column_role()}
               <select
                 value={user.role}
                 disabled={busy}
@@ -85,7 +92,7 @@ export function AdminUserDetailPanel({
               >
                 {ROLE_OPTIONS.map((role) => (
                   <option key={role} value={role}>
-                    {role}
+                    {adminRoleLabel(role)}
                   </option>
                 ))}
               </select>
@@ -93,7 +100,7 @@ export function AdminUserDetailPanel({
           </section>
 
           <section className="mt-6 border-t border-border pt-5">
-            <h4 className="text-xs font-medium text-fg-muted">Account access</h4>
+            <h4 className="text-xs font-medium text-fg-muted">{m.admin_users_account_access()}</h4>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
@@ -110,7 +117,7 @@ export function AdminUserDetailPanel({
                 ) : (
                   <ShieldBan className="size-4" />
                 )}
-                {user.suspended ? "Unsuspend" : "Suspend"}
+                {user.suspended ? m.admin_users_unsuspend() : m.admin_users_suspend()}
               </button>
               <button
                 type="button"
@@ -119,7 +126,7 @@ export function AdminUserDetailPanel({
                 className="flex h-10 items-center justify-center gap-2 rounded-md border border-border-strong text-xs font-medium text-fg transition-colors hover:bg-surface disabled:opacity-50"
               >
                 <KeyRound className="size-4" />
-                Reset token
+                {m.admin_users_reset_token()}
               </button>
             </div>
           </section>

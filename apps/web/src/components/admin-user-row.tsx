@@ -1,4 +1,6 @@
 import { MoreHorizontal } from "lucide-react";
+import { adminRoleLabel } from "../lib/admin-console";
+import { m } from "../paraglide/messages.js";
 import type { AuthRole, AuthUser } from "../types/auth";
 import { AdminUserAvatar } from "./admin-user-avatar";
 
@@ -16,7 +18,8 @@ function roleClass(role: AuthRole): string {
 
 export function AdminUserRow({ user, createdAtLabel, onSelect }: AdminUserRowProps) {
   const displayName = user.name.trim().length > 0 ? user.name : user.email;
-  const statusLabel = user.suspended ? "Suspended" : "Active";
+  const statusLabel = user.suspended ? m.admin_users_filter_suspended() : m.admin_users_active();
+  const roleLabel = adminRoleLabel(user.role);
   const statusClass = user.suspended ? "bg-danger" : "bg-emerald-500";
 
   return (
@@ -34,7 +37,7 @@ export function AdminUserRow({ user, createdAtLabel, onSelect }: AdminUserRowPro
             <span className="mt-1 flex items-center gap-3 text-[11px] capitalize text-fg-soft sm:hidden">
               <span className="flex items-center gap-1.5">
                 <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} />
-                {user.role}
+                {roleLabel}
               </span>
               <span className="flex items-center gap-1.5">
                 <span className={`size-1.5 rounded-full ${statusClass}`} />
@@ -47,7 +50,7 @@ export function AdminUserRow({ user, createdAtLabel, onSelect }: AdminUserRowPro
       <td className="hidden px-3 py-3 sm:table-cell">
         <span className="flex items-center gap-2 capitalize text-fg-muted">
           <span className={`size-1.5 rounded-full ${roleClass(user.role)}`} />
-          {user.role}
+          {roleLabel}
         </span>
       </td>
       <td className="hidden px-3 py-3 md:table-cell">
@@ -61,8 +64,8 @@ export function AdminUserRow({ user, createdAtLabel, onSelect }: AdminUserRowPro
         <button
           type="button"
           onClick={() => onSelect(user.id)}
-          aria-label={`Manage ${displayName}`}
-          title={`Manage ${displayName}`}
+          aria-label={`${m.admin_users_manage()} ${displayName}`}
+          title={`${m.admin_users_manage()} ${displayName}`}
           className="grid size-8 place-items-center rounded-full text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
         >
           <MoreHorizontal className="size-4" aria-hidden="true" />
