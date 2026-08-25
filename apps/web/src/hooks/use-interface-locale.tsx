@@ -10,6 +10,7 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import {
+  captureLocaleText,
   type LocaleTextAnimation,
   startLocaleDecryption,
 } from "../lib/interface-locale-decryption";
@@ -51,11 +52,12 @@ export function InterfaceLocaleProvider({ children }: { children: ReactNode }) {
     if (next === getLocale()) return;
     const transitionId = ++transitionIdRef.current;
     textAnimationRef.current?.cancel();
+    const previousText = captureLocaleText();
     await setParaglideLocale(next, { reload: false });
     if (transitionId !== transitionIdRef.current) return;
     syncDocumentLocale(next);
     flushSync(() => setLocaleState(next));
-    textAnimationRef.current = startLocaleDecryption(DECRYPTION_DURATION_MS);
+    textAnimationRef.current = startLocaleDecryption(previousText, DECRYPTION_DURATION_MS);
     window.clearTimeout(transitionTimerRef.current);
     transitionTimerRef.current = window.setTimeout(() => {
       textAnimationRef.current?.cancel();

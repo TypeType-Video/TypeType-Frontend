@@ -1,3 +1,4 @@
+import { Pin } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { formatCommentPublishedTime } from "../lib/comment-time";
@@ -60,8 +61,9 @@ export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
             </span>
           )}
           {comment.isPinned && (
-            <span className="text-xs text-fg-soft border border-border-strong rounded px-1">
-              {m.watch_pinned({}, { locale })}
+            <span className="inline-flex text-fg-muted" title={m.watch_pinned({}, { locale })}>
+              <Pin className="size-3.5" aria-hidden="true" />
+              <span className="sr-only">{m.watch_pinned({}, { locale })}</span>
             </span>
           )}
           {publishedTime && <span className="text-xs text-fg-soft">{publishedTime}</span>}

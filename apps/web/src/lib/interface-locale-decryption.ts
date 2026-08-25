@@ -7,9 +7,12 @@ type AnimatedText = {
   lastRendered: string;
 };
 
-const COPY_SELECTOR = "[data-interface-copy]";
 const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&?+";
 const ITERATIONS = 22;
+const IGNORED_SELECTOR =
+  "script, style, noscript, [aria-hidden='true'], [data-interface-copy-ignore]";
+
+export type LocaleTextSnapshot = Map<Text, string>;
 
 export function centeredRevealOrder(text: string): number[] {
   const center = (text.length - 1) / 2;
@@ -36,34 +39,46 @@ export function decryptedIteration(
     .join("");
 }
 
-function visibleTextNodes(): AnimatedText[] {
-  const seen = new Set<Node>();
+function isVisibleText(node: Text): boolean {
+  const parent = node.parentElement;
+  if (!parent || !node.textContent?.trim() || parent.closest(IGNORED_SELECTOR)) return false;
+  const style = getComputedStyle(parent);
+  return (
+    style.display !== "none" && style.visibility !== "hidden" && parent.getClientRects().length > 0
+  );
+}
+
+export function captureLocaleText(): LocaleTextSnapshot {
+  const snapshot: LocaleTextSnapshot = new Map();
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node as Text;
+    if (isVisibleText(text)) snapshot.set(text, text.textContent ?? "");
+  }
+  return snapshot;
+}
+
+function changedTextNodes(previous: LocaleTextSnapshot): AnimatedText[] {
   const animated: AnimatedText[] = [];
-  for (const root of document.querySelectorAll<HTMLElement>(COPY_SELECTOR)) {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      const parent = node.parentElement;
-      const original = node.textContent ?? "";
-      if (seen.has(node) || !parent || !original.trim()) continue;
-      seen.add(node);
-      if (parent.closest("[aria-hidden='true']")) continue;
-      const style = getComputedStyle(parent);
-      if (style.display === "none" || style.visibility === "hidden") continue;
-      if (parent.getClientRects().length === 0) continue;
-      animated.push({
-        node: node as Text,
-        original,
-        order: centeredRevealOrder(original),
-        lastRendered: original,
-      });
-    }
+  for (const [node, oldText] of previous) {
+    const translated = node.textContent ?? "";
+    if (!node.isConnected || translated === oldText || !isVisibleText(node)) continue;
+    animated.push({
+      node,
+      original: translated,
+      order: centeredRevealOrder(translated),
+      lastRendered: translated,
+    });
   }
   return animated;
 }
 
-export function startLocaleDecryption(durationMs: number): LocaleTextAnimation | null {
+export function startLocaleDecryption(
+  previous: LocaleTextSnapshot,
+  durationMs: number,
+): LocaleTextAnimation | null {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return null;
-  const texts = visibleTextNodes();
+  const texts = changedTextNodes(previous);
   if (texts.length === 0) return null;
   const intervalMs = durationMs / ITERATIONS;
   let iteration = 0;
