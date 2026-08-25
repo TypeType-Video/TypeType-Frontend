@@ -2,16 +2,24 @@ import { ExternalLink } from "lucide-react";
 import { FORMAT_NAMES } from "../lib/portability-catalog";
 import { portabilityImportGuide } from "../lib/portability-import-guides";
 import { m } from "../paraglide/messages.js";
+import { getLocale, type Locale } from "../paraglide/runtime.js";
 
-export function PortabilityImportGuide({ format }: { format: string }) {
-  const guide = portabilityImportGuide(format);
+export function PortabilityImportGuide({
+  format,
+  locale = getLocale(),
+}: {
+  format: string;
+  locale?: Locale;
+}) {
+  const guide = portabilityImportGuide(format, locale);
   const name = FORMAT_NAMES[format] ?? format;
   return (
     <section className="border border-border bg-surface px-4 py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-sm font-medium text-fg">
-            {m.portability_get_backup()} {name} {m.portability_backup_suffix()}
+            {m.portability_get_backup({}, { locale })} {name}{" "}
+            {m.portability_backup_suffix({}, { locale })}
           </h2>
           <p className="mt-1 max-w-2xl text-xs text-fg-muted">{guide.description}</p>
         </div>

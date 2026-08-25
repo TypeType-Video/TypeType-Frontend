@@ -3,11 +3,13 @@ import { useState } from "react";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import { categoryLabel } from "../lib/portability-catalog";
 import { m } from "../paraglide/messages.js";
+import { getLocale, type Locale } from "../paraglide/runtime.js";
 
 type Props = {
   job: PortabilityJob;
   onCancel?: () => void;
   cancelling?: boolean;
+  locale?: Locale;
 };
 
 const ACTIVE = new Set(["queued", "analyzing", "applying", "encoding"]);
@@ -18,30 +20,30 @@ function progressPercent(job: PortabilityJob): number | null {
   return Math.min(100, Math.round((progress.processed / progress.total) * 100));
 }
 
-function stateLabel(job: PortabilityJob): string {
-  if (job.state === "queued") return m.portability_job_waiting();
-  if (job.state === "analyzing") return m.portability_job_analyzing();
-  if (job.state === "ready") return m.portability_job_ready();
-  if (job.state === "applying") return m.portability_job_importing();
-  if (job.state === "encoding") return m.portability_job_generating();
+function stateLabel(job: PortabilityJob, locale: Locale): string {
+  if (job.state === "queued") return m.portability_job_waiting({}, { locale });
+  if (job.state === "analyzing") return m.portability_job_analyzing({}, { locale });
+  if (job.state === "ready") return m.portability_job_ready({}, { locale });
+  if (job.state === "applying") return m.portability_job_importing({}, { locale });
+  if (job.state === "encoding") return m.portability_job_generating({}, { locale });
   if (job.state === "completed") {
     return job.kind === "import"
-      ? m.portability_job_import_completed()
-      : m.portability_job_export_ready();
+      ? m.portability_job_import_completed({}, { locale })
+      : m.portability_job_export_ready({}, { locale });
   }
-  if (job.state === "cancelled") return m.portability_job_cancelled();
-  return m.portability_job_failed();
+  if (job.state === "cancelled") return m.portability_job_cancelled({}, { locale });
+  return m.portability_job_failed({}, { locale });
 }
 
-export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
+export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLocale() }: Props) {
   const [copied, setCopied] = useState(false);
   const percent = progressPercent(job);
   const active = ACTIVE.has(job.state);
   const Icon = active ? LoaderCircle : job.state === "failed" ? AlertTriangle : CheckCircle2;
   const reference = [
-    `${m.portability_job_label()}: ${job.id}`,
-    job.requestId ? `${m.portability_request_label()}: ${job.requestId}` : null,
-    job.errorCode ? `${m.portability_code_label()}: ${job.errorCode}` : null,
+    `${m.portability_job_label({}, { locale })}: ${job.id}`,
+    job.requestId ? `${m.portability_request_label({}, { locale })}: ${job.requestId}` : null,
+    job.errorCode ? `${m.portability_code_label({}, { locale })}: ${job.errorCode}` : null,
   ]
     .filter(Boolean)
     .join("\n");
@@ -64,7 +66,7 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
             className={`mt-0.5 shrink-0 ${active ? "animate-spin" : ""} ${job.state === "failed" ? "text-danger" : "text-fg"}`}
           />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-fg">{stateLabel(job)}</p>
+            <p className="text-sm font-medium text-fg">{stateLabel(job, locale)}</p>
             {job.progress && (
               <p className="mt-1 text-xs text-fg-soft">
                 {job.progress.processed.toLocaleString()}
@@ -74,13 +76,13 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
             )}
             {job.state === "failed" && (
               <div className="mt-1.5 text-xs text-danger">
-                <p>{job.errorMessage ?? m.portability_operation_failed()}</p>
+                <p>{job.errorMessage ?? m.portability_operation_failed({}, { locale })}</p>
                 <div className="mt-1 flex items-center gap-1.5 text-fg-soft">
                   <code className="truncate">{job.errorCode ?? "portability_failed"}</code>
                   <button
                     type="button"
-                    title={m.portability_copy_reference()}
-                    aria-label={m.portability_copy_reference()}
+                    title={m.portability_copy_reference({}, { locale })}
+                    aria-label={m.portability_copy_reference({}, { locale })}
                     onClick={() => void copyReference()}
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-fg-muted hover:text-fg"
                   >
@@ -96,7 +98,7 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
             type="button"
             disabled={cancelling}
             onClick={onCancel}
-            title={m.portability_cancel()}
+            title={m.portability_cancel({}, { locale })}
             className="inline-flex h-8 w-8 shrink-0 items-center justify-center border border-border text-fg-muted hover:text-fg disabled:opacity-40"
           >
             <X size={15} />
@@ -116,7 +118,7 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
           {Object.entries(job.result).map(([category, count]) => (
             <div key={category}>
               <dt className="truncate text-xs text-fg-soft">
-                {categoryLabel(category as PortabilityCategory)}
+                {categoryLabel(category as PortabilityCategory, locale)}
               </dt>
               <dd className="font-mono text-sm text-fg">{count?.toLocaleString()}</dd>
             </div>

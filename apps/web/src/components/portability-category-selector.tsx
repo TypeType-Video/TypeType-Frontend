@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle2, CircleX } from "lucide-react";
 import type { PortabilityCategory, PortabilityFidelity } from "../lib/api-portability";
 import { portabilityCategories } from "../lib/portability-catalog";
 import { m } from "../paraglide/messages.js";
+import { getLocale, type Locale } from "../paraglide/runtime.js";
 
 type Props = {
   available: Set<PortabilityCategory>;
@@ -9,6 +10,7 @@ type Props = {
   onToggle: (category: PortabilityCategory) => void;
   counts?: Partial<Record<PortabilityCategory, number>>;
   fidelity?: Partial<Record<PortabilityCategory, PortabilityFidelity>>;
+  locale?: Locale;
 };
 
 export function PortabilityCategorySelector({
@@ -17,18 +19,19 @@ export function PortabilityCategorySelector({
   onToggle,
   counts,
   fidelity,
+  locale = getLocale(),
 }: Props) {
   return (
     <div className="grid grid-cols-1 border border-border sm:grid-cols-2">
-      {portabilityCategories().map((item) => {
+      {portabilityCategories(locale).map((item) => {
         const supported = available.has(item.value);
         const partial = fidelity?.[item.value] === "partial";
         const StatusIcon = supported ? (partial ? AlertTriangle : CheckCircle2) : CircleX;
         const statusLabel = supported
           ? partial
-            ? m.portability_status_partial()
-            : m.portability_status_supported()
-          : m.portability_status_not_supported();
+            ? m.portability_status_partial({}, { locale })
+            : m.portability_status_supported({}, { locale })
+          : m.portability_status_not_supported({}, { locale });
         return (
           <label
             key={item.value}

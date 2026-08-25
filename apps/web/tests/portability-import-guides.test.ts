@@ -17,4 +17,12 @@ describe("portability import guides", () => {
     expect(guide.steps.join(" ")).toContain("without editing or extracting");
     expect(guide.steps.join(" ")).toContain("preview");
   });
+
+  test("provides the complete guide in French", () => {
+    const guide = portabilityImportGuide("youtube-takeout", "fr");
+
+    expect(guide.action?.label).toBe("Ouvrir Google Takeout");
+    expect(guide.description).toContain("vos abonnements");
+    expect(guide.steps.join(" ")).toContain("ZIP original");
+  });
 });
