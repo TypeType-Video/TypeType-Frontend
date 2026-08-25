@@ -1,4 +1,6 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { PLAYBACK_RATES } from "../lib/playback-rates";
+import { playerLayoutTranslations } from "../lib/player-layout-translations";
 import { DefaultAudioLayout, DefaultVideoLayout, defaultLayoutIcons, Time } from "../lib/vidstack";
 import { AudioPlayButton } from "./audio-play-button";
 import { AudioSeekButton } from "./audio-seek-button";
@@ -40,6 +42,9 @@ export function VideoPlayerLayout({
   onPreviousVideo,
   onNextVideo,
 }: Props) {
+  const { locale } = useInterfaceLocale();
+  const translations = playerLayoutTranslations(locale);
+
   if (layoutMode === "shorts") {
     return (
       <ShortsPlayerLayout
@@ -77,7 +82,7 @@ export function VideoPlayerLayout({
           icons={defaultLayoutIcons}
           playbackRates={PLAYBACK_RATES}
           smallLayoutWhen={false}
-          translations={{ Captions: "Subtitles" }}
+          translations={translations}
           slots={{
             captionButton: null,
             currentTime: null,
@@ -105,7 +110,7 @@ export function VideoPlayerLayout({
         icons={defaultLayoutIcons}
         playbackRates={PLAYBACK_RATES}
         smallLayoutWhen={false}
-        translations={{ Captions: "Subtitles" }}
+        translations={translations}
         slots={{
           captionButton: null,
           endTime: timePair,
@@ -127,7 +132,7 @@ export function VideoPlayerLayout({
       playbackRates={PLAYBACK_RATES}
       thumbnails={thumbnailVtt}
       smallLayoutWhen={({ height }) => height < 380}
-      translations={{ Captions: "Subtitles" }}
+      translations={translations}
       slots={{
         currentTime: sabr ? (
           <SabrCurrentTime transitioning={seeking} video={sabrVideo} />

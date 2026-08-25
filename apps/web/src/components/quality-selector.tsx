@@ -1,5 +1,6 @@
 import type * as dashjs from "dashjs";
 import { useRef } from "react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useDashPlayerSnapshot } from "../lib/dash-player-store";
 import { dashQualityOptions, selectDashTrack, selectedDashHeight } from "../lib/dash-video";
 import { sabrResolutionOptions } from "../lib/sabr-quality-selection";
@@ -11,6 +12,7 @@ import {
   Menu,
   useVideoQualityOptions,
 } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import { useSabrQualityStore } from "../stores/sabr-quality-store";
 
 const qualityIcon: DefaultLayoutIcon = (props) => <ClipIcon {...props} />;
@@ -43,6 +45,7 @@ function activeDashTrack(
 }
 
 export function QualitySelector() {
+  const { locale } = useInterfaceLocale();
   const menuRef = useRef<MenuInstance>(null);
   const { player, selectedVideoTrack } = useDashPlayerSnapshot();
   const options = useVideoQualityOptions(QUALITY_OPTIONS);
@@ -65,7 +68,11 @@ export function QualitySelector() {
     }
     return (
       <Menu.Root ref={menuRef} className="vds-quality-menu vds-menu">
-        <DefaultMenuButton label="Quality" hint={selected.label} Icon={qualityIcon} />
+        <DefaultMenuButton
+          label={m.player_quality({}, { locale })}
+          hint={selected.label}
+          Icon={qualityIcon}
+        />
         <Menu.Items className={MENU_ITEMS_CLASS}>
           <DefaultMenuRadioGroup
             value={String(selected.itag)}
@@ -98,7 +105,11 @@ export function QualitySelector() {
 
       return (
         <Menu.Root ref={menuRef} className="vds-quality-menu vds-menu">
-          <DefaultMenuButton label="Quality" hint={selected.label} Icon={qualityIcon} />
+          <DefaultMenuButton
+            label={m.player_quality({}, { locale })}
+            hint={selected.label}
+            Icon={qualityIcon}
+          />
           <Menu.Items className={MENU_ITEMS_CLASS}>
             <DefaultMenuRadioGroup
               value={selected.value}
@@ -132,7 +143,11 @@ export function QualitySelector() {
 
   return (
     <Menu.Root ref={menuRef} className="vds-quality-menu vds-menu">
-      <DefaultMenuButton label="Quality" hint={current} Icon={qualityIcon} />
+      <DefaultMenuButton
+        label={m.player_quality({}, { locale })}
+        hint={current}
+        Icon={qualityIcon}
+      />
       <Menu.Items className={MENU_ITEMS_CLASS}>
         <DefaultMenuRadioGroup
           value={qualityValue(selected)}
