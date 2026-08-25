@@ -66,6 +66,7 @@ function WatchPage() {
     isAuthed,
     progressFetch.isPending,
     progressFetch.isFetching,
+    progressFetch.data !== undefined,
   );
 
   useEffect(() => {

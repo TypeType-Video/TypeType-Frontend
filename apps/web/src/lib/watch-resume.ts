@@ -10,8 +10,9 @@ export function shouldWaitForWatchProgress(
   authenticated: boolean,
   pending: boolean,
   fetching: boolean,
+  hasData: boolean,
 ): boolean {
-  return authenticated && (pending || fetching);
+  return authenticated && !hasData && (pending || fetching);
 }
 
 export function resolveWatchStartTime(input: WatchResumeInput): number | null {
