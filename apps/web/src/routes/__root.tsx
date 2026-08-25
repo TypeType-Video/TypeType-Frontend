@@ -5,6 +5,7 @@ import { AuthBackdrop } from "../components/auth-backdrop";
 import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
+import { NotFoundPage } from "../components/not-found-page";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -44,6 +45,9 @@ function RootLayout() {
   const setSignedOut = useAuthStore((s) => s.setSignedOut);
   const { data: instance } = useInstance();
   const location = useRouterState({ select: (state) => state.location });
+  const notFoundPage = useRouterState({
+    select: (state) => state.matches.some((match) => match.status === "notFound"),
+  });
   const pathname = location.pathname;
   const pathWithSearch = `${pathname}${location.searchStr}`;
   const hideEverythingPage = pathname === "/hide-everything";
@@ -129,6 +133,10 @@ function RootLayout() {
   }
 
   const authPage = isAuthPage(pathname);
+
+  if (notFoundPage) {
+    return <NotFoundPage />;
+  }
 
   if (instance?.guestAllowed === false && (!isAuthed || isGuest) && !authPage && !embedPage) {
     return <GuestDisabledScreen />;
