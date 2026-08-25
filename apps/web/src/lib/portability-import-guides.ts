@@ -1,5 +1,5 @@
-import { FORMAT_NAMES } from "./portability-catalog";
 import { m } from "../paraglide/messages.js";
+import { FORMAT_NAMES } from "./portability-catalog";
 
 export type PortabilityImportGuide = {
   description: string;

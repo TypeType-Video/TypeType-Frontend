@@ -10,11 +10,11 @@ import {
   type PortabilityJob,
   startPortabilityExport,
 } from "../lib/api-portability";
+import { m } from "../paraglide/messages.js";
 import { PortabilityCategorySelector } from "./portability-category-selector";
 import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
-import { m } from "../paraglide/messages.js";
 
 const STORAGE_KEY = "typetype-portability-export-job";
 

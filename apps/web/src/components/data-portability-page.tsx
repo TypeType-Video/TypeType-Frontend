@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { FileDown, FileUp } from "lucide-react";
 import { getPortabilityFormats } from "../lib/api-portability";
+import { m } from "../paraglide/messages.js";
 import { PortabilityExportPanel } from "./portability-export-panel";
 import { PortabilityImportPanel } from "./portability-import-panel";
-import { m } from "../paraglide/messages.js";
 
 type PortabilityMode = "import" | "export";
 
@@ -19,9 +19,7 @@ export function DataPortabilityPage({ mode }: { mode: PortabilityMode }) {
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-5 pt-5 [animation:page-fade-in_0.2s_ease-out] sm:pt-8">
       <header className="px-1">
         <h1 className="text-xl font-semibold text-fg sm:text-2xl">{m.data_portability_title()}</h1>
-        <p className="mt-1 text-sm text-fg-muted">
-          {m.data_portability_subtitle()}
-        </p>
+        <p className="mt-1 text-sm text-fg-muted">{m.data_portability_subtitle()}</p>
       </header>
 
       <div className="grid grid-cols-2 border border-border bg-surface p-1" role="tablist">
@@ -36,7 +34,9 @@ export function DataPortabilityPage({ mode }: { mode: PortabilityMode }) {
       <main className="border-t border-border pt-5">
         {mode === "import" && formats.data && <PortabilityImportPanel formats={formats.data} />}
         {mode === "export" && formats.data && <PortabilityExportPanel formats={formats.data} />}
-        {formats.isPending && <p className="text-sm text-fg-muted">{m.data_portability_loading_formats()}</p>}
+        {formats.isPending && (
+          <p className="text-sm text-fg-muted">{m.data_portability_loading_formats()}</p>
+        )}
         {formats.error && (
           <p role="alert" className="text-sm text-danger">
             {formats.error.message}

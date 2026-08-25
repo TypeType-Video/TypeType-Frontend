@@ -11,13 +11,13 @@ import {
   startPortabilityImport,
 } from "../lib/api-portability";
 import { FORMAT_NAMES } from "../lib/portability-catalog";
+import { m } from "../paraglide/messages.js";
 import { PortabilityCategorySelector } from "./portability-category-selector";
 import { PortabilityFormatIcon } from "./portability-format-icon";
 import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityImportGuide } from "./portability-import-guide";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
-import { m } from "../paraglide/messages.js";
 
 const STORAGE_KEY = "typetype-portability-import-job";
 
@@ -76,7 +76,9 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     const state = job.data?.state ?? null;
     if (state === "completed" && previousState.current !== "completed") {
       const count = Object.values(job.data?.result ?? {}).reduce((sum, value) => sum + value, 0);
-      setToast(`${m.portability_import_completed()}: ${count.toLocaleString()} ${m.portability_items()}`);
+      setToast(
+        `${m.portability_import_completed()}: ${count.toLocaleString()} ${m.portability_items()}`,
+      );
     }
     previousState.current = state;
   }, [job.data?.result, job.data?.state]);
@@ -147,7 +149,9 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             className={`flex min-h-44 w-full flex-col items-center justify-center border border-dashed px-5 text-center transition-colors ${dragging ? "border-fg bg-surface-strong" : "border-border-strong bg-surface hover:border-fg-soft"}`}
           >
             <FileUp size={24} className="text-fg" />
-            <span className="mt-3 text-sm font-medium text-fg">{m.portability_choose_or_drop()}</span>
+            <span className="mt-3 text-sm font-medium text-fg">
+              {m.portability_choose_or_drop()}
+            </span>
             <span className="mt-1 max-w-md text-xs text-fg-soft">
               {m.portability_drop_original_prefix()} .{format.defaultExtension}{" "}
               {m.portability_drop_original_suffix()}
@@ -220,7 +224,9 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           )}
           <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end sm:justify-between">
             <fieldset>
-              <legend className="mb-2 text-xs text-fg-soft">{m.portability_duplicate_policy()}</legend>
+              <legend className="mb-2 text-xs text-fg-soft">
+                {m.portability_duplicate_policy()}
+              </legend>
               <div className="inline-flex border border-border bg-surface">
                 {(["skip", "replace"] as const).map((policy) => (
                   <button
