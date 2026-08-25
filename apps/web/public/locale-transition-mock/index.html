@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TypeType locale transition mock</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --app: #090a0c;
+        --panel: #0e1013;
+        --surface: #15181d;
+        --line: #292d34;
+        --line-strong: #3a4049;
+        --fg: #f4f5f7;
+        --muted: #9aa0aa;
+        --soft: #6f7681;
+        --accent: #3f9cff;
+      }
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --app: #f8f9fb;
+        --panel: #ffffff;
+        --surface: #f0f2f5;
+        --line: #d9dde3;
+        --line-strong: #b7bec8;
+        --fg: #17191d;
+        --muted: #5d6470;
+        --soft: #858c96;
+        --accent: #0878df;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        background: var(--app);
+        color: var(--fg);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
+      }
+      button, select { font: inherit; }
+      button { color: inherit; }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        height: 56px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--app) 94%, transparent);
+        padding: 0 20px;
+        backdrop-filter: blur(14px);
+      }
+      .brand { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
+      .mark { display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid #ff3d4f; color: #ff3d4f; }
+      .controls { display: flex; align-items: center; gap: 8px; }
+      .icon-button, .language-button {
+        display: inline-flex;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--panel);
+        cursor: pointer;
+      }
+      .icon-button { width: 36px; font-size: 16px; }
+      .language { position: relative; }
+      .language-button { min-width: 126px; gap: 9px; padding: 0 10px; font-size: 13px; }
+      .chevron { margin-left: auto; color: var(--soft); }
+      .flag { display: grid; width: 24px; height: 16px; flex: none; overflow: hidden; border: 1px solid #0003; border-radius: 2px; }
+      .flag-fr { grid-template-columns: repeat(3, 1fr); }
+      .flag-fr i:nth-child(1) { background: #1d4fa1; }
+      .flag-fr i:nth-child(2) { background: #fff; }
+      .flag-fr i:nth-child(3) { background: #e43c43; }
+      .flag-en { position: relative; background: #fff; }
+      .flag-en::before, .flag-en::after { content: ""; position: absolute; background: #d52b36; }
+      .flag-en::before { inset: 6px 0; }
+      .flag-en::after { inset: 0 9px; }
+      .menu {
+        position: absolute;
+        top: 42px;
+        right: 0;
+        width: 160px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        background: var(--panel);
+        padding: 5px;
+        box-shadow: 0 16px 36px #0005;
+        opacity: 0;
+        transform: translateY(-4px);
+        pointer-events: none;
+        transition: opacity 140ms ease, transform 140ms ease;
+      }
+      .menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+      .menu button { display: flex; width: 100%; align-items: center; gap: 9px; border: 0; border-radius: 4px; background: transparent; padding: 9px; cursor: pointer; }
+      .menu button:hover, .menu button[aria-selected="true"] { background: var(--surface); }
+      .check { margin-left: auto; color: var(--accent); }
+      .shell { display: grid; min-height: calc(100vh - 56px); grid-template-columns: 224px minmax(0, 1fr); }
+      .sidebar { border-right: 1px solid var(--line); padding: 20px 12px; }
+      .nav { display: grid; gap: 3px; }
+      .nav-item { display: flex; align-items: center; gap: 11px; min-height: 40px; border-left: 2px solid transparent; padding: 0 12px; color: var(--muted); font-size: 13px; }
+      .nav-item.active { border-color: var(--accent); color: var(--fg); background: var(--surface); }
+      .nav-icon { width: 18px; color: var(--soft); text-align: center; }
+      main { min-width: 0; padding: 40px clamp(24px, 5vw, 72px) 72px; }
+      .content { width: min(920px, 100%); margin: 0 auto; }
+      .page-head { border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+      h1 { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 650; }
+      .lead { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+      .tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); padding-top: 18px; }
+      .tab { flex: none; border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 12px 14px; color: var(--muted); cursor: pointer; font-size: 13px; }
+      .tab.active { border-color: var(--accent); color: var(--fg); }
+      .section { padding-top: 26px; }
+      h2 { margin: 0; font-size: 18px; font-weight: 620; }
+      .section-note { margin: 6px 0 20px; color: var(--muted); font-size: 13px; }
+      .row { display: grid; min-height: 74px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 24px; border-bottom: 1px solid var(--line); }
+      .row-title { margin: 0; font-size: 14px; font-weight: 520; }
+      .row-copy { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+      .toggle { position: relative; width: 42px; height: 24px; flex: none; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); cursor: pointer; }
+      .toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform 180ms ease, background 180ms ease; }
+      .toggle.on { border-color: color-mix(in srgb, var(--accent) 75%, var(--line)); background: var(--accent); }
+      .toggle.on::after { transform: translateX(18px); background: #fff; }
+      .select { min-width: 100px; height: 36px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel); color: var(--fg); padding: 0 10px; }
+      .copy-hidden { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }
+      .particle-layer { position: fixed; z-index: 100; pointer-events: none; }
+      @media (max-width: 700px) {
+        .topbar { padding: 0 12px; }
+        .brand span:last-child { display: none; }
+        .language-button { min-width: 44px; width: 44px; padding: 0; }
+        .language-button .language-name, .language-button .chevron { display: none; }
+        .shell { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        main { padding: 28px 16px 56px; }
+        h1 { font-size: 24px; }
+        .row { min-height: 82px; gap: 14px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .menu, .toggle::after { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="mark">T</span><span>TYPE<span style="color:var(--muted)">TYPE</span></span></div>
+      <div class="controls">
+        <button class="icon-button" id="theme" type="button" aria-label="Toggle theme">☼</button>
+        <div class="language">
+          <button class="language-button" id="languageButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span id="currentFlag" class="flag flag-en"></span>
+            <span class="language-name" id="currentLanguage">English</span>
+            <span class="chevron">⌄</span>
+          </button>
+          <div class="menu" id="languageMenu" role="listbox">
+            <button type="button" data-language="en" role="option" aria-selected="true"><span class="flag flag-en"></span><span>English</span><span class="check">✓</span></button>
+            <button type="button" data-language="fr" role="option" aria-selected="false"><span class="flag flag-fr"><i></i><i></i><i></i></span><span>Français</span><span class="check"></span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="shell">
+      <aside class="sidebar">
+        <nav class="nav">
+          <div class="nav-item"><span class="nav-icon">⌂</span><span data-copy data-en="Home" data-fr="Accueil">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">▣</span><span data-copy data-en="Subscriptions" data-fr="Abonnements">Subscriptions</span></div>
+          <div class="nav-item"><span class="nav-icon">◷</span><span data-copy data-en="History" data-fr="Historique">History</span></div>
+          <div class="nav-item active"><span class="nav-icon">⚙</span><span data-copy data-en="Settings" data-fr="Paramètres">Settings</span></div>
+          <div class="nav-item"><span class="nav-icon">♙</span><span data-copy data-en="Privacy" data-fr="Confidentialité">Privacy</span></div>
+        </nav>
+      </aside>
+      <main>
+        <div class="content">
+          <header class="page-head">
+            <h1 data-copy data-en="Settings" data-fr="Paramètres">Settings</h1>
+            <p class="lead" data-copy data-en="Control playback, language and accessibility without leaving your instance." data-fr="Contrôlez la lecture, la langue et l’accessibilité sans quitter votre instance.">Control playback, language and accessibility without leaving your instance.</p>
+          </header>
+          <div class="tabs">
+            <button class="tab active" data-copy data-en="Playback" data-fr="Lecture">Playback</button>
+            <button class="tab" data-copy data-en="Interface" data-fr="Interface">Interface</button>
+            <button class="tab" data-copy data-en="Privacy" data-fr="Confidentialité">Privacy</button>
+          </div>
+          <section class="section">
+            <h2 data-copy data-en="Playback" data-fr="Lecture">Playback</h2>
+            <p class="section-note" data-copy data-en="Choose how videos start and continue." data-fr="Choisissez comment les vidéos démarrent et continuent.">Choose how videos start and continue.</p>
+            <div class="row">
+              <div><p class="row-title" data-copy data-en="Autoplay" data-fr="Lecture automatique">Autoplay</p><p class="row-copy" data-copy data-en="Start the next video automatically." data-fr="Lancez automatiquement la vidéo suivante.">Start the next video automatically.</p></div>
+              <button class="toggle on" type="button" aria-label="Autoplay"></button>
+            </div>
+            <div class="row">
+              <div><p class="row-title" data-copy data-en="Prefer original language" data-fr="Préférer la langue originale">Prefer original language</p><p class="row-copy" data-copy data-en="Select the creator’s original audio track when available." data-fr="Sélectionnez la piste audio originale du créateur lorsqu’elle est disponible.">Select the creator’s original audio track when available.</p></div>
+              <button class="toggle on" type="button" aria-label="Original language"></button>
+            </div>
+            <div class="row">
+              <div><p class="row-title" data-copy data-en="Default quality" data-fr="Qualité par défaut">Default quality</p><p class="row-copy" data-copy data-en="Applied when a video starts." data-fr="Appliquée au démarrage d’une vidéo.">Applied when a video starts.</p></div>
+              <select class="select" aria-label="Default quality"><option>1080p</option><option>720p</option></select>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script>
+      const root = document.documentElement;
+      const menu = document.getElementById("languageMenu");
+      const languageButton = document.getElementById("languageButton");
+      const currentFlag = document.getElementById("currentFlag");
+      const currentLanguage = document.getElementById("currentLanguage");
+      let locale = "en";
+      let transitioning = false;
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const ease = (value) => -(Math.cos(Math.PI * value) - 1) / 2;
+      const random = (index, salt) => ((index * 9301 + salt * 49297) % 233280) / 233280;
+
+      function linesFor(text, width, context) {
+        const words = text.trim().split(/\s+/u);
+        const lines = [];
+        let line = "";
+        for (const word of words) {
+          const candidate = line ? `${line} ${word}` : word;
+          if (line && context.measureText(candidate).width > width) {
+            lines.push(line);
+            line = word;
+          } else line = candidate;
+        }
+        if (line) lines.push(line);
+        return lines;
+      }
+
+      function createLayer(element, phase) {
+        const rect = element.getBoundingClientRect();
+        if (!rect.width || !rect.height || rect.bottom < 0 || rect.top > innerHeight) return null;
+        const style = getComputedStyle(element);
+        const color = style.color;
+        const padding = 64;
+        const dpr = Math.min(devicePixelRatio || 1, 1.25);
+        const mask = document.createElement("canvas");
+        const maskContext = mask.getContext("2d", { willReadFrequently: true });
+        const width = Math.ceil(rect.width + padding * 2);
+        const height = Math.ceil(rect.height + padding * 2);
+        mask.width = width;
+        mask.height = height;
+        const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        maskContext.font = font;
+        maskContext.fillStyle = color;
+        maskContext.textBaseline = "alphabetic";
+        const fontSize = parseFloat(style.fontSize) || 14;
+        const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.35;
+        const lines = linesFor(element.textContent, rect.width, maskContext);
+        lines.forEach((line, index) => {
+          let x = padding;
+          if (style.textAlign === "center") x += (rect.width - maskContext.measureText(line).width) / 2;
+          if (style.textAlign === "right") x += rect.width - maskContext.measureText(line).width;
+          const y = padding + fontSize * 0.82 + index * lineHeight;
+          maskContext.fillText(line, x, y);
+        });
+        const image = maskContext.getImageData(0, 0, width, height);
+        const candidates = [];
+        const step = innerWidth < 600 ? 2 : 2;
+        for (let y = 0; y < height; y += step) {
+          for (let x = 0; x < width; x += step) {
+            const alpha = image.data[(y * width + x) * 4 + 3];
+            if (alpha > 52) candidates.push({ x, y, alpha: alpha / 255 });
+          }
+        }
+        const budget = clamp(Math.floor(rect.width * rect.height / 18), 26, 260);
+        const stride = Math.max(1, Math.ceil(candidates.length / budget));
+        const particles = candidates.filter((_, index) => index % stride === 0).map((pixel, index) => {
+          const spread = 34 + random(index, 4) * 36;
+          return {
+            ...pixel,
+            dx: (random(index, 2) - 0.5) * spread * 0.75,
+            dy: -spread * (0.58 + random(index, 5) * 0.62),
+            size: 0.8 + pixel.alpha * 1.25,
+            delay: random(index, 7),
+          };
+        });
+        const canvas = document.createElement("canvas");
+        canvas.className = "particle-layer";
+        canvas.width = Math.ceil(width * dpr);
+        canvas.height = Math.ceil(height * dpr);
+        canvas.style.left = `${rect.left - padding}px`;
+        canvas.style.top = `${rect.top - padding}px`;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.dataset.particles = String(particles.length);
+        canvas.dataset.firstParticle = JSON.stringify(particles[0] ?? null);
+        canvas.dataset.color = color;
+        const context = canvas.getContext("2d");
+        context.scale(dpr, dpr);
+        document.body.appendChild(canvas);
+        element.classList.add("copy-hidden");
+        return { element, canvas, context, particles, color, width, height, phase };
+      }
+
+      function particleTransition(phase, duration) {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+        const layers = [...document.querySelectorAll("[data-copy]")]
+          .map((element) => createLayer(element, phase))
+          .filter(Boolean);
+        if (!layers.length) return Promise.resolve();
+        const started = performance.now();
+        const stagger = 240;
+        const movement = duration - stagger;
+        return new Promise((resolve) => {
+          let frameCount = 0;
+          function frame(now) {
+            frameCount += 1;
+            const overall = clamp((now - started) / duration, 0, 1);
+            for (const layer of layers) {
+              const { context } = layer;
+              context.clearRect(0, 0, layer.width, layer.height);
+              context.fillStyle = layer.color;
+              context.globalAlpha = phase === "exit" ? Math.pow(1 - overall, 0.72) : ease(overall);
+              layer.canvas.dataset.frames = String(frameCount);
+              layer.canvas.dataset.alpha = String(context.globalAlpha);
+              for (const particle of layer.particles) {
+                const local = clamp((now - started - particle.delay * stagger) / movement, 0, 1);
+                const travel = phase === "exit" ? ease(local) : 1 - ease(local);
+                context.fillRect(particle.x + particle.dx * travel, particle.y + particle.dy * travel, particle.size, particle.size);
+              }
+            }
+            if (overall < 1) requestAnimationFrame(frame);
+            else {
+              layers.forEach(({ element, canvas }) => { element.classList.remove("copy-hidden"); canvas.remove(); });
+              resolve();
+            }
+          }
+          requestAnimationFrame(frame);
+        });
+      }
+
+      function updateLanguage(next) {
+        document.querySelectorAll("[data-copy]").forEach((element) => { element.textContent = element.dataset[next]; });
+        locale = next;
+        root.lang = next;
+        currentLanguage.textContent = next === "fr" ? "Français" : "English";
+        currentFlag.className = `flag flag-${next}`;
+        currentFlag.innerHTML = next === "fr" ? "<i></i><i></i><i></i>" : "";
+        menu.querySelectorAll("button").forEach((button) => {
+          const selected = button.dataset.language === next;
+          button.setAttribute("aria-selected", String(selected));
+          button.querySelector(".check").textContent = selected ? "✓" : "";
+        });
+      }
+
+      languageButton.addEventListener("click", () => {
+        const open = menu.classList.toggle("open");
+        languageButton.setAttribute("aria-expanded", String(open));
+      });
+      menu.addEventListener("click", async (event) => {
+        const option = event.target.closest("button[data-language]");
+        if (!option || option.dataset.language === locale || transitioning) return;
+        transitioning = true;
+        menu.classList.remove("open");
+        languageButton.setAttribute("aria-expanded", "false");
+        await particleTransition("exit", 820);
+        updateLanguage(option.dataset.language);
+        await new Promise(requestAnimationFrame);
+        await particleTransition("enter", 1040);
+        transitioning = false;
+      });
+      document.getElementById("theme").addEventListener("click", (event) => {
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        event.currentTarget.textContent = next === "dark" ? "☼" : "◐";
+      });
+      document.querySelectorAll(".toggle").forEach((toggle) => toggle.addEventListener("click", () => toggle.classList.toggle("on")));
+      document.addEventListener("pointerdown", (event) => {
+        if (!event.target.closest(".language")) { menu.classList.remove("open"); languageButton.setAttribute("aria-expanded", "false"); }
+      });
+    </script>
+  </body>
+</html>
