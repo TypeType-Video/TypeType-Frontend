@@ -17,6 +17,7 @@ import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityImportGuide } from "./portability-import-guide";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
+import { m } from "../paraglide/messages.js";
 
 const STORAGE_KEY = "typetype-portability-import-job";
 
@@ -75,10 +76,17 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     const state = job.data?.state ?? null;
     if (state === "completed" && previousState.current !== "completed") {
       const count = Object.values(job.data?.result ?? {}).reduce((sum, value) => sum + value, 0);
-      setToast(`Import completed: ${count.toLocaleString()} items`);
+      setToast(`${m.portability_import_completed()}: ${count.toLocaleString()} ${m.portability_items()}`);
     }
     previousState.current = state;
   }, [job.data?.result, job.data?.state]);
+
+  useEffect(() => {
+    if (!job.missing || !jobId) return;
+    queryClient.removeQueries({ queryKey: ["portability-job", jobId] });
+    setJobId(null);
+    setToast(m.portability_stale_job_toast());
+  }, [job.missing, jobId, queryClient]);
 
   useEffect(() => {
     if (!toast) return;
@@ -104,7 +112,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     apply.reset();
   }
 
-  if (!format) return <p className="text-sm text-fg-muted">No import format is available.</p>;
+  if (!format) return <p className="text-sm text-fg-muted">{m.portability_no_import_format()}</p>;
 
   const preview = job.data?.preview;
   const failure = upload.error ?? job.error ?? apply.error ?? report.error;
@@ -113,14 +121,14 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
       <div className="flex items-center gap-3">
         <ArchiveRestore size={20} className="shrink-0 text-fg" aria-hidden="true" />
         <div>
-          <h2 className="text-sm font-semibold text-fg">Import data</h2>
-          <p className="text-xs text-fg-soft">Preview and choose what to restore.</p>
+          <h2 className="text-sm font-semibold text-fg">{m.portability_import_title()}</h2>
+          <p className="text-xs text-fg-soft">{m.portability_import_description()}</p>
         </div>
       </div>
       {!jobId && (
         <>
           <PortabilityFormatPicker
-            label="Import from"
+            label={m.portability_import_from()}
             formats={importFormats}
             value={format.format}
             onChange={setFormatName}
@@ -139,10 +147,10 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             className={`flex min-h-44 w-full flex-col items-center justify-center border border-dashed px-5 text-center transition-colors ${dragging ? "border-fg bg-surface-strong" : "border-border-strong bg-surface hover:border-fg-soft"}`}
           >
             <FileUp size={24} className="text-fg" />
-            <span className="mt-3 text-sm font-medium text-fg">Choose or drop a backup</span>
+            <span className="mt-3 text-sm font-medium text-fg">{m.portability_choose_or_drop()}</span>
             <span className="mt-1 max-w-md text-xs text-fg-soft">
-              Drop the original .{format.defaultExtension} file. Nothing is imported until you
-              review the preview.
+              {m.portability_drop_original_prefix()} .{format.defaultExtension}{" "}
+              {m.portability_drop_original_suffix()}
             </span>
           </button>
           <input
@@ -171,7 +179,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
                     {preview.detection.formatVersion ? ` ${preview.detection.formatVersion}` : ""}
                   </p>
                   <p className="mt-0.5 text-xs text-fg-soft">
-                    {preview.duplicates.toLocaleString()} duplicate records found
+                    {preview.duplicates.toLocaleString()} {m.portability_duplicate_records()}
                   </p>
                 </div>
               </div>
@@ -181,7 +189,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
               onClick={reset}
               className="inline-flex h-8 items-center gap-2 border border-border px-2.5 text-xs text-fg-muted hover:text-fg"
             >
-              <RefreshCw size={13} /> Different file
+              <RefreshCw size={13} /> {m.portability_different_file()}
             </button>
           </div>
           <PortabilityCategorySelector
@@ -199,7 +207,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           />
           {preview.issues.length > 0 && (
             <div className="border border-warning/40 bg-warning/5 px-3 py-3">
-              <p className="text-xs font-medium text-fg">Compatibility notes</p>
+              <p className="text-xs font-medium text-fg">{m.portability_compatibility_notes()}</p>
               <ul className="mt-2 space-y-1 text-xs text-fg-muted">
                 {preview.issues.map((issue) => (
                   <li key={`${issue.category}-${issue.code}`}>
@@ -212,7 +220,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           )}
           <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end sm:justify-between">
             <fieldset>
-              <legend className="mb-2 text-xs text-fg-soft">When an item already exists</legend>
+              <legend className="mb-2 text-xs text-fg-soft">{m.portability_duplicate_policy()}</legend>
               <div className="inline-flex border border-border bg-surface">
                 {(["skip", "replace"] as const).map((policy) => (
                   <button
@@ -221,7 +229,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
                     onClick={() => setDuplicatePolicy(policy)}
                     className={`h-8 px-3 text-xs capitalize ${duplicatePolicy === policy ? "bg-fg text-app" : "text-fg-muted hover:text-fg"}`}
                   >
-                    {policy}
+                    {policy === "skip" ? m.portability_skip() : m.portability_replace()}
                   </button>
                 ))}
               </div>
@@ -232,7 +240,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
               onClick={() => apply.mutate()}
               className="h-9 bg-fg px-4 text-xs font-medium text-app hover:opacity-90 disabled:opacity-40"
             >
-              Import selected
+              {m.portability_import_selected()}
             </button>
           </div>
         </section>
@@ -245,7 +253,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             onClick={reset}
             className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
           >
-            Start another import
+            {m.portability_start_another_import()}
           </button>
           <button
             type="button"
@@ -253,7 +261,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             onClick={() => report.mutate()}
             className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg disabled:opacity-40"
           >
-            Download report
+            {m.portability_download_report()}
           </button>
         </div>
       )}
@@ -263,12 +271,12 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           onClick={reset}
           className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
         >
-          Choose another backup
+          {m.portability_choose_another_backup()}
         </button>
       )}
       {failure && (
         <p role="alert" className="text-sm text-danger">
-          {failure instanceof Error ? failure.message : "Import failed"}
+          {failure instanceof Error ? failure.message : m.portability_import_failed()}
         </p>
       )}
       <Toast message={toast} />

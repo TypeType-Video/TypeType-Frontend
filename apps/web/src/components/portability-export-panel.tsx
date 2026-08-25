@@ -14,6 +14,7 @@ import { PortabilityCategorySelector } from "./portability-category-selector";
 import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
+import { m } from "../paraglide/messages.js";
 
 const STORAGE_KEY = "typetype-portability-export-job";
 
@@ -61,24 +62,30 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
   const download = useMutation({
     mutationFn: () =>
       downloadPortabilityArtifact(jobId as string, `typetype-export.${format.defaultExtension}`),
-    onSuccess: () => setToast("Export download started"),
+    onSuccess: () => setToast(m.portability_export_download_started()),
   });
   const report = useMutation({ mutationFn: () => downloadPortabilityReport(jobId as string) });
-
   useEffect(() => {
     if (jobId) localStorage.setItem(STORAGE_KEY, jobId);
     else localStorage.removeItem(STORAGE_KEY);
   }, [jobId]);
-
   useEffect(() => {
     setSelected(new Set(available));
   }, [available]);
-
   useEffect(() => {
     const state = job.data?.state ?? null;
-    if (state === "completed" && previousState.current !== "completed") setToast("Export ready");
+    if (state === "completed" && previousState.current !== "completed") {
+      setToast(m.portability_export_ready());
+    }
     previousState.current = state;
   }, [job.data?.state]);
+
+  useEffect(() => {
+    if (!job.missing || !jobId) return;
+    queryClient.removeQueries({ queryKey: ["portability-job", jobId] });
+    setJobId(null);
+    setToast(m.portability_stale_job_toast());
+  }, [job.missing, jobId, queryClient]);
 
   useEffect(() => {
     if (!toast) return;
@@ -93,21 +100,21 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
     download.reset();
   }
 
-  if (!format) return <p className="text-sm text-fg-muted">No export format is available.</p>;
+  if (!format) return <p className="text-sm text-fg-muted">{m.portability_no_export_format()}</p>;
   const failure = job.error ?? generate.error ?? download.error ?? report.error;
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-3">
         <DatabaseBackup size={20} className="shrink-0 text-fg" aria-hidden="true" />
         <div>
-          <h2 className="text-sm font-semibold text-fg">Export data</h2>
-          <p className="text-xs text-fg-soft">Choose a destination and create a portable backup.</p>
+          <h2 className="text-sm font-semibold text-fg">{m.portability_export_title()}</h2>
+          <p className="text-xs text-fg-soft">{m.portability_export_description()}</p>
         </div>
       </div>
       {!jobId && (
         <>
           <PortabilityFormatPicker
-            label="Destination format"
+            label={m.portability_destination_format()}
             formats={exportFormats}
             value={format.format}
             onChange={setFormatName}
@@ -127,8 +134,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
           />
           {Object.values(fidelity).includes("partial") && (
             <p className="border border-warning/40 bg-warning/5 px-3 py-3 text-xs text-fg-muted">
-              This destination cannot represent every TypeType field. The completed report will list
-              any data that could not be preserved.
+              {m.portability_export_partial_warning()}
             </p>
           )}
           <div className="flex justify-end border-t border-border pt-4">
@@ -138,7 +144,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               onClick={() => generate.mutate()}
               className="h-9 bg-fg px-4 text-xs font-medium text-app hover:opacity-90 disabled:opacity-40"
             >
-              Generate export
+              {m.portability_generate_export()}
             </button>
           </div>
         </>
@@ -150,7 +156,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
         <div className="flex flex-col gap-3">
           {job.data.preview?.issues && job.data.preview.issues.length > 0 && (
             <div className="border border-warning/40 bg-warning/5 px-3 py-3">
-              <p className="text-xs font-medium text-fg">Export notes</p>
+              <p className="text-xs font-medium text-fg">{m.portability_export_notes()}</p>
               <ul className="mt-2 space-y-1 text-xs text-fg-muted">
                 {job.data.preview.issues.map((issue) => (
                   <li key={`${issue.category}-${issue.code}`}>{issue.message}</li>
@@ -165,14 +171,14 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               onClick={() => download.mutate()}
               className="inline-flex h-9 items-center justify-center gap-2 bg-fg px-4 text-xs font-medium text-app hover:opacity-90 disabled:opacity-40"
             >
-              <FileDown size={14} /> Download export
+              <FileDown size={14} /> {m.portability_download_export()}
             </button>
             <button
               type="button"
               onClick={reset}
               className="inline-flex h-9 items-center justify-center gap-2 border border-border px-3 text-xs text-fg-muted hover:text-fg"
             >
-              <RefreshCw size={13} /> New export
+              <RefreshCw size={13} /> {m.portability_new_export()}
             </button>
             <button
               type="button"
@@ -180,7 +186,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               onClick={() => report.mutate()}
               className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg disabled:opacity-40"
             >
-              Download report
+              {m.portability_download_report()}
             </button>
           </div>
         </div>
@@ -191,7 +197,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
           onClick={reset}
           className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
         >
-          Start another export
+          {m.portability_start_another_export()}
         </button>
       )}
       {jobId && !job.data && job.error && (
@@ -200,12 +206,12 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
           onClick={reset}
           className="h-9 border border-border px-3 text-xs text-fg-muted hover:text-fg"
         >
-          Start another export
+          {m.portability_start_another_export()}
         </button>
       )}
       {failure && (
         <p role="alert" className="text-sm text-danger">
-          {failure instanceof Error ? failure.message : "Export failed"}
+          {failure instanceof Error ? failure.message : m.portability_export_failed()}
         </p>
       )}
       <Toast message={toast} />

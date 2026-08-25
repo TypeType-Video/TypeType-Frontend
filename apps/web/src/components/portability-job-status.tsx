@@ -2,6 +2,7 @@ import { AlertTriangle, Check, CheckCircle2, Copy, LoaderCircle, X } from "lucid
 import { useState } from "react";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import { categoryLabel } from "../lib/portability-catalog";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   job: PortabilityJob;
@@ -18,14 +19,18 @@ function progressPercent(job: PortabilityJob): number | null {
 }
 
 function stateLabel(job: PortabilityJob): string {
-  if (job.state === "queued") return "Waiting to start";
-  if (job.state === "analyzing") return "Analyzing backup";
-  if (job.state === "ready") return "Ready to import";
-  if (job.state === "applying") return "Importing data";
-  if (job.state === "encoding") return "Generating export";
-  if (job.state === "completed") return job.kind === "import" ? "Import completed" : "Export ready";
-  if (job.state === "cancelled") return "Operation cancelled";
-  return "Operation failed";
+  if (job.state === "queued") return m.portability_job_waiting();
+  if (job.state === "analyzing") return m.portability_job_analyzing();
+  if (job.state === "ready") return m.portability_job_ready();
+  if (job.state === "applying") return m.portability_job_importing();
+  if (job.state === "encoding") return m.portability_job_generating();
+  if (job.state === "completed") {
+    return job.kind === "import"
+      ? m.portability_job_import_completed()
+      : m.portability_job_export_ready();
+  }
+  if (job.state === "cancelled") return m.portability_job_cancelled();
+  return m.portability_job_failed();
 }
 
 export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
@@ -34,9 +39,9 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
   const active = ACTIVE.has(job.state);
   const Icon = active ? LoaderCircle : job.state === "failed" ? AlertTriangle : CheckCircle2;
   const reference = [
-    `Job: ${job.id}`,
-    job.requestId ? `Request: ${job.requestId}` : null,
-    job.errorCode ? `Code: ${job.errorCode}` : null,
+    `${m.portability_job_label()}: ${job.id}`,
+    job.requestId ? `${m.portability_request_label()}: ${job.requestId}` : null,
+    job.errorCode ? `${m.portability_code_label()}: ${job.errorCode}` : null,
   ]
     .filter(Boolean)
     .join("\n");
@@ -69,13 +74,13 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
             )}
             {job.state === "failed" && (
               <div className="mt-1.5 text-xs text-danger">
-                <p>{job.errorMessage ?? "Portability operation failed"}</p>
+                <p>{job.errorMessage ?? m.portability_operation_failed()}</p>
                 <div className="mt-1 flex items-center gap-1.5 text-fg-soft">
                   <code className="truncate">{job.errorCode ?? "portability_failed"}</code>
                   <button
                     type="button"
-                    title="Copy support reference"
-                    aria-label="Copy support reference"
+                    title={m.portability_copy_reference()}
+                    aria-label={m.portability_copy_reference()}
                     onClick={() => void copyReference()}
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-fg-muted hover:text-fg"
                   >
@@ -91,7 +96,7 @@ export function PortabilityJobStatus({ job, onCancel, cancelling }: Props) {
             type="button"
             disabled={cancelling}
             onClick={onCancel}
-            title="Cancel"
+            title={m.portability_cancel()}
             className="inline-flex h-8 w-8 shrink-0 items-center justify-center border border-border text-fg-muted hover:text-fg disabled:opacity-40"
           >
             <X size={15} />

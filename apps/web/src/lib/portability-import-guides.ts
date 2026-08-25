@@ -1,4 +1,5 @@
 import { FORMAT_NAMES } from "./portability-catalog";
+import { m } from "../paraglide/messages.js";
 
 export type PortabilityImportGuide = {
   description: string;
@@ -9,45 +10,45 @@ export type PortabilityImportGuide = {
 const TAKEOUT_URL =
   "https://takeout.google.com/settings/takeout/custom/youtube,my_activity?dest=mail&frequency=once";
 
-const GUIDES: Record<string, PortabilityImportGuide> = {
-  typetype: {
-    description: "Move data from another TypeType instance or restore a portable backup.",
-    steps: [
-      "Open Settings, then Data portability on the source instance.",
-      "Choose TypeType as the destination and download the export.",
-      "Drop the downloaded backup below without changing it.",
-    ],
-  },
-  "youtube-takeout": {
-    description:
-      "Google Takeout can provide your subscriptions, history, playlists, Watch later and liked videos.",
-    steps: [
-      "Open Google Takeout with YouTube and My Activity selected.",
-      "Create a one-time ZIP export, then download it from Google.",
-      "Drop the original ZIP below. If Google creates several ZIPs, import them one at a time.",
-    ],
-    action: { label: "Open Google Takeout", url: TAKEOUT_URL },
-  },
-  opml: {
-    description: "Move subscriptions from any app or service that can export an OPML file.",
-    steps: [
-      "Find the subscription export or backup action in the source app.",
-      "Choose OPML when the app asks for an export format.",
-      "Download the OPML file, then drop it below.",
-    ],
-  },
-};
-
 export function portabilityImportGuide(format: string): PortabilityImportGuide {
-  const guide = GUIDES[format];
-  if (guide) return guide;
+  if (format === "typetype") {
+    return {
+      description: m.portability_guide_typetype_description(),
+      steps: [
+        m.portability_guide_typetype_step_one(),
+        m.portability_guide_typetype_step_two(),
+        m.portability_guide_typetype_step_three(),
+      ],
+    };
+  }
+  if (format === "youtube-takeout") {
+    return {
+      description: m.portability_guide_takeout_description(),
+      steps: [
+        m.portability_guide_takeout_step_one(),
+        m.portability_guide_takeout_step_two(),
+        m.portability_guide_takeout_step_three(),
+      ],
+      action: { label: m.portability_guide_takeout_action(), url: TAKEOUT_URL },
+    };
+  }
+  if (format === "opml") {
+    return {
+      description: m.portability_guide_opml_description(),
+      steps: [
+        m.portability_guide_opml_step_one(),
+        m.portability_guide_opml_step_two(),
+        m.portability_guide_opml_step_three(),
+      ],
+    };
+  }
   const name = FORMAT_NAMES[format] ?? format;
   return {
-    description: `Bring your existing ${name} data into TypeType.`,
+    description: `${m.portability_guide_generic_prefix()} ${name} ${m.portability_guide_generic_suffix()}`,
     steps: [
-      `Open ${name} and find its backup or export action.`,
-      "Download the original backup file without editing or extracting it.",
-      "Drop the file below. TypeType will preview the data before anything is imported.",
+      `${m.portability_guide_generic_open_prefix()} ${name} ${m.portability_guide_generic_open_suffix()}`,
+      m.portability_guide_generic_download(),
+      m.portability_guide_generic_drop(),
     ],
   };
 }
