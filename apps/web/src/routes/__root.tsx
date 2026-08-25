@@ -20,7 +20,7 @@ import {
 import { bootstrapSession } from "../lib/auth-session";
 import { isEmbeddedFrame } from "../lib/embed-access";
 import { applyTheme } from "../lib/theme";
-import { useAuthStore } from "../stores/auth-store";
+import { subscribeAuthStorage, useAuthStore } from "../stores/auth-store";
 import { useThemeStore } from "../stores/theme-store";
 import { useUiStore } from "../stores/ui-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
@@ -60,6 +60,8 @@ function RootLayout() {
     if (framedEmbedPage) return;
     void bootstrapSession();
   }, [framedEmbedPage]);
+
+  useEffect(() => subscribeAuthStorage(), []);
 
   useEffect(() => {
     applyTheme(theme);

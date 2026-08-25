@@ -1,4 +1,4 @@
-import { useAuthStore } from "../stores/auth-store";
+import { syncAuthStoreFromStorage, useAuthStore } from "../stores/auth-store";
 import type { AuthMe } from "../types/auth";
 import { ApiError } from "./api";
 import { fetchMe, loginAuth, logoutAuth, refreshAuth, registerAuth } from "./api-auth";
@@ -33,9 +33,19 @@ async function runRefreshSession(): Promise<string> {
   return refreshed.accessToken;
 }
 
+async function runCoordinatedRefresh(): Promise<string> {
+  const initialToken = useAuthStore.getState().token;
+  if (typeof navigator === "undefined" || !navigator.locks) return runRefreshSession();
+  return navigator.locks.request("typetype-auth-refresh", async () => {
+    const storedToken = syncAuthStoreFromStorage();
+    if (storedToken && storedToken !== initialToken) return storedToken;
+    return runRefreshSession();
+  });
+}
+
 export async function refreshSession(): Promise<string> {
   if (refreshInFlight) return refreshInFlight;
-  refreshInFlight = runRefreshSession().finally(() => {
+  refreshInFlight = runCoordinatedRefresh().finally(() => {
     refreshInFlight = null;
   });
   return refreshInFlight;

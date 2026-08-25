@@ -11,8 +11,8 @@ if (!("localStorage" in globalThis)) {
 }
 
 const { authed } = await import("../src/lib/authed");
-const { bootstrapSession } = await import("../src/lib/auth-session");
-const { useAuthStore } = await import("../src/stores/auth-store");
+const { bootstrapSession, refreshSession } = await import("../src/lib/auth-session");
+const { syncAuthStoreFromStorage, useAuthStore } = await import("../src/stores/auth-store");
 
 const originalFetch = globalThis.fetch;
 const me = {
@@ -138,6 +138,50 @@ describe("session refresh failures", () => {
       token: null,
       me: null,
       status: "signed_out",
+    });
+  });
+
+  test("adopts a refreshed session from another browser context", async () => {
+    const fresh = { token: "fresh-tab-token", me };
+    const getItem = localStorage.getItem;
+    const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+    localStorage.getItem = () => JSON.stringify(fresh);
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {
+        locks: {
+          request: async (_name: string, callback: () => Promise<string>) => callback(),
+        },
+      },
+    });
+    globalThis.fetch = mock(async () => {
+      throw new Error("Refresh should not reach the network");
+    });
+
+    try {
+      await expect(refreshSession()).resolves.toBe("fresh-tab-token");
+      expect(useAuthStore.getState()).toMatchObject({
+        token: "fresh-tab-token",
+        me,
+        status: "authenticated",
+      });
+    } finally {
+      localStorage.getItem = getItem;
+      if (navigatorDescriptor) {
+        Object.defineProperty(globalThis, "navigator", navigatorDescriptor);
+      } else {
+        Reflect.deleteProperty(globalThis, "navigator");
+      }
+    }
+  });
+
+  test("applies session changes received from storage", () => {
+    syncAuthStoreFromStorage(JSON.stringify({ token: "other-tab-token", me }));
+
+    expect(useAuthStore.getState()).toMatchObject({
+      token: "other-tab-token",
+      me,
+      status: "authenticated",
     });
   });
 });
