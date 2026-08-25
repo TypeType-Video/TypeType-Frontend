@@ -26,8 +26,8 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
-const EXIT_DURATION_MS = 140;
-const ENTER_DURATION_MS = 220;
+const EXIT_DURATION_MS = 180;
+const ENTER_DURATION_MS = 260;
 
 function syncDocumentLocale(locale: Locale): void {
   document.documentElement.lang = locale;

@@ -1,39 +1,31 @@
 @keyframes interface-copy-evaporate {
   from {
     opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
   }
   to {
     opacity: 0;
-    filter: blur(3px);
-    transform: translateY(-2px);
   }
 }
 
 @keyframes interface-copy-materialize {
   from {
     opacity: 0;
-    filter: blur(3px);
-    transform: translateY(2px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
   }
 }
 
 html.interface-locale-exit [data-interface-copy]:is(h1, h2, h3, h4, p, label, span, small),
 html.interface-locale-exit [data-interface-copy] :is(h1, h2, h3, h4, p, label, span, small) {
-  animation: interface-copy-evaporate 140ms ease-in both;
-  will-change: opacity, filter, transform;
+  animation: interface-copy-evaporate 180ms ease-in both;
+  will-change: opacity;
 }
 
 html.interface-locale-enter [data-interface-copy]:is(h1, h2, h3, h4, p, label, span, small),
 html.interface-locale-enter [data-interface-copy] :is(h1, h2, h3, h4, p, label, span, small) {
-  animation: interface-copy-materialize 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity, filter, transform;
+  animation: interface-copy-materialize 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity;
 }
 
 .interface-locale-particles {
