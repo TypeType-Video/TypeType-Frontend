@@ -5,14 +5,17 @@ import { AuthErrorBanner } from "../components/auth-error-banner";
 import { OidcSignInButton } from "../components/oidc-sign-in-button";
 import { Toast } from "../components/toast";
 import { useAuth } from "../hooks/use-auth";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useOidcStatus } from "../hooks/use-oidc-status";
 import { startOidc } from "../lib/api-oidc";
 import { sanitizeRedirect } from "../lib/auth-routes";
 import { loginSession } from "../lib/auth-session";
 import { oidcCallbackUrl } from "../lib/oidc-redirect";
 import { goto } from "../lib/route-redirect";
+import { m } from "../paraglide/messages.js";
 
 function LoginPage() {
+  const { locale } = useInterfaceLocale();
   const { isAuthed, isGuest } = useAuth();
   const { redirect } = Route.useSearch();
   const target = sanitizeRedirect(redirect);
@@ -53,10 +56,10 @@ function LoginPage() {
     setError(null);
     try {
       await loginSession({ identifier: identifier.trim(), password });
-      setToast("Signed in");
+      setToast(m.login_signed_in({}, { locale }));
       goto(target);
     } catch {
-      setError("Invalid credentials.");
+      setError(m.login_invalid_credentials({}, { locale }));
     }
     setPending(false);
   }
@@ -64,7 +67,7 @@ function LoginPage() {
   return (
     <div className="flex w-full items-center justify-center px-4">
       <Toast message={toast} />
-      <AuthCard title="Sign in" subtitle="Use your account credentials to continue.">
+      <AuthCard title={m.login_title({}, { locale })} subtitle={m.login_subtitle({}, { locale })}>
         <AuthErrorBanner message={error} />
         {oidcEnabled && (
           <div className="mb-4">
@@ -74,7 +77,7 @@ function LoginPage() {
         {oidcEnabled && localEnabled && (
           <div className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-wider text-fg-soft">
             <span className="h-px flex-1 bg-border" />
-            or
+            {m.login_or({}, { locale })}
             <span className="h-px flex-1 bg-border" />
           </div>
         )}
@@ -85,7 +88,7 @@ function LoginPage() {
               autoComplete="username"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Email or username"
+              placeholder={m.login_identifier_placeholder({}, { locale })}
               className="h-10 rounded-lg border border-border-strong bg-app px-3 text-sm text-fg"
               required
             />
@@ -94,7 +97,7 @@ function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={m.login_password_placeholder({}, { locale })}
               className="h-10 rounded-lg border border-border-strong bg-app px-3 text-sm text-fg"
               required
             />
@@ -103,11 +106,13 @@ function LoginPage() {
               disabled={pending}
               className="h-10 rounded-lg bg-fg text-app text-sm font-medium disabled:opacity-60"
             >
-              {pending ? "Signing in..." : "Sign in"}
+              {pending ? m.login_pending({}, { locale }) : m.login_title({}, { locale })}
             </button>
           </form>
         ) : (
-          !oidcEnabled && <p className="text-sm text-fg-muted">No sign-in method is available.</p>
+          !oidcEnabled && (
+            <p className="text-sm text-fg-muted">{m.login_no_method({}, { locale })}</p>
+          )
         )}
         {localEnabled && (
           <div className="mt-4 text-xs text-fg-soft flex items-center justify-between">
@@ -116,13 +121,13 @@ function LoginPage() {
               search={{ redirect }}
               className="text-fg-muted hover:text-fg underline underline-offset-2"
             >
-              Create account
+              {m.login_create_account({}, { locale })}
             </Link>
             <Link
               to="/reset-password"
               className="text-fg-muted hover:text-fg underline underline-offset-2"
             >
-              Reset password
+              {m.login_reset_password({}, { locale })}
             </Link>
           </div>
         )}
