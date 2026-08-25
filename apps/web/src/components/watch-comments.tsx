@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useInfiniteComments } from "../hooks/use-infinite-comments";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
 import { ScrollSentinel } from "./scroll-sentinel";
 import { WatchCommentSkeleton } from "./watch-comment-skeleton";
 import { WatchCommentsLazyList } from "./watch-comments-lazy-list";
@@ -14,6 +16,7 @@ type Props = {
 };
 
 export function WatchComments({ videoUrl, onSeekTimestamp }: Props) {
+  const { locale } = useInterfaceLocale();
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isLoading } =
     useInfiniteComments(videoUrl);
   const [renderCount, setRenderCount] = useState(INITIAL_RENDER_COUNT);
@@ -39,9 +42,9 @@ export function WatchComments({ videoUrl, onSeekTimestamp }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-base font-semibold text-fg">Comments</h2>
+      <h2 className="text-base font-semibold text-fg">{m.watch_comments({}, { locale })}</h2>
       {commentsDisabled ? (
-        <p className="text-sm text-fg-soft">Comments are disabled for this video.</p>
+        <p className="text-sm text-fg-soft">{m.watch_comments_disabled({}, { locale })}</p>
       ) : (
         <div className="flex flex-col gap-6">
           <WatchCommentsLazyList

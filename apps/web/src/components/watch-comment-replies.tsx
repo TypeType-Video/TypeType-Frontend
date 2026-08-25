@@ -1,5 +1,7 @@
 import { useCallback } from "react";
 import { useCommentReplies } from "../hooks/use-comment-replies";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
 import { WatchCommentSkeleton } from "./watch-comment-skeleton";
 import { WatchReply } from "./watch-reply";
 
@@ -13,6 +15,7 @@ type Props = {
 };
 
 export function WatchCommentReplies({ videoUrl, repliesPage, locale, onSeekTimestamp }: Props) {
+  const { locale: interfaceLocale } = useInterfaceLocale();
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isLoading } = useCommentReplies(
     videoUrl,
     repliesPage,
@@ -43,7 +46,7 @@ export function WatchCommentReplies({ videoUrl, repliesPage, locale, onSeekTimes
           onClick={loadMore}
           className="text-xs text-accent hover:text-accent-strong text-left w-fit"
         >
-          Load more replies
+          {m.watch_load_more_replies({}, { locale: interfaceLocale })}
         </button>
       )}
     </div>

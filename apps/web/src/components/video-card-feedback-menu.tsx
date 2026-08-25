@@ -1,4 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { Toast } from "./toast";
 import { MoreIcon } from "./watch-icons";
@@ -14,6 +16,7 @@ type Props = {
 };
 
 export function VideoCardFeedbackMenu({ stream }: Props) {
+  const { locale } = useInterfaceLocale();
   const menuRef = useRef<HTMLButtonElement | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,7 +42,7 @@ export function VideoCardFeedbackMenu({ stream }: Props) {
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
         className="rounded-md p-1 text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
-        aria-label="Video options"
+        aria-label={m.watch_video_options({}, { locale })}
       >
         <MoreIcon />
       </button>

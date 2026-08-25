@@ -1,9 +1,10 @@
 import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useClientLocale } from "../hooks/use-client-locale";
 import { useInstance } from "../hooks/use-instance";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { formatPublishedDate, formatSubscribers, formatViews } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
@@ -17,7 +18,7 @@ type Props = {
 };
 
 export function WatchInfo({ stream }: Props) {
-  const locale = useClientLocale();
+  const { locale } = useInterfaceLocale();
   const instance = useInstance();
   const { add, remove, isSubscribed } = useSubscriptions();
   const subscribed = stream.channelUrl ? isSubscribed(stream.channelUrl) : false;
@@ -35,17 +36,17 @@ export function WatchInfo({ stream }: Props) {
     try {
       if (subscribed) {
         await remove.mutateAsync(stream.channelUrl);
-        setToastMsg(`Unsubscribed from ${stream.channelName}`);
+        setToastMsg(`${m.watch_unsubscribed_from({}, { locale })} ${stream.channelName}`);
       } else {
         await add.mutateAsync({
           channelUrl: stream.channelUrl,
           name: stream.channelName,
           avatarUrl: stream.channelAvatar,
         });
-        setToastMsg(`Subscribed to ${stream.channelName}`);
+        setToastMsg(`${m.watch_subscribed_to({}, { locale })} ${stream.channelName}`);
       }
     } catch {
-      setToastMsg("Subscription update failed");
+      setToastMsg(m.watch_subscription_failed({}, { locale }));
     }
   }
 
@@ -128,7 +129,9 @@ export function WatchInfo({ stream }: Props) {
                     : "bg-fg text-app hover:bg-fg-strong"
                 }`}
               >
-                {subscribed ? "Subscribed" : "Subscribe"}
+                {subscribed
+                  ? m.watch_subscribed({}, { locale })
+                  : m.watch_subscribe({}, { locale })}
               </button>
             </>
           )}

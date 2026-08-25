@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { watchLaterActionLabel } from "../lib/watch-later-labels";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
 
 const MARGIN = 8;
 
@@ -29,6 +30,7 @@ export function VideoBlockActionsDropdown({
   videoBlocked,
   channelBlocked,
 }: Props) {
+  const { locale } = useInterfaceLocale();
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({ visibility: "hidden" });
   const onCloseRef = useRef(onClose);
@@ -86,7 +88,9 @@ export function VideoBlockActionsDropdown({
           aria-pressed={watchLaterSaved}
           className="w-full px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong disabled:cursor-wait disabled:opacity-60"
         >
-          {watchLaterActionLabel(watchLaterSaved)}
+          {watchLaterSaved
+            ? m.watch_remove_later({}, { locale })
+            : m.watch_save_later({}, { locale })}
         </button>
       )}
       {onSaveToPlaylist && (
@@ -95,7 +99,7 @@ export function VideoBlockActionsDropdown({
           onClick={onSaveToPlaylist}
           className="w-full px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong"
         >
-          Save to playlist
+          {m.watch_save_playlist({}, { locale })}
         </button>
       )}
       {onToggleVideoBlock && (
@@ -107,7 +111,9 @@ export function VideoBlockActionsDropdown({
           }}
           className="w-full px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong"
         >
-          {videoBlocked ? "Unblock video" : "Block video"}
+          {videoBlocked
+            ? m.watch_unblock_video({}, { locale })
+            : m.watch_block_video({}, { locale })}
         </button>
       )}
       {onToggleChannelBlock && (
@@ -119,7 +125,9 @@ export function VideoBlockActionsDropdown({
           }}
           className="w-full px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong"
         >
-          {channelBlocked ? "Unblock channel" : "Block channel"}
+          {channelBlocked
+            ? m.watch_unblock_channel({}, { locale })
+            : m.watch_block_channel({}, { locale })}
         </button>
       )}
     </div>,

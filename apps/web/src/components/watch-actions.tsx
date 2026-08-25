@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useFavoriteStatus } from "../hooks/use-favorite-status";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useShareUrl } from "../hooks/use-share-url";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import { prepareAudioSpectrum } from "../lib/audio-spectrum";
 import { detectProvider } from "../lib/provider";
 import { goto } from "../lib/route-redirect";
 import { toPublicWatchUrl } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { DanmakuControls } from "./danmaku-controls";
 import { DownloadSheet } from "./download-sheet";
@@ -29,6 +31,7 @@ type Props = {
   audioOnly: WatchAudioOnlyControls;
 };
 export function WatchActions({ stream, audioOnly }: Props) {
+  const { locale } = useInterfaceLocale();
   const { copied, share } = useShareUrl();
   const [playlistOpen, setPlaylistOpen] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -58,10 +61,10 @@ export function WatchActions({ stream, audioOnly }: Props) {
     }
     if (favorited) {
       await removeFavorite();
-      handleSaved("Removed from Favorites");
+      handleSaved(m.watch_removed_favorites({}, { locale }));
     } else {
       await addFavorite();
-      handleSaved("Saved to Favorites");
+      handleSaved(m.watch_saved_favorites({}, { locale }));
     }
   }
 
@@ -87,11 +90,15 @@ export function WatchActions({ stream, audioOnly }: Props) {
         active={favorited}
       >
         <StarIcon filled={favorited} />
-        {favPending ? "Saving..." : favorited ? "Favorited" : "Favorite"}
+        {favPending
+          ? m.watch_saving({}, { locale })
+          : favorited
+            ? m.watch_favorited({}, { locale })
+            : m.watch_favorite({}, { locale })}
       </WatchActionButton>
       <WatchActionButton onClick={handleDownloadMock}>
         <DownloadIcon />
-        Download
+        {m.watch_download({}, { locale })}
       </WatchActionButton>
       {audioOnlyAvailable && (
         <WatchActionButton
@@ -101,14 +108,16 @@ export function WatchActions({ stream, audioOnly }: Props) {
           active={audioOnly.active}
         >
           <HeadphonesIcon />
-          {audioOnly.loading ? "Loading audio..." : "Audio only"}
+          {audioOnly.loading
+            ? m.watch_audio_loading({}, { locale })
+            : m.watch_audio_only({}, { locale })}
         </WatchActionButton>
       )}
       <WatchActionButton onClick={() => share(toPublicWatchUrl(stream.id, window.location.origin))}>
         <ShareIcon />
-        Share
+        {m.watch_share({}, { locale })}
       </WatchActionButton>
-      <Toast message={copied ? "Link copied to clipboard" : toastLabel} />
+      <Toast message={copied ? m.watch_link_copied({}, { locale }) : toastLabel} />
       {showSave && (
         <button
           ref={saveAnchorRef}
@@ -122,7 +131,7 @@ export function WatchActions({ stream, audioOnly }: Props) {
           }`}
         >
           <ListPlusIcon />
-          Save
+          {m.watch_save({}, { locale })}
         </button>
       )}
       <WatchMoreActions
@@ -135,7 +144,7 @@ export function WatchActions({ stream, audioOnly }: Props) {
       {showReport && isAuthed && (
         <WatchActionButton onClick={() => setReportOpen(true)}>
           <BugIcon />
-          Report
+          {m.watch_report({}, { locale })}
         </WatchActionButton>
       )}
       {playlistOpen && (

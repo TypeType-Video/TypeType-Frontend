@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
 import { useBlocked } from "../hooks/use-blocked";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
 import { goto } from "../lib/route-redirect";
-import { watchLaterResultLabel } from "../lib/watch-later-labels";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { VideoBlockActionsDropdown } from "./video-block-actions-dropdown";
 import { MoreIcon } from "./watch-icons";
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props) {
+  const { locale } = useInterfaceLocale();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuAnchorRef = useRef<HTMLButtonElement>(null);
   const watchLater = useWatchLaterPlaylist();
@@ -40,18 +42,18 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
     if (!ensureAuth()) return;
     if (videoBlocked) {
       removeVideo.mutate(blockedVideo?.url ?? stream.id);
-      onSaved("Video unblocked");
+      onSaved(m.watch_video_unblocked({}, { locale }));
       return;
     }
     addVideo.mutate({ url: stream.id, global: false });
-    onSaved("Video blocked");
+    onSaved(m.watch_video_blocked({}, { locale }));
   }
 
   function toggleChannelBlock() {
     if (!stream.channelUrl || !ensureAuth()) return;
     if (channelBlocked) {
       removeChannel.mutate(blockedChannel?.url ?? stream.channelUrl);
-      onSaved("Channel unblocked");
+      onSaved(m.watch_channel_unblocked({}, { locale }));
       return;
     }
     addChannel.mutate({
@@ -60,16 +62,16 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
       thumbnailUrl: stream.channelAvatar,
       global: false,
     });
-    onSaved(`Channel blocked: ${stream.channelName}`);
+    onSaved(`${m.watch_channel_blocked({}, { locale })} ${stream.channelName}`);
   }
 
   async function toggleWatchLater() {
     if (!ensureAuth()) return;
     try {
       const saved = await watchLater.toggle(toWatchLaterPayload(stream));
-      onSaved(watchLaterResultLabel(saved));
+      onSaved(saved ? m.watch_saved_later({}, { locale }) : m.watch_removed_later({}, { locale }));
     } catch {
-      onSaved("Could not update Watch later");
+      onSaved(m.watch_could_not_update_later({}, { locale }));
     }
   }
 
@@ -82,7 +84,7 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
         className={className}
       >
         <MoreIcon />
-        More
+        {m.watch_more({}, { locale })}
       </button>
       {menuOpen && (
         <VideoBlockActionsDropdown

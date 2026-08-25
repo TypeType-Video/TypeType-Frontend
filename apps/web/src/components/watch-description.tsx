@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useClientLocale } from "../hooks/use-client-locale";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { formatExactDate } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import { RichText } from "./rich-text";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 
 export function WatchDescription({ description, uploadedAt, onSeekTimestamp }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const locale = useClientLocale();
+  const { locale } = useInterfaceLocale();
   const exactDate = formatExactDate(uploadedAt, locale);
 
   if (!expanded) {
@@ -25,7 +26,7 @@ export function WatchDescription({ description, uploadedAt, onSeekTimestamp }: P
           className="mt-2 block text-xs font-medium text-fg-muted hover:text-fg transition-colors"
           onClick={() => setExpanded(true)}
         >
-          Show more
+          {m.watch_show_more({}, { locale })}
         </button>
       </div>
     );
@@ -42,7 +43,7 @@ export function WatchDescription({ description, uploadedAt, onSeekTimestamp }: P
         className="mt-3 text-xs font-medium text-fg-muted hover:text-fg transition-colors"
         onClick={() => setExpanded(false)}
       >
-        Show less
+        {m.watch_show_less({}, { locale })}
       </button>
     </div>
   );
