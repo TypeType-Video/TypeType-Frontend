@@ -21,10 +21,13 @@ ARG BUILD_VERSION=0.1.0
 ARG BUILD_REVISION=development
 ARG BUILD_TIME=unknown
 
+# Let the official entrypoint derive the resolver from the runtime network.
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
+
 RUN apk upgrade --no-cache libxml2 libcrypto3 libssl3 libexpat
 
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 RUN short_revision="$(printf '%s' "$BUILD_REVISION" | cut -c1-12)" \
     && printf '{"service":"typetype","version":"%s","revision":"%s","shortRevision":"%s","buildTime":"%s"}\n' \
         "$BUILD_VERSION" "$BUILD_REVISION" "$short_revision" "$BUILD_TIME" \
