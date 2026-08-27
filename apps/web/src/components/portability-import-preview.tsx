@@ -63,7 +63,7 @@ export function PortabilityImportPreview({
           <ul className="mt-2 space-y-1 text-xs text-fg-muted">
             {preview.issues.map((issue) => (
               <li key={`${issue.category}-${issue.code}`}>
-                {issue.message}
+                {m.portability_issue_detected({ code: issue.code })}
                 {issue.count > 1 ? ` (${issue.count})` : ""}
               </li>
             ))}

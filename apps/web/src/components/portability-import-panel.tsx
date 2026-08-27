@@ -209,7 +209,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
       )}
       {failure && (
         <p role="alert" className="text-sm text-danger">
-          {failure instanceof Error ? failure.message : m.portability_import_failed()}
+          {m.portability_import_failed()}
         </p>
       )}
       <Toast message={toast} />

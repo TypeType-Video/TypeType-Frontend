@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import type { SearchOverlayItem } from "../lib/search-overlay-items";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   items: SearchOverlayItem[];
@@ -32,14 +33,16 @@ export function SearchOverlayList({
     <ul ref={listRef} onScroll={onScroll} className={listClass}>
       {showHistory && (
         <li className="px-4 py-2 flex items-center justify-between">
-          <span className="text-xs text-fg-soft uppercase tracking-wider">Recent searches</span>
+          <span className="text-xs text-fg-soft uppercase tracking-wider">
+            {m.portability_category_search_history_detail()}
+          </span>
           {onClearAll && (
             <button
               type="button"
               onClick={onClearAll}
               className="text-xs text-fg-soft hover:text-fg-muted transition-colors"
             >
-              Clear all
+              {m.ui_clear_all()}
             </button>
           )}
         </li>
@@ -64,7 +67,7 @@ export function SearchOverlayList({
               <span>{item.label}</span>
               {item.source === "history" && !showHistory && (
                 <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-fg-soft">
-                  History
+                  {m.nav_history()}
                 </span>
               )}
             </span>

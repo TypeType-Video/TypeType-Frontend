@@ -150,7 +150,9 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
               <p className="text-xs font-medium text-fg">{m.portability_export_notes()}</p>
               <ul className="mt-2 space-y-1 text-xs text-fg-muted">
                 {job.data.preview.issues.map((issue) => (
-                  <li key={`${issue.category}-${issue.code}`}>{issue.message}</li>
+                  <li key={`${issue.category}-${issue.code}`}>
+                    {m.portability_issue_detected({ code: issue.code })}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -202,7 +204,7 @@ export function PortabilityExportPanel({ formats }: { formats: PortabilityFormat
       )}
       {failure && (
         <p role="alert" className="text-sm text-danger">
-          {failure instanceof Error ? failure.message : m.portability_export_failed()}
+          {m.portability_export_failed()}
         </p>
       )}
       <Toast message={toast} />

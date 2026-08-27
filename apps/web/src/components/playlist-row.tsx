@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 function CheckIcon() {
   return (
     <svg
@@ -11,7 +13,7 @@ function CheckIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Selected"
+      aria-label={m.ui_selected_2()}
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>

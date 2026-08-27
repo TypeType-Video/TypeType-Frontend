@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { PLAYLIST_SORT_OPTIONS, type PlaylistSortMode } from "../lib/playlist-sort";
+import { m } from "../paraglide/messages.js";
 
 const MARGIN = 8;
 
@@ -51,8 +52,8 @@ export function PlaylistSortMenu({ value, onChange }: Props) {
         onClick={() => setOpen((previous) => !previous)}
         className="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-surface-strong"
       >
-        <span className="text-fg-muted">Sort</span>
-        <span>{current?.label ?? "Manual"}</span>
+        <span className="text-fg-muted">{m.ui_sort()}</span>
+        <span>{current?.label() ?? m.playlist_sort_manual()}</span>
         <ChevronDown
           className={`h-3.5 w-3.5 text-fg-muted transition-transform ${open ? "rotate-180" : ""}`}
           aria-hidden="true"
@@ -77,7 +78,7 @@ export function PlaylistSortMenu({ value, onChange }: Props) {
                   option.value === value ? "text-fg" : "text-fg-muted"
                 }`}
               >
-                {option.label}
+                {option.label()}
               </button>
             ))}
           </div>,

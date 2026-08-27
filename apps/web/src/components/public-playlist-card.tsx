@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { PublicPlaylistInfo } from "../types/playlist";
 
 type Props = {
@@ -7,7 +8,10 @@ type Props = {
 };
 
 export function PublicPlaylistCard({ playlist }: Props) {
-  const count = playlist.streamCount === 1 ? "1 video" : `${playlist.streamCount} videos`;
+  const count =
+    playlist.streamCount === 1
+      ? m.ui_video_count({ count: playlist.streamCount })
+      : m.ui_videos_count({ count: playlist.streamCount });
 
   return (
     <Link

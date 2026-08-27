@@ -6,6 +6,7 @@ import {
   searchFilterLabel,
   toggleSearchFilter,
 } from "../lib/search-filter-selection";
+import { m } from "../paraglide/messages.js";
 import type { SearchFilterGroup, SearchFilterOption, SearchFiltersResponse } from "../types/api";
 
 function chipClass(active: boolean): string {
@@ -77,7 +78,7 @@ export function SearchFilterBar({
             onClick={() => onContentChange(undefined)}
             className={chipClass(!contentFilter)}
           >
-            All
+            {m.admin_users_filter_all()}
           </button>
           {contentOptions.map((option) => (
             <button
@@ -103,7 +104,7 @@ export function SearchFilterBar({
             }`}
           >
             <SlidersHorizontal size={16} aria-hidden="true" />
-            <span>Filters</span>
+            <span>{m.ui_filters()}</span>
             {activeOptions.length > 0 && (
               <span className="min-w-5 rounded bg-app/15 px-1.5 text-center text-xs">
                 {activeOptions.length}
@@ -128,7 +129,7 @@ export function SearchFilterBar({
                   onFiltersChange(toggleSearchFilter(groups, selectedFilters, group.key, option))
                 }
                 className="flex h-7 items-center gap-1.5 rounded-md bg-surface-strong px-2.5 text-xs text-fg transition-colors hover:bg-surface-soft"
-                title={`Remove ${searchFilterLabel(option.label)} filter`}
+                title={m.ui_remove_filter({ label: searchFilterLabel(option.label) })}
               >
                 {searchFilterLabel(option.label)}
                 <X size={13} aria-hidden="true" />
@@ -141,11 +142,11 @@ export function SearchFilterBar({
       {open && (
         <div
           role="dialog"
-          aria-label="Search filters"
+          aria-label={m.ui_search_filters()}
           className="absolute right-0 top-[calc(100%+0.5rem)] z-40 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border-strong bg-surface shadow-2xl"
         >
           <div className="flex h-12 items-center justify-between border-b border-border px-4">
-            <h2 className="text-sm font-semibold text-fg">Filters</h2>
+            <h2 className="text-sm font-semibold text-fg">{m.ui_filters()}</h2>
             <div className="flex items-center gap-1">
               {activeOptions.length > 0 && (
                 <button
@@ -153,14 +154,14 @@ export function SearchFilterBar({
                   onClick={() => onFiltersChange([])}
                   className="h-8 px-2 text-xs font-medium text-fg-muted transition-colors hover:text-fg"
                 >
-                  Reset
+                  {m.ui_reset()}
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
-                title="Close filters"
+                title={m.ui_close_filters()}
               >
                 <X size={17} aria-hidden="true" />
               </button>

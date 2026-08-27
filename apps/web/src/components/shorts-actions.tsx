@@ -5,6 +5,7 @@ import { useShareUrl } from "../hooks/use-share-url";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
 import { shortsRouteKey, toPublicShortsUrl } from "../lib/shorts-route";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { ShortsActionButton } from "./shorts-action-button";
 
@@ -64,8 +65,8 @@ export function ShortsActions({
     <div className={`pointer-events-auto flex flex-col items-center gap-3 ${className ?? ""}`}>
       <ShortsActionButton
         icon={Star}
-        label="Favorite"
-        stateLabel={favorited ? "Saved" : "Save"}
+        label={m.watch_favorite()}
+        stateLabel={favorited ? m.watch_saved_favorites() : m.watch_save()}
         active={favorited}
         disabled={favoritesPending}
         compact={compact}
@@ -73,8 +74,8 @@ export function ShortsActions({
       />
       <ShortsActionButton
         icon={Clock3}
-        label="Watch later"
-        stateLabel={savedForLater ? "Saved" : "Watch Later"}
+        label={m.portability_category_watch_later()}
+        stateLabel={savedForLater ? m.watch_saved_later() : m.watch_save()}
         active={savedForLater}
         disabled={watchLater.isPending}
         compact={compact}
@@ -83,15 +84,15 @@ export function ShortsActions({
       {showComments && (
         <ShortsActionButton
           icon={MessageCircle}
-          label="Comments"
+          label={m.watch_comments()}
           compact={compact}
           onClick={onOpenComments}
         />
       )}
       <ShortsActionButton
         icon={Share2}
-        label="Share"
-        stateLabel={copied ? "Copied" : "Link"}
+        label={m.watch_share()}
+        stateLabel={copied ? m.ui_copied() : m.ui_link()}
         compact={compact}
         onClick={handleShare}
       />

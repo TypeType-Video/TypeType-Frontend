@@ -13,6 +13,7 @@ type Props = {
 };
 
 const ACTIVE = new Set(["queued", "analyzing", "applying", "encoding"]);
+type PortabilityProgressUnit = NonNullable<PortabilityJob["progress"]>["unit"];
 
 function progressPercent(job: PortabilityJob): number | null {
   const progress = job.progress;
@@ -33,6 +34,12 @@ function stateLabel(job: PortabilityJob, locale: Locale): string {
   }
   if (job.state === "cancelled") return m.portability_job_cancelled({}, { locale });
   return m.portability_job_failed({}, { locale });
+}
+
+function progressUnit(unit: PortabilityProgressUnit, locale: Locale): string {
+  if (unit === "records") return m.portability_progress_records({}, { locale });
+  if (unit === "categories") return m.portability_progress_categories({}, { locale });
+  return m.portability_progress_bytes({}, { locale });
 }
 
 export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLocale() }: Props) {
@@ -70,13 +77,21 @@ export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLo
             {job.progress && (
               <p className="mt-1 text-xs text-fg-soft">
                 {job.progress.processed.toLocaleString()}
-                {job.progress.total ? ` of ${job.progress.total.toLocaleString()}` : ""}{" "}
-                {job.progress.unit}
+                {job.progress.total
+                  ? m.portability_progress_of(
+                      {
+                        processed: job.progress.processed.toLocaleString(),
+                        total: job.progress.total.toLocaleString(),
+                      },
+                      { locale },
+                    )
+                  : job.progress.processed.toLocaleString()}{" "}
+                {progressUnit(job.progress.unit, locale)}
               </p>
             )}
             {job.state === "failed" && (
               <div className="mt-1.5 text-xs text-danger">
-                <p>{job.errorMessage ?? m.portability_operation_failed({}, { locale })}</p>
+                <p>{m.portability_operation_failed({}, { locale })}</p>
                 <div className="mt-1 flex items-center gap-1.5 text-fg-soft">
                   <code className="truncate">{job.errorCode ?? "portability_failed"}</code>
                   <button

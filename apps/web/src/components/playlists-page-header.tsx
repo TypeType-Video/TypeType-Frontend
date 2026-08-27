@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 type Props = {
   selectionMode: boolean;
   selectedCount: number;
@@ -20,13 +22,15 @@ export function PlaylistsPageHeader({
   const base = "rounded-lg px-3 py-2 text-sm transition-colors";
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h1 className="font-semibold text-fg text-lg">Playlists</h1>
+      <h1 className="font-semibold text-fg text-lg">{m.portability_category_playlists()}</h1>
       <div className="flex items-center gap-2">
         {selectionMode ? (
           <>
-            <span className="text-fg-soft text-xs">{selectedCount} selected</span>
+            <span className="text-fg-soft text-xs">
+              {selectedCount} {m.ui_selected()}
+            </span>
             <button type="button" onClick={onCancel} className={`${base} text-fg-muted`}>
-              Cancel
+              {m.portability_cancel()}
             </button>
             <button
               type="button"
@@ -34,7 +38,8 @@ export function PlaylistsPageHeader({
               onClick={onDelete}
               className="rounded-lg bg-danger px-3 py-2 text-sm text-white transition-colors hover:bg-danger disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Delete ({selectedCount})
+              {m.ui_delete_2()}
+              {selectedCount})
             </button>
           </>
         ) : (
@@ -45,7 +50,7 @@ export function PlaylistsPageHeader({
                 onClick={onSelect}
                 className={`${base} border border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg`}
               >
-                Select
+                {m.groups_preview_select_channel()}
               </button>
             )}
             <button
@@ -53,7 +58,7 @@ export function PlaylistsPageHeader({
               onClick={onCreate}
               className={`${base} border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft`}
             >
-              New playlist
+              {m.ui_new_playlist()}
             </button>
           </>
         )}

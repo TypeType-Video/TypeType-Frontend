@@ -10,6 +10,7 @@ import {
   resolveInitialSearchOverlayQuery,
   writeSearchOverlayQuery,
 } from "../lib/search-overlay-query";
+import { m } from "../paraglide/messages.js";
 import { ConfirmModal } from "./confirm-modal";
 import { SearchOverlayList } from "./search-overlay-list";
 
@@ -129,7 +130,7 @@ export function SearchOverlay({ onClose }: Props) {
             type="button"
             onClick={onClose}
             className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-fg hover:bg-surface-strong"
-            aria-label="Back"
+            aria-label={m.ui_back()}
           >
             <ArrowLeft size={20} />
           </button>
@@ -143,7 +144,7 @@ export function SearchOverlay({ onClose }: Props) {
               setSelectedIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search videos, channels..."
+            placeholder={m.ui_search_videos_channels()}
             className="h-10 min-w-0 flex-1 rounded-md bg-surface-strong px-4 text-base text-fg placeholder:text-fg-soft focus:outline-none"
           />
         </form>
@@ -162,9 +163,9 @@ export function SearchOverlay({ onClose }: Props) {
       </div>
       {confirmClearOpen && (
         <ConfirmModal
-          title="Clear search history?"
-          description="This removes all saved searches from your account."
-          confirmLabel="Clear all"
+          title={m.ui_clear_search_history()}
+          description={m.ui_this_removes_all_saved_searches_from_your_account()}
+          confirmLabel={m.ui_clear_all()}
           onConfirm={handleConfirmClear}
           onCancel={() => setConfirmClearOpen(false)}
         />

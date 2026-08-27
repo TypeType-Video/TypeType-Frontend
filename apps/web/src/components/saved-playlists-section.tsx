@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { SavedPlaylistItem } from "../types/playlist";
 import { SavedPlaylistCard } from "./saved-playlist-card";
 
@@ -12,8 +13,8 @@ export function SavedPlaylistsSection({ playlists, onDelete }: Props) {
   return (
     <section className="flex flex-col gap-3">
       <div>
-        <h2 className="text-sm font-semibold text-fg">Saved public playlists</h2>
-        <p className="text-xs text-fg-soft">Live public playlists saved to your library.</p>
+        <h2 className="text-sm font-semibold text-fg">{m.ui_saved_public_playlists()}</h2>
+        <p className="text-xs text-fg-soft">{m.ui_live_public_playlists_saved_to_your_library()}</p>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {playlists.map((playlist, index) => (

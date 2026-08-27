@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { PodcastItem } from "../types/api";
 
 type Props = {
@@ -9,7 +10,10 @@ type Props = {
 
 export function PodcastCard({ podcast, channelAvatar }: Props) {
   const thumbnail = proxyImage(podcast.thumbnailUrl);
-  const count = podcast.streamCount === 1 ? "1 episode" : `${podcast.streamCount} episodes`;
+  const count =
+    podcast.streamCount === 1
+      ? m.ui_episode_count({ count: podcast.streamCount })
+      : m.ui_episodes_count({ count: podcast.streamCount });
 
   return (
     <Link

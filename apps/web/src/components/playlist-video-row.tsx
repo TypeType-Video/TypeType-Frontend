@@ -6,6 +6,7 @@ import { formatDuration, formatViews } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
 import { isVideoWatched } from "../lib/watch-progress";
 import { watchRouteSearch } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import type { PlaylistVideoItem } from "../types/user";
 import { ChannelRouteLink } from "./channel-route-link";
@@ -81,7 +82,7 @@ export function PlaylistVideoRow({ video, onRemove, reorderable, listId, onDragS
               e.preventDefault();
               onRemove();
             }}
-            aria-label="Remove video"
+            aria-label={m.ui_remove_video()}
             className="absolute top-1.5 right-1.5 rounded-full bg-black/70 p-1 text-white transition-colors hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <X className="h-3 w-3" aria-hidden="true" />
@@ -92,7 +93,7 @@ export function PlaylistVideoRow({ video, onRemove, reorderable, listId, onDragS
               draggable
               onDragStart={onDragStart}
               onClick={(e) => e.preventDefault()}
-              aria-label="Drag to reorder"
+              aria-label={m.ui_drag_to_reorder()}
               className="absolute top-1.5 left-1.5 cursor-grab bg-black/70 p-1 text-white opacity-0 transition-opacity hover:bg-black/90 active:cursor-grabbing group-hover:opacity-100"
             >
               <GripVertical className="h-3 w-3" aria-hidden="true" />

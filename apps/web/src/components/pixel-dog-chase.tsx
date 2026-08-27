@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { m } from "../paraglide/messages.js";
 import {
   APPEAR_MS,
   advanceDog,
@@ -142,7 +143,7 @@ export function PixelDogChase() {
     <>
       <div className="pointer-events-none fixed inset-x-0 top-[26%] z-20 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-6">
         <span className="pixel-prompt-drop font-black text-3xl text-white uppercase tracking-[0.16em] drop-shadow-[2px_3px_0_rgba(0,0,0,0.5)] sm:text-5xl">
-          Go back to
+          {m.ui_go_back_to()}
         </span>
         {!carrying && (
           <img

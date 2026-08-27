@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import { ImportMascotLoop } from "./import-mascot-loop";
 
 export function PipePipeImportCookingState() {
@@ -10,8 +11,8 @@ export function PipePipeImportCookingState() {
           className="h-32 w-full rounded-xl object-cover sm:h-28"
         />
         <div>
-          <p className="text-base font-medium text-fg">Restoring your backup</p>
-          <p className="mt-1 text-sm text-fg-muted/80">We are plating your data now.</p>
+          <p className="text-base font-medium text-fg">{m.ui_restoring_your_backup()}</p>
+          <p className="mt-1 text-sm text-fg-muted/80">{m.ui_we_are_plating_your_data_now()}</p>
         </div>
       </div>
     </div>
