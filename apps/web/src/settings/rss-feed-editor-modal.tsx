@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { isRssFeedRequestValid } from "../lib/rss-feed-request";
+import { m } from "../paraglide/messages.js";
 import type { RssFeedItem, RssFeedRequest } from "../types/rss";
 import type { SubscriptionItem } from "../types/user";
 import { RssFilterFields, RssScopeFields } from "./rss-feed-editor-fields";
@@ -29,7 +30,7 @@ function initialRequest(feed: RssFeedItem | null, initialChannel: string | null)
     };
   }
   return {
-    name: initialChannel ? "Channel feed" : "My subscriptions",
+    name: initialChannel ? m.ui_channel_feed() : m.ui_my_subscriptions(),
     scope: initialChannel ? "channels" : "all",
     channelUrls: initialChannel ? [initialChannel] : [],
     serviceIds: [0, 5, 6],
@@ -76,7 +77,7 @@ export function RssFeedEditorModal({
     >
       <button
         type="button"
-        aria-label="Close"
+        aria-label={m.admin_users_close()}
         onClick={onClose}
         className="absolute inset-0 bg-black/65 backdrop-blur-sm"
       />
@@ -86,13 +87,13 @@ export function RssFeedEditorModal({
       >
         <header className="flex items-center justify-between border-b border-border px-4 py-3.5">
           <h2 className="text-sm font-semibold text-fg">
-            {feed ? "Edit RSS feed" : "New RSS feed"}
+            {feed ? m.ui_edit_rss_feed() : m.ui_new_rss_feed()}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
-            title="Close"
+            aria-label={m.admin_users_close()}
+            title={m.admin_users_close()}
             className="rounded p-1.5 text-fg-soft hover:bg-surface-strong hover:text-fg"
           >
             <X size={16} />
@@ -100,7 +101,7 @@ export function RssFeedEditorModal({
         </header>
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
           <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-fg-muted">Name</span>
+            <span className="text-xs font-medium text-fg-muted">{m.ui_name()}</span>
             <input
               value={request.name}
               maxLength={100}
@@ -119,14 +120,14 @@ export function RssFeedEditorModal({
             onClick={onClose}
             className="h-9 rounded-md px-3 text-sm text-fg-muted hover:bg-surface-strong hover:text-fg"
           >
-            Cancel
+            {m.portability_cancel()}
           </button>
           <button
             type="submit"
             disabled={!valid || pending}
             className="h-9 rounded-md bg-fg px-4 text-sm font-medium text-app hover:bg-fg-strong disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {pending ? "Saving..." : feed ? "Save" : "Create feed"}
+            {pending ? m.ui_saving() : feed ? m.ui_save() : m.ui_create_feed()}
           </button>
         </footer>
       </form>

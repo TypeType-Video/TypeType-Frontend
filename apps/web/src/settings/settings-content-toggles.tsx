@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useSettings } from "../hooks/use-settings";
 import { allowHideEverything } from "../lib/hide-everything";
+import { m } from "../paraglide/messages.js";
 import type { SettingsItem } from "../types/user";
 import { HideEverythingToggle } from "./hide-everything-toggle";
 import { SettingsDeArrowOptions } from "./settings-dearrow-options";
@@ -51,65 +52,69 @@ type ToggleOption = {
   area: string;
 };
 
-const WATCH_OPTIONS: ToggleOption[] = [
-  {
-    key: "autoplay",
-    label: "Autoplay next video",
-    description: "Automatically continue with the first item in the suggestions column.",
-    area: "Watch",
-  },
-];
+function watchOptions(): ToggleOption[] {
+  return [
+    {
+      key: "autoplay",
+      label: m.ui_autoplay_next_video(),
+      description: m.ui_automatically_continue_with_the_first_item_in_the_suggestions_column(),
+      area: m.ui_watch_page(),
+    },
+  ];
+}
 
-const DISCOVERY_OPTIONS: ToggleOption[] = [
-  {
-    key: "deArrowEnabled",
-    label: "DeArrow titles and thumbnails",
-    description: "Use community-written titles and representative thumbnails for YouTube videos.",
-    area: "YouTube",
-  },
-  {
-    key: "hideContinueWatching",
-    label: "Continue watching",
-    description: "Hide in-progress videos from the home page.",
-    area: "Home",
-  },
-  {
-    key: "hideHomeRecommendations",
-    label: "Home recommendations",
-    description: "Hide personalized recommendations from the home page.",
-    area: "Home",
-  },
-  {
-    key: "hideRelatedVideos",
-    label: "Related videos",
-    description: "Hide the suggestions column on watch pages.",
-    area: "Watch",
-  },
-  {
-    key: "hideComments",
-    label: "Comments and danmaku",
-    description: "Stop loading watch comments, Shorts comments, and bullet comments.",
-    area: "Watch + Shorts",
-  },
-  {
-    key: "hideShorts",
-    label: "Shorts surface",
-    description: "Hide Shorts navigation and block the Shorts page.",
-    area: "Shorts",
-  },
-  {
-    key: "hideSubscriptionLiveStreams",
-    label: "Live streams",
-    description: "Hide active and scheduled live streams from the subscriptions feed.",
-    area: "Subscriptions",
-  },
-  {
-    key: "hideMembersOnlyContent",
-    label: "Members-only videos",
-    description: "Hide videos that require a paid YouTube channel membership.",
-    area: "Discovery",
-  },
-];
+function discoveryOptions(): ToggleOption[] {
+  return [
+    {
+      key: "deArrowEnabled",
+      label: m.ui_dearrow_titles_and_thumbnails(),
+      description: m.ui_use_community_written_titles_and_representative_thumbnails_for_youtub(),
+      area: "YouTube",
+    },
+    {
+      key: "hideContinueWatching",
+      label: m.ui_continue_watching(),
+      description: m.ui_hide_in_progress_videos_from_the_home_page(),
+      area: m.nav_home(),
+    },
+    {
+      key: "hideHomeRecommendations",
+      label: m.ui_home_recommendations(),
+      description: m.ui_hide_personalized_recommendations_from_the_home_page(),
+      area: m.nav_home(),
+    },
+    {
+      key: "hideRelatedVideos",
+      label: m.ui_related_videos(),
+      description: m.ui_hide_the_suggestions_column_on_watch_pages(),
+      area: m.ui_watch_page(),
+    },
+    {
+      key: "hideComments",
+      label: m.ui_comments_and_danmaku(),
+      description: m.ui_stop_loading_watch_comments_shorts_comments_and_bullet_comments(),
+      area: m.ui_watch_and_shorts(),
+    },
+    {
+      key: "hideShorts",
+      label: m.ui_shorts_surface(),
+      description: m.ui_hide_shorts_navigation_and_block_the_shorts_page(),
+      area: m.nav_shorts(),
+    },
+    {
+      key: "hideSubscriptionLiveStreams",
+      label: m.ui_live_streams(),
+      description: m.ui_hide_active_and_scheduled_live_streams_from_the_subscriptions_feed(),
+      area: m.nav_subscriptions(),
+    },
+    {
+      key: "hideMembersOnlyContent",
+      label: m.ui_members_only_videos(),
+      description: m.ui_hide_videos_that_require_a_paid_youtube_channel_membership(),
+      area: m.ui_discovery_surfaces(),
+    },
+  ];
+}
 
 function ToggleRows({ options }: { options: ToggleOption[] }) {
   const { settings, update } = useSettings();
@@ -135,9 +140,9 @@ export function SettingsWatchToggles() {
   return (
     <>
       <div className="py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
-        Watch page
+        {m.ui_watch_page()}
       </div>
-      <ToggleRows options={WATCH_OPTIONS} />
+      <ToggleRows options={watchOptions()} />
     </>
   );
 }
@@ -147,9 +152,9 @@ export function SettingsDiscoveryToggles() {
   return (
     <>
       <div className="py-2 font-medium text-[11px] text-fg-soft uppercase tracking-wider">
-        Discovery surfaces
+        {m.ui_discovery_surfaces()}
       </div>
-      <ToggleRows options={DISCOVERY_OPTIONS} />
+      <ToggleRows options={discoveryOptions()} />
       <SettingsDeArrowOptions />
       <HideEverythingToggle />
     </>

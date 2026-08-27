@@ -1,5 +1,6 @@
 import { Copy, Pencil, Power, RefreshCw, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
+import { m } from "../paraglide/messages.js";
 import type { RssFeedItem } from "../types/rss";
 
 type Props = {
@@ -34,13 +35,13 @@ export function RssFeedRow({
   const scope =
     feed.scope === "channels"
       ? feed.channelUrls.map((url) => channelNames.get(url) ?? url).join(", ")
-      : "All subscriptions";
+      : m.ui_all_subscriptions();
   const services = feed.serviceIds.map((id) => SERVICE_NAMES.get(id) ?? String(id)).join(", ");
   const types = [
-    feed.includeVideos && "Videos",
-    feed.includeShorts && "Shorts",
-    feed.includeLive && "Live",
-    feed.includeUpcoming && "Upcoming",
+    feed.includeVideos && m.ui_videos(),
+    feed.includeShorts && m.nav_shorts(),
+    feed.includeLive && m.ui_live(),
+    feed.includeUpcoming && m.ui_upcoming(),
   ]
     .filter(Boolean)
     .join(", ");
@@ -54,7 +55,7 @@ export function RssFeedRow({
           <h3 className="truncate text-sm font-medium text-fg">{feed.name}</h3>
           <span
             className={`h-1.5 w-1.5 shrink-0 rounded-full ${feed.enabled ? "bg-emerald-500" : "bg-fg-soft"}`}
-            title={feed.enabled ? "Enabled" : "Disabled"}
+            title={feed.enabled ? m.ui_enabled() : m.ui_disabled()}
           />
         </div>
         <p className="mt-1 truncate text-xs text-fg-muted">{scope}</p>
@@ -64,24 +65,24 @@ export function RssFeedRow({
       </div>
       <div className="flex shrink-0 items-center gap-1 self-end sm:self-auto">
         {knownLink && (
-          <IconButton label="Copy private link" onClick={onCopy}>
+          <IconButton label={m.ui_copy_private_link()} onClick={onCopy}>
             <Copy size={14} />
           </IconButton>
         )}
-        <IconButton label="Edit feed" onClick={onEdit}>
+        <IconButton label={m.ui_edit_feed()} onClick={onEdit}>
           <Pencil size={14} />
         </IconButton>
         <IconButton
-          label={feed.enabled ? "Disable feed" : "Enable feed"}
+          label={feed.enabled ? m.ui_disable_feed() : m.ui_enable_feed()}
           onClick={onToggle}
           disabled={pending}
         >
           <Power size={14} />
         </IconButton>
-        <IconButton label="Replace private link" onClick={onRegenerate} disabled={pending}>
+        <IconButton label={m.ui_replace_private_link()} onClick={onRegenerate} disabled={pending}>
           <RefreshCw size={14} />
         </IconButton>
-        <IconButton label="Delete feed" onClick={onDelete} disabled={pending} danger>
+        <IconButton label={m.ui_delete_feed()} onClick={onDelete} disabled={pending} danger>
           <Trash2 size={14} />
         </IconButton>
       </div>

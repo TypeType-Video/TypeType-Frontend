@@ -1,6 +1,7 @@
 import { Check, Search } from "lucide-react";
 import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 import { ChannelAvatar } from "../components/channel-avatar";
+import { m } from "../paraglide/messages.js";
 import type { RssFeedRequest, RssScope } from "../types/rss";
 import type { SubscriptionItem } from "../types/user";
 
@@ -15,12 +16,14 @@ const SERVICES = [
   { id: 6, label: "NicoNico" },
 ];
 
-const TYPES = [
-  { key: "includeVideos", label: "Videos" },
-  { key: "includeShorts", label: "Shorts" },
-  { key: "includeLive", label: "Live" },
-  { key: "includeUpcoming", label: "Upcoming" },
-] as const;
+function types() {
+  return [
+    { key: "includeVideos", label: m.ui_videos() },
+    { key: "includeShorts", label: m.nav_shorts() },
+    { key: "includeLive", label: m.ui_live() },
+    { key: "includeUpcoming", label: m.ui_upcoming() },
+  ] as const;
+}
 
 export function RssScopeFields({
   request,
@@ -59,7 +62,9 @@ export function RssScopeFields({
   return (
     <>
       <fieldset className="space-y-2">
-        <legend className="text-xs font-medium text-fg-muted">Subscriptions</legend>
+        <legend className="text-xs font-medium text-fg-muted">
+          {m.portability_category_subscriptions()}
+        </legend>
         <div className="grid grid-cols-2 gap-1 rounded-md bg-app p-1">
           {(["all", "channels"] as const).map((scope) => (
             <button
@@ -73,7 +78,7 @@ export function RssScopeFields({
                   : "text-fg-soft hover:text-fg"
               }`}
             >
-              {scope === "all" ? "All" : "Channels"}
+              {scope === "all" ? m.ui_all() : m.groups_preview_channels()}
             </button>
           ))}
         </div>
@@ -81,7 +86,7 @@ export function RssScopeFields({
       {request.scope === "channels" && (
         <fieldset className="space-y-2">
           <legend className="flex w-full items-center justify-between text-xs font-medium text-fg-muted">
-            <span>Channels</span>
+            <span>{m.groups_preview_channels()}</span>
             <span className="font-normal text-fg-soft">{request.channelUrls.length} / 100</span>
           </legend>
           <div className="overflow-hidden rounded-md border border-border bg-app">
@@ -90,7 +95,7 @@ export function RssScopeFields({
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search subscriptions"
+                placeholder={m.ui_search_subscriptions()}
                 className="min-w-0 flex-1 bg-transparent text-sm text-fg outline-none placeholder:text-fg-soft"
               />
             </label>
@@ -120,7 +125,7 @@ export function RssScopeFields({
               })}
               {filteredSubscriptions.length === 0 && (
                 <p className="px-3 py-4 text-center text-xs text-fg-soft">
-                  No matching subscriptions
+                  {m.ui_no_matching_subscriptions()}
                 </p>
               )}
             </div>
@@ -144,7 +149,7 @@ export function RssFilterFields({ request, setRequest }: SharedProps) {
   return (
     <>
       <fieldset className="space-y-2">
-        <legend className="text-xs font-medium text-fg-muted">Services</legend>
+        <legend className="text-xs font-medium text-fg-muted">{m.settings_services_label()}</legend>
         <div className="grid grid-cols-3 gap-2">
           {SERVICES.map((service) => {
             const selected = request.serviceIds.includes(service.id);
@@ -163,9 +168,9 @@ export function RssFilterFields({ request, setRequest }: SharedProps) {
         </div>
       </fieldset>
       <fieldset className="space-y-2">
-        <legend className="text-xs font-medium text-fg-muted">Content</legend>
+        <legend className="text-xs font-medium text-fg-muted">{m.ui_content()}</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {TYPES.map((type) => (
+          {types().map((type) => (
             <label
               key={type.key}
               className="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border bg-app px-2.5 text-xs text-fg-muted"
