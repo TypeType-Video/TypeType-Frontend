@@ -12,6 +12,7 @@ import {
   sponsorBlockSkipTarget,
 } from "../lib/sponsorblock-skip";
 import { useMediaPlayer, useMediaRemote } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import type { SponsorBlockSegmentItem } from "../types/api";
 
 type Props = {
@@ -124,7 +125,7 @@ export function SponsorBlockCurrentSegment({
       <div className="min-w-0 leading-tight">
         <div className="truncate font-medium">{label}</div>
         <div className="hidden text-[10px] uppercase tracking-wide text-white/55 sm:block">
-          SponsorBlock
+          {m.ui_sponsorblock()}
         </div>
       </div>
       {canSkip && (
@@ -134,7 +135,7 @@ export function SponsorBlockCurrentSegment({
           className="ml-1 inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-black transition-colors hover:bg-white/85"
         >
           <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
-          Skip
+          {m.portability_skip()}
         </button>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
+import { m } from "../paraglide/messages.js";
 import type { WatchPlaylistItem } from "../types/playlist";
 import type { VideoStream } from "../types/stream";
 
@@ -66,7 +67,7 @@ export function useWatchEndedNavigation({
     if (nextParam) {
       return {
         id: nextParam,
-        title: nextVideo?.title ?? "Next video",
+        title: nextVideo?.title ?? m.player_next_video_fallback(),
         thumbnail: nextVideo?.thumbnail ?? "",
         channelName: nextVideo?.channelName ?? "",
         source: "playlist",

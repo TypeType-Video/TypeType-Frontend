@@ -1,4 +1,5 @@
 import { toSubtitleVttUrl } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { SubtitleItem } from "../types/api";
 
 type SafeSubtitleTrack = {
@@ -14,7 +15,7 @@ function normalizeText(value: unknown): string {
 }
 
 function uniqueLabel(base: string, isAuto: boolean, used: Map<string, number>): string {
-  const label = isAuto ? `${base} (auto)` : base;
+  const label = isAuto ? m.ui_subtitle_auto({ label: base }) : base;
   const seen = used.get(label) ?? 0;
   used.set(label, seen + 1);
   return seen > 0 ? `${label} (${seen + 1})` : label;

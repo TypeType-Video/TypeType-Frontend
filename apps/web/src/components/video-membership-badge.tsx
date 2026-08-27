@@ -1,4 +1,5 @@
 import { LockKeyhole } from "lucide-react";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   compact?: boolean;
@@ -12,7 +13,7 @@ export function VideoMembershipBadge({ compact = false }: Props) {
       }`}
     >
       <LockKeyhole aria-hidden="true" className={compact ? "size-3" : "size-3.5"} />
-      Members only
+      {m.ui_members_only()}
     </span>
   );
 }

@@ -3,6 +3,7 @@ import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import { sabrMediaSrc } from "../lib/sabr-vidstack-loader";
 import type { MediaSrc } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import type { SubtitleItem } from "../types/api";
 import { PlayerDefaults, PlayerPlaybackSpeedDefault } from "./player-defaults";
 import { Toast } from "./toast";
@@ -90,7 +91,7 @@ export function ShortsVideoPlayer({
               defaultAudioLanguage={defaultAudioLanguage}
               preferOriginalLanguage={preferOriginalLanguage}
               requireOriginalLanguage
-              onOriginalLanguageUnavailable={() => setToast("Original audio unavailable")}
+              onOriginalLanguageUnavailable={() => setToast(m.ui_original_audio_unavailable())}
               originalAudioTrackId={originalAudioTrackId}
               preferredDefaultAudioTrackId={preferredDefaultAudioTrackId}
               originalAudioLocale={originalAudioLocale}

@@ -18,6 +18,7 @@ import {
 import { useShortsNavigation } from "../lib/shorts-navigation";
 import { toPublicWatchParam } from "../lib/watch-url";
 import { youtubeSessionReturnToForShorts } from "../lib/youtube-session-route";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   targetUrl?: string;
@@ -85,7 +86,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
   if (!active) {
     return (
       <div className="flex items-center justify-center pt-24">
-        <p className="text-sm text-fg-muted">No shorts available right now.</p>
+        <p className="text-sm text-fg-muted">{m.ui_no_shorts_available_right_now()}</p>
       </div>
     );
   }

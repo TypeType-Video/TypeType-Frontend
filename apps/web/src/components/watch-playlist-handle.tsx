@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import type { DragEvent } from "react";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   reorderable: boolean;
@@ -28,7 +29,7 @@ export function WatchPlaylistHandle({
           type="button"
           onClick={() => onMove(-1)}
           disabled={index === 0}
-          aria-label="Move up"
+          aria-label={m.ui_move_up()}
           className="transition-colors hover:text-fg disabled:opacity-30"
         >
           <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
@@ -37,7 +38,7 @@ export function WatchPlaylistHandle({
           type="button"
           onClick={() => onMove(1)}
           disabled={index === total - 1}
-          aria-label="Move down"
+          aria-label={m.ui_move_down()}
           className="transition-colors hover:text-fg disabled:opacity-30"
         >
           <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
@@ -51,7 +52,7 @@ export function WatchPlaylistHandle({
       draggable
       onDragStart={onDragStart}
       onClick={(event) => event.preventDefault()}
-      aria-label="Drag to reorder"
+      aria-label={m.ui_drag_to_reorder()}
       className="flex w-5 shrink-0 cursor-grab justify-center text-fg-soft transition-colors hover:text-fg active:cursor-grabbing"
     >
       <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />

@@ -3,6 +3,7 @@ import { useSabrPlaybackConfig } from "../hooks/use-sabr-playback-config";
 import { detectProvider } from "../lib/provider";
 import { shortsPlaybackSourceKind, shortsPlaybackState } from "../lib/shorts-playback-state";
 import { resolveManifestSrc } from "../lib/stream-src";
+import { m } from "../paraglide/messages.js";
 import { PageSpinner } from "./page-spinner";
 import { ShortsActions } from "./shorts-actions";
 import { ShortsCommentsSheetSlot } from "./shorts-comments-sheet-slot";
@@ -95,12 +96,12 @@ export function ShortsPlayerStage({
   const playbackMessage =
     state === "source-unavailable"
       ? youtube
-        ? "SABR playback is unavailable for this Short"
-        : "Playback is unavailable for this Short"
+        ? m.ui_sabr_playback_is_unavailable_for_this_short()
+        : m.ui_playback_unavailable_for_short()
       : state === "playback-error"
-        ? "This Short stopped playing"
+        ? m.ui_this_short_stopped_playing()
         : isMemberOnlyShort
-          ? "This Short is only available for members"
+          ? m.ui_this_short_is_only_available_for_members()
           : errorMessage;
 
   return (

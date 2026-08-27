@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchFavorites } from "../lib/api-collections";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import type { FavoriteItem, PlaylistVideoItem } from "../types/user";
 import { useAuth } from "./use-auth";
@@ -31,7 +32,7 @@ function mapFavoritePlaylistItem(item: FavoriteItem, position: number): Playlist
   return {
     id: item.videoUrl,
     url: item.videoUrl,
-    title: item.title ?? "Unavailable video",
+    title: item.title ?? m.player_unavailable_video(),
     thumbnail: item.thumbnail ?? "",
     channelName: item.channelName ?? "",
     channelUrl: item.channelUrl ?? "",

@@ -6,6 +6,7 @@ import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
 import { goto } from "../lib/route-redirect";
 import { watchLaterResultLabel } from "../lib/watch-later-labels";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { PlaylistAddDropdown } from "./playlist-add-dropdown";
 import { VideoBlockActionsDropdown } from "./video-block-actions-dropdown";
@@ -71,7 +72,7 @@ export function VideoCardFeedbackPanel({ stream, anchorEl, onClose, onSaved }: P
       const saved = await watchLater.toggle(toWatchLaterPayload(stream));
       onSaved(watchLaterResultLabel(saved));
     } catch {
-      onSaved("Could not update Watch later");
+      onSaved(m.ui_watch_later_update_failed());
     }
   }
 

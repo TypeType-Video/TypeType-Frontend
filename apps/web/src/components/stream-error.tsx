@@ -1,9 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useAuth } from "../hooks/use-auth";
-import { FAMILY_LIST_BLOCKED_MESSAGE } from "../lib/allow-list-error";
+import { familyListBlockedMessage } from "../lib/allow-list-error";
 import { parseGeoRestriction } from "../lib/geo-restriction";
 import { isMemberOnlyMessage } from "../lib/member-only";
 import { type VideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
+import { m } from "../paraglide/messages.js";
 import { FlagIcon } from "./flag-icon";
 import { VideoAvailabilityPoster } from "./video-availability-poster";
 import { YoutubeIcon } from "./youtube-icon";
@@ -12,6 +13,7 @@ type Props = {
   message: string;
   onRetry?: () => void;
   youtubeSessionReturnTo?: string;
+  familyListBlocked?: boolean;
   availability?: VideoAvailability;
   poster?: string;
 };
@@ -20,6 +22,7 @@ export function StreamError({
   message,
   onRetry,
   youtubeSessionReturnTo,
+  familyListBlocked: familyListBlockedOverride,
   availability,
   poster,
 }: Props) {
@@ -29,7 +32,7 @@ export function StreamError({
   const displayedMessage = availabilityCopy?.message ?? message;
   const countryCode = parseGeoRestriction(displayedMessage);
   const isMemberOnly = availability === "members_only" || isMemberOnlyMessage(displayedMessage);
-  const familyListBlocked = message === FAMILY_LIST_BLOCKED_MESSAGE;
+  const familyListBlocked = familyListBlockedOverride ?? message === familyListBlockedMessage();
   const imageSrc = familyListBlocked
     ? "/family-list-blocked.gif"
     : isMemberOnly
@@ -51,7 +54,7 @@ export function StreamError({
           />
           <div className="flex flex-col items-center gap-1.5">
             <p className="text-base font-semibold tracking-tight text-white">
-              Couldn't load this video
+              {m.ui_couldn_t_load_this_video()}
             </p>
             <div className="flex items-center gap-2">
               {countryCode && (
@@ -69,7 +72,7 @@ export function StreamError({
             onClick={onRetry}
             className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
-            Retry
+            {m.ui_retry()}
           </button>
         )}
         {youtubeSessionReturnTo && (
@@ -79,7 +82,7 @@ export function StreamError({
             className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
             <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
-            <span>Connect with YouTube</span>
+            <span>{m.ui_connect_with_youtube()}</span>
           </Link>
         )}
         {familyListBlocked && canGlobalBlock && (
@@ -88,7 +91,7 @@ export function StreamError({
             search={{ section: "allow-list" }}
             className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
-            Open allow list
+            {m.ui_open_allow_list()}
           </Link>
         )}
         <button
@@ -96,7 +99,7 @@ export function StreamError({
           onClick={() => router.history.back()}
           className="cursor-pointer rounded-md bg-surface-strong px-5 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-soft"
         >
-          Go back
+          {m.not_found_back()}
         </button>
       </div>
     </div>

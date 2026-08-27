@@ -7,8 +7,8 @@ import type {
 import { ApiError } from "./api";
 import {
   DOWNLOADER_INSUFFICIENT_STORAGE_CODE,
-  DOWNLOADER_INSUFFICIENT_STORAGE_MESSAGE,
   DownloaderApiError,
+  downloaderInsufficientStorageMessage,
   normalizeDownloaderErrorCode,
 } from "./downloader-errors";
 import { API_BASE as BASE } from "./env";
@@ -42,7 +42,7 @@ function readDownloaderError(body: unknown, status: number, fallback: string): D
   const code = normalizeDownloaderErrorCode(status, readStringField(body, "code"));
   const message =
     code === DOWNLOADER_INSUFFICIENT_STORAGE_CODE
-      ? DOWNLOADER_INSUFFICIENT_STORAGE_MESSAGE
+      ? downloaderInsufficientStorageMessage()
       : readErrorMessage(body, fallback);
   return new DownloaderApiError(message, status, code);
 }

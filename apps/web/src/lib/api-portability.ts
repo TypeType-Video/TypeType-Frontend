@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
@@ -185,7 +186,7 @@ export async function downloadPortabilityArtifact(
         suggestedName,
         types: [
           {
-            description: "Backup archive",
+            description: m.ui_backup_archive(),
             accept: { "application/octet-stream": [".zip", ".json", ".db", ".opml"] },
           },
         ],

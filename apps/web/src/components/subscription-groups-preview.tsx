@@ -426,7 +426,7 @@ export function SubscriptionGroupsPreview() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleChannel(channel.id)}
-                        aria-label={`${m.groups_preview_select_channel({}, { locale })} ${channel.name}`}
+                        aria-label={m.ui_select_named_channel({ name: channel.name }, { locale })}
                         className="h-6 w-6 shrink-0 accent-blue-400 sm:h-4 sm:w-4"
                       />
                       <ChannelAvatar src="" name={channel.name} className="h-9 w-9" />

@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 type Props = {
   playing: boolean;
   onToggle: () => void;
@@ -8,7 +10,7 @@ export function ZenSoundToggle({ playing, onToggle }: Props) {
     <button
       type="button"
       onClick={onToggle}
-      aria-label={playing ? "Mute zen music" : "Play zen music"}
+      aria-label={playing ? m.ui_mute_zen_music() : m.ui_play_zen_music()}
       className="fixed top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-colors hover:bg-black/50"
     >
       <svg

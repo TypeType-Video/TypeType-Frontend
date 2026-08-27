@@ -18,6 +18,7 @@ import { useWatchRecommendations } from "../hooks/use-watch-recommendations";
 import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { useWatchToast } from "../hooks/use-watch-toast";
 import { getOriginalAudioLocale } from "../lib/audio-track";
+import { m } from "../paraglide/messages.js";
 import { useDanmakuStore } from "../stores/danmaku-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import { Toast } from "./toast";
@@ -148,7 +149,7 @@ export function WatchLayout({
             stream={stream}
             settings={settings}
             qualityFailed={player.qualityFailed}
-            onOriginalLanguageUnavailable={() => setToast("Original audio unavailable")}
+            onOriginalLanguageUnavailable={() => setToast(m.ui_original_audio_unavailable())}
           />
         }
         autoplayState={autoplay.autoplayState}
@@ -178,7 +179,7 @@ export function WatchLayout({
         onPreviousVideo={playlist.playPrevious}
         onNextVideo={playlist.playNext}
         onError={(positionMs) =>
-          audioOnly.fail() ? setToast("Audio only unavailable") : handlePlayerError(positionMs)
+          audioOnly.fail() ? setToast(m.ui_audio_only_unavailable()) : handlePlayerError(positionMs)
         }
         onReset={player.reset}
       />

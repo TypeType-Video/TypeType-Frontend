@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   onPrev: () => void;
@@ -10,8 +11,13 @@ type Props = {
 export function ShortsNavigation({ onPrev, onNext, hasPrev, hasNext }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <NavButton icon={ChevronUp} onClick={onPrev} disabled={!hasPrev} label="Previous" />
-      <NavButton icon={ChevronDown} onClick={onNext} disabled={!hasNext} label="Next" />
+      <NavButton
+        icon={ChevronUp}
+        onClick={onPrev}
+        disabled={!hasPrev}
+        label={m.player_previous_video()}
+      />
+      <NavButton icon={ChevronDown} onClick={onNext} disabled={!hasNext} label={m.ui_next()} />
     </div>
   );
 }
