@@ -270,7 +270,6 @@
   "portability_import_description": "Prévisualisez les données et choisissez ce qui doit être restauré.",
   "portability_import_from": "Importer depuis",
   "portability_choose_or_drop": "Choisissez ou déposez une sauvegarde",
-  "portability_drop_hint": "Déposez le fichier de sauvegarde original. Rien ne sera importé avant la validation de l'aperçu.",
   "portability_drop_original_prefix": "Déposez le fichier original",
   "portability_drop_original_suffix": "de sauvegarde. Rien ne sera importé avant la validation de l'aperçu.",
   "portability_duplicate_records": "enregistrements en double trouvés",

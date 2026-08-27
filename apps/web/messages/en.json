@@ -270,7 +270,6 @@
   "portability_import_description": "Preview and choose what to restore.",
   "portability_import_from": "Import from",
   "portability_choose_or_drop": "Choose or drop a backup",
-  "portability_drop_hint": "Drop the original backup file. Nothing is imported until you review the preview.",
   "portability_drop_original_prefix": "Drop the original",
   "portability_drop_original_suffix": "file. Nothing is imported until you review the preview.",
   "portability_duplicate_records": "duplicate records found",
