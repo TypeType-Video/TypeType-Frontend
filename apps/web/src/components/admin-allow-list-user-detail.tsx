@@ -2,6 +2,7 @@ import {
   useAdminAllowListMutations,
   useAdminUserAllowList,
 } from "../hooks/use-admin-granular-allow-list";
+import { m } from "../paraglide/messages.js";
 import type { AdminAllowListUser } from "../types/allow-list";
 import { AdminAllowListChannelList } from "./admin-allow-list-channel-list";
 import { AdminAllowListForm } from "./admin-allow-list-form";
@@ -18,36 +19,36 @@ type Props = {
 function accessState(user: AdminAllowListUser, instanceRestricted: boolean) {
   if (user.accessMode === "allow_list") {
     return {
-      label: "User-specific allow-list",
-      action: instanceRestricted ? "Set unrestricted override" : "Unrestrict user",
+      label: m.ui_user_specific_allow_list(),
+      action: instanceRestricted ? m.ui_set_unrestricted_override() : m.ui_unrestrict_user(),
       nextMode: "unrestricted" as const,
-      toast: instanceRestricted ? "Unrestricted override set" : "User unrestricted",
+      toast: instanceRestricted ? m.ui_unrestricted_override_set() : m.ui_user_unrestricted(),
       active: true,
     };
   }
   if (instanceRestricted && user.adminManagedAccessMode) {
     return {
-      label: "Admin unrestricted override",
-      action: "Restrict user",
+      label: m.ui_admin_unrestricted_override(),
+      action: m.ui_restrict_user(),
       nextMode: "allow_list" as const,
-      toast: "User restricted",
+      toast: m.ui_user_restricted(),
       active: true,
     };
   }
   if (instanceRestricted) {
     return {
-      label: "Restricted by entire instance",
-      action: "Set unrestricted override",
+      label: m.ui_restricted_by_entire_instance(),
+      action: m.ui_set_unrestricted_override(),
       nextMode: "unrestricted" as const,
-      toast: "Unrestricted override set",
+      toast: m.ui_unrestricted_override_set(),
       active: false,
     };
   }
   return {
-    label: "Unrestricted",
-    action: "Restrict user",
+    label: m.admin_unrestricted_label(),
+    action: m.ui_restrict_user(),
     nextMode: "allow_list" as const,
-    toast: "User restricted",
+    toast: m.ui_user_restricted(),
     active: false,
   };
 }
@@ -73,8 +74,7 @@ export function AdminAllowListUserDetail({ user, instanceRestricted, onToast }: 
       { id: selected.id, accessMode: state.nextMode },
       {
         onSuccess: () => onToast(state.toast),
-        onError: (error) =>
-          onToast(error instanceof Error ? error.message : "Unable to update user"),
+        onError: () => onToast(m.ui_unable_to_update_user()),
       },
     );
   }
@@ -82,7 +82,7 @@ export function AdminAllowListUserDetail({ user, instanceRestricted, onToast }: 
   if (detail.isLoading || !data) {
     return (
       <section className="border-t border-border pt-4 text-sm text-fg-soft">
-        Loading user allow list...
+        {m.ui_loading_user_allow_list()}
       </section>
     );
   }
@@ -128,34 +128,37 @@ export function AdminAllowListUserDetail({ user, instanceRestricted, onToast }: 
         </div>
       </section>
 
-      <AdminAllowListChannelList title="Inherited global channels" channels={data.globalChannels} />
+      <AdminAllowListChannelList
+        title={m.ui_inherited_global_channels()}
+        channels={data.globalChannels}
+      />
       <AdminAllowListPlaylistList
-        title="Inherited global playlists"
+        title={m.ui_inherited_global_playlists()}
         playlists={data.globalPlaylists}
       />
 
       <AdminAllowListForm
-        title="Add channel for this user"
-        description="Search by channel name or handle. This does not affect other users."
+        title={m.ui_add_channel_for_this_user()}
+        description={m.ui_search_by_channel_name_or_handle_this_does_not_affect_other_users()}
         trustedUrls={[...data.globalChannels, ...data.userChannels].map((item) => item.url)}
         pending={mutations.addUserChannel.isPending}
         onAdd={(channel) => mutations.addUserChannel.mutate({ id: selected.id, channel })}
       />
       <AdminAllowListChannelList
-        title="User channels"
+        title={m.ui_user_channels()}
         channels={data.userChannels}
         onRemove={(url) => mutations.removeUserChannel.mutate({ id: selected.id, url })}
       />
 
       <AdminAllowListPlaylistSearch
-        title="Add playlist for this user"
-        description="Search playlists by name. This does not affect other users."
+        title={m.ui_add_playlist_for_this_user()}
+        description={m.ui_search_playlists_by_name_this_does_not_affect_other_users()}
         addedUrls={[...data.globalPlaylists, ...data.userPlaylists].map((item) => item.url)}
         pending={mutations.addUserPlaylist.isPending}
         onAdd={(playlist) => mutations.addUserPlaylist.mutate({ id: selected.id, playlist })}
       />
       <AdminAllowListPlaylistList
-        title="User playlists"
+        title={m.ui_user_playlists()}
         playlists={data.userPlaylists}
         onRemove={(url) => mutations.removeUserPlaylist.mutate({ id: selected.id, url })}
       />

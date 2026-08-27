@@ -1,5 +1,6 @@
 import { Power, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
+import { m } from "../paraglide/messages.js";
 import type { AdminRssFeedItem } from "../types/rss";
 
 type FeedRowProps = {
@@ -19,16 +20,18 @@ export function AdminRssFeedRow({
 }: FeedRowProps) {
   const scope =
     item.feed.scope === "channels"
-      ? `${item.feed.channelUrls.length} selected ${item.feed.channelUrls.length === 1 ? "channel" : "channels"}`
-      : "All subscriptions";
+      ? item.feed.channelUrls.length === 1
+        ? m.ui_selected_channel({ count: item.feed.channelUrls.length })
+        : m.ui_selected_channels({ count: item.feed.channelUrls.length })
+      : m.ui_all_subscriptions();
   const status = item.userSuspended
-    ? "Account suspended"
+    ? m.ui_account_suspended()
     : !item.userRssEnabled
-      ? "Account RSS off"
+      ? m.ui_account_rss_off()
       : item.feed.enabled
-        ? "Active"
-        : "Feed off";
-  const active = status === "Active";
+        ? m.admin_users_active()
+        : m.ui_feed_off();
+  const active = item.feed.enabled && item.userRssEnabled && !item.userSuspended;
 
   return (
     <article
@@ -48,24 +51,28 @@ export function AdminRssFeedRow({
       </div>
       <div className="min-w-0 text-xs text-fg-soft">
         <p className="truncate">{scope}</p>
-        <p className="mt-1">Last read: {formatLastUsed(item.feed.lastUsedAt)}</p>
+        <p className="mt-1">
+          {m.ui_last_read()} {formatLastUsed(item.feed.lastUsedAt)}
+        </p>
       </div>
       <div className="flex items-center justify-end gap-1">
         <ActionButton
-          label={item.feed.enabled ? "Disable feed" : "Enable feed"}
+          label={item.feed.enabled ? m.ui_disable_feed() : m.ui_enable_feed()}
           disabled={pending}
           onClick={onToggleFeed}
         >
           <Power size={14} />
         </ActionButton>
         <ActionButton
-          label={item.userRssEnabled ? "Disable RSS for account" : "Enable RSS for account"}
+          label={
+            item.userRssEnabled ? m.ui_disable_rss_for_account() : m.ui_enable_rss_for_account()
+          }
           disabled={pending}
           onClick={onToggleUser}
         >
           {item.userRssEnabled ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
         </ActionButton>
-        <ActionButton label="Revoke feed" disabled={pending} onClick={onRevoke} danger>
+        <ActionButton label={m.ui_revoke_feed()} disabled={pending} onClick={onRevoke} danger>
           <Trash2 size={14} />
         </ActionButton>
       </div>
@@ -97,7 +104,7 @@ export function AdminRssPagination({
         onClick={() => onPage(page - 1)}
         className="h-8 rounded-md border border-border px-3 disabled:opacity-40"
       >
-        Prev
+        {m.ui_prev()}
       </button>
       <span>
         {page} / {totalPages}
@@ -108,7 +115,7 @@ export function AdminRssPagination({
         onClick={() => onPage(page + 1)}
         className="h-8 rounded-md border border-border px-3 disabled:opacity-40"
       >
-        Next
+        {m.ui_next()}
       </button>
     </div>
   );
@@ -152,6 +159,6 @@ function ActionButton({
 }
 
 function formatLastUsed(timestamp: number | null): string {
-  if (timestamp === null) return "Never";
+  if (timestamp === null) return m.ui_never();
   return new Date(timestamp).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }

@@ -1,5 +1,6 @@
 import { Activity, CircleAlert } from "lucide-react";
 import { formatTimestamp } from "../lib/bug-report-utils";
+import { m } from "../paraglide/messages.js";
 import type { BugReportDetail } from "../types/bug-report";
 
 type Props = { report: BugReportDetail };
@@ -40,7 +41,9 @@ export function AdminBugReportDiagnosticsDetails({ report }: Props) {
     <div className="space-y-3">
       {report.context.playerState && (
         <details className="border-t border-border pt-3">
-          <summary className="cursor-pointer text-xs font-medium text-fg">Player snapshot</summary>
+          <summary className="cursor-pointer text-xs font-medium text-fg">
+            {m.ui_player_snapshot()}
+          </summary>
           <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-app p-3 text-[11px] text-fg-muted">
             {JSON.stringify(report.context.playerState, null, 2)}
           </pre>
@@ -49,7 +52,8 @@ export function AdminBugReportDiagnosticsDetails({ report }: Props) {
       {timeline.length > 0 && (
         <details open className="border-t border-border pt-3">
           <summary className="cursor-pointer text-xs font-medium text-fg">
-            Event timeline ({timeline.length})
+            {m.ui_event_timeline()}
+            {timeline.length})
           </summary>
           <div className="mt-3 max-h-[32rem] space-y-1 overflow-y-auto pr-1">
             {timeline.map((entry) => (
@@ -74,7 +78,7 @@ export function AdminBugReportDiagnosticsDetails({ report }: Props) {
                   )}
                   {entry.requestId && (
                     <p className="mt-1 font-mono text-[10px] text-fg-soft">
-                      requestId: {entry.requestId}
+                      {m.ui_requestid()} {entry.requestId}
                     </p>
                   )}
                 </div>

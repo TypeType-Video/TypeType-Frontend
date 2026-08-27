@@ -1,5 +1,6 @@
 import { useAdminSessions } from "../hooks/use-admin-sessions";
 import { useAdminUsers } from "../hooks/use-admin-users";
+import { m } from "../paraglide/messages.js";
 import { AdminSessionCard } from "./admin-session-card";
 
 type Props = {
@@ -15,7 +16,7 @@ export function AdminSessionsSection({ enabled }: Props) {
   if (query.isPending) {
     return (
       <section className="rounded-lg border border-border bg-surface/70 p-4 text-center text-sm text-fg-muted sm:p-6">
-        Loading active sessions...
+        {m.ui_loading_active_sessions()}
       </section>
     );
   }
@@ -23,7 +24,7 @@ export function AdminSessionsSection({ enabled }: Props) {
   if (query.isError) {
     return (
       <section className="rounded-lg border border-danger bg-danger/30 p-4 text-center text-sm text-danger-strong sm:p-6">
-        Unable to load active sessions.
+        {m.ui_unable_to_load_active_sessions()}
       </section>
     );
   }
@@ -31,7 +32,7 @@ export function AdminSessionsSection({ enabled }: Props) {
   if (sessions.length === 0) {
     return (
       <section className="rounded-lg border border-border bg-surface/70 p-4 text-center text-sm text-fg-muted sm:p-6">
-        No active sessions are currently reported.
+        {m.ui_no_active_sessions_are_currently_reported()}
       </section>
     );
   }

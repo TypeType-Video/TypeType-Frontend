@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { m } from "../paraglide/messages.js";
 import type { BugReportDetail } from "../types/bug-report";
 import { AdminBugReportDiagnosticsDetails } from "./admin-bug-report-diagnostics-details";
 import { AdminBugReportDiagnosticsMeta } from "./admin-bug-report-diagnostics-meta";
@@ -25,13 +26,15 @@ export function AdminBugReportDiagnostics({ report }: Props) {
   return (
     <section className="space-y-3 border-t border-border pt-3">
       <div className="flex items-center justify-between">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-fg-soft">Diagnostics</p>
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-fg-soft">
+          {m.ui_diagnostics()}
+        </p>
         <button
           type="button"
           onClick={copyDiagnostics}
           className="rounded border border-border-strong px-2 py-1 text-xs text-fg-muted hover:border-border-strong hover:text-fg"
         >
-          {copied ? "Copied" : "Copy JSON"}
+          {copied ? m.ui_copied() : m.ui_copy_json()}
         </button>
       </div>
       <AdminBugReportDiagnosticsMeta report={report} />

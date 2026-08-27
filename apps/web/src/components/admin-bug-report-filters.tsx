@@ -1,4 +1,5 @@
-import { CATEGORY_OPTIONS, STATUS_OPTIONS } from "../lib/bug-report-utils";
+import { categoryOptions, statusOptions } from "../lib/bug-report-utils";
+import { m } from "../paraglide/messages.js";
 import type { BugReportCategory, BugReportStatus } from "../types/bug-report";
 
 type Props = {
@@ -23,7 +24,7 @@ export function AdminBugReportFilters({
       <input
         value={searchText}
         onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="Search id, email, text..."
+        placeholder={m.ui_search_id_email_text()}
         className="rounded border border-border-strong bg-transparent px-2 py-1.5 text-sm text-fg placeholder:text-fg-soft"
       />
       <select
@@ -34,9 +35,9 @@ export function AdminBugReportFilters({
         className="rounded border border-border-strong bg-transparent px-2 py-1.5 text-sm text-fg"
       >
         <option value="" className="bg-fg text-app">
-          All Statuses
+          {m.ui_all_statuses()}
         </option>
-        {STATUS_OPTIONS.map((opt) => (
+        {statusOptions().map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-fg text-app">
             {opt.label}
           </option>
@@ -50,9 +51,9 @@ export function AdminBugReportFilters({
         className="rounded border border-border-strong bg-transparent px-2 py-1.5 text-sm text-fg"
       >
         <option value="" className="bg-fg text-app">
-          All Categories
+          {m.ui_all_categories()}
         </option>
-        {CATEGORY_OPTIONS.map((opt) => (
+        {categoryOptions().map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-fg text-app">
             {opt.label}
           </option>

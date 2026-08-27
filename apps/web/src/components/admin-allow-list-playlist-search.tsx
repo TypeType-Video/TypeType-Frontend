@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { fetchSearch } from "../lib/api-discovery";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { AllowPlaylistInput } from "../types/allow-list";
 import type { PublicPlaylistInfo } from "../types/playlist";
 
@@ -78,7 +79,7 @@ export function AdminAllowListPlaylistSearch({
         <input
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          placeholder="Playlist URL"
+          placeholder={m.ui_playlist_url()}
           className="h-10 flex-1 border border-border bg-app px-3 text-sm text-fg outline-none transition-colors placeholder:text-fg-muted focus:border-border-strong"
         />
         <button
@@ -87,22 +88,24 @@ export function AdminAllowListPlaylistSearch({
           onClick={addUrl}
           className="h-10 border border-border px-4 text-sm font-medium text-fg transition-colors hover:border-border-strong disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {urlAlreadyAdded ? "Added" : "Add URL"}
+          {urlAlreadyAdded ? m.ui_added() : m.ui_add_url()}
         </button>
       </div>
       <input
         value={term}
         onChange={(event) => setTerm(event.target.value)}
-        placeholder="Playlist name"
+        placeholder={m.ui_playlist_name()}
         className="h-10 w-full border border-border bg-app px-3 text-sm text-fg outline-none transition-colors placeholder:text-fg-muted focus:border-border-strong"
       />
       <div className="mt-3 border-y border-border">
         {debounced.length < 2 ? (
-          <div className="px-4 py-5 text-sm text-fg-soft">Type at least two characters.</div>
+          <div className="px-4 py-5 text-sm text-fg-soft">
+            {m.ui_type_at_least_two_characters()}
+          </div>
         ) : search.isLoading ? (
-          <div className="px-4 py-5 text-sm text-fg-soft">Searching playlists...</div>
+          <div className="px-4 py-5 text-sm text-fg-soft">{m.ui_searching_playlists()}</div>
         ) : playlists.length === 0 ? (
-          <div className="px-4 py-5 text-sm text-fg-soft">No playlists found.</div>
+          <div className="px-4 py-5 text-sm text-fg-soft">{m.ui_no_playlists_found()}</div>
         ) : (
           <div className="divide-y divide-border">
             {playlists.slice(0, 8).map((playlist) => {
@@ -136,7 +139,7 @@ export function AdminAllowListPlaylistSearch({
                         : "border-fg bg-fg text-app hover:bg-fg-strong"
                     }`}
                   >
-                    {alreadyAdded ? "Added" : "Add"}
+                    {alreadyAdded ? m.ui_added() : m.ui_add()}
                   </button>
                 </div>
               );

@@ -1,5 +1,6 @@
 import { getAdminUserAvatarUrl } from "../lib/admin-user-avatar";
 import { getOpenMojiUrl, pickOpenMojiCode } from "../lib/openmoji";
+import { m } from "../paraglide/messages.js";
 import type { AdminSession } from "../types/admin";
 import type { AuthUser } from "../types/auth";
 
@@ -33,10 +34,15 @@ function avatarUrl(user: AuthUser | undefined, session: AdminSession): string | 
 
 export function AdminSessionCard({ session, user }: Props) {
   const name =
-    user?.publicUsername ?? user?.name ?? session.username ?? session.userId ?? "Unknown user";
-  const device = [session.deviceName, session.deviceType].filter(Boolean).join(" - ") || "Browser";
+    user?.publicUsername ?? user?.name ?? session.username ?? session.userId ?? m.ui_unknown_user();
+  const device =
+    [session.deviceName, session.deviceType].filter(Boolean).join(" - ") || m.ui_browser();
   const nowPlaying = session.nowPlaying;
-  const stateLabel = nowPlaying ? (nowPlaying.paused ? "Paused" : "Playing") : "Online";
+  const stateLabel = nowPlaying
+    ? nowPlaying.paused
+      ? m.ui_paused()
+      : m.ui_playing()
+    : m.ui_online();
   const imageUrl = avatarUrl(user, session);
   const progress = nowPlaying?.durationMs
     ? Math.min(100, Math.max(0, (nowPlaying.positionMs / nowPlaying.durationMs) * 100))
@@ -94,7 +100,7 @@ export function AdminSessionCard({ session, user }: Props) {
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">{nowPlaying.title}</p>
                 <p className="mt-1 truncate text-xs text-white/55">
-                  {nowPlaying.channelName ?? "Video"}
+                  {nowPlaying.channelName ?? m.ui_video()}
                 </p>
               </div>
               <span className="self-start rounded-md bg-white/10 px-2 py-1 text-[11px] font-medium text-white/70">
@@ -111,8 +117,10 @@ export function AdminSessionCard({ session, user }: Props) {
           </div>
         ) : (
           <div className="rounded-md border border-white/10 bg-[#0c1524] p-4">
-            <p className="text-sm font-medium text-white/85">No active playback</p>
-            <p className="mt-1 text-xs text-sky-200/55">The client is connected and ready.</p>
+            <p className="text-sm font-medium text-white/85">{m.ui_no_active_playback()}</p>
+            <p className="mt-1 text-xs text-sky-200/55">
+              {m.ui_the_client_is_connected_and_ready()}
+            </p>
           </div>
         )}
       </div>

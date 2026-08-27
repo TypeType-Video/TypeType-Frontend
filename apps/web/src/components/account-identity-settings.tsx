@@ -75,8 +75,7 @@ export function AccountIdentitySettings({ enabled, onMessage }: Props) {
                     setPassword("");
                     onMessage(m.account_saved());
                   },
-                  onError: (error) =>
-                    onMessage(error instanceof Error ? error.message : m.account_update_failed()),
+                  onError: () => onMessage(m.account_update_failed()),
                 },
               )
             }

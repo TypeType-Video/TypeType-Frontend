@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { m } from "../paraglide/messages.js";
 import type { AdminSettings } from "../types/admin";
 import { ToggleSwitch } from "./toggle-switch";
 
@@ -10,17 +11,20 @@ type Props = {
   onSave: () => void;
 };
 
-const NUMBER_FIELDS = [
-  ["rssMaxFeedsPerUser", "Feeds per account", 1, 100],
-  ["rssMaxItems", "Items per feed", 1, 200],
-  ["rssMinimumPollMinutes", "Minimum poll (minutes)", 1, 1440],
-  ["rssRateLimitPerMinute", "Requests per minute", 1, 600],
-] as const;
+function numberFields() {
+  return [
+    ["rssMaxFeedsPerUser", m.ui_feeds_per_account(), 1, 100],
+    ["rssMaxItems", m.ui_items_per_feed(), 1, 200],
+    ["rssMinimumPollMinutes", m.ui_minimum_poll_minutes(), 1, 1440],
+    ["rssRateLimitPerMinute", m.ui_requests_per_minute(), 1, 600],
+  ] as const;
+}
 
 export function AdminRssPolicy({ value, saved, pending, onChange, onSave }: Props) {
   const changed = useMemo(() => JSON.stringify(value) !== JSON.stringify(saved), [saved, value]);
   const validUrl = !value.rssEnabled || isPublicHttpUrl(value.rssPublicBaseUrl);
-  const validNumbers = NUMBER_FIELDS.every(
+  const fields = numberFields();
+  const validNumbers = fields.every(
     ([key, , min, max]) => Number.isInteger(value[key]) && value[key] >= min && value[key] <= max,
   );
 
@@ -28,19 +32,19 @@ export function AdminRssPolicy({ value, saved, pending, onChange, onSave }: Prop
     <section className="space-y-4 border-y border-border py-4">
       <div className="flex items-center justify-between gap-4 px-1">
         <div>
-          <h2 className="text-sm font-semibold text-fg">Instance policy</h2>
+          <h2 className="text-sm font-semibold text-fg">{m.ui_instance_policy()}</h2>
           <p className="mt-1 text-xs text-fg-soft">
-            Disabling RSS keeps existing feed configuration intact.
+            {m.ui_disabling_rss_keeps_existing_feed_configuration_intact()}
           </p>
         </div>
         <ToggleSwitch
           checked={value.rssEnabled}
-          ariaLabel="Enable private RSS feeds"
+          ariaLabel={m.ui_enable_private_rss_feeds()}
           onClick={() => onChange({ ...value, rssEnabled: !value.rssEnabled })}
         />
       </div>
       <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-fg-muted">Public instance URL</span>
+        <span className="text-xs font-medium text-fg-muted">{m.ui_public_instance_url()}</span>
         <input
           type="url"
           value={value.rssPublicBaseUrl ?? ""}
@@ -50,12 +54,12 @@ export function AdminRssPolicy({ value, saved, pending, onChange, onSave }: Prop
         />
         {!validUrl && (
           <span className="block text-xs text-danger-strong">
-            Enter the public HTTP or HTTPS URL of this instance.
+            {m.ui_enter_the_public_http_or_https_url_of_this_instance()}
           </span>
         )}
       </label>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {NUMBER_FIELDS.map(([key, label, min, max]) => (
+        {fields.map(([key, label, min, max]) => (
           <label key={key} className="space-y-1.5">
             <span className="text-xs font-medium text-fg-muted">{label}</span>
             <input
@@ -79,7 +83,7 @@ export function AdminRssPolicy({ value, saved, pending, onChange, onSave }: Prop
           onClick={onSave}
           className="h-9 rounded-md bg-fg px-4 text-sm font-medium text-app hover:bg-fg-strong disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {pending ? "Saving..." : "Save policy"}
+          {pending ? m.ui_saving() : m.ui_save_policy()}
         </button>
       </div>
     </section>

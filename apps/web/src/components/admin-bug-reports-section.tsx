@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAdminBugReportDetail, useAdminBugReports } from "../hooks/use-admin-bug-reports";
 import { filterBugReports } from "../lib/admin-bug-report-filter";
+import { m } from "../paraglide/messages.js";
 import type { BugReportCategory, BugReportStatus } from "../types/bug-report";
 import { AdminBugReportDetailPanel } from "./admin-bug-report-detail";
 import { AdminBugReportFilters } from "./admin-bug-report-filters";
@@ -67,8 +68,10 @@ export function AdminBugReportsSection({ enabled, isAdmin, onToast }: Props) {
         onNext={() => setPage((p) => p + 1)}
       />
 
-      {query.isPending && <p className="text-sm text-fg-muted">Loading bug reports...</p>}
-      {query.isError && <p className="text-sm text-danger-strong">Unable to load bug reports.</p>}
+      {query.isPending && <p className="text-sm text-fg-muted">{m.ui_loading_bug_reports()}</p>}
+      {query.isError && (
+        <p className="text-sm text-danger-strong">{m.ui_unable_to_load_bug_reports()}</p>
+      )}
 
       {!query.isPending && !query.isError && (
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
@@ -82,21 +85,22 @@ export function AdminBugReportsSection({ enabled, isAdmin, onToast }: Props) {
                 updateStatus.mutate(
                   { id: detailQuery.data.id, status },
                   {
-                    onSuccess: () => onToast("Status updated"),
-                    onError: (e) => onToast(e instanceof Error ? e.message : "Failed to update"),
+                    onSuccess: () => onToast(m.ui_status_updated()),
+                    onError: (e) =>
+                      onToast(e instanceof Error ? e.message : m.ui_failed_to_update()),
                   },
                 );
               }}
               onCreateIssue={() => {
                 createIssue.mutate(detailQuery.data.id, {
-                  onSuccess: () => onToast("GitHub issue created"),
+                  onSuccess: () => onToast(m.ui_github_issue_created()),
                   onError: (e) =>
-                    onToast(e instanceof Error ? e.message : "Failed to create issue"),
+                    onToast(e instanceof Error ? e.message : m.ui_failed_to_create_issue()),
                 });
               }}
             />
           ) : (
-            <p className="text-sm text-fg-soft">Select a report to inspect details.</p>
+            <p className="text-sm text-fg-soft">{m.ui_select_a_report_to_inspect_details()}</p>
           )}
         </div>
       )}

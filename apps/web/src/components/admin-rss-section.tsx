@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAdminRss } from "../hooks/use-admin-rss";
 import { useAdminSettings } from "../hooks/use-admin-settings";
+import { m } from "../paraglide/messages.js";
 import type { AdminSettings } from "../types/admin";
 import type { AdminRssFeedItem } from "../types/rss";
 import { AdminRssFeedRow, AdminRssPagination, AdminRssStatus } from "./admin-rss-inventory";
@@ -33,18 +34,18 @@ export function AdminRssSection({ enabled, onToast }: Props) {
   function saveSettings() {
     if (!draft) return;
     settings.update.mutate(draft, {
-      onSuccess: () => onToast("RSS settings updated"),
-      onError: (error) => onToast(errorMessage(error, "Unable to update RSS settings")),
+      onSuccess: () => onToast(m.ui_rss_settings_updated()),
+      onError: (error) => onToast(errorMessage(error, m.ui_unable_to_update_rss_settings())),
     });
   }
 
   if (settings.query.isPending || !draft) {
-    return <AdminRssStatus>Loading RSS controls...</AdminRssStatus>;
+    return <AdminRssStatus>{m.ui_loading_rss_controls()}</AdminRssStatus>;
   }
   if (settings.query.isError) {
     return (
       <AdminRssStatus danger>
-        {errorMessage(settings.query.error, "Unable to load RSS controls")}
+        {errorMessage(settings.query.error, m.ui_unable_to_load_rss_controls())}
       </AdminRssStatus>
     );
   }
@@ -61,23 +62,23 @@ export function AdminRssSection({ enabled, onToast }: Props) {
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-3 px-1">
           <div>
-            <h2 className="text-sm font-semibold text-fg">Created feeds</h2>
+            <h2 className="text-sm font-semibold text-fg">{m.ui_created_feeds()}</h2>
             <p className="mt-1 text-xs text-fg-soft">
-              Secrets are never available from this console.
+              {m.ui_secrets_are_never_available_from_this_console()}
             </p>
           </div>
           <span className="font-mono text-xs text-fg-soft">
-            {feeds.query.data?.total ?? 0} total
+            {feeds.query.data?.total ?? 0} {m.ui_total()}
           </span>
         </div>
         {feeds.query.isPending ? (
-          <AdminRssStatus>Loading private feeds...</AdminRssStatus>
+          <AdminRssStatus>{m.ui_loading_private_feeds()}</AdminRssStatus>
         ) : feeds.query.isError ? (
           <AdminRssStatus danger>
-            {errorMessage(feeds.query.error, "Unable to load private feeds")}
+            {errorMessage(feeds.query.error, m.ui_unable_to_load_private_feeds())}
           </AdminRssStatus>
         ) : (feeds.query.data?.items.length ?? 0) === 0 ? (
-          <AdminRssStatus>No private feeds have been created.</AdminRssStatus>
+          <AdminRssStatus>{m.ui_no_private_feeds_have_been_created()}</AdminRssStatus>
         ) : (
           <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
             {feeds.query.data?.items.map((item) => (
@@ -94,8 +95,11 @@ export function AdminRssSection({ enabled, onToast }: Props) {
                     { id: item.feed.id, value: !item.feed.enabled },
                     {
                       onSuccess: () =>
-                        onToast(item.feed.enabled ? "RSS feed disabled" : "RSS feed enabled"),
-                      onError: (error) => onToast(errorMessage(error, "Unable to update RSS feed")),
+                        onToast(
+                          item.feed.enabled ? m.ui_rss_feed_disabled() : m.ui_rss_feed_enabled(),
+                        ),
+                      onError: (error) =>
+                        onToast(errorMessage(error, m.ui_unable_to_update_rss_feed())),
                     },
                   )
                 }
@@ -105,10 +109,12 @@ export function AdminRssSection({ enabled, onToast }: Props) {
                     {
                       onSuccess: () =>
                         onToast(
-                          item.userRssEnabled ? "Account RSS disabled" : "Account RSS enabled",
+                          item.userRssEnabled
+                            ? m.ui_account_rss_disabled()
+                            : m.ui_account_rss_enabled(),
                         ),
                       onError: (error) =>
-                        onToast(errorMessage(error, "Unable to update account RSS")),
+                        onToast(errorMessage(error, m.ui_unable_to_update_account_rss())),
                     },
                   )
                 }
@@ -128,16 +134,16 @@ export function AdminRssSection({ enabled, onToast }: Props) {
       </section>
       {revoke && (
         <ConfirmModal
-          title="Revoke this RSS feed?"
-          description={`${revoke.feed.name} will stop working immediately.`}
-          confirmLabel="Revoke"
+          title={m.ui_revoke_this_rss_feed()}
+          description={m.ui_rss_feed_will_stop_working({ name: revoke.feed.name })}
+          confirmLabel={m.ui_revoke()}
           onCancel={() => setRevoke(null)}
           onConfirm={() => {
             const selected = revoke;
             setRevoke(null);
             feeds.revoke.mutate(selected.feed.id, {
-              onSuccess: () => onToast("RSS feed revoked"),
-              onError: (error) => onToast(errorMessage(error, "Unable to revoke RSS feed")),
+              onSuccess: () => onToast(m.ui_rss_feed_revoked()),
+              onError: (error) => onToast(errorMessage(error, m.ui_unable_to_revoke_rss_feed())),
             });
           }}
         />
@@ -146,6 +152,6 @@ export function AdminRssSection({ enabled, onToast }: Props) {
   );
 }
 
-function errorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
+function errorMessage(_error: unknown, fallback: string): string {
+  return fallback;
 }

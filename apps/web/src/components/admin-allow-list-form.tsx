@@ -5,6 +5,7 @@ import { fetchSearch } from "../lib/api-discovery";
 import { normalizeChannelUrl } from "../lib/channel-url";
 import { formatSubscribers } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { ChannelResultItem } from "../types/api";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
@@ -42,19 +43,19 @@ export function AdminAllowListForm({ title, description, trustedUrls, pending, o
       <input
         value={term}
         onChange={(event) => setTerm(event.target.value)}
-        placeholder="Channel name or @handle"
+        placeholder={m.ui_channel_name_or_handle()}
         className="h-10 w-full border border-border bg-app px-3 text-sm text-fg outline-none transition-colors placeholder:text-fg-muted focus:border-border-strong"
       />
       <div className="mt-3 border-y border-border">
         {debounced.length < 2 ? (
           <div className="px-4 py-5 text-sm text-fg-soft">
-            Type at least two characters to search channels.
+            {m.ui_type_at_least_two_characters_to_search_channels()}
           </div>
         ) : search.isLoading ? (
-          <div className="px-4 py-5 text-sm text-fg-soft">Searching channels...</div>
+          <div className="px-4 py-5 text-sm text-fg-soft">{m.ui_searching_channels()}</div>
         ) : channels.length === 0 ? (
           <div className="px-4 py-5 text-sm text-fg-soft">
-            No channels found. Try the exact channel name or handle.
+            {m.ui_no_channels_found_try_the_exact_channel_name_or_handle()}
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -88,7 +89,7 @@ export function AdminAllowListForm({ title, description, trustedUrls, pending, o
                         : "border-fg bg-fg text-app hover:bg-fg-strong"
                     }`}
                   >
-                    {alreadyAdded ? "Added" : "Add"}
+                    {alreadyAdded ? m.ui_added() : m.ui_add()}
                   </button>
                 </div>
               );

@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { m } from "../paraglide/messages.js";
 import type { BugReportDetail } from "../types/bug-report";
 
 type Props = {
@@ -19,7 +20,7 @@ export function AdminBugReportGitHubAction({ report, busy, isAdmin, onCreateIssu
         className="inline-flex items-center gap-2 rounded border border-border-strong px-3 py-1.5 text-sm text-fg hover:border-border-strong"
       >
         <ExternalLink className="h-4 w-4" />
-        View GitHub Issue
+        {m.ui_view_github_issue()}
       </a>
     );
   }
@@ -31,7 +32,7 @@ export function AdminBugReportGitHubAction({ report, busy, isAdmin, onCreateIssu
       onClick={onCreateIssue}
       className="rounded bg-fg px-3 py-1.5 text-sm font-medium text-app hover:bg-white disabled:opacity-50"
     >
-      Create GitHub Issue
+      {m.ui_create_github_issue()}
     </button>
   );
 }
