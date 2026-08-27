@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { PlaylistVideoItem } from "../types/user";
 
 export type PlaylistSortMode =
@@ -8,13 +9,13 @@ export type PlaylistSortMode =
   | "posted-old"
   | "popular";
 
-export const PLAYLIST_SORT_OPTIONS: { value: PlaylistSortMode; label: string }[] = [
-  { value: "manual", label: "Manual" },
-  { value: "added-new", label: "Date added (newest)" },
-  { value: "added-old", label: "Date added (oldest)" },
-  { value: "posted-new", label: "Date posted (newest)" },
-  { value: "posted-old", label: "Date posted (oldest)" },
-  { value: "popular", label: "Popularity" },
+export const PLAYLIST_SORT_OPTIONS: { value: PlaylistSortMode; label: () => string }[] = [
+  { value: "manual", label: () => m.playlist_sort_manual() },
+  { value: "added-new", label: () => m.playlist_sort_added_newest() },
+  { value: "added-old", label: () => m.playlist_sort_added_oldest() },
+  { value: "posted-new", label: () => m.playlist_sort_posted_newest() },
+  { value: "posted-old", label: () => m.playlist_sort_posted_oldest() },
+  { value: "popular", label: () => m.playlist_sort_popularity() },
 ];
 
 export function sortPlaylistVideos(

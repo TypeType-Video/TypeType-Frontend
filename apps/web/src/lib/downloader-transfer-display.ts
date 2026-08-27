@@ -1,5 +1,7 @@
+import { m } from "../paraglide/messages.js";
+
 export function formatTransferBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes < 0) return "Unknown";
+  if (!Number.isFinite(bytes) || bytes < 0) return m.ui_unknown();
   const units = ["B", "KiB", "MiB", "GiB", "TiB"];
   let value = bytes;
   let unit = 0;
@@ -22,12 +24,12 @@ export function estimateTransferRate(
 }
 
 export function formatEta(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) return "Unknown";
+  if (!Number.isFinite(seconds) || seconds < 0) return m.ui_unknown();
   const rounded = Math.ceil(seconds);
-  if (rounded < 60) return `${rounded}s left`;
+  if (rounded < 60) return m.ui_seconds_left({ count: rounded });
   const minutes = Math.floor(rounded / 60);
   const remainder = rounded % 60;
-  if (minutes < 60) return `${minutes}m ${remainder}s left`;
+  if (minutes < 60) return m.ui_minutes_seconds_left({ minutes, seconds: remainder });
   const hours = Math.floor(minutes / 60);
-  return `${hours}h ${minutes % 60}m left`;
+  return m.ui_hours_minutes_left({ hours, minutes: minutes % 60 });
 }

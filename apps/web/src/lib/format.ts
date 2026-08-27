@@ -1,19 +1,20 @@
+import { m } from "../paraglide/messages.js";
 import { normalizeClientLocale } from "./client-locale";
 
 export function formatViews(views: number): string {
   if (views < 0) return "";
-  if (views >= 1_000_000_000) return `${(views / 1_000_000_000).toFixed(1)}B views`;
-  if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1)}M views`;
-  if (views >= 1_000) return `${(views / 1_000).toFixed(0)}K views`;
-  return `${views} views`;
+  if (views >= 1_000_000_000) return `${(views / 1_000_000_000).toFixed(1)}B ${m.ui_views()}`;
+  if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1)}M ${m.ui_views()}`;
+  if (views >= 1_000) return `${(views / 1_000).toFixed(0)}K ${m.ui_views()}`;
+  return `${views} ${m.ui_views()}`;
 }
 
 export function formatSubscribers(n: number | undefined): string {
   if (n == null || n < 0) return "";
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B subscribers`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M subscribers`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K subscribers`;
-  return `${n} subscribers`;
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B ${m.ui_subscribers()}`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M ${m.ui_subscribers()}`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K ${m.ui_subscribers()}`;
+  return `${n} ${m.ui_subscribers()}`;
 }
 
 export function formatDuration(seconds: number): string {

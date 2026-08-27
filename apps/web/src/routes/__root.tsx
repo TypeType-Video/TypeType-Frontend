@@ -21,6 +21,7 @@ import {
 import { bootstrapSession } from "../lib/auth-session";
 import { isEmbeddedFrame } from "../lib/embed-access";
 import { applyTheme } from "../lib/theme";
+import { m } from "../paraglide/messages.js";
 import { subscribeAuthStorage, useAuthStore } from "../stores/auth-store";
 import { useThemeStore } from "../stores/theme-store";
 import { useUiStore } from "../stores/ui-store";
@@ -127,7 +128,7 @@ function RootLayout() {
   if (status === "loading" && (requiresAuth(pathname) || isAdminRoute(pathname))) {
     return (
       <div className="min-h-screen bg-app text-fg flex items-center justify-center">
-        <p className="text-sm text-fg-muted">Loading session...</p>
+        <p className="text-sm text-fg-muted">{m.ui_loading_session()}</p>
       </div>
     );
   }

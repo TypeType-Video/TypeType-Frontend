@@ -1,28 +1,29 @@
+import { m } from "../paraglide/messages.js";
 import type { SearchFilterGroup, SearchFilterOption, SearchFiltersResponse } from "../types/api";
 
-const LABELS: Record<string, string> = {
-  sortby: "Sort by",
-  upload_date: "Upload date",
-  sort_relevance: "Relevance",
-  sort_rating: "Rating",
-  sort_view: "View count",
-  past_hour: "Past hour",
-  past_day: "Today",
-  past_week: "This week",
-  past_month: "This month",
-  past_year: "This year",
-  short_video: "Short",
-  long_video: "Long",
-  Ccommons: "Creative Commons",
-  Hdr: "HDR",
-  "3d": "3D",
-  "4k": "4K",
+const LABELS: Record<string, () => string> = {
+  sortby: () => m.search_filter_sort_by(),
+  upload_date: () => m.search_filter_upload_date(),
+  sort_relevance: () => m.search_filter_relevance(),
+  sort_rating: () => m.search_filter_rating(),
+  sort_view: () => m.search_filter_view_count(),
+  past_hour: () => m.search_filter_past_hour(),
+  past_day: () => m.search_filter_today(),
+  past_week: () => m.search_filter_this_week(),
+  past_month: () => m.ui_this_month(),
+  past_year: () => m.search_filter_this_year(),
+  short_video: () => m.search_filter_short(),
+  long_video: () => m.search_filter_long(),
+  Ccommons: () => m.search_filter_creative_commons(),
+  Hdr: () => "HDR",
+  "3d": () => "3D",
+  "4k": () => "4K",
 };
 
 export function searchFilterLabel(raw: string): string {
   const afterColon = raw.includes(":") ? raw.slice(raw.indexOf(":") + 1) : raw;
   const value = afterColon.trim();
-  if (LABELS[value]) return LABELS[value];
+  if (LABELS[value]) return LABELS[value]();
   return value
     .split(/[_\s]+/)
     .filter(Boolean)
@@ -37,7 +38,7 @@ export function searchFilterGroups(filters: SearchFiltersResponse): SearchFilter
   return [
     {
       key: "legacy-sort",
-      label: "Sort by",
+      label: m.search_filter_sort_by(),
       multiSelect: false,
       options: filters.sortFilters.map((option, index) => ({
         ...option,
