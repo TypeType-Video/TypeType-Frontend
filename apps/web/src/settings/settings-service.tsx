@@ -1,6 +1,7 @@
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
 import { ServiceIcon } from "../components/service-icon";
 import { useSettings } from "../hooks/use-settings";
+import { m } from "../paraglide/messages.js";
 import type { ServiceId } from "../types/user";
 
 type ServiceOption = {
@@ -36,7 +37,7 @@ export function SettingsService() {
 
   return (
     <section className="flex flex-col gap-3">
-      <p className={SECTION_LABEL}>Default service</p>
+      <p className={SECTION_LABEL}>{m.ui_default_service()}</p>
       <div className={GROUP}>
         {SERVICES.map((svc) => (
           <button

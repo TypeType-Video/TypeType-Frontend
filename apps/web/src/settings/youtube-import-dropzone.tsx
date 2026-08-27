@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   disabled?: boolean;
@@ -42,8 +43,10 @@ export function YoutubeImportDropzone({ disabled, onSelectFiles }: Props) {
         onSelectFiles(files);
       }}
     >
-      <span className="text-sm text-fg">Drop one or more Takeout ZIP files here</span>
-      <span className="mt-1 text-xs text-fg-soft">or click to select multiple ZIP files</span>
+      <span className="text-sm text-fg">{m.ui_drop_one_or_more_takeout_zip_files_here()}</span>
+      <span className="mt-1 text-xs text-fg-soft">
+        {m.ui_or_click_to_select_multiple_zip_files()}
+      </span>
       <input
         type="file"
         multiple
