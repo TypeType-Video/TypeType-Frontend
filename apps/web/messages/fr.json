@@ -1288,5 +1288,6 @@
   "ui_remote_phase_awaiting_login": "En attente de la connexion",
   "ui_remote_phase_capturing_session": "Capture de la session",
   "ui_remote_phase_connected": "Connecté",
-  "ui_remote_phase_closed": "Fermé"
+  "ui_remote_phase_closed": "Fermé",
+  "ui_remote_phase_error": "Erreur"
 }
