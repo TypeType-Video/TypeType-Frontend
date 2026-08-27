@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHistory } from "../hooks/use-history";
 import { isVideoInProgress } from "../lib/watch-progress";
+import { m } from "../paraglide/messages.js";
 import { ContinueCard } from "./continue-card";
 
 const MAX_ITEMS = 12;
@@ -22,7 +23,7 @@ export function ContinueWatching() {
   return (
     <section className="mt-2 flex flex-col gap-3 sm:mt-3">
       <p className="text-xs font-medium text-fg-soft uppercase tracking-wider px-1">
-        Continue watching
+        {m.ui_continue_watching()}
       </p>
       <div className="flex gap-3 overflow-x-auto pb-3">
         {displayed.map((item, index) => (

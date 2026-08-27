@@ -45,7 +45,7 @@ export function DataPortabilityPage({ mode }: { mode: PortabilityMode }) {
         )}
         {formats.error && (
           <p role="alert" className="text-sm text-danger">
-            {formats.error.message}
+            {m.data_portability_formats_failed()}
           </p>
         )}
       </main>

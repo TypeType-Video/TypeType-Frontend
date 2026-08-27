@@ -1,6 +1,7 @@
 import { useAllowedChannels } from "../hooks/use-allowed-channels";
 import { useAuth } from "../hooks/use-auth";
 import { normalizeChannelUrl } from "../lib/channel-url";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   url: string;
@@ -29,7 +30,7 @@ export function AllowChannelButton({ url, name, thumbnailUrl, compact = false }:
           : "rounded-md bg-surface-strong px-4 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-60"
       }
     >
-      {allowed ? "Allowed" : add.isPending ? "Adding" : "Allow channel"}
+      {allowed ? m.ui_allowed() : add.isPending ? m.ui_adding() : m.ui_allow_channel()}
     </button>
   );
 }

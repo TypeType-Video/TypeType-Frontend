@@ -53,8 +53,7 @@ export function AdminUserIdentityForm({ user, disabled, onMessage }: Props) {
         onClick={() =>
           update.mutate(undefined, {
             onSuccess: () => onMessage(m.admin_users_identity_updated()),
-            onError: (error) =>
-              onMessage(error instanceof Error ? error.message : m.admin_users_update_failed()),
+            onError: () => onMessage(m.admin_users_update_failed()),
           })
         }
         className="h-10 rounded-md bg-accent text-xs font-medium text-white transition-colors hover:brightness-95 disabled:opacity-50"

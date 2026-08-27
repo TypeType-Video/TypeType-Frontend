@@ -10,7 +10,7 @@ import { getOriginalAudioLocale } from "../lib/audio-track";
 import { resolveEmbedAutoplay } from "../lib/embed-playback";
 import { toPublicWatchParam } from "../lib/watch-url";
 import type { VideoStream } from "../types/stream";
-import { EmbedError, PLAYBACK_FAILED_MESSAGE } from "./embed-error";
+import { EmbedError, playbackFailedMessage } from "./embed-error";
 import { EmbedVideoPlayer } from "./embed-player";
 
 type Props = {
@@ -86,7 +86,7 @@ export function EmbedPlayerShell({
   ].join(":");
 
   if (player.playerFailed) {
-    return <EmbedError message={PLAYBACK_FAILED_MESSAGE} onRetry={player.reset} />;
+    return <EmbedError message={playbackFailedMessage()} onRetry={player.reset} />;
   }
 
   return (

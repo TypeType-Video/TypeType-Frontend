@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { m } from "../paraglide/messages.js";
 
 const HOLDS = [3000, 2700, 2100];
 const FADE = 430;
@@ -41,21 +42,21 @@ export function HideEverythingIntro({ onDone, onRelax }: Props) {
         {phase === 0 && (
           <div className="flex flex-col items-center gap-4 sm:gap-6">
             <span className="pixel-intro-drop block font-black text-7xl text-white uppercase tracking-tight sm:text-9xl">
-              Fine!
+              {m.ui_fine()}
             </span>
             <span className="pixel-intro-fade-late block font-bold text-white/85 text-xl uppercase tracking-[0.22em] sm:text-3xl">
-              You want to hide everything?
+              {m.ui_you_want_to_hide_everything()}
             </span>
           </div>
         )}
         {phase === 1 && (
           <span className="pixel-intro-fade block max-w-3xl font-black text-3xl text-white uppercase leading-tight tracking-tight sm:text-5xl">
-            Do you know how much time I spent building all of this?!
+            {m.ui_do_you_know_how_much_time_i_spent_building_all_of_this()}
           </span>
         )}
         {phase === 2 && (
           <span className="pixel-intro-fade block font-black text-5xl text-white uppercase tracking-[0.18em] sm:text-7xl">
-            Go and relax
+            {m.ui_go_and_relax()}
           </span>
         )}
       </div>

@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 function toFlagEmoji(code: string): string | null {
   const normalized = code.trim().toUpperCase();
   if (!/^[A-Z]{2}$/.test(normalized)) return null;
@@ -17,7 +19,7 @@ export function FlagIcon({ code, className }: FlagIconProps) {
   const flag = toFlagEmoji(code);
   if (!flag) return null;
   return (
-    <span role="img" aria-label={`${code.toUpperCase()} flag`} className={className}>
+    <span role="img" aria-label={m.ui_flag({ code: code.toUpperCase() })} className={className}>
       {flag}
     </span>
   );

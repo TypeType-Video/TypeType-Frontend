@@ -1,5 +1,6 @@
 import { usePodcasts } from "../hooks/use-podcasts";
 import { detectProvider } from "../lib/provider";
+import { m } from "../paraglide/messages.js";
 import { PodcastCard } from "./podcast-card";
 
 const SKELETON_KEYS = [
@@ -25,8 +26,10 @@ export function ChannelPodcastsSection({ channelUrl, channelAvatar }: Props) {
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-fg-soft">Podcasts</p>
-          <p className="text-xs text-fg-muted">Podcast playlists from this channel</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-fg-soft">
+            {m.ui_podcasts()}
+          </p>
+          <p className="text-xs text-fg-muted">{m.ui_podcast_playlists_from_this_channel()}</p>
         </div>
         {query.hasNextPage && (
           <button
@@ -35,7 +38,7 @@ export function ChannelPodcastsSection({ channelUrl, channelAvatar }: Props) {
             disabled={query.isFetchingNextPage}
             className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:opacity-60"
           >
-            {query.isFetchingNextPage ? "Loading..." : "Load more"}
+            {query.isFetchingNextPage ? m.ui_loading() : m.ui_load_more()}
           </button>
         )}
       </div>

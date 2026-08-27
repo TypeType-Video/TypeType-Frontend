@@ -1,6 +1,7 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { useAudioPalette } from "../hooks/use-audio-palette";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import { AudioOnlyVisualizer } from "./audio-only-visualizer";
 
 type Props = {
@@ -75,12 +76,12 @@ export function AudioOnlyPoster({ poster, title, media = null }: Props) {
             <div className="relative flex w-full max-w-3xl items-center justify-start gap-4 text-left sm:gap-7">
               <img
                 src={image}
-                alt={title ?? "Audio only"}
+                alt={title ?? m.watch_audio_only()}
                 className="h-20 w-20 shrink-0 rounded-2xl object-cover shadow-[0_22px_70px_rgb(0_0_0/0.58)] ring-1 ring-white/15 sm:h-40 sm:w-40 sm:rounded-3xl md:h-48 md:w-48"
               />
               <div className="flex min-w-0 flex-1 flex-col gap-5">
                 <div ref={titleRef} className={titleClassName}>
-                  <span ref={titleTextRef}>{title ?? "Audio only playback"}</span>
+                  <span ref={titleTextRef}>{title ?? m.ui_audio_only_playback()}</span>
                 </div>
               </div>
             </div>
@@ -88,7 +89,7 @@ export function AudioOnlyPoster({ poster, title, media = null }: Props) {
         </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_25%,rgba(239,68,68,0.16),transparent_38%),linear-gradient(to_bottom,#09090b,#000)] px-6 pb-24 text-center text-2xl font-semibold text-white sm:text-4xl">
-          {title ?? "Audio only playback"}
+          {title ?? m.ui_audio_only_playback()}
         </div>
       )}
     </div>

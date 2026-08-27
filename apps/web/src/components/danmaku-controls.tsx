@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import { useDanmakuStore } from "../stores/danmaku-store";
 import { DanmakuIcon } from "./watch-icons";
 
@@ -17,12 +18,12 @@ export function DanmakuControls() {
         className={`${BTN} ${on ? BTN_ON : BTN_IDLE}`}
       >
         <DanmakuIcon />
-        {on ? "Danmaku on" : "Danmaku"}
+        {on ? m.ui_danmaku_on() : m.ui_danmaku()}
       </button>
       {on && (
         <div className="flex items-center gap-4 text-xs text-fg-muted">
           <label className="flex items-center gap-1.5">
-            Speed
+            {m.ui_speed()}
             <input
               type="range"
               min={0.5}
@@ -34,7 +35,7 @@ export function DanmakuControls() {
             />
           </label>
           <label className="flex items-center gap-1.5">
-            Size
+            {m.ui_size()}
             <input
               type="range"
               min={0.5}

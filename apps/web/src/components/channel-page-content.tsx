@@ -4,10 +4,10 @@ import { useChannel } from "../hooks/use-channel";
 import { useDocumentTitle } from "../hooks/use-document-title";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { isChannelNotAllowedError } from "../lib/allow-list-error";
-import { ApiError } from "../lib/api";
 import type { ChannelSort } from "../lib/api-discovery";
 import type { ChannelTab } from "../lib/channel-route-url";
 import { detectProvider } from "../lib/provider";
+import { m } from "../paraglide/messages.js";
 import { ChannelFilterBar } from "./channel-filter-bar";
 import { ChannelPageHeader } from "./channel-page-header";
 import { ChannelPlaylistsSection } from "./channel-playlists-section";
@@ -76,12 +76,12 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
     if (isChannelNotAllowedError(error)) {
       return (
         <FamilyListEmptyState
-          title="This channel is outside the family list"
-          description="A parent can add this channel if it belongs in your trusted family space."
+          title={m.ui_this_channel_is_outside_the_family_list()}
+          description={m.ui_a_parent_can_add_this_channel_if_it_belongs_in_your_trusted_family_sp()}
         />
       );
     }
-    const message = error instanceof ApiError ? error.message : "Unable to load channel right now.";
+    const message = m.ui_unable_to_load_channel_right_now();
     return (
       <div className="rounded-xl border border-border bg-surface p-6 flex flex-col gap-3 max-w-xl">
         <p className="text-sm text-fg">{message}</p>
@@ -90,7 +90,7 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
           onClick={() => refetch()}
           className="h-9 w-fit rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-fg-strong"
         >
-          Retry
+          {m.ui_retry()}
         </button>
       </div>
     );
@@ -98,8 +98,8 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
   if (meta && isChannelIdentityBlocked({ url: sourceUrl, name: meta.name })) {
     return (
       <FamilyListEmptyState
-        title="This channel is blocked"
-        description="Unblock it from Settings to see this channel again."
+        title={m.ui_this_channel_is_blocked()}
+        description={m.ui_unblock_it_from_settings_to_see_this_channel_again()}
       />
     );
   }

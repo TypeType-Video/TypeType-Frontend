@@ -1,10 +1,11 @@
 import { requestSabrVidstackPlayback } from "../lib/sabr-vidstack-bridge";
 import { useMediaRemote, useMediaState } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 
 export function AudioCenterToggle({ video = null }: { video?: HTMLVideoElement | null }) {
   const remote = useMediaRemote();
   const paused = useMediaState("paused");
-  const label = paused ? "Play audio" : "Pause audio";
+  const label = paused ? m.ui_play_audio() : m.ui_pause_audio();
 
   const togglePlayback = async () => {
     if (video) return requestSabrVidstackPlayback(video, paused, true);

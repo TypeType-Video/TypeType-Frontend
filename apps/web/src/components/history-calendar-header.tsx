@@ -1,20 +1,23 @@
 import { useState } from "react";
+import { m } from "../paraglide/messages.js";
 import { ChevronLeft, ChevronRight } from "./history-calendar-icons";
 
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+function monthNames() {
+  return [
+    m.ui_january(),
+    m.ui_february(),
+    m.ui_march(),
+    m.ui_april(),
+    m.ui_may(),
+    m.ui_june(),
+    m.ui_july(),
+    m.ui_august(),
+    m.ui_september(),
+    m.ui_october(),
+    m.ui_november(),
+    m.ui_december(),
+  ];
+}
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1999 }, (_, i) => CURRENT_YEAR - i);
@@ -39,6 +42,7 @@ export function CalendarHeader({
   onYearChange,
 }: Props) {
   const [dropdown, setDropdown] = useState<"month" | "year" | null>(null);
+  const months = monthNames();
 
   const toggle = (which: "month" | "year") => setDropdown(dropdown === which ? null : which);
 
@@ -60,7 +64,7 @@ export function CalendarHeader({
           type="button"
           onClick={close}
           className="fixed inset-0 z-10"
-          aria-label="Close picker"
+          aria-label={m.ui_close_picker()}
           tabIndex={-1}
         />
       )}
@@ -80,11 +84,11 @@ export function CalendarHeader({
             onClick={() => toggle("month")}
             className="text-xs font-medium text-fg-muted hover:text-fg px-1 py-0.5 rounded transition-colors"
           >
-            {MONTH_NAMES[month]}
+            {months[month]}
           </button>
           {dropdown === "month" && (
             <div className="absolute z-10 top-full left-1/2 -translate-x-1/2 mt-1 w-44 bg-app border border-border rounded-lg p-1.5 grid grid-cols-3 gap-0.5 shadow-xl">
-              {MONTH_NAMES.map((name, m) => (
+              {months.map((name, m) => (
                 <button
                   key={name}
                   type="button"

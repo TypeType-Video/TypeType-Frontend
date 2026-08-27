@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHomeRecommendations } from "../hooks/use-home-recommendations";
 import { useSettings } from "../hooks/use-settings";
+import { m } from "../paraglide/messages.js";
 import { FamilyListEmptyState } from "./family-list-empty-state";
 import { HomeFallbackSection } from "./home-fallback-section";
 import { ScrollSentinel } from "./scroll-sentinel";
@@ -18,7 +19,7 @@ export function HomeRecommendationsSection() {
   if (isLoading) return <VideoGridSkeleton idPrefix="home-recommendations" />;
   if (isError || filtered.length === 0) {
     if (settings.accessMode === "allow_list") {
-      return <FamilyListEmptyState title="No family recommendations yet" />;
+      return <FamilyListEmptyState title={m.ui_no_family_recommendations_yet()} />;
     }
     return <HomeFallbackSection />;
   }

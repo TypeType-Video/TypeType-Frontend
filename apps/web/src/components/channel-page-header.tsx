@@ -1,4 +1,5 @@
-import { formatViews } from "../lib/format";
+import { formatSubscribers } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
 import { RssShortcut } from "./rss-shortcut";
@@ -36,7 +37,7 @@ export function ChannelPageHeader({
               {name}
               {isVerified && <VerifiedBadgeIcon />}
             </h1>
-            <p className="text-sm text-fg-soft">{formatViews(subscriberCount)} subscribers</p>
+            <p className="text-sm text-fg-soft">{formatSubscribers(subscriberCount)}</p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -52,7 +53,7 @@ export function ChannelPageHeader({
                 : "bg-fg text-app hover:bg-fg-strong"
             }`}
           >
-            {subscribed ? "Subscribed" : "Subscribe"}
+            {subscribed ? m.watch_subscribed() : m.watch_subscribe()}
           </button>
         </div>
       </div>

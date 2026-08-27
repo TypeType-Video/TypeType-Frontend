@@ -4,6 +4,7 @@ import { useDownloaderJob } from "../hooks/use-downloader-job";
 import { useOverlayLock } from "../hooks/use-overlay-lock";
 import { useSmoothDismiss } from "../hooks/use-smooth-dismiss";
 import { deleteDownloaderJob } from "../lib/api-downloader";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import {
   buildDownloaderCreatePayload,
@@ -50,7 +51,7 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
   const completion = useArtifactDownloadOnDone({
     isDone,
     jobId,
-    selectedLabel: selected?.label ?? "file",
+    selectedLabel: selected?.label ?? m.ui_file(),
     openArtifact,
     autoStart: !canUseIosShareFlow,
     preferShare: canUseIosShareFlow,
@@ -81,8 +82,8 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
       await deleteDownloaderJob(jobId);
       reset();
       setArtifactError(null);
-    } catch (error) {
-      setArtifactError(error instanceof Error ? error.message : "Failed to clear download job");
+    } catch {
+      setArtifactError(m.ui_failed_to_clear_download_job());
     }
     setClearPending(false);
   }
@@ -91,7 +92,7 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
     <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
       <button
         type="button"
-        aria-label="Close download"
+        aria-label={m.ui_close_download()}
         onClick={dismiss}
         className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? "opacity-0" : "opacity-100"}`}
       />
@@ -101,7 +102,7 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
         >
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-fg">Download</p>
+              <p className="text-sm font-semibold text-fg">{m.watch_download()}</p>
               <p className="max-w-72 truncate text-xs text-fg-muted">{stream.title}</p>
             </div>
             <button
@@ -109,7 +110,7 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
               onClick={dismiss}
               className="rounded-md px-2 py-1 text-xs text-fg-muted hover:bg-surface-strong"
             >
-              Close
+              {m.admin_users_close()}
             </button>
           </div>
           {!showWorkingState && !requiresManualArtifactTap && (
@@ -127,14 +128,14 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
                 disabled={!selected}
                 className="mt-4 w-full rounded-lg bg-fg px-3 py-2 text-sm font-medium text-app transition-colors hover:bg-fg-strong disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-fg-muted"
               >
-                Start download
+                {m.ui_start_download()}
               </button>
             </>
           )}
           {requiresManualArtifactTap && (
             <div className="mt-2 flex flex-col gap-3 rounded-lg border border-border bg-surface/60 p-3">
               <p className="text-xs text-fg-muted">
-                File is ready. Tap below to open it in iOS and save to Files.
+                {m.ui_file_is_ready_tap_below_to_open_it_in_ios_and_save_to_files()}
               </p>
               <button
                 type="button"
@@ -142,7 +143,7 @@ export function DownloadSheet({ stream, onClose, onDone }: Props) {
                 disabled={completion.isCompleting}
                 className="w-full rounded-lg bg-fg px-3 py-2 text-sm font-medium text-app transition-colors hover:bg-fg-strong disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-fg-muted"
               >
-                {completion.isCompleting ? "Opening..." : "Open file"}
+                {completion.isCompleting ? m.ui_opening() : m.ui_open_file()}
               </button>
             </div>
           )}

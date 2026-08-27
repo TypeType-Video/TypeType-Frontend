@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   url: string;
@@ -36,9 +37,9 @@ export function ExternalLinkModal({ url, onConfirm, onCancel }: Props) {
       >
         <div className="flex flex-col gap-1.5">
           <p id="external-link-title" className="text-sm font-semibold text-fg">
-            You are leaving TypeType
+            {m.ui_you_are_leaving_typetype()}
           </p>
-          <p className="text-xs text-fg-muted">This link will open in a new tab:</p>
+          <p className="text-xs text-fg-muted">{m.ui_this_link_will_open_in_a_new_tab()}</p>
           <p className="text-xs text-fg-muted break-all font-mono bg-surface-strong rounded-lg px-2.5 py-2 mt-0.5">
             {url}
           </p>
@@ -49,14 +50,14 @@ export function ExternalLinkModal({ url, onConfirm, onCancel }: Props) {
             onClick={onCancel}
             className="px-3.5 py-1.5 text-sm text-fg-muted hover:text-fg bg-surface-strong hover:bg-surface-soft rounded-lg transition-colors"
           >
-            Cancel
+            {m.portability_cancel()}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="px-3.5 py-1.5 text-sm text-white bg-accent hover:bg-accent-strong rounded-lg transition-colors"
           >
-            Continue
+            {m.ui_continue()}
           </button>
         </div>
       </div>

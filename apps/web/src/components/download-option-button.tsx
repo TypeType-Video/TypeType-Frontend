@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { DownloadOption } from "./download-options";
 
 type Props = {
@@ -32,7 +33,7 @@ export function DownloadOptionButton({
         <p className={`${compact ? "text-[11px]" : "text-xs"} font-medium`}>{option.label}</p>
         {option.recommended && (
           <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300">
-            Recommended
+            {m.ui_recommended()}
           </span>
         )}
       </div>

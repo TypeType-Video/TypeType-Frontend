@@ -1,4 +1,4 @@
-import { DOWNLOADER_INSUFFICIENT_STORAGE_HELP } from "../lib/downloader-errors";
+import { m } from "../paraglide/messages.js";
 
 export function DownloaderStorageError() {
   return (
@@ -9,7 +9,7 @@ export function DownloaderStorageError() {
         className="h-20 w-20 rounded-xl object-cover motion-reduce:hidden"
       />
       <p className="text-xs leading-relaxed text-fg-muted">
-        {DOWNLOADER_INSUFFICIENT_STORAGE_HELP}
+        {m.ui_downloader_insufficient_storage_help()}
       </p>
     </div>
   );

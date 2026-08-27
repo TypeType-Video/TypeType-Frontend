@@ -106,8 +106,7 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
               { id, role: nextRole },
               {
                 onSuccess: () => onToast(m.admin_users_role_updated()),
-                onError: (error) =>
-                  onToast(error instanceof Error ? error.message : m.admin_users_update_failed()),
+                onError: () => onToast(m.admin_users_update_failed()),
               },
             );
           }}
@@ -116,8 +115,7 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
               { id, suspended: !suspendedFlag },
               {
                 onSuccess: () => onToast(m.admin_users_suspend_updated()),
-                onError: (error) =>
-                  onToast(error instanceof Error ? error.message : m.admin_users_update_failed()),
+                onError: () => onToast(m.admin_users_update_failed()),
               },
             );
           }}
@@ -127,8 +125,7 @@ export function AdminUsersSection({ enabled, onToast }: Props) {
                 setSelectedUserId(null);
                 setResetTokenData({ email, token: result.resetToken });
               },
-              onError: (error) =>
-                onToast(error instanceof Error ? error.message : m.admin_users_reset_failed()),
+              onError: () => onToast(m.admin_users_reset_failed()),
             });
           }}
         />

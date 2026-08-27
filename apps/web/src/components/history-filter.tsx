@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "../paraglide/messages.js";
 import { HistoryCalendar } from "./history-calendar";
 
 export type FilterState =
@@ -15,11 +16,13 @@ type Props = {
   onClearHistory: () => void;
 };
 
-const PRESET_OPTIONS = [
-  { label: "Today", value: "today" as const },
-  { label: "This week", value: "week" as const },
-  { label: "This month", value: "month" as const },
-];
+function presetOptions() {
+  return [
+    { label: m.search_filter_today(), value: "today" as const },
+    { label: m.ui_this_week(), value: "week" as const },
+    { label: m.ui_this_month(), value: "month" as const },
+  ];
+}
 
 function SearchIcon() {
   return (
@@ -34,7 +37,7 @@ function SearchIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Search"
+      aria-label={m.shell_search()}
     >
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -95,7 +98,9 @@ export function HistoryFilter({
       <div>
         <div className="mb-2.5 flex items-center justify-between gap-3">
           <p className="text-[11px] text-fg-soft uppercase tracking-wider">
-            {resultCount} {resultCount === 1 ? "video" : "videos"}
+            {resultCount === 1
+              ? m.ui_video_count({ count: resultCount })
+              : m.ui_videos_count({ count: resultCount })}
           </p>
           {canClearHistory && (
             <button
@@ -103,7 +108,7 @@ export function HistoryFilter({
               onClick={onClearHistory}
               className="rounded-md border border-danger/40 px-2.5 py-1 text-[11px] text-danger transition-colors hover:border-danger hover:text-danger-strong"
             >
-              Clear all
+              {m.ui_clear_all()}
             </button>
           )}
         </div>
@@ -115,16 +120,16 @@ export function HistoryFilter({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search history..."
+            placeholder={m.ui_search_history_2()}
             className="w-full h-9 bg-surface border border-border rounded-lg pl-8 pr-3 text-xs text-fg placeholder-zinc-600 focus:outline-none focus:border-border-strong transition-colors"
           />
         </div>
       </div>
 
       <div>
-        <p className="text-[11px] text-fg-soft uppercase tracking-wider mb-2">Date</p>
+        <p className="text-[11px] text-fg-soft uppercase tracking-wider mb-2">{m.ui_date()}</p>
         <div className="grid grid-cols-2 gap-1 sm:grid-cols-4 lg:flex lg:flex-col lg:gap-0.5">
-          {PRESET_OPTIONS.map((opt) => (
+          {presetOptions().map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -148,7 +153,7 @@ export function HistoryFilter({
                 : "text-fg-muted hover:text-fg hover:bg-surface-strong"
             }`}
           >
-            {selectedDate ? formatDate(selectedDate) : "Older"}
+            {selectedDate ? formatDate(selectedDate) : m.ui_older()}
           </button>
 
           {calendarOpen && <HistoryCalendar selected={selectedDate} onSelect={handleDateSelect} />}
@@ -161,7 +166,7 @@ export function HistoryFilter({
           onClick={handleClear}
           className="text-[11px] text-fg-soft hover:text-fg-muted transition-colors text-left"
         >
-          Clear filters
+          {m.ui_clear_filters()}
         </button>
       )}
     </aside>
