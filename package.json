@@ -15,9 +15,10 @@
   "private": true,
   "scripts": {
     "localize": "bun run --cwd apps/web localize",
+    "localization:report": "node scripts/localization-report.mjs",
     "dev": "bun run --cwd apps/web dev",
     "build": "bun run --cwd apps/web build",
-    "check": "bun run localize && biome check .",
+    "check": "bun run localize && node scripts/check-localization.mjs && biome check .",
     "format": "biome format --write .",
     "knip": "knip",
     "sherif": "sherif",
