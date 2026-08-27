@@ -301,7 +301,7 @@
   "portability_status_supported": "Pris en charge",
   "portability_status_not_supported": "Non pris en charge",
   "portability_get_backup": "Récupérer votre sauvegarde",
-  "portability_backup_suffix": "sauvegarde",
+  "portability_backup_suffix": "Sauvegarde",
   "portability_guide_typetype_description": "Déplacez vos données depuis une autre instance TypeType ou restaurez une sauvegarde portable.",
   "portability_guide_typetype_step_one": "Ouvrez Paramètres, puis Portabilité des données sur l'instance source.",
   "portability_guide_typetype_step_two": "Choisissez TypeType comme destination et téléchargez l'export.",
