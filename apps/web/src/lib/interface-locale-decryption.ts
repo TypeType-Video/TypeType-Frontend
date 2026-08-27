@@ -8,9 +8,13 @@ type AnimatedText = {
 };
 
 const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&?+";
-const ITERATIONS = 22;
+const ITERATIONS = 18;
 const IGNORED_SELECTOR =
   "script, style, noscript, [aria-hidden='true'], [data-interface-copy-ignore]";
+
+function isScrambleCharacter(character: string): boolean {
+  return /[\p{L}\p{N}]/u.test(character);
+}
 
 export type LocaleTextSnapshot = Map<Text, string>;
 
@@ -18,7 +22,7 @@ export function centeredRevealOrder(text: string): number[] {
   const center = (text.length - 1) / 2;
   return [...text]
     .map((character, index) => ({ character, index }))
-    .filter(({ character }) => character !== " ")
+    .filter(({ character }) => isScrambleCharacter(character))
     .sort((left, right) => Math.abs(left.index - center) - Math.abs(right.index - center))
     .map(({ index }) => index);
 }
@@ -33,7 +37,7 @@ export function decryptedIteration(
   const revealed = new Set(order.slice(0, revealCount));
   return [...text]
     .map((character, index) => {
-      if (character === " " || revealed.has(index)) return character;
+      if (!isScrambleCharacter(character) || revealed.has(index)) return character;
       return CHARACTERS[(index * 17 + iteration * 13) % CHARACTERS.length];
     })
     .join("");

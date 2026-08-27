@@ -27,7 +27,7 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
-const DECRYPTION_DURATION_MS = 960;
+const DECRYPTION_DURATION_MS = 800;
 
 function syncDocumentLocale(locale: Locale): void {
   document.documentElement.lang = locale;

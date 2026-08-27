@@ -14,8 +14,15 @@ describe("interface locale decryption", () => {
     expect(encrypted[5]).toBe(" ");
   });
 
+  test("keeps punctuation stable while text is encrypted", () => {
+    const text = "Hello, world!";
+    const encrypted = decryptedIteration(text, centeredRevealOrder(text), 1);
+    expect(encrypted[5]).toBe(",");
+    expect(encrypted[12]).toBe("!");
+  });
+
   test("restores the exact translated text on the final iteration", () => {
     const text = "Préférer la langue originale";
-    expect(decryptedIteration(text, centeredRevealOrder(text), 22)).toBe(text);
+    expect(decryptedIteration(text, centeredRevealOrder(text), 18)).toBe(text);
   });
 });
