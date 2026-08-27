@@ -13,6 +13,7 @@ import { useFavoriteStreams } from "../hooks/use-favorite-streams";
 import { usePlaylists } from "../hooks/use-playlists";
 import { useSavedPlaylists } from "../hooks/use-saved-playlists";
 import { useWatchLaterStreams } from "../hooks/use-watch-later-streams";
+import { m } from "../paraglide/messages.js";
 import type { SavedPlaylistItem } from "../types/playlist";
 
 function PlaylistsPage() {
@@ -66,13 +67,13 @@ function PlaylistsPage() {
     for (const id of confirmIds) remove.mutate(id);
     setConfirmIds(null);
     exitSelection();
-    setToastMsg(count === 1 ? "Playlist deleted" : `${count} playlists deleted`);
+    setToastMsg(count === 1 ? m.ui_playlist_deleted() : m.ui_playlists_deleted({ count }));
   }
 
   function handleSavedConfirm() {
     if (!savedConfirm) return;
     savedPlaylists.remove.mutate(savedConfirm.id);
-    setToastMsg(`Removed ${savedConfirm.title}`);
+    setToastMsg(m.ui_saved_playlist_removed({ name: savedConfirm.title }));
     setSavedConfirm(null);
   }
 
@@ -80,8 +81,10 @@ function PlaylistsPage() {
     confirmIds === null
       ? ""
       : confirmIds.length === 1
-        ? `Delete "${playlists.find((p) => p.id === confirmIds[0])?.name ?? "this playlist"}"?`
-        : `Delete ${confirmIds.length} playlists?`;
+        ? m.ui_delete_playlist_question({
+            name: playlists.find((p) => p.id === confirmIds[0])?.name ?? m.ui_this_playlist(),
+          })
+        : m.ui_delete_playlists_question({ count: confirmIds.length });
   const hasLocalCollections =
     playlists.length > 0 || visibleFavorites.length > 0 || visibleWatchLater.length > 0;
 
@@ -103,13 +106,13 @@ function PlaylistsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           <LibraryCollectionCard
             kind="favorites"
-            title="Favorites"
+            title={m.portability_category_favorites()}
             count={visibleFavorites.length}
             thumbnail={visibleFavorites[0]?.thumbnail}
           />
           <LibraryCollectionCard
             kind="watch-later"
-            title="Watch later"
+            title={m.portability_category_watch_later()}
             count={visibleWatchLater.length}
             thumbnail={visibleWatchLater[0]?.thumbnail}
           />
@@ -135,7 +138,7 @@ function PlaylistsPage() {
           onConfirm={(name) => {
             create.mutate(name);
             setCreating(false);
-            setToastMsg(`"${name}" created`);
+            setToastMsg(m.ui_playlist_created({ name }));
           }}
           onCancel={() => setCreating(false)}
         />
@@ -143,15 +146,15 @@ function PlaylistsPage() {
       {confirmIds !== null && (
         <ConfirmModal
           title={confirmTitle}
-          description="This action cannot be undone."
+          description={m.ui_this_action_cannot_be_undone()}
           onConfirm={handleConfirm}
           onCancel={() => setConfirmIds(null)}
         />
       )}
       {savedConfirm !== null && (
         <ConfirmModal
-          title={`Remove "${savedConfirm.title}"?`}
-          description="This only removes the saved reference from your library."
+          title={m.ui_remove_saved_playlist_question({ name: savedConfirm.title })}
+          description={m.ui_this_only_removes_the_saved_reference_from_your_library()}
           onConfirm={handleSavedConfirm}
           onCancel={() => setSavedConfirm(null)}
         />

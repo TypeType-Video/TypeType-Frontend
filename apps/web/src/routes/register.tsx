@@ -12,6 +12,7 @@ import { ApiError } from "../lib/api";
 import { sanitizeRedirect } from "../lib/auth-routes";
 import { registerSession } from "../lib/auth-session";
 import { goto } from "../lib/route-redirect";
+import { m } from "../paraglide/messages.js";
 
 function RegisterPage() {
   const { isAuthed, isGuest } = useAuth();
@@ -40,13 +41,14 @@ function RegisterPage() {
 
   const closedByPolicy = status ? !status.allowRegistration && !status.bootstrapAvailable : false;
   const subtitle = !localEnabled
-    ? "Local registration is disabled."
+    ? m.ui_local_registration_is_disabled()
     : bootstrapAvailable
-      ? "First installation detected. Set up the administrator account."
+      ? m.ui_first_installation_detected_set_up_the_administrator_account()
       : closedByPolicy
-        ? "Registrations are currently closed."
-        : "Use your email to create an account. You can sign in with email or username.";
-  const bannerMessage = error ?? (closedByPolicy ? "Registrations are currently closed." : null);
+        ? m.ui_registrations_are_currently_closed()
+        : m.ui_use_your_email_to_create_an_account_you_can_sign_in_with_email_or_use();
+  const bannerMessage =
+    error ?? (closedByPolicy ? m.ui_registrations_are_currently_closed() : null);
 
   if (isAuthed && !isGuest && status && !bootstrapAvailable) {
     goto(postAuthTarget);
@@ -66,16 +68,14 @@ function RegisterPage() {
         email: email.trim(),
         password,
       });
-      setToast("Account created");
+      setToast(m.ui_account_created());
       goto(postAuthTarget);
     } catch (error) {
       await queryClient.invalidateQueries({ queryKey: REGISTER_STATUS_KEY });
       if (error instanceof ApiError && error.status === 403) {
-        setError(
-          `Registration was rejected by the server. Add ${window.location.origin} to ALLOWED_ORIGINS without a trailing slash, then restart typetype-server.`,
-        );
+        setError(m.ui_registration_rejected_server({ origin: window.location.origin }));
       } else {
-        setError("Unable to create account.");
+        setError(m.ui_unable_to_create_account());
       }
     }
     setPending(false);
@@ -85,7 +85,7 @@ function RegisterPage() {
     <div className="flex w-full items-center justify-center px-4">
       <Toast message={toast} />
       <AuthCard
-        title={bootstrapAvailable ? "Create admin account" : "Create account"}
+        title={bootstrapAvailable ? m.ui_create_admin_account() : m.login_create_account()}
         subtitle={subtitle}
       >
         <AuthErrorBanner message={bannerMessage} />
@@ -97,12 +97,12 @@ function RegisterPage() {
         {oidcEnabled && localEnabled && (
           <div className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-wider text-fg-soft">
             <span className="h-px flex-1 bg-border" />
-            or
+            {m.login_or()}
             <span className="h-px flex-1 bg-border" />
           </div>
         )}
         {!localEnabled && !oidcEnabled && (
-          <p className="text-sm text-fg-muted">Local registration is disabled.</p>
+          <p className="text-sm text-fg-muted">{m.ui_local_registration_is_disabled()}</p>
         )}
         {localEnabled && (
           <form className="flex flex-col gap-3" onSubmit={submitRegister}>
@@ -111,7 +111,7 @@ function RegisterPage() {
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={bootstrapAvailable ? "Administrator name" : "Name"}
+              placeholder={bootstrapAvailable ? m.ui_administrator_name() : m.ui_name()}
               className="h-10 rounded-lg border border-border-strong bg-app px-3 text-sm text-fg"
               required
             />
@@ -120,7 +120,7 @@ function RegisterPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder={m.admin_users_email()}
               className="h-10 rounded-lg border border-border-strong bg-app px-3 text-sm text-fg"
               required
             />
@@ -129,7 +129,7 @@ function RegisterPage() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={m.login_password_placeholder()}
               className="h-10 rounded-lg border border-border-strong bg-app px-3 text-sm text-fg"
               required
             />
@@ -139,19 +139,19 @@ function RegisterPage() {
               className="h-10 rounded-lg bg-fg text-app text-sm font-medium disabled:opacity-60"
             >
               {closedByPolicy
-                ? "Registrations closed"
+                ? m.ui_registrations_closed()
                 : pending
-                  ? "Creating account..."
+                  ? m.ui_creating_account()
                   : bootstrapAvailable
-                    ? "Create admin account"
-                    : "Register"}
+                    ? m.ui_create_admin_account()
+                    : m.nav_register()}
             </button>
           </form>
         )}
         {!bootstrapAvailable && (
           <div className="mt-4 text-xs text-fg-soft">
             <Link to="/login" search={{ redirect }} className="hover:text-fg-muted">
-              Already have an account? Sign in
+              {m.ui_already_have_an_account_sign_in()}
             </Link>
           </div>
         )}

@@ -7,7 +7,11 @@ import { Toast } from "../components/toast";
 import { useAuth } from "../hooks/use-auth";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useProfile } from "../hooks/use-profile";
-import { parseProfileServerError } from "../lib/profile-errors";
+import {
+  type ProfileErrorCode,
+  parseProfileServerError,
+  profileErrorMessage,
+} from "../lib/profile-errors";
 import { normalizeField, validateBio, validatePublicUsername } from "../lib/profile-validation";
 import { m } from "../paraglide/messages.js";
 
@@ -17,8 +21,8 @@ function ProfilePage() {
   const { save } = useProfile();
   const [publicUsername, setPublicUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [serverUsernameError, setServerUsernameError] = useState<string | null>(null);
-  const [serverBioError, setServerBioError] = useState<string | null>(null);
+  const [serverUsernameError, setServerUsernameError] = useState<ProfileErrorCode | null>(null);
+  const [serverBioError, setServerBioError] = useState<ProfileErrorCode | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,9 +39,11 @@ function ProfilePage() {
 
   const normalizedUsername = normalizeField(publicUsername);
   const normalizedBio = normalizeField(bio);
-  const usernameError = serverUsernameError ?? validatePublicUsername(normalizedUsername);
-  const bioError = serverBioError ?? validateBio(normalizedBio);
-  const hasError = usernameError !== null || bioError !== null;
+  const usernameErrorCode = serverUsernameError ?? validatePublicUsername(normalizedUsername);
+  const bioErrorCode = serverBioError ?? validateBio(normalizedBio);
+  const usernameError = usernameErrorCode ? profileErrorMessage(usernameErrorCode) : null;
+  const bioError = bioErrorCode ? profileErrorMessage(bioErrorCode) : null;
+  const hasError = usernameErrorCode !== null || bioErrorCode !== null;
 
   const isDirty = useMemo(() => {
     const currentUsername = me?.publicUsername ?? null;
@@ -78,7 +84,7 @@ function ProfilePage() {
               value={publicUsername}
               onChange={(event) => setPublicUsername(event.target.value)}
               onFocus={() => setServerUsernameError(null)}
-              placeholder="john.doe"
+              placeholder={m.ui_john_doe()}
               className="h-10 min-w-0 w-full rounded-sm border border-border-strong bg-app px-3 text-sm text-fg"
             />
             <p className={`text-xs ${usernameError ? "text-danger-strong" : "text-fg-soft"}`}>
@@ -122,14 +128,14 @@ function ProfilePage() {
                     onError: (error) => {
                       const parsed = parseProfileServerError(error);
                       if (parsed.field === "publicUsername") {
-                        setServerUsernameError(parsed.message);
+                        setServerUsernameError(parsed.code);
                         return;
                       }
                       if (parsed.field === "bio") {
-                        setServerBioError(parsed.message);
+                        setServerBioError(parsed.code);
                         return;
                       }
-                      setToast(parsed.message);
+                      setToast(profileErrorMessage(parsed.code));
                     },
                   },
                 );

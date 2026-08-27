@@ -14,6 +14,7 @@ import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
 import { playlistListId } from "../lib/playlist-url";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 
 function PublicPlaylistPage() {
   const { list, url } = Route.useSearch();
@@ -41,14 +42,14 @@ function PublicPlaylistPage() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  if (!playlistUrl) return <p className="text-fg-muted text-sm">No playlist selected.</p>;
+  if (!playlistUrl) return <p className="text-fg-muted text-sm">{m.ui_no_playlist_selected()}</p>;
   if (isLoading) return <VideoGridSkeleton idPrefix="public-playlist" />;
   if (isError || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-2 text-center">
-        <p className="text-fg-muted text-sm">This playlist could not be loaded.</p>
+        <p className="text-fg-muted text-sm">{m.ui_this_playlist_could_not_be_loaded()}</p>
         <Link to="/" className="text-xs text-fg-soft hover:text-fg-muted transition-colors">
-          Back home
+          {m.ui_back_home()}
         </Link>
       </div>
     );
@@ -70,10 +71,12 @@ function PublicPlaylistPage() {
 
   function toggleSaved() {
     if (saved) {
-      savedPlaylists.remove.mutate(saved.id, { onSuccess: () => setToast("Playlist removed") });
+      savedPlaylists.remove.mutate(saved.id, {
+        onSuccess: () => setToast(m.ui_playlist_removed()),
+      });
       return;
     }
-    savedPlaylists.save.mutate(playlistUrl, { onSuccess: () => setToast("Playlist saved") });
+    savedPlaylists.save.mutate(playlistUrl, { onSuccess: () => setToast(m.ui_playlist_saved()) });
   }
 
   return (
@@ -100,13 +103,13 @@ function PublicPlaylistPage() {
               ) : (
                 <BookmarkPlus className="h-3.5 w-3.5" />
               )}
-              {saved ? "Saved" : "Save"}
+              {saved ? m.ui_saved() : m.ui_save()}
             </button>
           </div>
         )}
       </div>
       {streams.length === 0 ? (
-        <p className="text-fg-muted text-sm">This playlist has no videos.</p>
+        <p className="text-fg-muted text-sm">{m.ui_this_playlist_has_no_videos()}</p>
       ) : (
         <VideoGrid streams={streams} listId={listId} />
       )}

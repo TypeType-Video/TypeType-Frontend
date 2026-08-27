@@ -13,6 +13,7 @@ import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
 import { type PlaylistSortMode, sortPlaylistVideos } from "../lib/playlist-sort";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { PlaylistVideoItem } from "../types/user";
 
 function PlaylistDetailPage() {
@@ -29,19 +30,19 @@ function PlaylistDetailPage() {
   if (isPending) {
     return (
       <div className="flex items-center justify-center py-32">
-        <p className="text-fg-soft text-sm">Loading...</p>
+        <p className="text-fg-soft text-sm">{m.ui_loading()}</p>
       </div>
     );
   }
   if (!playlist) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
-        <p className="text-fg-muted text-sm">Playlist not found.</p>
+        <p className="text-fg-muted text-sm">{m.ui_playlist_not_found()}</p>
         <Link
           to="/playlists"
           className="text-fg-soft text-xs transition-colors hover:text-fg-muted"
         >
-          Back to playlists
+          {m.ui_back_to_playlists()}
         </Link>
       </div>
     );
@@ -77,7 +78,7 @@ function PlaylistDetailPage() {
           <Link
             to="/playlists"
             className="text-fg-soft transition-colors hover:text-fg"
-            aria-label="Back to playlists"
+            aria-label={m.ui_back_to_playlists()}
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
@@ -88,13 +89,13 @@ function PlaylistDetailPage() {
                 type="button"
                 onClick={() => setRenaming(true)}
                 className="text-fg-soft transition-colors hover:text-fg-muted"
-                aria-label="Rename playlist"
+                aria-label={m.ui_rename_playlist()}
               >
                 <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
             </div>
             <p className="text-fg-soft text-xs">
-              {count} video{count !== 1 ? "s" : ""}
+              {count === 1 ? m.ui_video_count({ count }) : m.ui_videos_count({ count })}
             </p>
           </div>
         </div>
@@ -113,7 +114,7 @@ function PlaylistDetailPage() {
             onClick={() => setConfirmingDelete(true)}
             className="rounded-lg px-3 py-1.5 text-danger text-xs transition-colors hover:bg-danger/10"
           >
-            Delete playlist
+            {m.ui_delete_playlist()}
           </button>
         </div>
       </div>
@@ -121,11 +122,11 @@ function PlaylistDetailPage() {
         <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
           <p className="text-fg-muted text-sm">
             {allVideos.length > 0
-              ? "All videos in this playlist are blocked."
-              : "No videos in this playlist yet."}
+              ? m.ui_all_videos_in_playlist_blocked()
+              : m.ui_no_videos_in_playlist_yet()}
           </p>
           <p className="text-fg-soft text-xs">
-            Save videos from the watch page using the Save button.
+            {m.ui_save_videos_from_the_watch_page_using_the_save_button()}
           </p>
         </div>
       ) : (
@@ -139,9 +140,9 @@ function PlaylistDetailPage() {
       )}
       {pendingRemove && (
         <ConfirmModal
-          title="Remove video"
-          description={`Remove "${pendingRemove.title}" from this playlist?`}
-          confirmLabel="Remove"
+          title={m.ui_remove_video()}
+          description={m.ui_remove_video_from_playlist_question({ name: pendingRemove.title })}
+          confirmLabel={m.ui_remove()}
           onConfirm={() => {
             removeVideo.mutate({ playlistId: playlist.id, videoUrl: pendingRemove.url });
             setPendingRemove(null);
@@ -151,9 +152,9 @@ function PlaylistDetailPage() {
       )}
       {confirmingDelete && (
         <ConfirmModal
-          title="Delete playlist"
-          description={`Delete "${playlist.name}"? This cannot be undone.`}
-          confirmLabel="Delete"
+          title={m.ui_delete_playlist()}
+          description={m.ui_delete_playlist_confirmation({ name: playlist.name })}
+          confirmLabel={m.ui_delete()}
           onConfirm={() => {
             setConfirmingDelete(false);
             handleDelete();

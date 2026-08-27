@@ -164,7 +164,7 @@ function SettingsPage() {
       )}
       {activeSection === "rss" && pendingRssDecision && (
         <div className="border-y border-border py-5 text-sm text-fg-muted">
-          Loading RSS settings...
+          {m.ui_loading_rss_settings()}
         </div>
       )}
       {activeSection === "about" && <SettingsAbout />}

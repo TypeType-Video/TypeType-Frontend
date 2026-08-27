@@ -14,6 +14,7 @@ import {
   sanitizeYoutubeSessionReturnTo,
   toYoutubeSessionWebSocketUrl,
 } from "../lib/youtube-session-route";
+import { m } from "../paraglide/messages.js";
 
 const SIDE_LABEL = "font-mono text-fg-soft text-[11px] uppercase tracking-[0.22em]";
 
@@ -38,7 +39,7 @@ function YoutubeSessionPage() {
     if (remote.phase !== "connected") return;
     setBrowserSession(null);
     void refetchStatus();
-    setToast("YouTube session connected");
+    setToast(m.ui_youtube_session_connected());
   }, [remote.phase, refetchStatus]);
 
   function startRemoteBrowser() {
@@ -52,7 +53,7 @@ function YoutubeSessionPage() {
         recordClientEvent("youtube_remote.start_error", {
           message: error instanceof Error ? error.message : "unknown",
         });
-        setToast("Remote YouTube login is not available yet");
+        setToast(m.ui_remote_youtube_login_is_not_available_yet());
       },
     });
   }
@@ -68,8 +69,8 @@ function YoutubeSessionPage() {
 
   function disconnect() {
     session.disconnect.mutate(undefined, {
-      onSuccess: () => setToast("YouTube session disconnected"),
-      onError: () => setToast("Could not disconnect YouTube session"),
+      onSuccess: () => setToast(m.ui_youtube_session_disconnected()),
+      onError: () => setToast(m.ui_could_not_disconnect_youtube_session()),
     });
   }
 
@@ -77,21 +78,20 @@ function YoutubeSessionPage() {
     <div className="flex w-full max-w-none flex-col gap-8 pt-2 [animation:page-fade-in_0.2s_ease-out]">
       <div className="px-1">
         <Link to="/" className="w-fit text-fg-soft text-xs transition-colors hover:text-fg">
-          Back home
+          {m.ui_back_home()}
         </Link>
       </div>
 
       <section className="grid min-h-[28rem] gap-10 border-border border-y py-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="flex min-w-0 flex-col justify-center gap-8">
-          <p className={SIDE_LABEL}>YouTube remote sign-in</p>
+          <p className={SIDE_LABEL}>{m.ui_youtube_remote_sign_in()}</p>
 
           <div className="flex flex-col gap-3">
             <h1 className="max-w-4xl font-semibold text-3xl text-fg tracking-tight sm:text-5xl sm:leading-tight">
-              Connect YouTube inside TypeType
+              {m.ui_connect_youtube_inside_typetype()}
             </h1>
             <p className="max-w-3xl text-base text-fg-muted leading-7 sm:text-lg">
-              TypeType opens a temporary remote browser for YouTube sign-in. Cookies and playback
-              token are captured server-side, encrypted, and never sent to the web UI.
+              {m.ui_typetype_opens_a_temporary_remote_browser_for_youtube_sign_in_cookies()}
             </p>
           </div>
 

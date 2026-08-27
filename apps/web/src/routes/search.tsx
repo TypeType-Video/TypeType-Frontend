@@ -9,6 +9,7 @@ import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useSearch } from "../hooks/use-search";
 import { useSearchFilters } from "../hooks/use-search-filters";
 import { useSettings } from "../hooks/use-settings";
+import { m } from "../paraglide/messages.js";
 
 function SearchPage() {
   const {
@@ -101,19 +102,20 @@ function SearchPage() {
       {filterBar}
       {isCorrected && suggestion && (
         <p className="text-sm text-fg-muted mb-4">
-          Showing results for <span className="text-fg font-medium">{suggestion}</span>.{" "}
+          {m.ui_showing_results_for()} <span className="text-fg font-medium">{suggestion}</span>.{" "}
           <button
             type="button"
             onClick={handleSuggestion}
             className="text-accent hover:text-accent-strong underline"
           >
-            Search instead for &ldquo;{q}&rdquo;
+            {m.ui_search_instead_for()}
+            {q}&rdquo;
           </button>
         </p>
       )}
       {!isCorrected && suggestion && (
         <p className="text-sm text-fg-muted mb-4">
-          Did you mean{" "}
+          {m.ui_did_you_mean()}{" "}
           <button
             type="button"
             onClick={handleSuggestion}
@@ -127,11 +129,14 @@ function SearchPage() {
       {items.length === 0 ? (
         settings.accessMode === "allow_list" ? (
           <FamilyListEmptyState
-            title="No family-list results"
-            description="Try a channel you already trust, or add more channels to the family list."
+            title={m.ui_no_family_list_results()}
+            description={m.ui_try_a_channel_you_already_trust_or_add_more_channels_to_the_family_li()}
           />
         ) : (
-          <p className="text-fg-muted text-sm">No results for &ldquo;{q}&rdquo;</p>
+          <p className="text-fg-muted text-sm">
+            {m.ui_no_results_for()}
+            {q}&rdquo;
+          </p>
         )
       ) : (
         <SearchResultsGrid items={items} />

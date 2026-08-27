@@ -11,6 +11,7 @@ import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
 import { type PlaylistSortMode, sortPlaylistVideos } from "../lib/playlist-sort";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 
 function WatchLaterPage() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ function WatchLaterPage() {
   return (
     <div className="flex flex-col gap-6 pt-2 sm:pt-4 [animation:page-fade-in_0.2s_ease-out]">
       <CollectionPageHeader
-        title="Watch later"
+        title={m.portability_category_watch_later()}
         count={count}
         loading={isLoading}
         canPlay={visiblePlaylistVideos.length > 0}
@@ -57,7 +58,9 @@ function WatchLaterPage() {
       {isLoading ? (
         <VideoGridSkeleton idPrefix="watch-later" />
       ) : videos.length === 0 ? (
-        <p className="py-24 text-center text-sm text-fg-muted">No videos saved for later.</p>
+        <p className="py-24 text-center text-sm text-fg-muted">
+          {m.ui_no_videos_saved_for_later()}
+        </p>
       ) : (
         <PlaylistGrid
           videos={visiblePlaylistVideos}

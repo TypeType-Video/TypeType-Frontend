@@ -8,6 +8,7 @@ import { YoutubeImportDone } from "../../components/youtube-import-done";
 import { YoutubeImportDrop } from "../../components/youtube-import-drop";
 import { useYoutubeTakeoutImport } from "../../hooks/use-youtube-takeout-import";
 import { ApiError } from "../../lib/api";
+import { m } from "../../paraglide/messages.js";
 import { applyJobFeedback } from "../../settings/youtube-import-helpers";
 
 const TAKEOUT_URL =
@@ -61,7 +62,7 @@ function YoutubeImportPage() {
       try {
         await imp.report.mutateAsync(job.jobId);
         reportRetryRef.current = null;
-        setToast("YouTube import completed.");
+        setToast(m.ui_youtube_import_completed());
       } catch (error) {
         if (error instanceof ApiError && error.status === 429 && attempt < 5) {
           const delay = 1200 * (attempt + 1);
@@ -72,7 +73,7 @@ function YoutubeImportPage() {
         }
         reportRetryRef.current = null;
         reportJobRef.current = job.jobId;
-        const msg = error instanceof ApiError ? error.message : "Unable to load import report.";
+        const msg = m.ui_unable_to_load_import_report();
         setInlineError(msg);
       }
     };
@@ -87,12 +88,14 @@ function YoutubeImportPage() {
       try {
         const job = await imp.create.mutateAsync(file);
         const preview = await imp.preview.mutateAsync(job.jobId);
-        if ((preview.counts.history ?? 0) > 5000) setToast(`Large history in ${file.name}`);
+        if ((preview.counts.history ?? 0) > 5000) {
+          setToast(m.ui_large_history_in({ file: file.name }));
+        }
         await imp.commit.mutateAsync(job.jobId);
         setCurrentIndex((v) => v + 1);
-      } catch (error) {
+      } catch (_error) {
         setQueueStarted(false);
-        const msg = error instanceof ApiError ? error.message : "Unable to process archive.";
+        const msg = m.ui_unable_to_process_archive();
         setInlineError(msg);
         setToast(msg);
       }
@@ -101,7 +104,7 @@ function YoutubeImportPage() {
 
   useEffect(() => {
     if (!queueStarted || currentIndex < queue.length) return;
-    if (queue.length > 0) setToast("All archives processed.");
+    if (queue.length > 0) setToast(m.ui_all_archives_processed());
     setQueueStarted(false);
   }, [currentIndex, queue.length, queueStarted]);
 
@@ -111,12 +114,12 @@ function YoutubeImportPage() {
         to="/import"
         className="inline-flex w-fit items-center gap-1 text-xs text-fg-soft hover:text-fg-muted"
       >
-        <ArrowLeft size={13} aria-hidden="true" /> Back to import sources
+        <ArrowLeft size={13} aria-hidden="true" /> {m.ui_back_to_import_sources()}
       </Link>
       <ImportRouteHeading
-        label="YouTube Takeout"
-        title="Import from YouTube"
-        description="Drop your Takeout ZIP below. We import subscriptions, playlists, and history."
+        label={m.ui_youtube_takeout()}
+        title={m.ui_import_from_youtube()}
+        description={m.ui_drop_your_takeout_zip_below_we_import_subscriptions_playlists_and_his()}
       />
 
       {isCooking ? (
@@ -145,7 +148,7 @@ function YoutubeImportPage() {
           onOpenTakeout={() => window.open(TAKEOUT_URL, "_blank", "noopener,noreferrer")}
           onQueueFiles={(files) => {
             setQueue((prev) => [...prev, ...files]);
-            setToast(`${files.length} file(s) queued.`);
+            setToast(m.ui_files_queued({ count: files.length }));
           }}
           onRemoveFile={(i) => {
             if (queueStarted) return;
@@ -159,7 +162,7 @@ function YoutubeImportPage() {
           onStart={() => {
             if (queue.length === 0) return;
             setQueueStarted(true);
-            setToast("Import started.");
+            setToast(m.ui_import_started());
           }}
         />
       )}

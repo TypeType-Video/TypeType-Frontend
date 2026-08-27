@@ -7,6 +7,7 @@ import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { SUBSCRIPTION_FEED_KEY } from "../hooks/use-subscription-feed";
 import { SUBSCRIPTIONS_KEY, useSubscriptions } from "../hooks/use-subscriptions";
 import { fetchSubscriptionFeed, fetchSubscriptions } from "../lib/api-user";
+import { m } from "../paraglide/messages.js";
 
 const SUBSCRIPTION_STALE_MS = 5 * 60 * 1000;
 
@@ -43,7 +44,7 @@ function SubscriptionChannelsPage() {
   if (query.isSuccess && subscriptions.length === 0) {
     return (
       <div className="flex items-center justify-center pt-32">
-        <p className="text-sm text-fg-muted">No subscriptions yet.</p>
+        <p className="text-sm text-fg-muted">{m.ui_no_subscriptions_yet_2()}</p>
       </div>
     );
   }

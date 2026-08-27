@@ -1,18 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FlagIcon } from "../components/flag-icon";
 import { LANGUAGES } from "../lib/languages";
-
-const CHEVRON = (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-label="toggle">
-    <path
-      d="M2 4l4 4 4-4"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   value: string;
@@ -27,7 +16,7 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const selected = LANGUAGES.find((language) => language.code === value);
-  const label = selected ? selected.label.split(" — ")[0] : "No preference";
+  const label = selected ? selected.label.split(" — ")[0] : m.ui_no_preference();
   const normalizedQuery = query.toLowerCase();
   const filtered =
     query.trim() === ""
@@ -63,7 +52,22 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
           <FlagIcon code={selected.flag} className="w-4 h-3 rounded-sm flex-shrink-0" />
         )}
         {label}
-        {CHEVRON}
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          role="img"
+          aria-label={m.ui_toggle()}
+        >
+          <path
+            d="M2 4l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </button>
       {open && !disabled && (
         <div className="absolute right-0 top-full mt-1 bg-surface-strong border border-border-strong rounded-lg overflow-hidden z-10 w-56 shadow-lg flex flex-col">
@@ -72,7 +76,7 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search language..."
+            placeholder={m.ui_search_language()}
             className="px-3 py-2 text-xs bg-surface-strong text-fg placeholder:text-fg-soft border-b border-border-strong focus:outline-none"
           />
           <div className="overflow-y-auto max-h-52">
@@ -84,7 +88,7 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
               }}
               className={`block w-full text-left px-3 py-2 text-xs transition-colors ${value === "" ? "text-fg bg-surface-soft" : "text-fg-muted hover:bg-surface-soft hover:text-fg"}`}
             >
-              No preference
+              {m.ui_no_preference()}
             </button>
             {filtered.map((language) => (
               <button
