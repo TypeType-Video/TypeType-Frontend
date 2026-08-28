@@ -1,5 +1,12 @@
+import { Search } from "lucide-react";
 import type { ChangeEvent } from "react";
-import { ADMIN_FILTERS, type AdminFilter, isAdminFilter } from "../lib/admin-console";
+import {
+  ADMIN_FILTERS,
+  type AdminFilter,
+  adminFilterLabel,
+  isAdminFilter,
+} from "../lib/admin-console";
+import { m } from "../paraglide/messages.js";
 
 type AdminUserToolbarProps = {
   search: string;
@@ -21,26 +28,36 @@ export function AdminUserToolbar({
   }
 
   return (
-    <section className="flex items-center gap-2">
-      <div className="w-full max-w-sm">
+    <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <label className="relative block w-full sm:max-w-sm">
+        <span className="sr-only">{m.admin_users_search()}</span>
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-soft"
+          aria-hidden="true"
+        />
         <input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search name, email or id"
-          className="h-9 w-full rounded-md border border-border-strong bg-surface px-3 text-sm text-fg outline-none transition-colors focus:border-border-strong"
+          placeholder={m.admin_users_search_placeholder()}
+          className="h-10 w-full rounded-md border border-border-strong bg-app pl-9 pr-3 text-sm text-fg outline-none transition-colors placeholder:text-fg-soft focus:border-accent"
         />
-      </div>
-      <select
-        value={filter}
-        onChange={handleFilter}
-        className="h-9 rounded-md border border-border-strong bg-surface px-2 text-xs text-fg-muted"
-      >
-        {ADMIN_FILTERS.map((item) => (
-          <option key={item.value} value={item.value}>
-            {item.label}
-          </option>
-        ))}
-      </select>
+      </label>
+      <label className="w-full sm:w-40">
+        <span className="mb-1.5 block text-xs font-medium text-fg-muted">
+          {m.admin_users_filter()}
+        </span>
+        <select
+          value={filter}
+          onChange={handleFilter}
+          className="h-10 w-full rounded-md border border-border-strong bg-app px-3 text-sm text-fg outline-none transition-colors focus:border-accent"
+        >
+          {ADMIN_FILTERS.map((item) => (
+            <option key={item} value={item}>
+              {adminFilterLabel(item)}
+            </option>
+          ))}
+        </select>
+      </label>
     </section>
   );
 }

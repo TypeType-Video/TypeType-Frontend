@@ -4,6 +4,7 @@ import { usePlaylists } from "../hooks/use-playlists";
 import { useWatchLaterPlaylist } from "../hooks/use-watch-later-playlist";
 import { watchLaterResultLabel } from "../lib/watch-later-labels";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { PlaylistRow } from "./playlist-row";
 
@@ -75,7 +76,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
     if (!playlist) return;
     if (isInPlaylist(playlistId, stream.id)) {
       removeVideo.mutate({ playlistId, videoUrl: stream.id });
-      onSaved(`Removed from ${playlist.name}`);
+      onSaved(m.ui_removed_from_playlist({ name: playlist.name }));
     } else {
       addVideo.mutate({
         playlistId,
@@ -90,7 +91,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
           duration: stream.duration,
         },
       });
-      onSaved(`Saved to ${playlist.name}`);
+      onSaved(m.ui_saved_to_playlist({ name: playlist.name }));
     }
   }
 
@@ -99,7 +100,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
     if (!trimmed) return;
     create.mutate(trimmed);
     setNewName("");
-    onSaved(`Playlist "${trimmed}" created`);
+    onSaved(m.ui_playlist_named_created({ name: trimmed }));
   }
 
   async function handleWatchLaterToggle() {
@@ -107,7 +108,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
       const saved = await watchLater.toggle(toWatchLaterPayload(stream));
       onSaved(watchLaterResultLabel(saved));
     } catch {
-      onSaved("Could not update Watch later");
+      onSaved(m.ui_watch_later_update_failed());
     }
   }
 
@@ -118,19 +119,19 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
       style={panelStyle}
     >
       <p className="flex-shrink-0 text-xs text-fg-muted px-3 pt-3 pb-1 uppercase tracking-wider font-medium">
-        Save to playlist
+        {m.watch_save_playlist()}
       </p>
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="border-b border-border">
           <PlaylistRow
-            label="Watch later"
+            label={m.portability_category_watch_later()}
             checked={watchLater.isInWatchLater(stream.id)}
             disabled={watchLater.isPending}
             onToggle={() => void handleWatchLaterToggle()}
           />
         </div>
         {playlists.length === 0 && (
-          <p className="text-xs text-fg-soft px-3 py-3">No custom playlists yet.</p>
+          <p className="text-xs text-fg-soft px-3 py-3">{m.ui_no_custom_playlists_yet()}</p>
         )}
         {playlists.map((playlist) => (
           <PlaylistRow
@@ -147,7 +148,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-          placeholder="New playlist..."
+          placeholder={m.ui_new_playlist_2()}
           className="min-w-0 flex-1 text-xs bg-surface-strong text-fg placeholder-zinc-500 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-border-strong"
         />
         <button
@@ -155,7 +156,7 @@ export function PlaylistAddDropdown({ stream, anchorEl, onClose, onSaved }: Prop
           onClick={handleCreate}
           className="flex-shrink-0 text-xs px-2.5 py-1.5 bg-surface-soft hover:bg-surface-soft text-fg rounded-lg transition-colors"
         >
-          Create
+          {m.ui_create()}
         </button>
       </div>
     </div>,

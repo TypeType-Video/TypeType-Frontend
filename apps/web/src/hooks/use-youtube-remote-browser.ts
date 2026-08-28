@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { m } from "../paraglide/messages.js";
 
 export type YoutubeRemotePhase =
   | "idle"
@@ -104,7 +105,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
         }
         if (message?.type === "error") {
           setPhase("error");
-          setError(message.message);
+          setError(m.ui_remote_browser_error());
           recordClientEvent("youtube_remote.backend_error", { message: message.message });
         }
         return;
@@ -123,7 +124,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     ws.onerror = () => {
       finished = true;
       setPhase("error");
-      setError("Remote browser connection failed");
+      setError(m.ui_remote_browser_connection_failed());
       recordClientEvent("youtube_remote.ws_error");
     };
 

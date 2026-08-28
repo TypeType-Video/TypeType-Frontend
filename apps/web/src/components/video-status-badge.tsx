@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
 };
 
 export function VideoStatusBadge({ stream, compact = false }: Props) {
-  const label = stream.isLive ? "LIVE" : stream.isPostLive ? "REPLAY" : null;
+  const label = stream.isLive ? m.ui_live() : stream.isPostLive ? m.ui_replay() : null;
   if (!label) return null;
   return (
     <span

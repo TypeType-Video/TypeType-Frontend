@@ -5,6 +5,7 @@ import { API_BASE as BASE } from "./env";
 export type InstanceCapabilities = {
   guestAllowed: boolean;
   youtubeRemoteLoginEnabled: boolean;
+  parentalControlsEnabled: boolean;
   rss: RssInstanceCapability;
 };
 
@@ -28,7 +29,10 @@ function isRssCapability(value: unknown): value is RssInstanceCapability {
   );
 }
 
-function isInstanceCapabilities(value: unknown): value is Omit<InstanceCapabilities, "rss"> & {
+function isInstanceCapabilities(value: unknown): value is {
+  guestAllowed: boolean;
+  youtubeRemoteLoginEnabled: boolean;
+  parentalControlsEnabled?: unknown;
   rss?: unknown;
 } {
   return (
@@ -43,7 +47,14 @@ function isInstanceCapabilities(value: unknown): value is Omit<InstanceCapabilit
 
 export function normalizeInstanceCapabilities(value: unknown): InstanceCapabilities | null {
   if (!isInstanceCapabilities(value)) return null;
-  return { ...value, rss: isRssCapability(value.rss) ? value.rss : RSS_DISABLED };
+  return {
+    ...value,
+    parentalControlsEnabled:
+      "parentalControlsEnabled" in value && typeof value.parentalControlsEnabled === "boolean"
+        ? value.parentalControlsEnabled
+        : false,
+    rss: isRssCapability(value.rss) ? value.rss : RSS_DISABLED,
+  };
 }
 
 export async function fetchInstanceCapabilities(): Promise<InstanceCapabilities> {

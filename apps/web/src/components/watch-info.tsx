@@ -1,7 +1,10 @@
+import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useClientLocale } from "../hooks/use-client-locale";
+import { useInstance } from "../hooks/use-instance";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { formatPublishedDate, formatSubscribers, formatViews } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
@@ -15,7 +18,8 @@ type Props = {
 };
 
 export function WatchInfo({ stream }: Props) {
-  const locale = useClientLocale();
+  const { locale } = useInterfaceLocale();
+  const instance = useInstance();
   const { add, remove, isSubscribed } = useSubscriptions();
   const subscribed = stream.channelUrl ? isSubscribed(stream.channelUrl) : false;
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -32,17 +36,17 @@ export function WatchInfo({ stream }: Props) {
     try {
       if (subscribed) {
         await remove.mutateAsync(stream.channelUrl);
-        setToastMsg(`Unsubscribed from ${stream.channelName}`);
+        setToastMsg(`${m.watch_unsubscribed_from({}, { locale })} ${stream.channelName}`);
       } else {
         await add.mutateAsync({
           channelUrl: stream.channelUrl,
           name: stream.channelName,
           avatarUrl: stream.channelAvatar,
         });
-        setToastMsg(`Subscribed to ${stream.channelName}`);
+        setToastMsg(`${m.watch_subscribed_to({}, { locale })} ${stream.channelName}`);
       }
     } catch {
-      setToastMsg("Subscription update failed");
+      setToastMsg(m.watch_subscription_failed({}, { locale }));
     }
   }
 
@@ -63,7 +67,8 @@ export function WatchInfo({ stream }: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <h1 className="text-base font-semibold text-fg leading-snug">{stream.title}</h1>
-        <span className="text-sm text-fg-muted flex-shrink-0 mt-0.5">
+        <span className="mt-0.5 flex flex-shrink-0 items-center gap-1.5 text-sm text-fg-muted">
+          <Eye className="size-4" aria-hidden="true" />
           {formatViews(stream.views)}
         </span>
       </div>
@@ -105,12 +110,14 @@ export function WatchInfo({ stream }: Props) {
           <WatchLikeDislike stream={stream} />
           {stream.channelUrl && (
             <>
-              <AllowChannelButton
-                url={stream.channelUrl}
-                name={stream.channelName}
-                thumbnailUrl={stream.rawChannelAvatar}
-                compact
-              />
+              {instance.data?.parentalControlsEnabled === true && (
+                <AllowChannelButton
+                  url={stream.channelUrl}
+                  name={stream.channelName}
+                  thumbnailUrl={stream.rawChannelAvatar}
+                  compact
+                />
+              )}
               <button
                 type="button"
                 onClick={handleSubscribe}
@@ -122,7 +129,9 @@ export function WatchInfo({ stream }: Props) {
                     : "bg-fg text-app hover:bg-fg-strong"
                 }`}
               >
-                {subscribed ? "Subscribed" : "Subscribe"}
+                {subscribed
+                  ? m.watch_subscribed({}, { locale })
+                  : m.watch_subscribe({}, { locale })}
               </button>
             </>
           )}

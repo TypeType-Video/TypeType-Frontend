@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { m } from "../paraglide/messages.js";
 
 export function useWatchToast(audioOnlyUnavailable: boolean) {
   const [toast, setToast] = useState<string | null>(null);
@@ -11,7 +12,7 @@ export function useWatchToast(audioOnlyUnavailable: boolean) {
 
   useEffect(() => {
     if (!audioOnlyUnavailable) return;
-    setToast("Audio-only is unavailable for this video");
+    setToast(m.ui_audio_only_unavailable());
   }, [audioOnlyUnavailable]);
 
   return { toast, setToast };

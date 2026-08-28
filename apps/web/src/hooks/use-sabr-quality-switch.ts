@@ -10,6 +10,7 @@ export function useSabrQualitySwitch(
   engineRef: RefObject<TypeTypeMsePlayer | null>,
   qualityRef: RefObject<TypeTypeMseQuality | null>,
   seekingRef: RefObject<boolean>,
+  onTransitionChange: (transitioning: boolean) => void,
 ): void {
   const revisionRef = useRef(0);
   useEffect(() => {
@@ -31,6 +32,7 @@ export function useSabrQualitySwitch(
       return;
     const revision = ++revisionRef.current;
     seekingRef.current = true;
+    onTransitionChange(true);
     void engine
       .setQuality(quality)
       .then(() => {
@@ -42,7 +44,9 @@ export function useSabrQualitySwitch(
         if (store.streamId) store.restoreQuality(store.streamId, previous.videoItag);
       })
       .finally(() => {
-        if (revision === revisionRef.current) seekingRef.current = false;
+        if (revision !== revisionRef.current) return;
+        seekingRef.current = false;
+        onTransitionChange(false);
       });
-  }, [config, engineReady, engineRef, qualityRef, seekingRef]);
+  }, [config, engineReady, engineRef, onTransitionChange, qualityRef, seekingRef]);
 }

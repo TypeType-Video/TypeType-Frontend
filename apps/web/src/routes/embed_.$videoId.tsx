@@ -7,7 +7,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
 import { useSettings } from "../hooks/use-settings";
 import { isStreamUnavailableError, useSabrBootstrap, useStream } from "../hooks/use-stream";
-import { FAMILY_LIST_BLOCKED_MESSAGE, isChannelNotAllowedError } from "../lib/allow-list-error";
+import { familyListBlockedMessage, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
@@ -16,6 +16,7 @@ import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { resolveVideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
 import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 
 type EmbedSearch = {
   t?: string | number;
@@ -74,7 +75,9 @@ function EmbedPage() {
   if (instancePending) return <EmbedLoading />;
 
   if (instanceError || !instance)
-    return <EmbedError message="Could not load player." onRetry={() => void retryInstance()} />;
+    return (
+      <EmbedError message={m.ui_could_not_load_player()} onRetry={() => void retryInstance()} />
+    );
 
   if (!guestAllowed && !access.accountAuthenticated)
     return <EmbedGuestRequired watchUrl={watchUrl} />;
@@ -88,29 +91,28 @@ function EmbedPage() {
       activeError instanceof ApiError &&
       activeError.status === 422 &&
       activeError.message ===
-        "Error occurs when fetching the page. Try increase the loading timeout in Settings.";
+        m.ui_error_occurs_when_fetching_the_page_try_increase_the_loading_timeout();
     const availability = genericExtractorError
       ? "members_only"
       : resolveVideoAvailability(activeError);
     const needsYoutubeSession = isYoutubeSessionActionError(activeError);
     const familyListBlocked = isChannelNotAllowedError(activeError);
     const message = availability
-      ? activeError instanceof Error
-        ? activeError.message
-        : videoAvailabilityCopy(availability).message
+      ? videoAvailabilityCopy(
+          availability,
+          activeError instanceof Error ? activeError.message : undefined,
+        ).message
       : familyListBlocked
-        ? FAMILY_LIST_BLOCKED_MESSAGE
+        ? familyListBlockedMessage()
         : needsYoutubeSession
-          ? "Connect YouTube to access this video."
-          : activeError instanceof ApiError &&
-              (activeError.status === 400 || activeError.status === 422)
-            ? activeError.message
-            : isStreamUnavailableError(activeError)
-              ? "This video is currently unavailable"
-              : "Failed to load stream.";
+          ? m.ui_connect_youtube_to_access_this_video()
+          : isStreamUnavailableError(activeError)
+            ? m.ui_this_video_is_currently_unavailable()
+            : m.ui_failed_to_load_stream();
     return (
       <EmbedError
         message={message}
+        familyListBlocked={familyListBlocked}
         availability={availability ?? undefined}
         poster={availabilityPoster}
         watchUrl={needsYoutubeSession ? watchUrl : undefined}

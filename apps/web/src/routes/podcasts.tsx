@@ -6,8 +6,8 @@ import { ScrollSentinel } from "../components/scroll-sentinel";
 import { VideoGrid } from "../components/video-grid";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { usePodcastEpisodes } from "../hooks/use-podcast-episodes";
-import { ApiError } from "../lib/api";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 
 function PodcastsPage() {
   const { url, avatar } = Route.useSearch();
@@ -34,14 +34,13 @@ function PodcastsPage() {
   );
 
   if (url.trim().length === 0) {
-    return <p className="text-sm text-fg-muted">No podcast selected.</p>;
+    return <p className="text-sm text-fg-muted">{m.ui_no_podcast_selected()}</p>;
   }
 
   if (query.isLoading) return <PageSpinner />;
 
   if (query.isError) {
-    const message =
-      query.error instanceof ApiError ? query.error.message : "Unable to load podcast episodes.";
+    const message = m.ui_unable_to_load_podcast_episodes();
     return (
       <div className="flex max-w-xl flex-col gap-3 rounded-xl border border-border bg-surface p-6">
         <p className="text-sm text-fg">{message}</p>
@@ -50,7 +49,7 @@ function PodcastsPage() {
           onClick={() => query.refetch()}
           className="h-9 w-fit rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-fg-strong"
         >
-          Retry
+          {m.ui_retry()}
         </button>
       </div>
     );
@@ -74,7 +73,7 @@ function PodcastsPage() {
                   className="h-5 w-5"
                 />
               )}
-              Podcast
+              {m.ui_podcast()}
             </p>
             <h1 className="line-clamp-2 text-lg font-semibold text-fg">{podcast.title}</h1>
             <p className="mt-1 text-sm text-fg-muted">{podcast.uploaderName}</p>
@@ -82,7 +81,7 @@ function PodcastsPage() {
         </header>
       )}
       {episodes.length === 0 ? (
-        <p className="text-sm text-fg-muted">No episodes found.</p>
+        <p className="text-sm text-fg-muted">{m.ui_no_episodes_found()}</p>
       ) : (
         <VideoGrid streams={episodes} />
       )}

@@ -1,5 +1,6 @@
 import type * as dashjs from "dashjs";
 import { useRef } from "react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useDashPlayerSnapshot } from "../lib/dash-player-store";
 import { dashTrackGroups, maxTrackHeight, selectDashTrack } from "../lib/dash-video";
 import { activeFamily, type CodecFamily, codecFamily, groupByFamily } from "../lib/quality-utils";
@@ -15,6 +16,7 @@ import {
   Menu,
   useVideoQualityOptions,
 } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import { useSabrQualityStore } from "../stores/sabr-quality-store";
 
 const FORMAT_ORDER: CodecFamily[] = ["H.264", "VP9", "AV1"];
@@ -32,6 +34,7 @@ function formatLabel(family: CodecFamily, track: dashjs.MediaInfo): string {
 }
 
 export function FormatSelector() {
+  const { locale } = useInterfaceLocale();
   const menuRef = useRef<MenuInstance>(null);
   const { player, selectedVideoTrack } = useDashPlayerSnapshot();
   const options = useVideoQualityOptions(QUALITY_OPTIONS);
@@ -55,7 +58,7 @@ export function FormatSelector() {
     }
     return (
       <Menu.Root ref={menuRef} className="vds-format-menu vds-menu">
-        <DefaultMenuButton label="Format" hint={selected.codec} />
+        <DefaultMenuButton label={m.player_format({}, { locale })} hint={selected.codec} />
         <Menu.Items className={MENU_ITEMS_CLASS}>
           <DefaultMenuRadioGroup
             value={selected.codec}
@@ -97,7 +100,7 @@ export function FormatSelector() {
 
     return (
       <Menu.Root ref={menuRef} className="vds-format-menu vds-menu">
-        <DefaultMenuButton label="Format" hint={selected} />
+        <DefaultMenuButton label={m.player_format({}, { locale })} hint={selected} />
         <Menu.Items className={MENU_ITEMS_CLASS}>
           <DefaultMenuRadioGroup
             value={selected}
@@ -127,7 +130,7 @@ export function FormatSelector() {
 
   return (
     <Menu.Root ref={menuRef} className="vds-format-menu vds-menu">
-      <DefaultMenuButton label="Format" hint={selected} />
+      <DefaultMenuButton label={m.player_format({}, { locale })} hint={selected} />
       <Menu.Items className={MENU_ITEMS_CLASS}>
         <DefaultMenuRadioGroup value={selected} options={availableOptions} onChange={onChange} />
       </Menu.Items>

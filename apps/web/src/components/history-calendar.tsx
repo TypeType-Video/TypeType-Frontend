@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "../paraglide/messages.js";
 import { CalendarHeader } from "./history-calendar-header";
 
 type Props = {
@@ -6,7 +7,9 @@ type Props = {
   onSelect: (date: Date) => void;
 };
 
-const DAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+function dayLabels() {
+  return [m.ui_su(), m.ui_mo(), m.ui_tu(), m.ui_we(), m.ui_th(), m.ui_fr(), m.ui_sa()];
+}
 
 function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -69,7 +72,7 @@ export function HistoryCalendar({ selected, onSelect }: Props) {
       />
 
       <div className="grid grid-cols-7 gap-y-0.5">
-        {DAY_LABELS.map((d) => (
+        {dayLabels().map((d) => (
           <div key={d} className="text-center text-[10px] text-fg-soft py-0.5">
             {d}
           </div>

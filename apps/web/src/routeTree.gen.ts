@@ -13,6 +13,7 @@ import { Route as YoutubeSessionRouteImport } from './routes/youtube-session'
 import { Route as WatchLaterRouteImport } from './routes/watch-later'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as SubscriptionGroupsPreviewRouteImport } from './routes/subscription-groups-preview'
 import { Route as ShortsRouteImport } from './routes/shorts'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
@@ -28,6 +29,7 @@ import { Route as ImportRouteImport } from './routes/import'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HideEverythingRouteImport } from './routes/hide-everything'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as ExportRouteImport } from './routes/export'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as AdminConsoleRouteImport } from './routes/admin-console'
 import { Route as IndexRouteImport } from './routes/index'
@@ -61,6 +63,12 @@ const SubscriptionsRoute = SubscriptionsRouteImport.update({
   path: '/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubscriptionGroupsPreviewRoute =
+  SubscriptionGroupsPreviewRouteImport.update({
+    id: '/subscription-groups-preview',
+    path: '/subscription-groups-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShortsRoute = ShortsRouteImport.update({
   id: '/shorts',
   path: '/shorts',
@@ -136,6 +144,11 @@ const FavoritesRoute = FavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChannelRoute = ChannelRouteImport.update({
   id: '/channel',
   path: '/channel',
@@ -201,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
   '/channel': typeof ChannelRoute
+  '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
   '/hide-everything': typeof HideEverythingRoute
   '/history': typeof HistoryRoute
@@ -216,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/shorts': typeof ShortsRoute
+  '/subscription-groups-preview': typeof SubscriptionGroupsPreviewRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/watch': typeof WatchRoute
   '/watch-later': typeof WatchLaterRoute
@@ -234,6 +249,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
   '/channel': typeof ChannelRoute
+  '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
   '/hide-everything': typeof HideEverythingRoute
   '/history': typeof HistoryRoute
@@ -248,6 +264,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/shorts': typeof ShortsRoute
+  '/subscription-groups-preview': typeof SubscriptionGroupsPreviewRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/watch': typeof WatchRoute
   '/watch-later': typeof WatchLaterRoute
@@ -267,6 +284,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
   '/channel': typeof ChannelRoute
+  '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
   '/hide-everything': typeof HideEverythingRoute
   '/history': typeof HistoryRoute
@@ -282,6 +300,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/shorts': typeof ShortsRoute
+  '/subscription-groups-preview': typeof SubscriptionGroupsPreviewRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/watch': typeof WatchRoute
   '/watch-later': typeof WatchLaterRoute
@@ -302,6 +321,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-console'
     | '/channel'
+    | '/export'
     | '/favorites'
     | '/hide-everything'
     | '/history'
@@ -317,6 +337,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shorts'
+    | '/subscription-groups-preview'
     | '/subscriptions'
     | '/watch'
     | '/watch-later'
@@ -335,6 +356,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-console'
     | '/channel'
+    | '/export'
     | '/favorites'
     | '/hide-everything'
     | '/history'
@@ -349,6 +371,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shorts'
+    | '/subscription-groups-preview'
     | '/subscriptions'
     | '/watch'
     | '/watch-later'
@@ -367,6 +390,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-console'
     | '/channel'
+    | '/export'
     | '/favorites'
     | '/hide-everything'
     | '/history'
@@ -382,6 +406,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shorts'
+    | '/subscription-groups-preview'
     | '/subscriptions'
     | '/watch'
     | '/watch-later'
@@ -401,6 +426,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
   ChannelRoute: typeof ChannelRoute
+  ExportRoute: typeof ExportRoute
   FavoritesRoute: typeof FavoritesRoute
   HideEverythingRoute: typeof HideEverythingRoute
   HistoryRoute: typeof HistoryRoute
@@ -416,6 +442,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   ShortsRoute: typeof ShortsRoute
+  SubscriptionGroupsPreviewRoute: typeof SubscriptionGroupsPreviewRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
   WatchRoute: typeof WatchRoute
   WatchLaterRoute: typeof WatchLaterRoute
@@ -456,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/subscriptions'
       fullPath: '/subscriptions'
       preLoaderRoute: typeof SubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscription-groups-preview': {
+      id: '/subscription-groups-preview'
+      path: '/subscription-groups-preview'
+      fullPath: '/subscription-groups-preview'
+      preLoaderRoute: typeof SubscriptionGroupsPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shorts': {
@@ -561,6 +595,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channel': {
@@ -669,6 +710,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminConsoleRoute: AdminConsoleRoute,
   ChannelRoute: ChannelRoute,
+  ExportRoute: ExportRoute,
   FavoritesRoute: FavoritesRoute,
   HideEverythingRoute: HideEverythingRoute,
   HistoryRoute: HistoryRoute,
@@ -684,6 +726,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   ShortsRoute: ShortsRoute,
+  SubscriptionGroupsPreviewRoute: SubscriptionGroupsPreviewRoute,
   SubscriptionsRoute: SubscriptionsRoute,
   WatchRoute: WatchRoute,
   WatchLaterRoute: WatchLaterRoute,

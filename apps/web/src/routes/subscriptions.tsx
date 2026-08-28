@@ -11,6 +11,7 @@ import { SUBSCRIPTION_FEED_KEY, useSubscriptionFeed } from "../hooks/use-subscri
 import { SUBSCRIPTIONS_KEY, useSubscriptions } from "../hooks/use-subscriptions";
 import { ApiError } from "../lib/api";
 import { fetchSubscriptionFeed, fetchSubscriptions } from "../lib/api-user";
+import { m } from "../paraglide/messages.js";
 
 const SUBSCRIPTION_STALE_MS = 5 * 60 * 1000;
 
@@ -62,7 +63,7 @@ function SubscriptionsPage() {
   if (query.isSuccess && subscriptions.length === 0) {
     return (
       <div className="flex items-center justify-center pt-32">
-        <p className="text-fg-muted text-sm">No subscriptions yet.</p>
+        <p className="text-fg-muted text-sm">{m.ui_no_subscriptions_yet_2()}</p>
       </div>
     );
   }

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAdminUsers } from "../hooks/use-admin-users";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { type AdminFilter, matchesAdminFilter } from "../lib/admin-console";
+import { m } from "../paraglide/messages.js";
 import { AdminUserDetailPanel } from "./admin-user-detail-panel";
 import { AdminUserGrid } from "./admin-user-grid";
 import { AdminUserToolbar } from "./admin-user-toolbar";
@@ -11,11 +13,11 @@ const PAGE_SIZE = 50;
 
 type Props = {
   enabled: boolean;
-  currentUserId: string | null;
   onToast: (message: string) => void;
 };
 
-export function AdminUsersSection({ enabled, currentUserId, onToast }: Props) {
+export function AdminUsersSection({ enabled, onToast }: Props) {
+  const { locale } = useInterfaceLocale();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<AdminFilter>("all");
@@ -47,20 +49,7 @@ export function AdminUsersSection({ enabled, currentUserId, onToast }: Props) {
     [users, filter, searchTerm],
   );
 
-  const selectedUser = filtered.find((user) => user.id === selectedUserId) ?? null;
-
-  useEffect(() => {
-    if (filtered.length === 0) {
-      setSelectedUserId(null);
-      return;
-    }
-    if (selectedUserId && filtered.some((user) => user.id === selectedUserId)) return;
-    if (currentUserId && filtered.some((user) => user.id === currentUserId)) {
-      setSelectedUserId(currentUserId);
-      return;
-    }
-    setSelectedUserId(filtered[0].id);
-  }, [selectedUserId, filtered, currentUserId]);
+  const selectedUser = users.find((user) => user.id === selectedUserId) ?? null;
 
   return (
     <>
@@ -76,87 +65,77 @@ export function AdminUsersSection({ enabled, currentUserId, onToast }: Props) {
           setPage(1);
         }}
       />
-      <AdminUsersPagination
-        page={currentPage}
-        totalPages={totalPages}
-        total={total}
-        pageStart={pageStart}
-        pageEnd={pageEnd}
-        pending={query.isPending}
-        onPrev={() => setPage((value) => Math.max(1, value - 1))}
-        onNext={() => setPage((value) => Math.min(totalPages, value + 1))}
-      />
       {query.isPending && (
-        <section className="rounded-lg border border-border bg-surface/70 p-6 text-center text-sm text-fg-muted">
-          Loading users...
+        <section className="rounded-md border border-border p-10 text-center text-sm text-fg-muted">
+          {m.admin_users_loading()}
         </section>
       )}
       {query.isError && (
-        <section className="rounded-lg border border-danger bg-danger/30 p-6 text-center text-sm text-danger-strong">
-          Unable to load users right now.
+        <section className="rounded-md border border-danger/50 p-10 text-center text-sm text-danger-strong">
+          {m.admin_users_load_error()}
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length === 0 && (
-        <section className="rounded-lg border border-border bg-surface/70 p-6 text-center text-sm text-fg-muted">
-          No user matches this view.
+        <section className="rounded-md border border-border p-10 text-center text-sm text-fg-muted">
+          {m.admin_users_empty()}
         </section>
       )}
       {!query.isPending && !query.isError && filtered.length > 0 && (
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <AdminUserGrid
-            users={filtered}
-            selectedUserId={selectedUserId}
-            onSelectUser={setSelectedUserId}
+        <section className="space-y-4">
+          <AdminUserGrid users={filtered} locale={locale} onSelectUser={setSelectedUserId} />
+          <AdminUsersPagination
+            page={currentPage}
+            totalPages={totalPages}
+            total={total}
+            pageStart={pageStart}
+            pageEnd={pageEnd}
+            pending={query.isPending}
+            onPrev={() => setPage((value) => Math.max(1, value - 1))}
+            onNext={() => setPage((value) => Math.min(totalPages, value + 1))}
           />
-          {selectedUser ? (
-            <AdminUserDetailPanel
-              user={selectedUser}
-              busy={busy}
-              onMessage={onToast}
-              onRole={(id, nextRole) => {
-                role.mutate(
-                  { id, role: nextRole },
-                  {
-                    onSuccess: () => onToast(`Role set to ${nextRole}`),
-                    onError: (error) =>
-                      onToast(error instanceof Error ? error.message : "Unable to update role"),
-                  },
-                );
-              }}
-              onSuspend={(id, suspendedFlag) => {
-                suspend.mutate(
-                  { id, suspended: !suspendedFlag },
-                  {
-                    onSuccess: () =>
-                      onToast(!suspendedFlag ? "User suspended" : "User unsuspended"),
-                    onError: (error) =>
-                      onToast(
-                        error instanceof Error ? error.message : "Unable to update suspension",
-                      ),
-                  },
-                );
-              }}
-              onReset={(id, email) => {
-                resetToken.mutate(id, {
-                  onSuccess: (result) => setResetTokenData({ email, token: result.resetToken }),
-                  onError: (error) =>
-                    onToast(
-                      error instanceof Error ? error.message : "Unable to generate reset token",
-                    ),
-                });
-              }}
-            />
-          ) : (
-            <div className="hidden lg:block" />
-          )}
         </section>
+      )}
+      {selectedUser && (
+        <AdminUserDetailPanel
+          user={selectedUser}
+          busy={busy}
+          onClose={() => setSelectedUserId(null)}
+          onMessage={onToast}
+          onRole={(id, nextRole) => {
+            role.mutate(
+              { id, role: nextRole },
+              {
+                onSuccess: () => onToast(m.admin_users_role_updated()),
+                onError: () => onToast(m.admin_users_update_failed()),
+              },
+            );
+          }}
+          onSuspend={(id, suspendedFlag) => {
+            suspend.mutate(
+              { id, suspended: !suspendedFlag },
+              {
+                onSuccess: () => onToast(m.admin_users_suspend_updated()),
+                onError: () => onToast(m.admin_users_update_failed()),
+              },
+            );
+          }}
+          onReset={(id, email) => {
+            resetToken.mutate(id, {
+              onSuccess: (result) => {
+                setSelectedUserId(null);
+                setResetTokenData({ email, token: result.resetToken });
+              },
+              onError: () => onToast(m.admin_users_reset_failed()),
+            });
+          }}
+        />
       )}
       {resetTokenData && (
         <ResetTokenModal
           email={resetTokenData.email}
           token={resetTokenData.token}
           onClose={() => setResetTokenData(null)}
-          onCopied={() => onToast("Token copied to clipboard")}
+          onCopied={() => onToast(m.admin_users_token_copied())}
         />
       )}
     </>

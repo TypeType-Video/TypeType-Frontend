@@ -5,6 +5,7 @@ import { formatDuration } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
 import { isVideoWatched } from "../lib/watch-progress";
 import { watchRouteSearch } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { HistoryItem } from "../types/user";
 import { ChannelRouteLink } from "./channel-route-link";
 import { HistoryChannelAvatar } from "./history-channel-avatar";
@@ -60,7 +61,7 @@ export function HistoryCard({ item, onRemove }: HistoryCardProps) {
         <button
           type="button"
           onClick={onRemove}
-          aria-label="Remove from history"
+          aria-label={m.ui_remove_from_history()}
           className="absolute top-1.5 right-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-black/75 text-white opacity-100 shadow-sm transition-colors hover:bg-black/90 sm:h-7 sm:w-7 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
         >
           <X className="h-4 w-4 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
@@ -93,7 +94,7 @@ export function HistoryCard({ item, onRemove }: HistoryCardProps) {
             <p className="truncate text-xs text-fg-muted">{item.channelName}</p>
           )}
           <p className="line-clamp-1 text-[11px] text-fg-soft sm:mt-0">
-            Watched {formatWatchedAt(item.watchedAt)}
+            {m.ui_watched()} {formatWatchedAt(item.watchedAt)}
           </p>
         </div>
       </div>

@@ -8,30 +8,29 @@ import {
   type TypeTypeBackupCategory,
 } from "../lib/api-restore";
 import { goto } from "../lib/route-redirect";
+import { m } from "../paraglide/messages.js";
 
 const SECTION_LABEL = "px-1 text-xs font-medium uppercase tracking-wider text-fg-soft";
-const CATEGORIES: { value: TypeTypeBackupCategory; label: string }[] = [
-  { value: "subscriptions", label: "Subscriptions" },
-  { value: "history", label: "Watch history" },
-  { value: "playlists", label: "Playlists" },
-  { value: "watchLater", label: "Watch later" },
-  { value: "favorites", label: "Favorites" },
-  { value: "progress", label: "Playback progress" },
-  { value: "searchHistory", label: "Search history" },
-  { value: "savedPlaylists", label: "Saved playlists" },
-  { value: "settings", label: "Settings" },
-  { value: "contentFilters", label: "Content filters" },
-];
-
-function message(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
+function backupCategories(): { value: TypeTypeBackupCategory; label: string }[] {
+  return [
+    { value: "subscriptions", label: m.portability_category_subscriptions() },
+    { value: "history", label: m.portability_category_history() },
+    { value: "playlists", label: m.portability_category_playlists() },
+    { value: "watchLater", label: m.portability_category_watch_later() },
+    { value: "favorites", label: m.portability_category_favorites() },
+    { value: "progress", label: m.portability_category_progress() },
+    { value: "searchHistory", label: m.portability_category_search_history() },
+    { value: "savedPlaylists", label: m.portability_category_saved_playlists() },
+    { value: "settings", label: m.portability_category_settings() },
+    { value: "contentFilters", label: m.portability_category_content_filters() },
+  ];
 }
 
 export function SettingsBackup() {
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
-  const [categories, setCategories] = useState<TypeTypeBackupCategory[]>(
-    CATEGORIES.map((item) => item.value),
+  const [selectedCategories, setSelectedCategories] = useState<TypeTypeBackupCategory[]>(
+    backupCategories().map((item) => item.value),
   );
   const [toast, setToast] = useState<string | null>(null);
 
@@ -42,22 +41,22 @@ export function SettingsBackup() {
   }, [toast]);
 
   const exportBackup = useMutation({
-    mutationFn: () => downloadTypeTypeBackup(categories),
-    onSuccess: () => setToast("Export completed"),
-    onError: (error) => setToast(message(error, "Export failed")),
+    mutationFn: () => downloadTypeTypeBackup(selectedCategories),
+    onSuccess: () => setToast(m.ui_export_completed()),
+    onError: () => setToast(m.portability_export_failed()),
   });
   const importBackup = useMutation({
     mutationFn: restoreTypeType,
     onSuccess: (summary) => {
       const count = Object.values(summary.restored).reduce((total, value) => total + value, 0);
-      setToast(`Backup restored: ${count} items`);
+      setToast(m.ui_backup_restored({ count }));
       void queryClient.invalidateQueries();
     },
-    onError: (error) => setToast(message(error, "Restore failed")),
+    onError: () => setToast(m.ui_restore_failed()),
   });
 
   function toggleCategory(category: TypeTypeBackupCategory) {
-    setCategories((current) =>
+    setSelectedCategories((current) =>
       current.includes(category)
         ? current.filter((item) => item !== category)
         : [...current, category],
@@ -73,17 +72,17 @@ export function SettingsBackup() {
   return (
     <div className="flex flex-col gap-5">
       <section className="flex flex-col gap-3">
-        <p className={SECTION_LABEL}>TypeType backup</p>
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
-          <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-border px-4 py-4 sm:grid-cols-2">
-            {CATEGORIES.map((category) => (
+        <p className={SECTION_LABEL}>{m.ui_typetype_backup()}</p>
+        <div className="border-y border-border">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-border py-4 sm:grid-cols-2">
+            {backupCategories().map((category) => (
               <label
                 key={category.value}
                 className="flex cursor-pointer items-center gap-2 text-sm text-fg-muted"
               >
                 <input
                   type="checkbox"
-                  checked={categories.includes(category.value)}
+                  checked={selectedCategories.includes(category.value)}
                   onChange={() => toggleCategory(category.value)}
                   className="h-4 w-4 accent-fg"
                 />
@@ -91,24 +90,24 @@ export function SettingsBackup() {
               </label>
             ))}
           </div>
-          <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row">
+          <div className="flex flex-col gap-2 py-4 sm:flex-row">
             <button
               type="button"
-              disabled={categories.length === 0 || exportBackup.isPending}
+              disabled={selectedCategories.length === 0 || exportBackup.isPending}
               onClick={() => exportBackup.mutate()}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-sm bg-fg px-3 text-xs font-medium text-app transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Download size={15} />
-              Export selected
+              {m.ui_export_selected()}
             </button>
             <button
               type="button"
               disabled={importBackup.isPending}
               onClick={() => fileInput.current?.click()}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-strong px-3 text-xs text-fg transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-sm border border-border-strong px-3 text-xs text-fg transition-colors hover:border-fg-soft disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Upload size={15} />
-              Restore backup
+              {m.ui_restore_backup()}
             </button>
             <input
               ref={fileInput}
@@ -118,24 +117,26 @@ export function SettingsBackup() {
               onChange={selectFile}
             />
           </div>
-          <p className="border-t border-border px-4 py-3 text-xs text-fg-soft">
-            Restoring replaces the categories included in the backup.
+          <p className="border-t border-border py-3 text-xs text-fg-soft">
+            {m.ui_restoring_replaces_the_categories_included_in_the_backup()}
           </p>
         </div>
       </section>
       <section className="flex flex-col gap-3">
-        <p className={SECTION_LABEL}>Migration</p>
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className={SECTION_LABEL}>{m.data_portability_title()}</p>
+        <div className="flex min-w-0 flex-col items-start gap-3 border-y border-border py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-sm text-fg">Import from YouTube or PipePipe</span>
-            <span className="text-xs text-fg-soft">Open the dedicated import page.</span>
+            <span className="text-sm text-fg">{m.ui_move_data_between_supported_apps()}</span>
+            <span className="text-xs text-fg-soft">
+              {m.ui_preview_imports_or_create_a_compatible_export()}
+            </span>
           </div>
           <button
             type="button"
             onClick={() => goto("/import")}
-            className="h-9 w-full rounded-md bg-surface-strong px-3 text-xs text-fg-muted transition-colors hover:text-fg sm:w-auto"
+            className="h-9 w-full rounded-sm border border-border-strong px-3 text-xs text-fg-muted transition-colors hover:border-fg-soft hover:text-fg sm:w-auto"
           >
-            Open import
+            {m.ui_open_data_transfer()}
           </button>
         </div>
       </section>

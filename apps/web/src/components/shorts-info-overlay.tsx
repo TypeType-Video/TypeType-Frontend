@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useSubscriptions } from "../hooks/use-subscriptions";
+import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
@@ -33,7 +34,7 @@ export function ShortsInfoOverlay({ stream, className }: Props) {
     try {
       if (subscribed) {
         await remove.mutateAsync(stream.channelUrl);
-        setToastMsg(`Unsubscribed from ${stream.channelName}`);
+        setToastMsg(m.ui_unsubscribed_from({ name: stream.channelName }));
         return;
       }
       await add.mutateAsync({
@@ -41,9 +42,9 @@ export function ShortsInfoOverlay({ stream, className }: Props) {
         name: stream.channelName,
         avatarUrl: stream.channelAvatar,
       });
-      setToastMsg(`Subscribed to ${stream.channelName}`);
+      setToastMsg(m.ui_subscribed_to({ name: stream.channelName }));
     } catch {
-      setToastMsg("Subscription update failed");
+      setToastMsg(m.watch_subscription_failed());
     }
   }
 
@@ -79,7 +80,7 @@ export function ShortsInfoOverlay({ stream, className }: Props) {
               aria-pressed={subscribed}
               className={`${overlayButtonClass} pointer-events-auto`}
             >
-              {subscribed ? "Subscribed" : "Subscribe"}
+              {subscribed ? m.watch_subscribed() : m.watch_subscribe()}
             </button>
           )}
         </div>

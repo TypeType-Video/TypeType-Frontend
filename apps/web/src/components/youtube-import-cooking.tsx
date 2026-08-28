@@ -3,6 +3,7 @@ import type {
   YoutubeTakeoutPreview,
   YoutubeTakeoutReport,
 } from "../lib/api-youtube-import";
+import { m } from "../paraglide/messages.js";
 import { YoutubeImportJobSummary } from "../settings/youtube-import-job-summary";
 import { CardLiquidFill } from "./card-liquid-fill";
 import { ImportMascotLoop } from "./import-mascot-loop";
@@ -41,11 +42,11 @@ export function YoutubeImportCooking({ job, preview, report, queueLength, curren
             className="h-32 w-full rounded-xl object-cover sm:h-28"
           />
           <div>
-            <p className="text-base font-medium text-fg">Cooking your import</p>
+            <p className="text-base font-medium text-fg">{m.ui_cooking_your_import()}</p>
             <p className="mt-1 text-sm text-fg-muted/80">
-              Unpacking and syncing your data. This may take a moment.
+              {m.ui_unpacking_and_syncing_your_data_this_may_take_a_moment()}
             </p>
-            <p className="mt-2 text-xs text-fg-muted/75">estimated sync in progress...</p>
+            <p className="mt-2 text-xs text-fg-muted/75">{m.ui_estimated_sync_in_progress()}</p>
           </div>
         </div>
       </div>

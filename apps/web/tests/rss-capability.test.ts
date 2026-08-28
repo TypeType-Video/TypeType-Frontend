@@ -19,6 +19,7 @@ describe("RSS instance capability", () => {
     ).toEqual({
       guestAllowed: true,
       youtubeRemoteLoginEnabled: false,
+      parentalControlsEnabled: false,
       rss: {
         enabled: false,
         maxFeedsPerUser: 0,
@@ -41,9 +42,15 @@ describe("RSS instance capability", () => {
       normalizeInstanceCapabilities({
         guestAllowed: false,
         youtubeRemoteLoginEnabled: true,
+        parentalControlsEnabled: true,
         rss,
       }),
-    ).toEqual({ guestAllowed: false, youtubeRemoteLoginEnabled: true, rss });
+    ).toEqual({
+      guestAllowed: false,
+      youtubeRemoteLoginEnabled: true,
+      parentalControlsEnabled: true,
+      rss,
+    });
   });
 
   test("rejects an invalid base payload", () => {

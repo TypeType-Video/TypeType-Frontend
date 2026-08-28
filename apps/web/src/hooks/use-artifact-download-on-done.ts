@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { m } from "../paraglide/messages.js";
 
 type Params = {
   isDone: boolean;
@@ -33,7 +34,7 @@ export function useArtifactDownloadOnDone({
       const run = openArtifact(options);
       if (!run) throw new Error("Download is not ready");
       await run;
-      onDone(`Download started: ${selected}`);
+      onDone(m.ui_download_started({ selected }));
       reset();
       onDismiss();
     },
@@ -47,10 +48,10 @@ export function useArtifactDownloadOnDone({
     setIsCompleting(true);
     try {
       await completeDownload(selectedLabel, { preferShare });
-    } catch (error) {
+    } catch {
       handledJobIdRef.current = null;
       setIsCompleting(false);
-      onArtifactError(error instanceof Error ? error.message : "Download failed");
+      onArtifactError(m.ui_download_failed());
     }
   }, [completeDownload, isDone, jobId, onArtifactError, preferShare, selectedLabel]);
 
@@ -75,11 +76,11 @@ export function useArtifactDownloadOnDone({
       try {
         await completeDownload(selectedLabel, { preferShare });
         if (cancelled) return;
-      } catch (error) {
+      } catch {
         if (cancelled) return;
         handledJobIdRef.current = null;
         setIsCompleting(false);
-        onArtifactError(error instanceof Error ? error.message : "Download failed");
+        onArtifactError(m.ui_download_failed());
       }
     };
     void run();

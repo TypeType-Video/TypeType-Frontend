@@ -4,6 +4,7 @@ import {
   youtubeSessionStatusDescription,
   youtubeSessionStatusLabel,
 } from "../lib/youtube-session-format";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   state: YoutubeSessionState | undefined;
@@ -18,9 +19,9 @@ export function YoutubeSessionStatusPanel({ state, loading, canDisconnect, onDis
   return (
     <aside className="flex flex-col justify-center gap-5 border-border lg:border-l lg:pl-8">
       <div>
-        <p className={SIDE_LABEL}>Status</p>
+        <p className={SIDE_LABEL}>{m.admin_users_column_status()}</p>
         <p className="mt-2 font-semibold text-fg text-lg">
-          {loading ? "Loading" : youtubeSessionStatusLabel(state?.status)}
+          {loading ? m.ui_loading() : youtubeSessionStatusLabel(state?.status)}
         </p>
         <p className="mt-2 text-fg-muted text-sm leading-6">
           {youtubeSessionStatusDescription(state?.status)}
@@ -29,11 +30,11 @@ export function YoutubeSessionStatusPanel({ state, loading, canDisconnect, onDis
 
       <dl className="flex flex-col gap-4 border-border border-t pt-5">
         <div>
-          <dt className="text-fg-soft text-xs">Last used</dt>
+          <dt className="text-fg-soft text-xs">{m.ui_last_used()}</dt>
           <dd className="mt-1 text-fg text-sm">{formatSessionTime(state?.lastUsedAt)}</dd>
         </div>
         <div>
-          <dt className="text-fg-soft text-xs">Updated</dt>
+          <dt className="text-fg-soft text-xs">{m.ui_updated()}</dt>
           <dd className="mt-1 text-fg text-sm">{formatSessionTime(state?.updatedAt)}</dd>
         </div>
       </dl>
@@ -44,7 +45,7 @@ export function YoutubeSessionStatusPanel({ state, loading, canDisconnect, onDis
         onClick={onDisconnect}
         className="h-10 w-full border border-border-strong bg-transparent px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger disabled:opacity-50"
       >
-        Disconnect
+        {m.ui_disconnect()}
       </button>
     </aside>
   );

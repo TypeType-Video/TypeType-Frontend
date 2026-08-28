@@ -1,5 +1,6 @@
 import { getAdminUserAvatarUrl } from "../lib/admin-user-avatar";
 import { getOpenMojiUrl, pickOpenMojiCode } from "../lib/openmoji";
+import { m } from "../paraglide/messages.js";
 import type { AdminSession } from "../types/admin";
 import type { AuthUser } from "../types/auth";
 
@@ -33,17 +34,22 @@ function avatarUrl(user: AuthUser | undefined, session: AdminSession): string | 
 
 export function AdminSessionCard({ session, user }: Props) {
   const name =
-    user?.publicUsername ?? user?.name ?? session.username ?? session.userId ?? "Unknown user";
-  const device = [session.deviceName, session.deviceType].filter(Boolean).join(" - ") || "Browser";
+    user?.publicUsername ?? user?.name ?? session.username ?? session.userId ?? m.ui_unknown_user();
+  const device =
+    [session.deviceName, session.deviceType].filter(Boolean).join(" - ") || m.ui_browser();
   const nowPlaying = session.nowPlaying;
-  const stateLabel = nowPlaying ? (nowPlaying.paused ? "Paused" : "Playing") : "Online";
+  const stateLabel = nowPlaying
+    ? nowPlaying.paused
+      ? m.ui_paused()
+      : m.ui_playing()
+    : m.ui_online();
   const imageUrl = avatarUrl(user, session);
   const progress = nowPlaying?.durationMs
     ? Math.min(100, Math.max(0, (nowPlaying.positionMs / nowPlaying.durationMs) * 100))
     : 0;
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-[#10151f] shadow-sm transition-colors hover:border-border-strong">
+    <article className="group overflow-hidden rounded-md border border-border bg-[#10151f] shadow-sm transition-colors hover:border-border-strong">
       <div className="relative aspect-video overflow-hidden bg-surface-soft">
         {nowPlaying?.thumbnail ? (
           <img
@@ -54,14 +60,12 @@ export function AdminSessionCard({ session, user }: Props) {
           />
         ) : (
           <div className="relative h-full w-full overflow-hidden bg-[#0b1220]">
-            <div className="absolute -left-12 top-4 h-40 w-40 rounded-full bg-[#00a4dc]/25 blur-3xl" />
-            <div className="absolute bottom-0 right-0 h-44 w-44 rounded-full bg-sky-500/15 blur-3xl" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_32%)]" />
             <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#10151f] via-[#10151f]/45 to-transparent" />
-        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur sm:left-4 sm:top-4">
+        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-md bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur sm:left-4 sm:top-4">
           <span
             className={`h-2 w-2 rounded-full ${nowPlaying && !nowPlaying.paused ? "bg-emerald-400" : "bg-fg-soft"}`}
           />
@@ -96,10 +100,10 @@ export function AdminSessionCard({ session, user }: Props) {
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-white">{nowPlaying.title}</p>
                 <p className="mt-1 truncate text-xs text-white/55">
-                  {nowPlaying.channelName ?? "Video"}
+                  {nowPlaying.channelName ?? m.ui_video()}
                 </p>
               </div>
-              <span className="self-start rounded-full bg-white/10 px-2 py-1 text-[11px] font-medium text-white/70">
+              <span className="self-start rounded-md bg-white/10 px-2 py-1 text-[11px] font-medium text-white/70">
                 {formatDuration(nowPlaying.positionMs)}
               </span>
             </div>
@@ -112,9 +116,11 @@ export function AdminSessionCard({ session, user }: Props) {
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-white/10 bg-[#0c1524] p-4">
-            <p className="text-sm font-medium text-white/85">No active playback</p>
-            <p className="mt-1 text-xs text-sky-200/55">The client is connected and ready.</p>
+          <div className="rounded-md border border-white/10 bg-[#0c1524] p-4">
+            <p className="text-sm font-medium text-white/85">{m.ui_no_active_playback()}</p>
+            <p className="mt-1 text-xs text-sky-200/55">
+              {m.ui_the_client_is_connected_and_ready()}
+            </p>
           </div>
         )}
       </div>

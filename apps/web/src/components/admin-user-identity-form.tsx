@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { updateAdminIdentity } from "../lib/api-account-identity";
+import { m } from "../paraglide/messages.js";
 import type { AuthUser } from "../types/auth";
 
 type Props = {
@@ -26,32 +27,38 @@ export function AdminUserIdentityForm({ user, disabled, onMessage }: Props) {
   const dirty =
     email.trim().toLowerCase() !== user.email.toLowerCase() || name.trim() !== user.name;
   return (
-    <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-      <input
-        value={name}
-        aria-label="Display name"
-        onChange={(event) => setName(event.target.value)}
-        className="h-8 rounded-md border border-border-strong bg-app px-2.5 text-xs text-fg"
-      />
-      <input
-        type="email"
-        value={email}
-        aria-label="Email address"
-        onChange={(event) => setEmail(event.target.value)}
-        className="h-8 rounded-md border border-border-strong bg-app px-2.5 text-xs text-fg"
-      />
+    <div className="mt-5 flex flex-col gap-4 border-t border-border pt-5">
+      <label className="text-xs font-medium text-fg-muted">
+        {m.admin_users_display_name()}
+        <input
+          value={name}
+          aria-label={m.admin_users_display_name()}
+          onChange={(event) => setName(event.target.value)}
+          className="mt-1.5 h-10 w-full rounded-md border border-border-strong bg-app px-3 text-sm text-fg outline-none transition-colors focus:border-accent"
+        />
+      </label>
+      <label className="text-xs font-medium text-fg-muted">
+        {m.admin_users_email()}
+        <input
+          type="email"
+          value={email}
+          aria-label={m.admin_users_email_address()}
+          onChange={(event) => setEmail(event.target.value)}
+          className="mt-1.5 h-10 w-full rounded-md border border-border-strong bg-app px-3 text-sm text-fg outline-none transition-colors focus:border-accent"
+        />
+      </label>
       <button
         type="button"
         disabled={disabled || update.isPending || !dirty}
         onClick={() =>
           update.mutate(undefined, {
-            onSuccess: () => onMessage("User identity updated"),
-            onError: (error) => onMessage(error instanceof Error ? error.message : "Update failed"),
+            onSuccess: () => onMessage(m.admin_users_identity_updated()),
+            onError: () => onMessage(m.admin_users_update_failed()),
           })
         }
-        className="h-8 rounded-md border border-border-strong bg-surface text-xs text-fg disabled:opacity-50"
+        className="h-10 rounded-md bg-accent text-xs font-medium text-white transition-colors hover:brightness-95 disabled:opacity-50"
       >
-        Save identity
+        {m.admin_users_save_identity()}
       </button>
     </div>
   );

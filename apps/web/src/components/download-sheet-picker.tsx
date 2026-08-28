@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { m } from "../paraglide/messages.js";
 import { DownloadModeButton } from "./download-mode-button";
 import { DownloadOptionButton } from "./download-option-button";
 import type { DownloadMode, DownloadOption } from "./download-options";
@@ -24,12 +25,14 @@ export function DownloadSheetPicker({ mode, options, selectedId, onSelect, onMod
         <DownloadModeButton
           active={mode === "video"}
           onClick={() => onMode("video")}
-          label="Video"
+          label={m.settings_video_label()}
+          mode="video"
         />
         <DownloadModeButton
           active={mode === "audio"}
           onClick={() => onMode("audio")}
-          label="Audio"
+          label={m.ui_audio()}
+          mode="audio"
         />
       </div>
       {!showAllFormats && (
@@ -75,7 +78,9 @@ export function DownloadSheetPicker({ mode, options, selectedId, onSelect, onMod
           onClick={() => setShowAllFormats((open) => !open)}
           className="mt-2 w-full rounded-md border border-border-strong px-2.5 py-1.5 text-xs text-fg-muted transition-colors hover:border-border-strong hover:bg-surface-strong"
         >
-          {showAllFormats ? "Simple view" : `All formats (${modeOptions.length})`}
+          {showAllFormats
+            ? m.ui_simple_view()
+            : m.ui_all_formats_count({ count: modeOptions.length })}
         </button>
       )}
     </>

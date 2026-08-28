@@ -14,6 +14,7 @@ import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
+import { shouldLoadFullWatchStream } from "../lib/watch-stream-loading";
 import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 
@@ -32,8 +33,9 @@ function WatchPage() {
   const navigationSnapshot = useWatchNavigationStore((state) => state.snapshot);
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
-  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, streamEnabled);
   const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, streamEnabled);
+  const fullStreamEnabled = shouldLoadFullWatchStream(sourceUrl, streamEnabled, bootstrap);
+  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, fullStreamEnabled);
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
   const previewMatches =
@@ -66,6 +68,7 @@ function WatchPage() {
     isAuthed,
     progressFetch.isPending,
     progressFetch.isFetching,
+    progressFetch.data !== undefined,
   );
 
   useEffect(() => {

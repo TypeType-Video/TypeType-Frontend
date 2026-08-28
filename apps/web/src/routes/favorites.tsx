@@ -11,6 +11,7 @@ import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
 import { type PlaylistSortMode, sortPlaylistVideos } from "../lib/playlist-sort";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 
 const FAVORITES_BATCH_SIZE = 12;
 
@@ -45,7 +46,7 @@ function FavoritesPage() {
   return (
     <div className="flex flex-col gap-6 pt-2 sm:pt-4 [animation:page-fade-in_0.2s_ease-out]">
       <CollectionPageHeader
-        title="Favorites"
+        title={m.portability_category_favorites()}
         count={count}
         loading={isLoading}
         canPlay={visiblePlaylistVideos.length > 0}
@@ -63,7 +64,7 @@ function FavoritesPage() {
       {isLoading ? (
         <VideoGridSkeleton idPrefix="favorites" />
       ) : videos.length === 0 ? (
-        <p className="py-24 text-center text-sm text-fg-muted">No favorites yet.</p>
+        <p className="py-24 text-center text-sm text-fg-muted">{m.ui_no_favorites_yet()}</p>
       ) : (
         <>
           <PlaylistGrid
@@ -80,7 +81,7 @@ function FavoritesPage() {
                 onClick={() => setLimit((current) => current + FAVORITES_BATCH_SIZE)}
                 className="rounded-lg bg-surface-strong px-4 py-2 text-sm text-fg transition-colors hover:bg-surface-soft"
               >
-                Load more
+                {m.ui_load_more()}
               </button>
             </div>
           )}

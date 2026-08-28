@@ -10,6 +10,7 @@ import {
   resolveInitialSearchOverlayQuery,
   writeSearchOverlayQuery,
 } from "../lib/search-overlay-query";
+import { m } from "../paraglide/messages.js";
 import { ConfirmModal } from "./confirm-modal";
 import { SearchOverlayList } from "./search-overlay-list";
 
@@ -128,8 +129,8 @@ export function SearchOverlay({ onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-fg hover:bg-surface-strong"
-            aria-label="Back"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-fg hover:bg-surface-strong"
+            aria-label={m.ui_back()}
           >
             <ArrowLeft size={20} />
           </button>
@@ -143,8 +144,8 @@ export function SearchOverlay({ onClose }: Props) {
               setSelectedIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search videos, channels..."
-            className="h-10 min-w-0 flex-1 rounded-full bg-surface-strong px-4 text-base text-fg placeholder:text-fg-soft focus:outline-none"
+            placeholder={m.ui_search_videos_channels()}
+            className="h-10 min-w-0 flex-1 rounded-md bg-surface-strong px-4 text-base text-fg placeholder:text-fg-soft focus:outline-none"
           />
         </form>
         <div className="min-h-0 flex-1 overflow-hidden px-2 pt-2">
@@ -156,15 +157,15 @@ export function SearchOverlay({ onClose }: Props) {
             onScroll={handleHistoryScroll}
             onClearAll={() => setConfirmClearOpen(true)}
             onSelect={submitTerm}
-            className="max-h-full overflow-y-auto scroll-smooth rounded-xl border border-border bg-surface"
+            className="max-h-full overflow-y-auto scroll-smooth rounded-md border border-border bg-surface"
           />
         </div>
       </div>
       {confirmClearOpen && (
         <ConfirmModal
-          title="Clear search history?"
-          description="This removes all saved searches from your account."
-          confirmLabel="Clear all"
+          title={m.ui_clear_search_history()}
+          description={m.ui_this_removes_all_saved_searches_from_your_account()}
+          confirmLabel={m.ui_clear_all()}
           onConfirm={handleConfirmClear}
           onCancel={() => setConfirmClearOpen(false)}
         />

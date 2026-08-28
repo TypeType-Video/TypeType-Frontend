@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { secondsFromMediaSliderPercent } from "../lib/sabr-player-seek";
 import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { TimeSlider } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   seeking?: boolean;
@@ -20,7 +21,7 @@ export function SabrTimeSlider({ seeking = false, thumbnails, video }: Props) {
     <TimeSlider.Root
       className="vds-time-slider vds-slider"
       style={style}
-      aria-label="Seek"
+      aria-label={m.ui_seek()}
       aria-busy={seeking}
       data-seeking={seeking ? "true" : undefined}
       onDragEnd={(percent) => {

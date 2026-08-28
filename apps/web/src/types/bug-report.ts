@@ -33,6 +33,13 @@ export type BugReportContext = {
   timestamp: number;
   userAgent: string;
   browserLanguage: string;
+  viewportWidth?: number;
+  viewportHeight?: number;
+  screenWidth?: number;
+  screenHeight?: number;
+  devicePixelRatio?: number;
+  online?: boolean;
+  timezone?: string;
   playerState: PlayerStateContext | null;
   crashLogs: CrashLogEntry[];
   apiErrors: BugApiErrorItem[];

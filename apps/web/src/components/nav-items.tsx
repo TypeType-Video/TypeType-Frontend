@@ -1,18 +1,21 @@
+import { m } from "../paraglide/messages.js";
+
 type NavItem = {
-  label: string;
+  label: () => string;
   to: string;
+  activePaths?: string[];
   icon: React.ReactNode;
   adminOnly?: boolean;
 };
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    label: "Home",
+    label: m.nav_home,
     to: "/",
     icon: <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />,
   },
   {
-    label: "Shorts",
+    label: m.nav_shorts,
     to: "/shorts",
     icon: (
       <>
@@ -25,7 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Subscriptions",
+    label: m.nav_subscriptions,
     to: "/subscriptions",
     icon: (
       <>
@@ -35,7 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "History",
+    label: m.nav_history,
     to: "/history",
     icon: (
       <>
@@ -45,7 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Playlists",
+    label: m.nav_playlists,
     to: "/playlists",
     icon: (
       <>
@@ -57,18 +60,20 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Import",
+    label: m.nav_data_transfer,
     to: "/import",
+    activePaths: ["/export"],
     icon: (
       <>
-        <path d="M12 3v12" />
-        <path d="M8 11l4 4 4-4" />
-        <path d="M4 19h16" />
+        <path d="M8 3v12" />
+        <path d="M4 11l4 4 4-4" />
+        <path d="M16 21V9" />
+        <path d="M12 13l4-4 4 4" />
       </>
     ),
   },
   {
-    label: "Settings",
+    label: m.nav_settings,
     to: "/settings",
     icon: (
       <>
@@ -78,7 +83,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Login",
+    label: m.nav_login,
     to: "/youtube-session",
     icon: (
       <>
@@ -89,7 +94,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Admin",
+    label: m.nav_admin,
     to: "/admin-console",
     adminOnly: true,
     icon: (
@@ -100,7 +105,7 @@ export const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    label: "Privacy",
+    label: m.nav_privacy,
     to: "/privacy",
     icon: (
       <>

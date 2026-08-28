@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { SavedPlaylistItem } from "../types/playlist";
 
 type Props = {
@@ -9,7 +10,10 @@ type Props = {
 };
 
 export function SavedPlaylistCard({ playlist, onDelete }: Props) {
-  const count = playlist.streamCount === 1 ? "1 video" : `${playlist.streamCount} videos`;
+  const count =
+    playlist.streamCount === 1
+      ? m.ui_video_count({ count: playlist.streamCount })
+      : m.ui_videos_count({ count: playlist.streamCount });
 
   return (
     <div className="group flex flex-col gap-2">
@@ -39,7 +43,7 @@ export function SavedPlaylistCard({ playlist, onDelete }: Props) {
         <button
           type="button"
           onClick={onDelete}
-          aria-label="Remove saved playlist"
+          aria-label={m.ui_remove_saved_playlist()}
           className="mt-0.5 shrink-0 text-fg-soft transition-colors hover:text-danger"
         >
           <Trash2 className="h-4 w-4" aria-hidden="true" />

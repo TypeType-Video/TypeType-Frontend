@@ -3,6 +3,7 @@ import { type DragEvent, type UIEvent, useEffect, useRef, useState } from "react
 import { useFlipList } from "../hooks/use-flip-list";
 import { useMobile } from "../hooks/use-mobile";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { WatchPlaylistItem } from "../types/playlist";
 import { WatchPlaylistRow } from "./watch-playlist-row";
 
@@ -94,18 +95,18 @@ export function WatchPlaylistPanel({
         <button
           type="button"
           onClick={onToggleShuffle}
-          aria-label="Shuffle playlist"
+          aria-label={m.ui_shuffle_playlist()}
           className={`inline-flex h-8 w-8 shrink-0 items-center justify-center gap-1.5 rounded-full font-medium text-xs transition-colors sm:w-auto sm:rounded-lg sm:px-2.5 sm:py-1.5 ${
             shuffle ? "bg-fg text-app" : "text-fg-muted hover:bg-surface-strong hover:text-fg"
           }`}
         >
           <Shuffle className="h-3.5 w-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Shuffle</span>
+          <span className="hidden sm:inline">{m.ui_shuffle()}</span>
         </button>
         <button
           type="button"
           onClick={() => setCollapsed((value) => !value)}
-          aria-label={collapsed ? "Expand playlist" : "Collapse playlist"}
+          aria-label={collapsed ? m.ui_expand_playlist() : m.ui_collapse_playlist()}
           className="shrink-0 text-fg-muted transition-colors hover:text-fg"
         >
           <ChevronDown

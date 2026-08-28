@@ -4,6 +4,8 @@
   <p>The React web client for TypeType.</p>
 </div>
 
+[![Translation status](https://translate.typetype.video/widgets/typetype/-/svg-badge.svg)](https://translate.typetype.video/engage/typetype/)
+
 This repository contains the browser application and its nginx container. It owns the user interface, routing, settings, account flows, library views, and integration with the TypeType API and playback package.
 
 If you want to install or update a complete TypeType instance, use the [central TypeType repository](https://github.com/TypeType-Video/TypeType) and the [self-hosting documentation](https://typetype-video.github.io/Docs-TypeType/self-hosting/introduction).
@@ -72,6 +74,12 @@ bun run knip
 bun run sherif
 bun run build
 ```
+
+Translation contributors can use [Weblate](https://translate.typetype.video/engage/typetype/)
+without editing code. The current catalog status can also be inspected locally
+with `bun run localization:report -- --markdown`. See
+[LOCALIZATION.md](LOCALIZATION.md) for the source catalog, Weblate sync rules,
+and the contributor workflow.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Bug reports and feature requests belong in the [central issue tracker](https://github.com/TypeType-Video/TypeType/issues).
 

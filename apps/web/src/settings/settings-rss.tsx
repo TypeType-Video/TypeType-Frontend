@@ -6,6 +6,7 @@ import { useInstance } from "../hooks/use-instance";
 import { useRssFeeds } from "../hooks/use-rss-feeds";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { copyText } from "../lib/copy-text";
+import { m } from "../paraglide/messages.js";
 import type { RssFeedItem, RssFeedRequest, RssFeedSecretItem } from "../types/rss";
 import { RssFeedEditorModal } from "./rss-feed-editor-modal";
 import { RssFeedRow } from "./rss-feed-row";
@@ -60,7 +61,7 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
         {
           onSuccess: () => {
             setEditing(undefined);
-            setToast("RSS feed updated");
+            setToast(m.ui_rss_feed_updated());
           },
           onError: showError,
         },
@@ -84,7 +85,7 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
       rss.remove.mutate(action.feed.id, {
         onSuccess: () => {
           setKnownLinks((current) => withoutKey(current, action.feed.id));
-          setToast("RSS feed deleted");
+          setToast(m.ui_rss_feed_deleted());
         },
         onError: showError,
       });
@@ -96,8 +97,8 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
     });
   }
 
-  function showError(error: unknown) {
-    setToast(error instanceof Error ? error.message : "Unable to update RSS feed");
+  function showError() {
+    setToast(m.ui_unable_to_update_rss_feed());
   }
 
   const feeds = rss.query.data ?? [];
@@ -110,36 +111,34 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3 px-1">
           <div>
-            <p className="text-xs font-medium uppercase text-fg-soft">Private feeds</p>
+            <p className="text-xs font-medium uppercase text-fg-soft">{m.ui_private_feeds()}</p>
             <p className="mt-1 text-xs text-fg-muted">
-              {feeds.length} of {feedLimit} used
+              {feeds.length} {m.admin_users_of()} {feedLimit} {m.ui_used()}
             </p>
           </div>
           <button
             type="button"
-            title={limitReached ? "Feed limit reached" : "Create RSS feed"}
+            title={limitReached ? m.ui_feed_limit_reached() : m.ui_create_rss_feed()}
             disabled={limitReached}
             onClick={() => setEditing(null)}
             className="inline-flex h-9 items-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-fg-strong disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Plus size={14} />
-            New feed
+            {m.ui_new_feed()}
           </button>
         </div>
         {rss.query.isPending ? (
           <div className="rounded-lg border border-border bg-surface px-4 py-5 text-sm text-fg-muted">
-            Loading RSS feeds...
+            {m.ui_loading_rss_feeds()}
           </div>
         ) : rss.query.isError ? (
           <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-4 text-sm text-danger-strong">
-            {rss.query.error instanceof Error
-              ? rss.query.error.message
-              : "Unable to load RSS feeds"}
+            {m.ui_unable_to_load_rss_feeds()}
           </div>
         ) : feeds.length === 0 ? (
           <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border-strong bg-surface/50 px-4 text-center">
             <Rss size={20} className="text-fg-soft" />
-            <p className="text-sm text-fg-muted">No private feeds</p>
+            <p className="text-sm text-fg-muted">{m.ui_no_private_feeds()}</p>
           </div>
         ) : (
           <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
@@ -154,7 +153,7 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
                 }
                 onCopy={async () => {
                   const link = knownLinks[feed.id];
-                  if (link && (await copyText(link))) setToast("Private RSS link copied");
+                  if (link && (await copyText(link))) setToast(m.ui_private_rss_link_copied());
                 }}
                 onEdit={() => setEditing(feed)}
                 onToggle={() =>
@@ -189,13 +188,13 @@ export function SettingsRss({ initialChannel, openComposer }: Props) {
       )}
       {confirm && (
         <ConfirmModal
-          title={confirm.type === "delete" ? "Delete RSS feed?" : "Replace private link?"}
+          title={confirm.type === "delete" ? m.ui_delete_rss_feed() : m.ui_replace_private_link_2()}
           description={
             confirm.type === "delete"
-              ? "The current link will stop working immediately."
-              : "The current private link will be revoked immediately."
+              ? m.ui_the_current_link_will_stop_working_immediately()
+              : m.ui_the_current_private_link_will_be_revoked_immediately()
           }
-          confirmLabel={confirm.type === "delete" ? "Delete" : "Replace link"}
+          confirmLabel={confirm.type === "delete" ? m.ui_delete() : m.ui_replace_link()}
           onConfirm={runConfirmedAction}
           onCancel={() => setConfirm(null)}
         />

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { AllowedPlaylistItem } from "../types/allow-list";
 
 type Props = {
@@ -39,11 +40,11 @@ export function AdminAllowListPlaylistList({ title, playlists, onRemove }: Props
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-fg">{title}</h2>
         <span className="text-xs text-fg-soft">
-          {playlists.length} {playlists.length === 1 ? "playlist" : "playlists"}
+          {playlists.length} {playlists.length === 1 ? m.ui_playlist() : m.ui_playlists()}
         </span>
       </div>
       {playlists.length === 0 ? (
-        <p className="py-3 text-sm text-fg-soft">No playlists added.</p>
+        <p className="py-3 text-sm text-fg-soft">{m.ui_no_playlists_added()}</p>
       ) : (
         <div className="border-y border-border">
           {playlists.map((playlist) => {
@@ -80,7 +81,7 @@ export function AdminAllowListPlaylistList({ title, playlists, onRemove }: Props
                   <button
                     type="button"
                     onClick={() => onRemove(playlist.url)}
-                    aria-label={`Remove ${label}`}
+                    aria-label={`${m.ui_remove()} ${label}`}
                     className="flex h-7 w-7 shrink-0 items-center justify-center text-fg-soft transition-colors hover:text-fg"
                   >
                     <XIcon />

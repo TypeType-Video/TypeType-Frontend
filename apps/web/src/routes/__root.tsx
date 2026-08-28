@@ -5,6 +5,7 @@ import { AuthBackdrop } from "../components/auth-backdrop";
 import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
+import { NotFoundPage } from "../components/not-found-page";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -20,7 +21,8 @@ import {
 import { bootstrapSession } from "../lib/auth-session";
 import { isEmbeddedFrame } from "../lib/embed-access";
 import { applyTheme } from "../lib/theme";
-import { useAuthStore } from "../stores/auth-store";
+import { m } from "../paraglide/messages.js";
+import { subscribeAuthStorage, useAuthStore } from "../stores/auth-store";
 import { useThemeStore } from "../stores/theme-store";
 import { useUiStore } from "../stores/ui-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
@@ -44,6 +46,9 @@ function RootLayout() {
   const setSignedOut = useAuthStore((s) => s.setSignedOut);
   const { data: instance } = useInstance();
   const location = useRouterState({ select: (state) => state.location });
+  const notFoundPage = useRouterState({
+    select: (state) => state.matches.some((match) => match.status === "notFound"),
+  });
   const pathname = location.pathname;
   const pathWithSearch = `${pathname}${location.searchStr}`;
   const hideEverythingPage = pathname === "/hide-everything";
@@ -60,6 +65,8 @@ function RootLayout() {
     if (framedEmbedPage) return;
     void bootstrapSession();
   }, [framedEmbedPage]);
+
+  useEffect(() => subscribeAuthStorage(), []);
 
   useEffect(() => {
     applyTheme(theme);
@@ -121,12 +128,16 @@ function RootLayout() {
   if (status === "loading" && (requiresAuth(pathname) || isAdminRoute(pathname))) {
     return (
       <div className="min-h-screen bg-app text-fg flex items-center justify-center">
-        <p className="text-sm text-fg-muted">Loading session...</p>
+        <p className="text-sm text-fg-muted">{m.ui_loading_session()}</p>
       </div>
     );
   }
 
   const authPage = isAuthPage(pathname);
+
+  if (notFoundPage) {
+    return <NotFoundPage />;
+  }
 
   if (instance?.guestAllowed === false && (!isAuthed || isGuest) && !authPage && !embedPage) {
     return <GuestDisabledScreen />;

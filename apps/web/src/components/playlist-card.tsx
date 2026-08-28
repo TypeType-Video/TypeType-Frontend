@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { m } from "../paraglide/messages.js";
 import type { PlaylistItem } from "../types/playlist";
 
 type Props = {
@@ -22,7 +23,7 @@ function TrashIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Delete"
+      aria-label={m.ui_delete()}
     >
       <polyline points="3 6 5 6 21 6" />
       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -43,7 +44,7 @@ function EmptyIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Empty playlist"
+      aria-label={m.ui_empty_playlist()}
       className="text-fg-soft"
     >
       <path d="M3 5h15" />
@@ -57,7 +58,7 @@ function EmptyIcon() {
 function ThumbnailContent({ playlist }: { playlist: PlaylistItem }) {
   const thumbnail = playlist.videos?.[0]?.thumbnail;
   const count = playlist.videoCount ?? playlist.videos?.length ?? 0;
-  const label = `${count} video${count !== 1 ? "s" : ""}`;
+  const label = count === 1 ? m.ui_video_count({ count }) : m.ui_videos_count({ count });
   return (
     <div className="relative aspect-video rounded-xl overflow-hidden bg-surface-strong">
       {thumbnail ? (
@@ -88,7 +89,7 @@ export function PlaylistCard({
   onDeleteRequest,
 }: Props) {
   const count = playlist.videoCount ?? playlist.videos?.length ?? 0;
-  const label = `${count} video${count !== 1 ? "s" : ""}`;
+  const label = count === 1 ? m.ui_video_count({ count }) : m.ui_videos_count({ count });
 
   return (
     <div className="flex flex-col gap-2 group">
@@ -98,7 +99,7 @@ export function PlaylistCard({
             type="button"
             className="w-full"
             onClick={onToggleSelect}
-            aria-label={`${selected ? "Deselect" : "Select"} ${playlist.name}`}
+            aria-label={`${selected ? m.ui_deselect() : m.groups_preview_select_channel()} ${playlist.name}`}
           >
             <ThumbnailContent playlist={playlist} />
             <div
@@ -148,7 +149,7 @@ export function PlaylistCard({
           <button
             type="button"
             onClick={onDeleteRequest}
-            aria-label="Delete playlist"
+            aria-label={m.ui_delete_playlist()}
             className="text-fg-soft hover:text-danger transition-colors flex-shrink-0 mt-0.5"
           >
             <TrashIcon />

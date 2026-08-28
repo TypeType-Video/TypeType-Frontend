@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { DownloaderCreateJobRequest, DownloaderMode } from "../types/downloader";
 import type { VideoStream } from "../types/stream";
 
@@ -23,7 +24,7 @@ export type DownloadOption = {
 };
 
 function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "Unknown size";
+  if (!Number.isFinite(bytes) || bytes <= 0) return m.ui_unknown_size();
   const units = ["B", "KB", "MB", "GB"];
   let value = bytes;
   let unitIndex = 0;
@@ -78,9 +79,9 @@ export function buildDownloadOptions(stream: VideoStream): DownloadOption[] {
   const videos = [...(stream.videoOnlyStreams ?? [])]
     .sort((left, right) => right.height - left.height || right.fps - left.fps)
     .map((item, index) => {
-      const resolution = item.resolution || (item.height > 0 ? `${item.height}p` : "Video");
+      const resolution = item.resolution || (item.height > 0 ? `${item.height}p` : m.ui_video());
       const fps = item.fps > 0 ? ` ${item.fps}fps` : "";
-      const codec = item.codec ?? "video";
+      const codec = item.codec ?? m.ui_video();
       const container = parseContainer(item.mimeType);
       return {
         id: `video-${item.itag}-${index}`,
@@ -102,14 +103,14 @@ export function buildDownloadOptions(stream: VideoStream): DownloadOption[] {
   const audios = [...(stream.audioStreams ?? [])]
     .sort((left, right) => (right.bitrate ?? 0) - (left.bitrate ?? 0))
     .map((item, index) => {
-      const locale = item.audioLocale || item.quality || "default";
-      const codec = item.codec ?? "audio";
+      const locale = item.audioLocale || item.quality || m.ui_default();
+      const codec = item.codec ?? m.ui_audio();
       const container = parseContainer(item.mimeType);
       const bitrate = item.bitrate ?? 0;
       return {
         id: `audio-${item.itag}-${index}`,
         mode: "audio" as const,
-        label: `${item.bitrate ? `${Math.round(item.bitrate)} kbps` : "Audio"} ${container}`,
+        label: `${item.bitrate ? `${Math.round(item.bitrate)} kbps` : m.ui_audio()} ${container}`,
         detail: `${locale} · ${codec} · itag ${item.itag}`,
         size: formatBytes(item.contentLength),
         recommended: false,

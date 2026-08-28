@@ -2,19 +2,23 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { NotFoundPage } from "./components/not-found-page";
 import { PageSpinner } from "./components/page-spinner";
+import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
 import { ApiError } from "./lib/api";
 import { installConsoleWarningFilter } from "./lib/console-warning-filter";
 import { initErrorCapture } from "./lib/error-capture";
-import { installWatchAutoplayIntent } from "./lib/watch-autoplay-intent";
+import { getLocale, getTextDirection } from "./paraglide/runtime.js";
 import { routeTree } from "./routeTree.gen";
 
 installConsoleWarningFilter();
 initErrorCapture();
-installWatchAutoplayIntent();
+document.documentElement.lang = getLocale();
+document.documentElement.dir = getTextDirection();
 
 const router = createRouter({
   routeTree,
+  defaultNotFoundComponent: NotFoundPage,
   defaultPendingComponent: PageSpinner,
   scrollRestoration: true,
 });
@@ -46,7 +50,9 @@ if (!root) {
 }
 
 createRoot(root).render(
-  <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
-  </QueryClientProvider>,
+  <InterfaceLocaleProvider>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </InterfaceLocaleProvider>,
 );

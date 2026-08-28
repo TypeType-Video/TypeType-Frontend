@@ -1,10 +1,11 @@
+import { m } from "../paraglide/messages.js";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import type { SettingsItem, SponsorBlockCategoryAction } from "../types/user";
 
 export type SponsorBlockCategory = {
   id: string;
-  label: string;
-  description: string;
+  label: () => string;
+  description: () => string;
   color: string;
   defaultAction: SponsorBlockCategoryAction;
 };
@@ -12,78 +13,78 @@ export type SponsorBlockCategory = {
 export const SPONSORBLOCK_CATEGORIES: SponsorBlockCategory[] = [
   {
     id: "sponsor",
-    label: "Sponsored message",
-    description: "Paid promotion, sponsorship, or direct advertising.",
+    label: () => m.sponsorblock_sponsored_message(),
+    description: () => m.sponsorblock_sponsored_message_description(),
     color: "#00d400",
     defaultAction: "auto_skip",
   },
   {
     id: "selfpromo",
-    label: "Self-promotion",
-    description: "Unpaid promotion, merch, donations, or guest promotion.",
+    label: () => m.sponsorblock_self_promotion(),
+    description: () => m.sponsorblock_self_promotion_description(),
     color: "#ffff00",
     defaultAction: "auto_skip",
   },
   {
     id: "exclusive_access",
-    label: "Exclusive access",
-    description: "Whole-video labels for free or subsidized access.",
+    label: () => m.sponsorblock_exclusive_access(),
+    description: () => m.sponsorblock_exclusive_access_description(),
     color: "#008a5c",
     defaultAction: "mark_only",
   },
   {
     id: "interaction",
-    label: "Interaction reminder",
-    description: "Short reminders to like, subscribe, or follow.",
+    label: () => m.sponsorblock_interaction_reminder(),
+    description: () => m.sponsorblock_interaction_reminder_description(),
     color: "#cc00ff",
     defaultAction: "auto_skip",
   },
   {
     id: "poi_highlight",
-    label: "Highlight",
-    description: "The main point most viewers are looking for.",
+    label: () => m.sponsorblock_highlight(),
+    description: () => m.sponsorblock_highlight_description(),
     color: "#ff1684",
     defaultAction: "mark_only",
   },
   {
     id: "intro",
-    label: "Intermission or intro",
-    description: "Low-content pauses, static screens, or repeated animations.",
+    label: () => m.sponsorblock_intermission_or_intro(),
+    description: () => m.sponsorblock_intermission_or_intro_description(),
     color: "#00ffff",
     defaultAction: "auto_skip",
   },
   {
     id: "outro",
-    label: "Endcards or credits",
-    description: "Credits or YouTube end screens without useful conclusions.",
+    label: () => m.sponsorblock_endcards_or_credits(),
+    description: () => m.sponsorblock_endcards_or_credits_description(),
     color: "#0202ed",
     defaultAction: "auto_skip",
   },
   {
     id: "preview",
-    label: "Preview or recap",
-    description: "Clips repeated later in the same video or series.",
+    label: () => m.sponsorblock_preview_or_recap(),
+    description: () => m.sponsorblock_preview_or_recap_description(),
     color: "#008fd6",
     defaultAction: "auto_skip",
   },
   {
     id: "filler",
-    label: "Tangents or jokes",
-    description: "Aggressive skipping for non-essential tangents or jokes.",
+    label: () => m.sponsorblock_tangents_or_jokes(),
+    description: () => m.sponsorblock_tangents_or_jokes_description(),
     color: "#7300ff",
     defaultAction: "auto_skip",
   },
   {
     id: "chapter",
-    label: "Chapter",
-    description: "Custom chapters describing important sections.",
+    label: () => m.sponsorblock_chapter(),
+    description: () => m.sponsorblock_chapter_description(),
     color: "#ffd000",
     defaultAction: "mark_only",
   },
   {
     id: "music_offtopic",
-    label: "Music: non-music",
-    description: "Non-musical sections in music videos.",
+    label: () => m.sponsorblock_music_non_music(),
+    description: () => m.sponsorblock_music_non_music_description(),
     color: "#ff9900",
     defaultAction: "auto_skip",
   },
@@ -99,7 +100,7 @@ export function getSponsorBlockCategoryColor(categoryId: string) {
 
 export function getSponsorBlockCategoryLabel(categoryId: string) {
   return (
-    SPONSORBLOCK_CATEGORIES.find((category) => category.id === categoryId)?.label ?? categoryId
+    SPONSORBLOCK_CATEGORIES.find((category) => category.id === categoryId)?.label() ?? categoryId
   );
 }
 

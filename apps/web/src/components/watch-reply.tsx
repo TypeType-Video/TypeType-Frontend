@@ -1,5 +1,7 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { formatCommentPublishedTime } from "../lib/comment-time";
 import { formatLikes } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import type { Comment } from "../types/comment";
 import { RichText } from "./rich-text";
 
@@ -10,6 +12,7 @@ type Props = {
 };
 
 export function WatchReply({ reply, locale, onSeekTimestamp }: Props) {
+  const { locale: interfaceLocale } = useInterfaceLocale();
   const publishedTime = formatCommentPublishedTime(reply.publishedAt, reply.publishedTime, locale);
 
   return (
@@ -30,7 +33,9 @@ export function WatchReply({ reply, locale, onSeekTimestamp }: Props) {
           <RichText text={reply.text} onSeekTimestamp={onSeekTimestamp} />
         </p>
         {reply.likeCount >= 0 && (
-          <span className="text-xs text-fg-soft">{formatLikes(reply.likeCount)} likes</span>
+          <span className="text-xs text-fg-soft">
+            {formatLikes(reply.likeCount)} {m.watch_likes({}, { locale: interfaceLocale })}
+          </span>
         )}
       </div>
     </div>

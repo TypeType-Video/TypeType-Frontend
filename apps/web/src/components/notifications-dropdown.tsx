@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMobile } from "../hooks/use-mobile";
 import { useNotifications } from "../hooks/use-notifications";
+import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import { NotificationBellIcon } from "./notification-bell-icon";
 import { NotificationRow } from "./notification-row";
@@ -52,7 +53,7 @@ export function NotificationsDropdown() {
         type="button"
         onClick={toggle}
         className="relative inline-flex h-9 w-9 items-center justify-center text-fg-muted hover:text-fg"
-        aria-label="Notifications"
+        aria-label={m.ui_notifications()}
       >
         <NotificationBellIcon />
         {unreadCount > 0 && (
@@ -66,13 +67,13 @@ export function NotificationsDropdown() {
         <div
           className={
             isMobile
-              ? "fixed left-2 right-2 top-16 z-50 overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl"
-              : "absolute right-0 top-full z-50 mt-2 w-[calc(100vw-1rem)] max-w-[26rem] overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl"
+              ? "fixed left-2 right-2 top-16 z-50 overflow-hidden rounded-md border border-border-strong bg-surface shadow-2xl"
+              : "absolute right-0 top-full z-50 mt-2 w-[calc(100vw-1rem)] max-w-[26rem] overflow-hidden rounded-md border border-border-strong bg-surface shadow-2xl"
           }
         >
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
-              Notifications
+              {m.ui_notifications()}
             </p>
             <button
               type="button"
@@ -80,24 +81,26 @@ export function NotificationsDropdown() {
               disabled={unreadCount === 0 || markAllRead.isPending}
               className="text-xs text-fg-muted hover:text-fg-strong disabled:cursor-not-allowed disabled:text-fg-soft"
             >
-              Mark all read
+              {m.ui_mark_all_read()}
             </button>
           </div>
 
           <div ref={setScrollRoot} className="max-h-[28rem] overflow-y-auto px-2 py-2">
             {!hasLoaded && (
-              <p className="px-2 py-3 text-xs text-fg-soft">Open notifications to load items.</p>
+              <p className="px-2 py-3 text-xs text-fg-soft">
+                {m.ui_open_notifications_to_load_items()}
+              </p>
             )}
             {hasLoaded && query.isFetching && items.length === 0 && (
-              <p className="px-2 py-3 text-xs text-fg-soft">Loading notifications...</p>
+              <p className="px-2 py-3 text-xs text-fg-soft">{m.ui_loading_notifications()}</p>
             )}
             {hasLoaded && query.isError && (
               <p className="px-2 py-3 text-xs text-danger">
-                Failed to load notifications. Retry in a few seconds.
+                {m.ui_failed_to_load_notifications_retry_in_a_few_seconds()}
               </p>
             )}
             {hasLoaded && !query.isFetching && !query.isError && items.length === 0 && (
-              <p className="px-2 py-3 text-xs text-fg-soft">No notifications yet.</p>
+              <p className="px-2 py-3 text-xs text-fg-soft">{m.ui_no_notifications_yet()}</p>
             )}
             {items.map((item) => (
               <NotificationRow
@@ -118,13 +121,17 @@ export function NotificationsDropdown() {
               />
             )}
             {isFetchingNextPage && (
-              <p className="px-2 py-2 text-xs text-fg-soft">Loading more...</p>
+              <p className="px-2 py-2 text-xs text-fg-soft">{m.ui_loading_more()}</p>
             )}
             {isFetchNextPageError && (
-              <p className="px-2 py-2 text-xs text-danger">Rate limited while loading more.</p>
+              <p className="px-2 py-2 text-xs text-danger">
+                {m.ui_rate_limited_while_loading_more()}
+              </p>
             )}
             {unreadQuery.isError && (
-              <p className="px-2 py-2 text-xs text-fg-soft">Badge temporarily unavailable.</p>
+              <p className="px-2 py-2 text-xs text-fg-soft">
+                {m.ui_badge_temporarily_unavailable()}
+              </p>
             )}
           </div>
         </div>

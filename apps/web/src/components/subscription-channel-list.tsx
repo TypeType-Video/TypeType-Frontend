@@ -1,5 +1,6 @@
 import { startTransition, useMemo, useState } from "react";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { SubscriptionItem } from "../types/user";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
@@ -55,7 +56,7 @@ export function SubscriptionChannelList({ subscriptions }: Props) {
       </section>
       {hasMore && (
         <div className="pt-2 text-center text-[11px] text-fg-soft">
-          Showing {visible.length} of {sorted.length} channels
+          {m.ui_showing()} {visible.length} {m.admin_users_of()} {sorted.length} {m.ui_channels()}
         </div>
       )}
       <ScrollSentinel enabled={hasMore} onIntersect={loadMore} />

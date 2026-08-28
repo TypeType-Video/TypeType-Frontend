@@ -11,6 +11,7 @@ export function selectProgressiveWatchStream(
   const currentBootstrap =
     bootstrap && toPublicWatchParam(bootstrap.id) === publicParam ? bootstrap : undefined;
   const extracted = currentFull ?? currentBootstrap;
-  if (!extracted || currentFull || previewRelated.length === 0) return extracted;
+  if (!extracted || previewRelated.length === 0 || (extracted.related?.length ?? 0) > 0)
+    return extracted;
   return { ...extracted, related: previewRelated };
 }

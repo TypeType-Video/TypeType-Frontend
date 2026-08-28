@@ -1,4 +1,6 @@
 import type { YoutubeRemoteInput, YoutubeRemotePhase } from "../hooks/use-youtube-remote-browser";
+import { youtubeRemotePhaseLabel } from "../lib/youtube-remote-phase";
+import { m } from "../paraglide/messages.js";
 import { YoutubeIcon } from "./youtube-icon";
 import { YoutubeRemoteBrowser } from "./youtube-remote-browser";
 
@@ -41,14 +43,15 @@ export function YoutubeSessionBrowserPanel({
         <YoutubeRemoteBrowser frameUrl={frameUrl} phase={phase} error={error} onInput={onInput} />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-fg-soft text-xs">
-            Phase: {phase.replace(/_/g, " ")}. Click the browser area before typing.
+            {m.ui_phase()} {youtubeRemotePhaseLabel(phase)}.{" "}
+            {m.ui_click_the_browser_area_before_typing()}
           </p>
           <button
             type="button"
             onClick={onCancel}
             className="h-10 border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
           >
-            Cancel sign-in
+            {m.ui_cancel_sign_in()}
           </button>
         </div>
       </div>
@@ -58,8 +61,7 @@ export function YoutubeSessionBrowserPanel({
   return (
     <div className="max-w-3xl border-border border-l-2 pl-5">
       <p className="text-fg text-sm leading-6">
-        Use a secondary YouTube account. The remote browser is temporary and closes after
-        connection, timeout, or cancellation.
+        {m.ui_use_a_secondary_youtube_account_the_remote_browser_is_temporary_and_c()}
       </p>
       <button
         type="button"
@@ -69,12 +71,16 @@ export function YoutubeSessionBrowserPanel({
       >
         <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
         <span>
-          {!loaded ? "Checking availability..." : pending ? "Opening..." : "Connect with YouTube"}
+          {!loaded
+            ? m.ui_checking_availability()
+            : pending
+              ? m.ui_opening()
+              : m.ui_connect_with_youtube()}
         </span>
       </button>
       {loaded && !enabled && (
         <p className="mt-3 text-danger-strong text-xs">
-          Remote YouTube login is disabled on this instance.
+          {m.ui_remote_youtube_login_is_disabled_on_this_instance()}
         </p>
       )}
       {connected && returnTo && (
@@ -82,7 +88,7 @@ export function YoutubeSessionBrowserPanel({
           href={returnTo}
           className="mt-3 inline-flex h-11 w-full items-center justify-center border border-border-strong px-5 text-fg text-sm transition-colors hover:border-fg sm:ml-3 sm:w-auto"
         >
-          Retry video
+          {m.ui_retry_video()}
         </a>
       )}
     </div>

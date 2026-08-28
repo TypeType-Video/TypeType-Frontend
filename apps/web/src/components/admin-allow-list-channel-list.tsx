@@ -1,4 +1,5 @@
 import { channelRoutePath } from "../lib/channel-route-url";
+import { m } from "../paraglide/messages.js";
 import type { AllowedChannelItem } from "../types/user";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
@@ -30,7 +31,7 @@ type Props = {
 };
 
 export function AdminAllowListChannelList({
-  title = "Allowed channels",
+  title = m.ui_allowed_channels(),
   channels,
   onRemove,
 }: Props) {
@@ -40,15 +41,15 @@ export function AdminAllowListChannelList({
         <div>
           <h2 className="text-sm font-semibold text-fg">{title}</h2>
           <p className="mt-1 text-xs text-fg-soft">
-            Channels available when allow-list mode is enabled.
+            {m.ui_channels_available_when_allow_list_mode_is_enabled()}
           </p>
         </div>
         <span className="text-xs text-fg-soft">
-          {channels.length} {channels.length === 1 ? "channel" : "channels"}
+          {channels.length} {channels.length === 1 ? m.ui_channel() : m.ui_channels()}
         </span>
       </div>
       {channels.length === 0 ? (
-        <p className="py-3 text-sm text-fg-soft">No channels added.</p>
+        <p className="py-3 text-sm text-fg-soft">{m.ui_no_channels_added()}</p>
       ) : (
         <div className="border-y border-border">
           {channels.map((item) => {
@@ -82,7 +83,7 @@ export function AdminAllowListChannelList({
                   <button
                     type="button"
                     onClick={() => onRemove(item.url)}
-                    aria-label={`Remove ${label}`}
+                    aria-label={`${m.ui_remove()} ${label}`}
                     className="flex h-7 w-7 shrink-0 items-center justify-center text-fg-soft transition-colors hover:text-fg"
                   >
                     <XIcon />

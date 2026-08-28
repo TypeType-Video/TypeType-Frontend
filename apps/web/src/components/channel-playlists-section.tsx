@@ -1,4 +1,5 @@
 import { useChannelPlaylists } from "../hooks/use-channel-playlists";
+import { m } from "../paraglide/messages.js";
 import { PageSpinner } from "./page-spinner";
 import { PublicPlaylistCard } from "./public-playlist-card";
 import { ScrollSentinel } from "./scroll-sentinel";
@@ -16,7 +17,7 @@ export function ChannelPlaylistsSection({ channelUrl }: Props) {
 
   if (isLoading) return <PageSpinner />;
   if (playlists.length === 0) {
-    return <p className="text-fg-muted text-sm">No playlists on this channel.</p>;
+    return <p className="text-fg-muted text-sm">{m.ui_no_playlists_on_this_channel()}</p>;
   }
 
   return (

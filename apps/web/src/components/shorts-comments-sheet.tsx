@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useInfiniteComments } from "../hooks/use-infinite-comments";
+import { m } from "../paraglide/messages.js";
 import { ScrollSentinel } from "./scroll-sentinel";
 import { WatchComment } from "./watch-comment";
 import { WatchCommentSkeleton } from "./watch-comment-skeleton";
@@ -108,13 +109,13 @@ export function ShortsCommentsSheet({ videoUrl, anchorEl, open, onClose }: Props
         }}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-fg">Comments</h2>
+          <h2 className="text-sm font-semibold text-fg">{m.watch_comments()}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-md px-2 py-1 text-xs text-fg-muted hover:bg-surface-strong hover:text-fg"
           >
-            Close
+            {m.admin_users_close()}
           </button>
         </div>
         <div className="h-px bg-surface-strong" />
@@ -124,7 +125,7 @@ export function ShortsCommentsSheet({ videoUrl, anchorEl, open, onClose }: Props
           style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
         >
           {commentsDisabled ? (
-            <p className="text-sm text-fg-soft">Comments are disabled for this video.</p>
+            <p className="text-sm text-fg-soft">{m.watch_comments_disabled()}</p>
           ) : (
             <>
               {visibleComments.map((comment, i) => (

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { m } from "../paraglide/messages.js";
 import { RssShortcut } from "./rss-shortcut";
 
 type Props = {
@@ -18,13 +19,15 @@ export function SubscriptionsHeader({ active, count, onVideosIntent, onChannelsI
   return (
     <header className="flex flex-col gap-5 border-border border-b pt-3 pb-5 sm:flex-row sm:items-end sm:justify-between sm:pt-4">
       <div className="min-w-0">
-        <p className="text-[11px] text-fg-soft uppercase tracking-[0.22em]">Library</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-fg">Subscriptions</h1>
+        <p className="text-[11px] text-fg-soft uppercase tracking-[0.22em]">{m.ui_library()}</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-fg">
+          {m.portability_category_subscriptions()}
+        </h1>
         <p className="mt-1 text-sm text-fg-muted">
-          {count} {count === 1 ? "channel" : "channels"} followed
+          {count === 1 ? m.ui_channel_followed({ count }) : m.ui_channels_followed({ count })}
         </p>
       </div>
-      <nav className="flex items-center gap-6" aria-label="Subscription views">
+      <nav className="flex items-center gap-6" aria-label={m.ui_subscription_views()}>
         <Link
           to="/subscriptions"
           preload="intent"
@@ -33,7 +36,7 @@ export function SubscriptionsHeader({ active, count, onVideosIntent, onChannelsI
           onTouchStart={onVideosIntent}
           className={`border-b pb-1.5 text-sm font-medium transition-colors ${linkClass(active === "videos")}`}
         >
-          Videos
+          {m.ui_videos()}
         </Link>
         <Link
           to="/subscriptions/channels"
@@ -43,7 +46,7 @@ export function SubscriptionsHeader({ active, count, onVideosIntent, onChannelsI
           onTouchStart={onChannelsIntent}
           className={`border-b pb-1.5 text-sm font-medium transition-colors ${linkClass(active === "channels")}`}
         >
-          Channels
+          {m.groups_preview_channels()}
         </Link>
         <RssShortcut />
       </nav>

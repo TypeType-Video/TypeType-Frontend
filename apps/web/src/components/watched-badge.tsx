@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 function CheckIcon() {
   return (
     <svg
@@ -11,7 +13,7 @@ function CheckIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Watched"
+      aria-label={m.ui_watched()}
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>
@@ -22,7 +24,7 @@ export function WatchedBadge() {
   return (
     <span
       className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/80 text-white ring-1 ring-white/25 backdrop-blur"
-      title="Watched"
+      title={m.ui_watched()}
     >
       <CheckIcon />
     </span>

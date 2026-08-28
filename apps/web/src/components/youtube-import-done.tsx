@@ -4,6 +4,7 @@ import type {
   YoutubeTakeoutPreview,
   YoutubeTakeoutReport,
 } from "../lib/api-youtube-import";
+import { m } from "../paraglide/messages.js";
 import { YoutubeImportJobSummary } from "../settings/youtube-import-job-summary";
 import { ImportMascotLoop } from "./import-mascot-loop";
 
@@ -25,15 +26,15 @@ export function YoutubeImportDone({ job, preview, report }: Props) {
             intervalMs={2500}
           />
           <div>
-            <p className="text-base font-medium text-fg">Import complete</p>
+            <p className="text-base font-medium text-fg">{m.groups_preview_import_complete()}</p>
             <p className="mt-1 text-sm text-fg-muted/80">
-              Your data has been plated. Check your subscriptions and playlists.
+              {m.ui_your_data_has_been_plated_check_your_subscriptions_and_playlists()}
             </p>
             <Link
               to="/subscriptions"
               className="mt-3 inline-flex h-8 items-center rounded-md bg-emerald-600 px-3 text-xs text-white hover:bg-emerald-500"
             >
-              View subscriptions
+              {m.groups_preview_view_subscriptions()}
             </Link>
           </div>
         </div>

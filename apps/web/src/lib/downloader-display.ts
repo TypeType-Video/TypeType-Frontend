@@ -1,6 +1,9 @@
+import { m } from "../paraglide/messages.js";
 import type { DownloaderJobStage, DownloaderJobStatus } from "../types/downloader";
 
-export const DOWNLOADER_STEPS = ["Prepare", "Download", "Finalize"];
+export function downloaderSteps(): string[] {
+  return [m.ui_prepare(), m.ui_download(), m.ui_finalize()];
+}
 
 export function isCancelledDownloaderJob(
   status: DownloaderJobStatus | null,
@@ -38,34 +41,36 @@ export function downloaderStatusLabel(
   errorCode: string | null,
   forceWaiting: boolean,
 ): string {
-  if (forceWaiting) return "Opening file";
-  if (isCancelledDownloaderJob(status, stage, errorCode)) return "Cancelled";
-  if (isFailedDownloaderJob(status, stage, errorCode)) return "Failed";
-  if (stage === "cached") return "Ready from cache";
-  if (status === "done" || stage === "done") return "Ready";
-  if (status === "queued" || stage === "queued") return "Queued";
-  if (stage === "download" || stage === "downloading") return "Downloading";
-  if (stage === "mux" || stage === "finalizing") return "Finalizing";
-  return "Preparing download";
+  if (forceWaiting) return m.ui_opening_file();
+  if (isCancelledDownloaderJob(status, stage, errorCode)) return m.portability_job_cancelled();
+  if (isFailedDownloaderJob(status, stage, errorCode)) return m.ui_failed();
+  if (stage === "cached") return m.ui_ready_from_cache();
+  if (status === "done" || stage === "done") return m.ui_ready();
+  if (status === "queued" || stage === "queued") return m.ui_queued();
+  if (stage === "download" || stage === "downloading") return m.ui_downloading();
+  if (stage === "mux" || stage === "finalizing") return m.ui_finalizing();
+  return m.ui_preparing_download();
 }
 
 export function downloaderStatusMessage(
   status: DownloaderJobStatus | null,
   stage: DownloaderJobStage | null,
   errorCode: string | null,
-  errorText: string | null,
+  _errorText: string | null,
   forceWaiting: boolean,
 ): string {
-  if (forceWaiting) return "Handing the file to your browser.";
-  if (isCancelledDownloaderJob(status, stage, errorCode)) return "The download was cancelled.";
-  if (isFailedDownloaderJob(status, stage, errorCode))
-    return errorText ?? "The download could not be completed.";
-  if (stage === "cached") return "Using the cached file.";
-  if (status === "done" || stage === "done") return "Your file is ready.";
-  if (status === "queued" || stage === "queued") return "Waiting for an available worker.";
-  if (stage === "download" || stage === "downloading") return "Downloading the selected media.";
-  if (stage === "mux" || stage === "finalizing") return "Combining the final file.";
-  return "Preparing streams and selecting the format.";
+  if (forceWaiting) return m.ui_handing_file_to_browser();
+  if (isCancelledDownloaderJob(status, stage, errorCode)) return m.ui_download_cancelled();
+  if (isFailedDownloaderJob(status, stage, errorCode)) {
+    if (errorCode === "insufficient_storage") return m.ui_downloader_insufficient_storage();
+    return m.ui_download_could_not_be_completed();
+  }
+  if (stage === "cached") return m.ui_using_cached_file();
+  if (status === "done" || stage === "done") return m.ui_file_is_ready();
+  if (status === "queued" || stage === "queued") return m.ui_waiting_for_worker();
+  if (stage === "download" || stage === "downloading") return m.ui_downloading_selected_media();
+  if (stage === "mux" || stage === "finalizing") return m.ui_combining_final_file();
+  return m.ui_preparing_streams_and_selecting_format();
 }
 
 export function downloaderProgressValue(

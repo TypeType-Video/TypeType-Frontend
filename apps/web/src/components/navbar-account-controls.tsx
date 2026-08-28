@@ -3,6 +3,7 @@ import { getStoredAdminSection } from "../lib/admin-console-section";
 import { logoutSession } from "../lib/auth-session";
 import { goto } from "../lib/route-redirect";
 import { getStoredSettingsSection } from "../lib/settings-section";
+import { m } from "../paraglide/messages.js";
 import type { AuthMe, AuthStatus } from "../types/auth";
 import { ProfileAvatar } from "./profile-avatar";
 import { ThemeToggleButton } from "./theme-toggle-button";
@@ -25,10 +26,10 @@ function loginHref() {
 }
 
 function statusLabel(status: AuthStatus): string {
-  if (status === "guest") return "Guest";
-  if (status === "authenticated") return "Connected";
-  if (status === "loading") return "Loading";
-  return "Signed out";
+  if (status === "guest") return m.nav_guest();
+  if (status === "authenticated") return m.nav_connected();
+  if (status === "loading") return m.nav_loading();
+  return m.nav_signed_out();
 }
 
 export function NavbarAccountControls({
@@ -54,9 +55,9 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
           >
-            Sign in
+            {m.nav_sign_in()}
           </a>
         </div>
       );
@@ -98,16 +99,16 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
           >
-            Sign in
+            {m.nav_sign_in()}
           </a>
           <button
             type="button"
             onClick={() => goto("/")}
-            className="hidden sm:inline-flex h-8 items-center justify-center px-3 text-xs rounded-full bg-surface hover:bg-surface-strong text-fg-muted"
+            className="hidden h-8 items-center justify-center rounded-sm px-3 text-xs text-fg-muted hover:text-fg sm:inline-flex"
           >
-            Browse
+            {m.nav_browse()}
           </button>
         </div>
       )}
@@ -126,16 +127,16 @@ export function NavbarAccountControls({
             <>
               <a
                 href={loginHref()}
-                className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+                className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
               >
-                Login
+                {m.nav_login()}
               </a>
               <Link
                 to="/register"
                 search={{ redirect: undefined }}
-                className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-fg text-app hover:bg-fg/90"
+                className="inline-flex h-8 items-center rounded-md bg-fg px-3 text-xs text-app hover:bg-fg/90"
               >
-                Register
+                {m.nav_register()}
               </Link>
             </>
           )}
@@ -143,26 +144,26 @@ export function NavbarAccountControls({
             <Link
               to="/settings"
               search={{ section: getStoredSettingsSection() }}
-              className="hidden sm:inline-flex h-8 px-3 items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+              className="hidden h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft sm:inline-flex"
             >
-              Account
+              {m.nav_account()}
             </Link>
           )}
           {isAdmin && (
             <Link
               to="/admin-console"
               search={{ section: getStoredAdminSection() }}
-              className="h-8 px-3 inline-flex items-center text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+              className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
             >
-              Admin
+              {m.nav_admin()}
             </Link>
           )}
           <button
             type="button"
             onClick={() => void handleSignOut()}
-            className="h-8 px-3 text-xs rounded-full bg-surface-strong hover:bg-surface-soft text-fg"
+            className="h-8 rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
           >
-            Sign out
+            {m.nav_sign_out()}
           </button>
         </div>
       )}

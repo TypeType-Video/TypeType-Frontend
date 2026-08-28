@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import { NAV_ITEMS } from "./nav-items";
 
@@ -31,37 +33,41 @@ function TabIcon({ children, label }: { children: React.ReactNode; label: string
 }
 
 export function MobileTabBar() {
+  useInterfaceLocale();
   const openMobileSidebar = useUiStore((s) => s.openMobileSidebar);
   const mobileOpen = useUiStore((s) => s.mobileSidebarOpen);
   const items = NAV_ITEMS.filter((item) => BOTTOM_NAV_PATHS.includes(item.to));
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label={m.nav_primary()}
       className="fixed bottom-0 left-0 right-0 z-30 flex items-stretch border-t border-border bg-app pb-[env(safe-area-inset-bottom)]"
     >
-      {items.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          activeOptions={item.to === "/" ? { exact: true } : undefined}
-          className={ITEM}
-          activeProps={{ className: ACTIVE }}
-          inactiveProps={{ className: INACTIVE }}
-        >
-          <TabIcon label={item.label}>{item.icon}</TabIcon>
-          <span className="w-full truncate px-0.5 text-center">{item.label}</span>
-        </Link>
-      ))}
+      {items.map((item) => {
+        const label = item.label();
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            activeOptions={item.to === "/" ? { exact: true } : undefined}
+            className={ITEM}
+            activeProps={{ className: ACTIVE }}
+            inactiveProps={{ className: INACTIVE }}
+          >
+            <TabIcon label={label}>{item.icon}</TabIcon>
+            <span className="w-full truncate px-0.5 text-center">{label}</span>
+          </Link>
+        );
+      })}
       <button
         type="button"
         onClick={openMobileSidebar}
-        aria-label="Open menu"
+        aria-label={m.nav_open_menu()}
         aria-expanded={mobileOpen}
         className={`${ITEM} ${mobileOpen ? ACTIVE : INACTIVE}`}
       >
         <Menu size={22} className="flex-shrink-0" aria-hidden />
-        <span className="w-full truncate px-0.5 text-center">More</span>
+        <span className="w-full truncate px-0.5 text-center">{m.nav_more()}</span>
       </button>
     </nav>
   );

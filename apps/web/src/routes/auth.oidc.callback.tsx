@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthCard } from "../components/auth-card";
 import { oidcCallbackSession } from "../lib/auth-session";
 import { oidcCallbackUrl, safeReturnTo } from "../lib/oidc-redirect";
+import { m } from "../paraglide/messages.js";
 
 function OidcCallbackPage() {
   const { code, state, error: providerError } = Route.useSearch();
@@ -23,19 +24,19 @@ function OidcCallbackPage() {
 
   return (
     <div className="min-h-[calc(100vh-56px)] flex items-center justify-center px-4">
-      <AuthCard title="Signing in" subtitle="Completing sign-in with your provider.">
+      <AuthCard title={m.ui_signing_in()} subtitle={m.ui_completing_sign_in_with_your_provider()}>
         {failed ? (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-fg-muted">Sign-in could not be completed.</p>
+            <p className="text-sm text-fg-muted">{m.ui_sign_in_could_not_be_completed()}</p>
             <a
               href="/login"
               className="h-10 rounded-lg bg-fg text-app text-sm font-medium flex items-center justify-center"
             >
-              Back to sign in
+              {m.ui_back_to_sign_in()}
             </a>
           </div>
         ) : (
-          <p className="text-sm text-fg-soft">Please wait...</p>
+          <p className="text-sm text-fg-soft">{m.ui_please_wait()}</p>
         )}
       </AuthCard>
     </div>

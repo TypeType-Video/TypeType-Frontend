@@ -1,7 +1,9 @@
+import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
 
-export const FAMILY_LIST_BLOCKED_MESSAGE =
-  "This channel is not on your family list. A parent can add it from the allow list.";
+export function familyListBlockedMessage(): string {
+  return m.ui_family_list_blocked();
+}
 
 export function isChannelNotAllowedError(error: unknown): boolean {
   return (

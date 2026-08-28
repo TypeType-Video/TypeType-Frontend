@@ -6,6 +6,7 @@ import { useSearchHistory } from "../hooks/use-search-history";
 import { useSearchOverlayNavigation } from "../hooks/use-search-overlay-navigation";
 import { fetchSuggestions } from "../lib/api-suggestions";
 import { buildSearchOverlayItems } from "../lib/search-overlay-items";
+import { m } from "../paraglide/messages.js";
 import { ConfirmModal } from "./confirm-modal";
 import { SearchOverlayList } from "./search-overlay-list";
 
@@ -128,13 +129,13 @@ export function NavbarSearch() {
             }}
             onFocus={() => setOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search"
+            placeholder={m.shell_search()}
             className="min-w-0 flex-1 rounded-l-full border border-border-strong bg-app px-4 text-sm text-fg placeholder:text-fg-soft outline-none focus:border-fg"
           />
           <button
             type="submit"
             className="flex w-16 items-center justify-center rounded-r-full border border-l-0 border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
-            aria-label="Search"
+            aria-label={m.shell_search()}
           >
             <Search size={18} />
           </button>
@@ -154,9 +155,9 @@ export function NavbarSearch() {
         )}
         {confirmClearOpen && (
           <ConfirmModal
-            title="Clear search history?"
-            description="This removes all saved searches from your account."
-            confirmLabel="Clear all"
+            title={m.ui_clear_search_history()}
+            description={m.ui_this_removes_all_saved_searches_from_your_account()}
+            confirmLabel={m.ui_clear_all()}
             onConfirm={handleConfirmClear}
             onCancel={() => setConfirmClearOpen(false)}
           />

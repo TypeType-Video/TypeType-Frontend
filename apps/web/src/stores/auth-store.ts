@@ -36,7 +36,10 @@ function normalizeAuthMe(me: AuthMe | null): AuthMe | null {
 }
 
 function readStoredAuth(): StoredAuth | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  return parseStoredAuth(localStorage.getItem(STORAGE_KEY));
+}
+
+function parseStoredAuth(raw: string | null): StoredAuth | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as StoredAuth;
@@ -77,3 +80,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ token: null, me: null, status: "signed_out" });
   },
 }));
+
+export function syncAuthStoreFromStorage(raw = localStorage.getItem(STORAGE_KEY)): string | null {
+  const next = parseStoredAuth(raw);
+  if (!next) {
+    useAuthStore.setState({ token: null, me: null, status: "signed_out" });
+    return null;
+  }
+  useAuthStore.setState({
+    token: next.token,
+    me: next.me,
+    status: next.me ? toStatus(next.me) : "loading",
+  });
+  return next.token;
+}
+
+export function subscribeAuthStorage(): () => void {
+  const sync = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) syncAuthStoreFromStorage(event.newValue);
+  };
+  window.addEventListener("storage", sync);
+  return () => window.removeEventListener("storage", sync);
+}

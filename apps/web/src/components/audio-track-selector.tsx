@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import type { DefaultLayoutIcon, MenuInstance } from "../lib/vidstack";
 import {
   DefaultMenuButton,
@@ -7,12 +8,13 @@ import {
   Menu,
   useAudioOptions,
 } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import { useSabrAudioStore } from "../stores/sabr-audio-store";
 import { includesOriginal, normalizeLanguageTag } from "./player-language";
 
 const languageIcon: DefaultLayoutIcon = (props) => <LanguageIcon {...props} />;
 const MENU_ITEMS_CLASS =
-  "vds-menu-items overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin] [scrollbar-color:var(--color-zinc-500)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-surface-soft/80 [&::-webkit-scrollbar-thumb:hover]:bg-surface-soft [&::-webkit-scrollbar-track]:bg-transparent";
+  "vds-menu-items max-h-[44svh] overflow-y-auto overscroll-y-contain pr-0.5 md:max-h-72 [scrollbar-width:thin] [scrollbar-color:var(--color-zinc-500)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-surface-soft/80 [&::-webkit-scrollbar-thumb:hover]:bg-surface-soft [&::-webkit-scrollbar-track]:bg-transparent";
 
 type Props = {
   originalLocale?: string | null;
@@ -20,6 +22,7 @@ type Props = {
 };
 
 export function AudioTrackSelector({ originalLocale, sabr = false }: Props) {
+  const { locale } = useInterfaceLocale();
   const menuRef = useRef<MenuInstance>(null);
   const nativeOptions = useAudioOptions();
   const sabrStreamId = useSabrAudioStore((state) => state.streamId);
@@ -48,7 +51,7 @@ export function AudioTrackSelector({ originalLocale, sabr = false }: Props) {
   const currentHint = selectedIsOriginal
     ? includesOriginal(selectedOption?.label)
       ? selectedOption?.label
-      : `${selectedOption?.label} (original)`
+      : `${selectedOption?.label} (${m.player_original({}, { locale })})`
     : selectedOption?.label;
 
   const radioOptions = options.map((o, index) => {
@@ -57,7 +60,10 @@ export function AudioTrackSelector({ originalLocale, sabr = false }: Props) {
       (originalLocale != null &&
         normalizeLanguageTag(o.track.language) === normalizeLanguageTag(originalLocale));
     return {
-      label: isOriginal && !includesOriginal(o.label) ? `${o.label} (original)` : o.label,
+      label:
+        isOriginal && !includesOriginal(o.label)
+          ? `${o.label} (${m.player_original({}, { locale })})`
+          : o.label,
       value: `${o.label}-${o.track.language ?? "und"}-${index}`,
     };
   });
@@ -75,7 +81,11 @@ export function AudioTrackSelector({ originalLocale, sabr = false }: Props) {
 
   return (
     <Menu.Root ref={menuRef} className="vds-audio-menu vds-menu">
-      <DefaultMenuButton label="Language" hint={currentHint} Icon={languageIcon} />
+      <DefaultMenuButton
+        label={m.player_language({}, { locale })}
+        hint={currentHint}
+        Icon={languageIcon}
+      />
       <Menu.Items className={MENU_ITEMS_CLASS}>
         <DefaultMenuRadioGroup value={selectedValue} options={radioOptions} onChange={onChange} />
       </Menu.Items>

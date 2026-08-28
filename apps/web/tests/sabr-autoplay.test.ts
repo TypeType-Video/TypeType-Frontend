@@ -46,6 +46,27 @@ test("accepts playback that resolves before the deadline", () => {
   expect(attempt.isConfirmed).toBe(true);
 });
 
+test("confirms a user gesture before autoplay begins", () => {
+  const attempt = new SabrAutoplayAttempt();
+
+  attempt.allow();
+
+  expect(attempt.isConfirmed).toBe(true);
+  expect(attempt.begin()).toBe(false);
+  expect(attempt.expire()).toBe(false);
+});
+
+test("cancels a pending autoplay deadline after a user gesture", () => {
+  const attempt = new SabrAutoplayAttempt();
+  attempt.begin();
+
+  attempt.allow();
+
+  expect(attempt.isConfirmed).toBe(true);
+  expect(attempt.expire()).toBe(false);
+  expect(attempt.resolve()).toBe(false);
+});
+
 test("pauses a late playback event until user playback is allowed", () => {
   let listener = () => {};
   let pauses = 0;

@@ -1,12 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Heart, Search } from "lucide-react";
+import { DollarSign, Search } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useAuthToasts } from "../hooks/use-auth-toasts";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useMobile } from "../hooks/use-mobile";
 import { useSearchShortcut } from "../hooks/use-search-shortcut";
 import { isAuthPage } from "../lib/auth-routes";
+import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
+import { InterfaceLanguagePicker } from "./interface-language-picker";
 import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
@@ -22,6 +25,7 @@ const SearchOverlay = lazy(() =>
 const SPONSOR_URL = "https://github.com/sponsors/Priveetee";
 
 export function Navbar() {
+  useInterfaceLocale();
   const [searchOpen, setSearchOpen] = useState(false);
   const toast = useAuthToasts();
   const isMobile = useMobile();
@@ -58,7 +62,7 @@ export function Navbar() {
           />
           <Link to="/" className="flex min-w-0 shrink items-center gap-2">
             <img src="/logo.svg" alt="TypeType" width={28} height={28} />
-            <span className="max-w-28 truncate text-fg text-sm font-semibold tracking-widest sm:max-w-none">
+            <span className="hidden max-w-28 truncate text-fg text-sm font-semibold tracking-widest min-[430px]:inline sm:max-w-none">
               TYPETYPE
             </span>
           </Link>
@@ -66,12 +70,12 @@ export function Navbar() {
             href={SPONSOR_URL}
             target="_blank"
             rel="noreferrer"
-            aria-label="Support TypeType"
-            title="Support TypeType"
+            aria-label={m.shell_support_typetype()}
+            title={m.shell_support_typetype()}
             className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-fg-muted hover:bg-surface-strong hover:text-fg"
           >
-            <Heart size={15} />
-            <span className="hidden sm:inline">Support</span>
+            <DollarSign size={15} />
+            <span className="hidden sm:inline">{m.shell_support()}</span>
           </a>
         </div>
 
@@ -79,8 +83,8 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
-            aria-label="Search"
+            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
+            aria-label={m.shell_search()}
           >
             <Search size={18} />
           </button>
@@ -89,6 +93,7 @@ export function Navbar() {
         {canOpenSearch && !isMobile && <NavbarSearch />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          <InterfaceLanguagePicker />
           <NavbarNotifications />
           <NavbarAccountControls
             status={status}

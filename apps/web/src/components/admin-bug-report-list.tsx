@@ -1,4 +1,5 @@
-import { formatTimestamp } from "../lib/bug-report-utils";
+import { bugReportCategoryLabel, formatTimestamp } from "../lib/bug-report-utils";
+import { m } from "../paraglide/messages.js";
 import type { BugReportListItem } from "../types/bug-report";
 
 type Props = {
@@ -13,7 +14,8 @@ function trimDescription(value: string): string {
 }
 
 export function AdminBugReportList({ reports, selectedId, onSelect }: Props) {
-  if (reports.length === 0) return <p className="text-sm text-fg-soft">No bug reports found.</p>;
+  if (reports.length === 0)
+    return <p className="text-sm text-fg-soft">{m.ui_no_bug_reports_found()}</p>;
 
   return (
     <div className="max-h-[68svh] space-y-2 overflow-y-auto pr-1">
@@ -28,7 +30,7 @@ export function AdminBugReportList({ reports, selectedId, onSelect }: Props) {
           >
             <p className="text-sm text-fg">{trimDescription(report.description)}</p>
             <p className="mt-1 text-xs text-fg-soft">
-              {report.category.replace("_", " ")} · {report.userEmail}
+              {bugReportCategoryLabel(report.category)} · {report.userEmail}
             </p>
             <p className="text-xs text-fg-soft">{formatTimestamp(report.createdAt)}</p>
           </button>

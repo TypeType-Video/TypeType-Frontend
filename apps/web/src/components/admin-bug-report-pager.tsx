@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 type Props = {
   page: number;
   totalPages: number;
@@ -10,7 +12,7 @@ export function AdminBugReportPager({ page, totalPages, total, onPrev, onNext }:
   return (
     <div className="flex items-center justify-between text-xs text-fg-soft">
       <span>
-        {total} report{total !== 1 ? "s" : ""}
+        {total === 1 ? m.ui_report_count({ count: total }) : m.ui_reports_count({ count: total })}
       </span>
       <div className="flex items-center gap-2">
         <button
@@ -19,10 +21,10 @@ export function AdminBugReportPager({ page, totalPages, total, onPrev, onNext }:
           onClick={onPrev}
           className="rounded border border-border-strong px-2 py-1 disabled:opacity-50"
         >
-          Prev
+          {m.ui_prev()}
         </button>
         <span>
-          Page {page} of {totalPages}
+          {m.admin_users_page()} {page} {m.admin_users_of()} {totalPages}
         </span>
         <button
           type="button"
@@ -30,7 +32,7 @@ export function AdminBugReportPager({ page, totalPages, total, onPrev, onNext }:
           onClick={onNext}
           className="rounded border border-border-strong px-2 py-1 disabled:opacity-50"
         >
-          Next
+          {m.ui_next()}
         </button>
       </div>
     </div>

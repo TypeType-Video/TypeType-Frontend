@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { DownloadMode, DownloadOption } from "./download-options";
 
 type SimpleChoice = {
@@ -26,16 +27,24 @@ export function buildSimpleChoices(options: DownloadOption[], mode: DownloadMode
   const balancedHeight = effectiveVideoHeight(balanced);
   const balancedTitle =
     mode === "video" && balancedHeight === 1080
-      ? "Recommended (1080p)"
+      ? m.ui_recommended_quality({ height: balancedHeight })
       : mode === "video" && balancedHeight === 720
-        ? "Recommended (720p)"
+        ? m.ui_recommended_quality({ height: balancedHeight })
         : mode === "audio"
-          ? "Recommended"
-          : "Balanced";
+          ? m.ui_recommended()
+          : m.ui_balanced();
   const raw = [
-    { id: best.id, title: mode === "video" ? "Best quality" : "Best sound", option: best },
+    {
+      id: best.id,
+      title: mode === "video" ? m.ui_best_quality() : m.ui_best_sound(),
+      option: best,
+    },
     { id: balanced.id, title: balancedTitle, option: balanced },
-    { id: small.id, title: mode === "video" ? "Small size (360p)" : "Small size", option: small },
+    {
+      id: small.id,
+      title: mode === "video" ? m.ui_small_size_360p() : m.ui_small_size(),
+      option: small,
+    },
   ];
   const unique = new Map<string, SimpleChoice>();
   raw.forEach((choice) => {

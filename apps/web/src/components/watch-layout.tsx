@@ -14,9 +14,11 @@ import { useWatchVttAssets } from "../hooks/use-watch-layout-assets";
 import { useWatchPlaybackFlow } from "../hooks/use-watch-playback-flow";
 import { useWatchPlayerSourceState } from "../hooks/use-watch-player-source-state";
 import { useWatchPlaylist } from "../hooks/use-watch-playlist";
+import { useWatchRecommendations } from "../hooks/use-watch-recommendations";
 import { useWatchSponsorBlock } from "../hooks/use-watch-sponsorblock";
 import { useWatchToast } from "../hooks/use-watch-toast";
 import { getOriginalAudioLocale } from "../lib/audio-track";
+import { m } from "../paraglide/messages.js";
 import { useDanmakuStore } from "../stores/danmaku-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import { Toast } from "./toast";
@@ -44,10 +46,12 @@ export function WatchLayout({
   const { on: bulletCommentsOn } = useDanmakuStore();
   const { isNicoNico, bulletComments } = useWatchBulletComments(stream.id, settings.hideComments);
   const sponsor = useWatchSponsorBlock(stream, settings);
-  const relatedStreams = useMemo(
-    () => (settings.hideRelatedVideos ? [] : filter(stream.related ?? [])),
-    [filter, settings.hideRelatedVideos, stream.related],
+  const recommendations = useWatchRecommendations(
+    stream,
+    settings.defaultService,
+    settings.hideRelatedVideos,
   );
+  const relatedStreams = useMemo(() => filter(recommendations), [filter, recommendations]);
   const playlist = useWatchPlaylist(list, shuffle, currentParam);
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
   const seekRef = useRef<((seconds: number) => void) | null>(null);
@@ -86,6 +90,7 @@ export function WatchLayout({
     player.sabrEnabled,
     settings.defaultQuality,
     settings.defaultAudioLanguage,
+    settings.preferOriginalLanguage,
     audioOnly.active,
   );
   const { toast, setToast } = useWatchToast(audioOnly.unavailable);
@@ -144,7 +149,7 @@ export function WatchLayout({
             stream={stream}
             settings={settings}
             qualityFailed={player.qualityFailed}
-            onOriginalLanguageUnavailable={() => setToast("Original audio unavailable")}
+            onOriginalLanguageUnavailable={() => setToast(m.ui_original_audio_unavailable())}
           />
         }
         autoplayState={autoplay.autoplayState}
@@ -174,7 +179,7 @@ export function WatchLayout({
         onPreviousVideo={playlist.playPrevious}
         onNextVideo={playlist.playNext}
         onError={(positionMs) =>
-          audioOnly.fail() ? setToast("Audio only unavailable") : handlePlayerError(positionMs)
+          audioOnly.fail() ? setToast(m.ui_audio_only_unavailable()) : handlePlayerError(positionMs)
         }
         onReset={player.reset}
       />

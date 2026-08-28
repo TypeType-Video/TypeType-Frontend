@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages.js";
+
 type Props = {
   files: File[];
   currentIndex: number;
@@ -18,14 +20,17 @@ export function YoutubeImportQueueList({ files, currentIndex, locked, onRemove, 
   return (
     <div className="rounded-xl border border-border bg-app p-3">
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-xs text-fg-muted">Queued archives ({files.length})</p>
+        <p className="text-xs text-fg-muted">
+          {m.ui_queued_archives()}
+          {files.length})
+        </p>
         <button
           type="button"
           onClick={onClear}
           disabled={locked}
           className="h-7 rounded-md border border-border-strong bg-surface px-2 text-[11px] text-fg-muted disabled:cursor-not-allowed disabled:text-fg-soft"
         >
-          Clear
+          {m.groups_preview_clear()}
         </button>
       </div>
       <div className="space-y-1">
@@ -54,7 +59,7 @@ export function YoutubeImportQueueList({ files, currentIndex, locked, onRemove, 
                   disabled={locked}
                   className="h-6 rounded-md border border-border-strong bg-surface px-2 text-[11px] text-fg-muted disabled:cursor-not-allowed disabled:text-fg-soft"
                 >
-                  Remove
+                  {m.ui_remove()}
                 </button>
               </div>
             </div>

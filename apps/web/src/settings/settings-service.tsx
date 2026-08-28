@@ -1,6 +1,7 @@
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
 import { ServiceIcon } from "../components/service-icon";
 import { useSettings } from "../hooks/use-settings";
+import { m } from "../paraglide/messages.js";
 import type { ServiceId } from "../types/user";
 
 type ServiceOption = {
@@ -17,7 +18,7 @@ const SERVICES: ServiceOption[] = [
 ];
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
-const CARD = "bg-surface rounded-xl border border-border overflow-hidden divide-y divide-border";
+const GROUP = "divide-y divide-border border-y border-border";
 
 function RadioDot({ selected }: { selected: boolean }) {
   return (
@@ -36,17 +37,15 @@ export function SettingsService() {
 
   return (
     <section className="flex flex-col gap-3">
-      <p className={SECTION_LABEL}>Default service</p>
-      <div className={CARD}>
+      <p className={SECTION_LABEL}>{m.ui_default_service()}</p>
+      <div className={GROUP}>
         {SERVICES.map((svc) => (
           <button
             key={svc.id}
             type="button"
             onClick={() => update.mutate({ defaultService: svc.id })}
-            className={`flex items-center gap-3 px-4 py-3.5 w-full text-left transition-colors ${
-              settings.defaultService === svc.id
-                ? "bg-surface-strong/60"
-                : "hover:bg-surface-strong/30"
+            className={`flex w-full items-center gap-3 py-3.5 text-left transition-colors ${
+              settings.defaultService === svc.id ? "text-fg" : "text-fg-muted hover:text-fg"
             }`}
           >
             <ServiceIcon path={svc.path} color={svc.color} label={svc.label} />

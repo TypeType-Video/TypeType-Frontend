@@ -1,20 +1,33 @@
+import { m } from "../paraglide/messages.js";
 import type { BugReportCategory, BugReportStatus } from "../types/bug-report";
 
-export const STATUS_OPTIONS: { value: BugReportStatus; label: string }[] = [
-  { value: "new", label: "New" },
-  { value: "triaged", label: "Triaged" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "fixed", label: "Fixed" },
-  { value: "closed", label: "Closed" },
-];
+export function statusOptions(): { value: BugReportStatus; label: string }[] {
+  return [
+    { value: "new", label: m.ui_bug_status_new() },
+    { value: "triaged", label: m.ui_bug_status_triaged() },
+    { value: "in_progress", label: m.ui_bug_status_in_progress() },
+    { value: "fixed", label: m.ui_bug_status_fixed() },
+    { value: "closed", label: m.ui_bug_status_closed() },
+  ];
+}
 
-export const CATEGORY_OPTIONS: { value: BugReportCategory; label: string }[] = [
-  { value: "player", label: "Player" },
-  { value: "audio_language", label: "Audio Language" },
-  { value: "subtitles", label: "Subtitles" },
-  { value: "ui", label: "Interface" },
-  { value: "functionality", label: "Functionality" },
-];
+export function categoryOptions(): { value: BugReportCategory; label: string }[] {
+  return [
+    { value: "player", label: m.ui_bug_category_player() },
+    { value: "audio_language", label: m.ui_bug_category_audio_language() },
+    { value: "subtitles", label: m.ui_bug_category_subtitles() },
+    { value: "ui", label: m.ui_bug_category_interface() },
+    { value: "functionality", label: m.ui_bug_category_functionality() },
+  ];
+}
+
+export function bugReportStatusLabel(status: BugReportStatus): string {
+  return statusOptions().find((option) => option.value === status)?.label ?? m.ui_status();
+}
+
+export function bugReportCategoryLabel(category: BugReportCategory): string {
+  return categoryOptions().find((option) => option.value === category)?.label ?? m.ui_category();
+}
 
 export function formatTimestamp(ts: number): string {
   return new Date(ts).toLocaleString();

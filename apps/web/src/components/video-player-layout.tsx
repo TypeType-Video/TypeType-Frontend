@@ -1,4 +1,6 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { PLAYBACK_RATES } from "../lib/playback-rates";
+import { playerLayoutTranslations } from "../lib/player-layout-translations";
 import { DefaultAudioLayout, DefaultVideoLayout, defaultLayoutIcons, Time } from "../lib/vidstack";
 import { AudioPlayButton } from "./audio-play-button";
 import { AudioSeekButton } from "./audio-seek-button";
@@ -9,6 +11,7 @@ import { FormatSelector } from "./format-selector";
 import { PlayerTrackButton } from "./player-track-button";
 import { PlayerVolumeControl } from "./player-volume-control";
 import { QualitySelector } from "./quality-selector";
+import { SabrCurrentTime } from "./sabr-current-time";
 import { SabrTimeSlider } from "./sabr-time-slider";
 import { ShortsPlayerLayout } from "./shorts-player-layout";
 
@@ -39,6 +42,9 @@ export function VideoPlayerLayout({
   onPreviousVideo,
   onNextVideo,
 }: Props) {
+  const { locale } = useInterfaceLocale();
+  const translations = playerLayoutTranslations(locale);
+
   if (layoutMode === "shorts") {
     return (
       <ShortsPlayerLayout
@@ -53,7 +59,11 @@ export function VideoPlayerLayout({
   if (audioOnly) {
     const timePair = (
       <div className="typetype-audio-time-pair">
-        <Time type="current" />
+        {sabr ? (
+          <SabrCurrentTime transitioning={seeking} video={sabrVideo} />
+        ) : (
+          <Time type="current" />
+        )}
         <span>/</span>
         <Time type="duration" />
       </div>
@@ -72,7 +82,7 @@ export function VideoPlayerLayout({
           icons={defaultLayoutIcons}
           playbackRates={PLAYBACK_RATES}
           smallLayoutWhen={false}
-          translations={{ Captions: "Subtitles" }}
+          translations={translations}
           slots={{
             captionButton: null,
             currentTime: null,
@@ -100,7 +110,7 @@ export function VideoPlayerLayout({
         icons={defaultLayoutIcons}
         playbackRates={PLAYBACK_RATES}
         smallLayoutWhen={false}
-        translations={{ Captions: "Subtitles" }}
+        translations={translations}
         slots={{
           captionButton: null,
           endTime: timePair,
@@ -122,8 +132,11 @@ export function VideoPlayerLayout({
       playbackRates={PLAYBACK_RATES}
       thumbnails={thumbnailVtt}
       smallLayoutWhen={({ height }) => height < 380}
-      translations={{ Captions: "Subtitles" }}
+      translations={translations}
       slots={{
+        currentTime: sabr ? (
+          <SabrCurrentTime transitioning={seeking} video={sabrVideo} />
+        ) : undefined,
         timeSlider: sabr ? (
           <SabrTimeSlider seeking={seeking} thumbnails={thumbnailVtt} video={sabrVideo} />
         ) : undefined,

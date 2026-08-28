@@ -2,6 +2,7 @@ import { BellRing, X } from "lucide-react";
 import { useClientLocale } from "../hooks/use-client-locale";
 import { formatPublishedDate } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
+import { m } from "../paraglide/messages.js";
 import type { NotificationItem } from "../types/notifications";
 import "../styles/notification-toast.css";
 
@@ -43,10 +44,10 @@ export function NotificationToast({ items, onOpen, onClose, onPausedChange }: Pr
   const grouped = items.length > 1;
   const channelCount = new Set(items.map((item) => item.channelUrl || item.channelName)).size;
   const publishedAt = first.publishedAt ?? first.video.publishedAt ?? first.createdAt;
-  const publishedText = formatPublishedDate(publishedAt, undefined, locale) || "Just now";
-  const title = grouped ? `${items.length} new videos are waiting` : first.video.title;
+  const publishedText = formatPublishedDate(publishedAt, undefined, locale) || m.ui_just_now();
+  const title = grouped ? m.ui_videos_waiting() : first.video.title;
   const source = grouped
-    ? `${channelCount} ${channelCount === 1 ? "channel" : "channels"}`
+    ? `${channelCount} ${channelCount === 1 ? m.ui_channel() : m.ui_channels()}`
     : first.channelName;
 
   return (
@@ -70,14 +71,16 @@ export function NotificationToast({ items, onOpen, onClose, onPausedChange }: Pr
           <span className="min-w-0 flex-1">
             <span className="flex items-center gap-1 text-[10px] font-semibold uppercase text-accent">
               <BellRing size={11} aria-hidden="true" />
-              {grouped ? `${items.length} new uploads` : "New upload"}
+              {grouped ? m.ui_new_uploads({ count: items.length }) : m.ui_new_upload()}
             </span>
             <span className="mt-0.5 block truncate text-[13px] font-medium leading-tight text-fg">
               {title}
             </span>
             <span className="mt-1 flex items-center gap-1.5 text-[11px] text-fg-muted">
               <span className="truncate">{source}</span>
-              <span className="shrink-0 text-fg-soft">{grouped ? "Just now" : publishedText}</span>
+              <span className="shrink-0 text-fg-soft">
+                {grouped ? m.ui_just_now() : publishedText}
+              </span>
             </span>
           </span>
         </button>
@@ -85,8 +88,8 @@ export function NotificationToast({ items, onOpen, onClose, onPausedChange }: Pr
           type="button"
           onClick={onClose}
           className="mr-1.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-soft hover:bg-surface-strong hover:text-fg"
-          aria-label="Dismiss notification"
-          title="Dismiss"
+          aria-label={m.ui_dismiss_notification()}
+          title={m.ui_dismiss()}
         >
           <X size={14} aria-hidden="true" />
         </button>

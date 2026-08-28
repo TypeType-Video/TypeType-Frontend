@@ -1,10 +1,11 @@
 import { expect, test } from "bun:test";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../src/lib/watch-resume";
 
-test("waits while a cached progress value is refreshed on remount", () => {
-  expect(shouldWaitForWatchProgress(true, false, true)).toBe(true);
-  expect(shouldWaitForWatchProgress(true, false, false)).toBe(false);
-  expect(shouldWaitForWatchProgress(false, false, true)).toBe(false);
+test("does not block a cached progress value during refresh", () => {
+  expect(shouldWaitForWatchProgress(true, false, true, false)).toBe(true);
+  expect(shouldWaitForWatchProgress(true, false, true, true)).toBe(false);
+  expect(shouldWaitForWatchProgress(true, false, false, false)).toBe(false);
+  expect(shouldWaitForWatchProgress(false, false, true, false)).toBe(false);
 });
 
 test("waits for authenticated progress before choosing the initial position", () => {

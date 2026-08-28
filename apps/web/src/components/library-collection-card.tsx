@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   kind: "favorites" | "watch-later";
@@ -21,7 +22,7 @@ function EmptyLibraryIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="Collection"
+      aria-label={m.ui_collection()}
       className="text-fg-soft"
     >
       <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
@@ -32,7 +33,7 @@ function EmptyLibraryIcon() {
 export function LibraryCollectionCard({ kind, title, count, thumbnail }: Props) {
   const [failedThumbnail, setFailedThumbnail] = useState<string | null>(null);
   const showThumbnail = Boolean(thumbnail) && failedThumbnail !== thumbnail;
-  const label = `${count} video${count !== 1 ? "s" : ""}`;
+  const label = count === 1 ? m.ui_video_count({ count }) : m.ui_videos_count({ count });
   const body = (
     <div className="flex flex-col gap-2 group">
       <div className="relative aspect-video overflow-hidden rounded-xl bg-surface-strong">

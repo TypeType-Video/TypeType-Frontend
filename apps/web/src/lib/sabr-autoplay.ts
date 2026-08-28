@@ -44,6 +44,8 @@ export class SabrAutoplayAttempt {
   }
 
   allow(): void {
+    this.pending = false;
+    this.confirmed = true;
     this.expired = false;
   }
 

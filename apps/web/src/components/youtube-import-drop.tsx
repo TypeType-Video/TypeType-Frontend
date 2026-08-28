@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import { YoutubeImportDropzone } from "../settings/youtube-import-dropzone";
 import { YoutubeImportQueueList } from "./youtube-import-queue-list";
 
@@ -61,7 +62,7 @@ export function YoutubeImportDrop(props: Props) {
             disabled={busy || queueStarted}
             className="h-9 rounded-lg bg-danger px-4 text-sm font-medium text-white hover:bg-danger-strong disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Start import
+            {m.ui_start_import()}
           </button>
         )}
         <button
@@ -69,14 +70,14 @@ export function YoutubeImportDrop(props: Props) {
           onClick={onToggleGuide}
           className="h-9 rounded-lg border border-border-strong bg-surface px-4 text-sm text-fg-muted hover:bg-surface-strong"
         >
-          {guideOpen ? "Hide guide" : "Need help?"}
+          {guideOpen ? m.ui_hide_guide() : m.ui_need_help()}
         </button>
         <button
           type="button"
           onClick={onOpenTakeout}
           className="h-9 rounded-lg border border-border-strong bg-surface px-4 text-sm text-fg-muted hover:bg-surface-strong"
         >
-          Open Google Takeout
+          {m.portability_guide_takeout_action()}
         </button>
       </div>
 
@@ -88,10 +89,10 @@ export function YoutubeImportDrop(props: Props) {
 function TakeoutGuide() {
   return (
     <div className="rounded-xl border border-border bg-surface p-4 text-sm">
-      <p className="font-medium text-fg">How to export from YouTube</p>
+      <p className="font-medium text-fg">{m.ui_how_to_export_from_youtube()}</p>
       <ol className="mt-3 list-inside list-decimal space-y-2 text-fg-muted">
         <li>
-          Go to{" "}
+          {m.ui_go_to()}{" "}
           <a
             href={TAKEOUT_URL}
             target="_blank"
@@ -101,13 +102,13 @@ function TakeoutGuide() {
             takeout.google.com
           </a>
         </li>
-        <li>Click "Deselect all", then select only YouTube and My Activity</li>
-        <li>Choose ZIP format, any size</li>
-        <li>Create export and wait for the email</li>
-        <li>Download the ZIP and drop it here</li>
+        <li>{m.ui_click_deselect_all_then_select_only_youtube_and_my_activity()}</li>
+        <li>{m.ui_choose_zip_format_any_size()}</li>
+        <li>{m.ui_create_export_and_wait_for_the_email()}</li>
+        <li>{m.ui_download_the_zip_and_drop_it_here()}</li>
       </ol>
       <p className="mt-3 text-xs text-fg-soft">
-        We import subscriptions, playlists, and watch history (if available).
+        {m.ui_we_import_subscriptions_playlists_and_watch_history_if_available()}
       </p>
     </div>
   );

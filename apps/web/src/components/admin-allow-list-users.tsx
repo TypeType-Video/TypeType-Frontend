@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAdminAllowListUsers, useAdminUserSearch } from "../hooks/use-admin-granular-allow-list";
+import { m } from "../paraglide/messages.js";
 import type { AdminAllowListUser } from "../types/allow-list";
 import { AdminAllowListUserDetail } from "./admin-allow-list-user-detail";
 import { AdminUserAvatar } from "./admin-user-avatar";
@@ -26,9 +27,11 @@ function avatarUser(user: AdminAllowListUser) {
 }
 
 function accessLabel(user: AdminAllowListUser, instanceRestricted: boolean): string {
-  if (user.accessMode === "allow_list") return "User restricted";
-  if (!instanceRestricted) return "Unrestricted";
-  return user.adminManagedAccessMode ? "Admin override" : "Instance restricted";
+  if (user.accessMode === "allow_list") return m.ui_user_restricted();
+  if (!instanceRestricted) return m.admin_unrestricted_label();
+  return user.adminManagedAccessMode
+    ? m.ui_admin_unrestricted_override()
+    : m.ui_restricted_by_entire_instance();
 }
 
 export function AdminAllowListUsers({ enabled, instanceRestricted, onToast }: Props) {
@@ -44,23 +47,23 @@ export function AdminAllowListUsers({ enabled, instanceRestricted, onToast }: Pr
   return (
     <section className="min-w-0 border-t border-border pt-4">
       <div className="mb-3 flex flex-col gap-1">
-        <h2 className="text-sm font-semibold text-fg">Specific users</h2>
+        <h2 className="text-sm font-semibold text-fg">{m.ui_specific_users()}</h2>
         <p className="text-xs text-fg-soft">
-          Users with admin-managed access appear here. Search to configure another account.
+          {m.ui_users_with_admin_managed_access_appear_here_search_to_configure_anoth()}
         </p>
       </div>
       <input
         value={search}
         onChange={(event) => setSearch(event.target.value)}
-        placeholder="Search by email or name"
+        placeholder={m.ui_search_by_email_or_name()}
         className="h-10 w-full border border-border bg-app px-3 text-sm text-fg outline-none transition-colors placeholder:text-fg-muted focus:border-border-strong"
       />
       <div className="mt-3 border-y border-border">
         {loading ? (
-          <div className="px-3 py-4 text-sm text-fg-soft">Searching users...</div>
+          <div className="px-3 py-4 text-sm text-fg-soft">{m.ui_searching_users()}</div>
         ) : visibleUsers.length === 0 ? (
           <div className="px-3 py-4 text-sm text-fg-soft">
-            {searching ? "No users found." : "No users are managed by allow-list rules yet."}
+            {searching ? m.ui_no_users_found() : m.ui_no_managed_users_yet()}
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -95,7 +98,7 @@ export function AdminAllowListUsers({ enabled, instanceRestricted, onToast }: Pr
           }}
           className="mt-3 h-8 border border-border px-3 text-xs text-fg-soft transition-colors hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {managedQuery.isFetchingNextPage ? "Loading..." : "Load more users"}
+          {managedQuery.isFetchingNextPage ? m.ui_loading() : m.ui_load_more_users()}
         </button>
       )}
       {selected && (

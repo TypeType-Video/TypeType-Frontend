@@ -4,6 +4,7 @@ import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { formatPublishedDate } from "../lib/format";
 import { proxyImage } from "../lib/proxy";
 import { watchRouteSearch } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import type { NotificationItem } from "../types/notifications";
 
 type Props = {
@@ -18,7 +19,8 @@ export function NotificationRow({ item, onOpen }: Props) {
     typeof item.publishedAt === "number" && item.publishedAt > 0
       ? item.publishedAt
       : item.video.publishedAt;
-  const createdText = formatPublishedDate(publishedAt ?? undefined, undefined, locale) || "recent";
+  const createdText =
+    formatPublishedDate(publishedAt ?? undefined, undefined, locale) || m.ui_recent();
   const branding = useDeArrowBranding(
     videoId,
     item.video.title,

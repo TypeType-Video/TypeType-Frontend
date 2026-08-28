@@ -11,6 +11,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHistory } from "../hooks/use-history";
 import { fetchHistory } from "../lib/api-user";
+import { m } from "../paraglide/messages.js";
 import type { HistoryItem } from "../types/user";
 
 function startOfDay(date: Date): number {
@@ -115,14 +116,13 @@ function HistoryPage() {
       />
       {clearHistoryOpen && (
         <ConfirmModal
-          title="Clear watch history?"
-          description="This removes every video from your watch history."
-          confirmLabel="Clear all"
+          title={m.ui_clear_watch_history()}
+          description={m.ui_this_removes_every_video_from_your_watch_history()}
+          confirmLabel={m.ui_clear_all()}
           onConfirm={() => {
             clear.mutate(undefined, {
-              onSuccess: () => setToast("Watch history cleared"),
-              onError: (error) =>
-                setToast(error instanceof Error ? error.message : "Failed to clear history"),
+              onSuccess: () => setToast(m.ui_watch_history_cleared()),
+              onError: () => setToast(m.ui_failed_to_clear_history()),
             });
             setClearHistoryOpen(false);
           }}
@@ -131,9 +131,9 @@ function HistoryPage() {
       )}
       {pendingRemoveItem !== null && (
         <ConfirmModal
-          title="Remove from history?"
-          description="This video will be removed from your watch history."
-          confirmLabel="Remove"
+          title={m.ui_remove_from_history_2()}
+          description={m.ui_this_video_will_be_removed_from_your_watch_history()}
+          confirmLabel={m.ui_remove()}
           onConfirm={() => {
             remove.mutate({ id: pendingRemoveItem.id, url: pendingRemoveItem.url });
             setPendingRemoveItem(null);

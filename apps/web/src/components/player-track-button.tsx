@@ -1,11 +1,18 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { m } from "../paraglide/messages.js";
+
 type Props = {
   direction: "previous" | "next";
   onClick?: () => void;
 };
 
 export function PlayerTrackButton({ direction, onClick }: Props) {
+  const { locale } = useInterfaceLocale();
   if (!onClick) return null;
-  const label = direction === "previous" ? "Previous video" : "Next video";
+  const label =
+    direction === "previous"
+      ? m.player_previous_video({}, { locale })
+      : m.player_next_video({}, { locale });
 
   return (
     <button

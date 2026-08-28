@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ImportRouteHeading } from "../../components/import-route-heading";
 import { PipePipeImportCookingState } from "../../components/pipepipe-import-cooking-state";
@@ -6,8 +7,8 @@ import { PipePipeImportDropZone } from "../../components/pipepipe-import-drop-zo
 import { PipePipeImportSummary } from "../../components/pipepipe-import-summary";
 import { Toast } from "../../components/toast";
 import { usePipePipeRestore } from "../../hooks/use-pipepipe-restore";
-import { ApiError } from "../../lib/api";
 import type { PipePipeRestoreSummary } from "../../lib/api-restore";
+import { m } from "../../paraglide/messages.js";
 
 function PipePipeImportPage() {
   const { restore } = usePipePipeRestore();
@@ -28,10 +29,10 @@ function PipePipeImportPage() {
       {
         onSuccess: (result) => {
           setSummary(result);
-          setToast("PipePipe import completed.");
+          setToast(m.ui_pipepipe_import_completed());
         },
-        onError: (error) => {
-          const msg = error instanceof ApiError ? error.message : "PipePipe import failed.";
+        onError: () => {
+          const msg = m.ui_pipepipe_import_failed();
           setToast(msg);
         },
       },
@@ -50,13 +51,13 @@ function PipePipeImportPage() {
         to="/import"
         className="inline-flex w-fit items-center gap-1 text-xs text-fg-soft hover:text-fg-muted"
       >
-        <span>←</span> Back to import sources
+        <ArrowLeft size={13} aria-hidden="true" /> {m.ui_back_to_import_sources()}
       </Link>
 
       <ImportRouteHeading
-        label="PipePipe Backup"
-        title="Import from PipePipe"
-        description="Restore history, subscriptions, playlists, and watch progress from a backup ZIP."
+        label={m.ui_pipepipe_backup()}
+        title={m.ui_import_from_pipepipe()}
+        description={m.ui_restore_history_subscriptions_playlists_and_watch_progress_from_a_bac()}
         labelClassName="text-danger-strong/75"
       />
 

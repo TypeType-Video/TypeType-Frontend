@@ -1,4 +1,6 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { PLAYBACK_RATES } from "../lib/playback-rates";
+import { playerLayoutTranslations } from "../lib/player-layout-translations";
 import { DefaultVideoLayout, defaultLayoutIcons } from "../lib/vidstack";
 import { AudioTrackSelector } from "./audio-track-selector";
 import { FormatSelector } from "./format-selector";
@@ -14,13 +16,15 @@ type Props = {
 };
 
 export function ShortsPlayerLayout({ sabr, video, seeking, originalAudioLocale }: Props) {
+  const { locale } = useInterfaceLocale();
+
   return (
     <DefaultVideoLayout
       className="typetype-shorts-layout"
       icons={defaultLayoutIcons}
       playbackRates={PLAYBACK_RATES}
       smallLayoutWhen={false}
-      translations={{ Captions: "Subtitles" }}
+      translations={playerLayoutTranslations(locale)}
       noModal
       menuContainer="body"
       menuGroup="bottom"

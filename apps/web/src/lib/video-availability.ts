@@ -1,4 +1,5 @@
-import { isMemberOnlyMessage, MEMBER_ONLY_MESSAGE } from "./member-only";
+import { m } from "../paraglide/messages.js";
+import { isMemberOnlyMessage } from "./member-only";
 
 export type VideoAvailability = "scheduled_premiere" | "paid_content" | "members_only";
 
@@ -34,19 +35,19 @@ export function videoAvailabilityCopy(
 ): AvailabilityCopy {
   if (availability === "scheduled_premiere") {
     return {
-      heading: "Premiere scheduled",
+      heading: m.video_premiere_scheduled(),
       message: premiereMessage(sourceMessage),
     };
   }
   if (availability === "paid_content") {
     return {
-      heading: "Paid video",
-      message: "This video must be purchased on YouTube before it can be played.",
+      heading: m.video_paid(),
+      message: m.video_paid_message(),
     };
   }
   return {
-    heading: "Members-only video",
-    message: MEMBER_ONLY_MESSAGE,
+    heading: m.video_members_only(),
+    message: m.video_members_only_message(),
   };
 }
 
@@ -57,6 +58,6 @@ function isAvailabilityCode(code: string | null): code is VideoAvailability {
 function premiereMessage(sourceMessage?: string): string {
   const relativeTime = sourceMessage?.match(/premieres?\s+in\s+(.+?)[.!]?$/i)?.[1]?.trim();
   return relativeTime
-    ? `This premiere starts in ${relativeTime}.`
-    : "This premiere has not started yet.";
+    ? m.video_premiere_starts_in({ relativeTime })
+    : m.video_premiere_not_started();
 }

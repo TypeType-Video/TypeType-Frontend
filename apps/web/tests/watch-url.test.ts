@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../src/lib/watch-url";
+import {
+  toPublicWatchParam,
+  toWatchSourceUrl,
+  watchServiceId,
+  youtubeThumbnailUrl,
+} from "../src/lib/watch-url";
 
 test("builds a YouTube thumbnail URL from watch values", () => {
   expect(youtubeThumbnailUrl("Z05XGDSTe7U")).toBe("https://i.ytimg.com/vi/Z05XGDSTe7U/hq720.jpg");
@@ -24,4 +29,11 @@ test("shortens and expands BiliBili watch URLs", () => {
   expect(toWatchSourceUrl("BV1UbX3B2EZQ?p=3")).toBe(
     "https://www.bilibili.com/video/BV1UbX3B2EZQ?p=3",
   );
+});
+
+test("keeps recommendation fallback on the watched provider", () => {
+  expect(watchServiceId("Z05XGDSTe7U", 2)).toBe(0);
+  expect(watchServiceId("sm46525483", 0)).toBe(1);
+  expect(watchServiceId("BV1UbX3B2EZQ?p=3", 0)).toBe(2);
+  expect(watchServiceId("https://example.com/video", 1)).toBe(1);
 });

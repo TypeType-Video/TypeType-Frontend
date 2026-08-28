@@ -1,14 +1,20 @@
 import {
-  DOWNLOADER_STEPS,
   downloaderProgressValue,
   downloaderStageIndex,
   downloaderStatusLabel,
   downloaderStatusMessage,
+  downloaderSteps,
   isCancelledDownloaderJob,
   isFailedDownloaderJob,
   shouldShowDownloaderProgress,
 } from "../lib/downloader-display";
 import { DOWNLOADER_INSUFFICIENT_STORAGE_CODE } from "../lib/downloader-errors";
+import {
+  estimateTransferRate,
+  formatEta,
+  formatTransferBytes,
+} from "../lib/downloader-transfer-display";
+import { m } from "../paraglide/messages.js";
 import type {
   DownloaderJobStage,
   DownloaderJobStatus,
@@ -20,6 +26,9 @@ type Props = {
   status: DownloaderJobStatus | null;
   stage: DownloaderJobStage | null;
   progressPercent: number | null;
+  downloadedBytes: number | null;
+  totalBytes: number | null;
+  etaSeconds: number | null;
   resolved: DownloaderResolvedSelection | null;
   errorCode: string | null;
   errorText: string | null;
@@ -51,15 +60,18 @@ function formatResolved(resolved: DownloaderResolvedSelection | null): string | 
 
 function exactUnavailableMessage(resolved: DownloaderResolvedSelection | null): string {
   if (typeof resolved?.height === "number") {
-    return `Requested ${resolved.height}p is unavailable. Pick another format.`;
+    return m.ui_requested_quality_unavailable({ height: resolved.height });
   }
-  return "Selected format is unavailable. Pick another format.";
+  return m.ui_selected_format_unavailable();
 }
 
 export function DownloaderJobFeedback({
   status,
   stage,
   progressPercent,
+  downloadedBytes,
+  totalBytes,
+  etaSeconds,
   resolved,
   errorCode,
   errorText,
@@ -88,6 +100,19 @@ export function DownloaderJobFeedback({
   const showClear = canClear && typeof onClear === "function";
   const showProgress = shouldShowDownloaderProgress(status, forceWaiting) && !failed && !cancelled;
   const showPercent = typeof progressPercent === "number" && status === "running";
+  const rate = estimateTransferRate(downloadedBytes, totalBytes, etaSeconds);
+  const transferDetails = [
+    downloadedBytes === null
+      ? null
+      : totalBytes === null
+        ? formatTransferBytes(downloadedBytes)
+        : m.ui_downloaded_of({
+            downloaded: formatTransferBytes(downloadedBytes),
+            total: formatTransferBytes(totalBytes),
+          }),
+    rate === null ? null : `${formatTransferBytes(rate)}/s`,
+    etaSeconds === null ? null : formatEta(etaSeconds),
+  ].filter((value): value is string => value !== null);
 
   if (!status && !forceWaiting && !resolvedLabel && !visibleError) return null;
 
@@ -113,9 +138,9 @@ export function DownloaderJobFeedback({
               type="button"
               onClick={onCancel}
               disabled={cancelPending}
-              className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-md border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {cancelPending ? "Cancelling..." : "Cancel"}
+              {cancelPending ? m.ui_cancelling() : m.ui_cancel()}
             </button>
           )}
           {showClear && (
@@ -123,9 +148,9 @@ export function DownloaderJobFeedback({
               type="button"
               onClick={onClear}
               disabled={clearPending}
-              className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-md border border-border px-2 py-1 text-[11px] font-medium text-fg-muted hover:border-border-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {clearPending ? "Clearing..." : "Clear"}
+              {clearPending ? m.ui_clearing() : m.ui_clear()}
             </button>
           )}
         </div>
@@ -139,9 +164,12 @@ export function DownloaderJobFeedback({
           />
         </div>
       )}
+      {status === "running" && transferDetails.length > 0 && (
+        <p className="mt-2 font-mono text-[11px] text-fg-soft">{transferDetails.join(" · ")}</p>
+      )}
       {status === "running" && (
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {DOWNLOADER_STEPS.map((step, index) => (
+          {downloaderSteps().map((step, index) => (
             <div key={step} className="flex items-center gap-2 text-[11px] text-fg-muted">
               <span
                 className={`h-2 w-2 rounded-full ${index <= activeStep ? "bg-fg" : "bg-surface-soft"}`}
@@ -152,7 +180,9 @@ export function DownloaderJobFeedback({
         </div>
       )}
       {resolvedLabel && !failed && (
-        <p className="mt-3 truncate text-xs text-fg-soft">Selected: {resolvedLabel}</p>
+        <p className="mt-3 truncate text-xs text-fg-soft">
+          {m.ui_selected_3()} {resolvedLabel}
+        </p>
       )}
     </section>
   );

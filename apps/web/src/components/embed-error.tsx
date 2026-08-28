@@ -1,18 +1,21 @@
-import { FAMILY_LIST_BLOCKED_MESSAGE } from "../lib/allow-list-error";
+import { familyListBlockedMessage } from "../lib/allow-list-error";
 import { parseGeoRestriction } from "../lib/geo-restriction";
 import { isMemberOnlyMessage } from "../lib/member-only";
 import { type VideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
+import { m } from "../paraglide/messages.js";
 import { FlagIcon } from "./flag-icon";
 import { VideoAvailabilityPoster } from "./video-availability-poster";
 
-export const PLAYBACK_FAILED_MESSAGE =
-  "This video could not be played. The stream may be unavailable or unsupported.";
+export function playbackFailedMessage(): string {
+  return m.ui_this_video_could_not_be_played_the_stream_may_be_unavailable_or_unsup();
+}
 
 type EmbedErrorProps = {
   message: string;
   onRetry?: () => void;
   heading?: string;
   image?: string;
+  familyListBlocked?: boolean;
   availability?: VideoAvailability;
   poster?: string;
   watchUrl?: string;
@@ -23,6 +26,7 @@ export function EmbedError({
   onRetry,
   heading,
   image,
+  familyListBlocked: familyListBlockedOverride,
   availability,
   poster,
   watchUrl,
@@ -31,8 +35,8 @@ export function EmbedError({
   const displayedMessage = availabilityCopy?.message ?? message;
   const countryCode = parseGeoRestriction(displayedMessage);
   const isMemberOnly = availability === "members_only" || isMemberOnlyMessage(displayedMessage);
-  const familyListBlocked = message === FAMILY_LIST_BLOCKED_MESSAGE;
-  const playbackFailed = message === PLAYBACK_FAILED_MESSAGE;
+  const familyListBlocked = familyListBlockedOverride ?? message === familyListBlockedMessage();
+  const playbackFailed = message === playbackFailedMessage();
   const imageSrc =
     image ??
     (playbackFailed
@@ -45,7 +49,7 @@ export function EmbedError({
   const headingText =
     heading ??
     availabilityCopy?.heading ??
-    (playbackFailed ? "Playback failed" : "Couldn't load this video");
+    (playbackFailed ? m.ui_playback_failed() : m.ui_couldn_t_load_this_video());
 
   return (
     <div className="w-full h-full bg-black flex flex-col items-center justify-center gap-5 px-4">
@@ -81,9 +85,9 @@ export function EmbedError({
           <button
             type="button"
             onClick={onRetry}
-            className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+            className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
-            Retry
+            {m.ui_retry()}
           </button>
         )}
         {watchUrl && (
@@ -91,9 +95,9 @@ export function EmbedError({
             href={watchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2 rounded-full bg-white hover:bg-fg text-app text-sm font-medium transition-colors cursor-pointer"
+            className="cursor-pointer rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
-            Connect YouTube on TypeType
+            {m.ui_connect_youtube_on_typetype()}
           </a>
         )}
       </div>

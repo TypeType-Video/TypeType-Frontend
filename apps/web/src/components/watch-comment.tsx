@@ -1,7 +1,9 @@
+import { Pin } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useClientLocale } from "../hooks/use-client-locale";
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { formatCommentPublishedTime } from "../lib/comment-time";
 import { formatLikes } from "../lib/format";
+import { m } from "../paraglide/messages.js";
 import type { Comment } from "../types/comment";
 import { RichText } from "./rich-text";
 import { WatchCommentReplies } from "./watch-comment-replies";
@@ -13,7 +15,7 @@ type Props = {
 };
 
 export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
-  const locale = useClientLocale();
+  const { locale } = useInterfaceLocale();
   const [showReplies, setShowReplies] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
@@ -31,7 +33,9 @@ export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
   }, []);
 
   const repliesLabel =
-    comment.replyCount > 0 ? `${formatLikes(comment.replyCount)} replies` : "Show replies";
+    comment.replyCount > 0
+      ? `${formatLikes(comment.replyCount)} ${m.watch_replies({}, { locale })}`
+      : m.watch_show_replies({}, { locale });
 
   const likeDisplay = comment.textualLikeCount || formatLikes(comment.likeCount);
 
@@ -53,12 +57,13 @@ export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
           <span className="text-xs font-medium text-fg-muted">{comment.author}</span>
           {comment.uploaderVerified && (
             <span className="text-xs text-fg-soft border border-border-strong rounded px-1">
-              verified
+              {m.watch_verified({}, { locale })}
             </span>
           )}
           {comment.isPinned && (
-            <span className="text-xs text-fg-soft border border-border-strong rounded px-1">
-              pinned
+            <span className="inline-flex text-fg-muted" title={m.watch_pinned({}, { locale })}>
+              <Pin className="size-3.5" aria-hidden="true" />
+              <span className="sr-only">{m.watch_pinned({}, { locale })}</span>
             </span>
           )}
           {publishedTime && <span className="text-xs text-fg-soft">{publishedTime}</span>}
@@ -75,11 +80,13 @@ export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
             onClick={() => setExpanded((v) => !v)}
             className="text-xs text-fg-muted hover:text-fg text-left w-fit"
           >
-            {expanded ? "Show less" : "Show more"}
+            {expanded ? m.watch_show_less({}, { locale }) : m.watch_show_more({}, { locale })}
           </button>
         )}
         {comment.likeCount >= 0 && (
-          <span className="text-xs text-fg-soft">{likeDisplay} likes</span>
+          <span className="text-xs text-fg-soft">
+            {likeDisplay} {m.watch_likes({}, { locale })}
+          </span>
         )}
         {comment.repliesPage !== null && (
           <button
@@ -87,7 +94,7 @@ export function WatchComment({ comment, videoUrl, onSeekTimestamp }: Props) {
             onClick={() => setShowReplies((v) => !v)}
             className="text-xs text-accent hover:text-accent-strong text-left w-fit mt-1"
           >
-            {showReplies ? "Hide replies" : repliesLabel}
+            {showReplies ? m.watch_hide_replies({}, { locale }) : repliesLabel}
           </button>
         )}
         {showReplies && comment.repliesPage !== null && (

@@ -1,10 +1,10 @@
+import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
 
 export const DOWNLOADER_INSUFFICIENT_STORAGE_CODE = "insufficient_storage";
-export const DOWNLOADER_INSUFFICIENT_STORAGE_MESSAGE =
-  "Stockage temporairement sature, reessayez plus tard.";
-export const DOWNLOADER_INSUFFICIENT_STORAGE_HELP =
-  "Si le probleme persiste, contactez l'administrateur de l'instance avec le code : insufficient_storage (HTTP 507).";
+export function downloaderInsufficientStorageMessage(): string {
+  return m.ui_downloader_insufficient_storage();
+}
 
 export class DownloaderApiError extends ApiError {
   code: string | null;

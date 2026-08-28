@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   onConfirm: (name: string) => void;
@@ -45,7 +46,7 @@ export function PlaylistCreateModal({ onConfirm, onCancel }: Props) {
         className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 bg-surface border border-border-strong rounded-xl shadow-2xl p-5 flex flex-col gap-4"
       >
         <p id="create-playlist-title" className="text-sm font-semibold text-fg">
-          New playlist
+          {m.ui_new_playlist()}
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
@@ -53,7 +54,7 @@ export function PlaylistCreateModal({ onConfirm, onCancel }: Props) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Playlist name..."
+            placeholder={m.ui_playlist_name_2()}
             className="bg-surface-strong text-fg placeholder-zinc-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-border-strong w-full"
           />
           <div className="flex justify-end gap-2">
@@ -62,14 +63,14 @@ export function PlaylistCreateModal({ onConfirm, onCancel }: Props) {
               onClick={onCancel}
               className="px-3.5 py-1.5 text-sm text-fg-muted hover:text-fg bg-surface-strong hover:bg-surface-soft rounded-lg transition-colors"
             >
-              Cancel
+              {m.portability_cancel()}
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
               className="px-3.5 py-1.5 text-sm text-app bg-fg hover:bg-fg-strong disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
             >
-              Create
+              {m.ui_create()}
             </button>
           </div>
         </form>

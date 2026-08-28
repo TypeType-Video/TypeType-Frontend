@@ -5,6 +5,7 @@ import { HomeFallbackSection } from "../components/home-fallback-section";
 import { HomeRecommendationsSection } from "../components/home-recommendations-section";
 import { useAuth } from "../hooks/use-auth";
 import { useSettings } from "../hooks/use-settings";
+import { m } from "../paraglide/messages.js";
 
 let landingApplied = false;
 
@@ -40,11 +41,11 @@ function HomePage() {
   if (!authReady) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
-        <p className="text-sm text-fg-muted">Loading session...</p>
+        <p className="text-sm text-fg-muted">{m.ui_loading_session()}</p>
       </div>
     );
   }
-  const title = isAuthed ? "Recommended" : "Trending";
+  const title = isAuthed ? m.ui_recommended() : m.ui_trending();
   const showRecommendations = !isAuthed || !settings.hideHomeRecommendations;
 
   return (

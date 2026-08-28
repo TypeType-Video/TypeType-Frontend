@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { m } from "../paraglide/messages.js";
 import { useAuth } from "./use-auth";
 
 export function useAuthToasts() {
@@ -11,11 +12,11 @@ export function useAuthToasts() {
     const from = previousStatus.current;
     previousStatus.current = status;
     if (status === "authenticated" && from !== "loading") {
-      setToast("Signed in");
+      setToast(m.login_signed_in());
       return;
     }
     if (status === "signed_out" && from !== "loading") {
-      setToast("Signed out");
+      setToast(m.nav_signed_out());
     }
   }, [status]);
 

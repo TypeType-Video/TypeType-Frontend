@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProgress, updateProgress } from "../lib/api-collections";
+import {
+  type HistoryPageData,
+  type HistoryPagesData,
+  updateHistoryPageProgress,
+  updateHistoryPagesProgress,
+} from "../lib/history-progress-cache";
 import { useAuthStore } from "../stores/auth-store";
 import type { ProgressItem } from "../types/user";
 import { useAuth } from "./use-auth";
@@ -35,7 +41,12 @@ export function useSaveProgress(videoUrl: string) {
         updatedAt: Date.now(),
       };
       qc.setQueryData(["progress", videoUrl], next);
-      void qc.invalidateQueries({ queryKey: ["history"] });
+      qc.setQueriesData<HistoryPagesData>({ queryKey: ["history"] }, (data) =>
+        updateHistoryPagesProgress(data, videoUrl, position),
+      );
+      qc.setQueriesData<HistoryPageData>({ queryKey: ["history-filtered"] }, (data) =>
+        updateHistoryPageProgress(data, videoUrl, position),
+      );
     },
   });
 }

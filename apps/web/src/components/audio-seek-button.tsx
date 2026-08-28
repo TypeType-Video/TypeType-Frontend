@@ -1,5 +1,7 @@
+import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { useMediaRemote, useMediaState } from "../lib/vidstack";
+import { m } from "../paraglide/messages.js";
 import { AudioSeekBackward10Icon, AudioSeekForward10Icon } from "./audio-control-icons";
 
 type Props = {
@@ -9,11 +11,15 @@ type Props = {
 };
 
 export function AudioSeekButton({ direction, disabled = false, video = null }: Props) {
+  const { locale } = useInterfaceLocale();
   const remote = useMediaRemote();
   const currentTime = useMediaState("currentTime");
   const duration = useMediaState("duration");
   const seconds = direction === "backward" ? -10 : 10;
-  const label = direction === "backward" ? "Seek backward 10 seconds" : "Seek forward 10 seconds";
+  const label =
+    direction === "backward"
+      ? m.player_seek_backward_10({}, { locale })
+      : m.player_seek_forward_10({}, { locale });
   const Icon = direction === "backward" ? AudioSeekBackward10Icon : AudioSeekForward10Icon;
 
   const seek = () => {

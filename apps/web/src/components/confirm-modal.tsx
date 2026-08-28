@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   title: string;
@@ -12,7 +13,7 @@ type Props = {
 export function ConfirmModal({
   title,
   description,
-  confirmLabel = "Delete",
+  confirmLabel = m.ui_delete(),
   onConfirm,
   onCancel,
 }: Props) {
@@ -54,7 +55,7 @@ export function ConfirmModal({
             onClick={onCancel}
             className="px-3.5 py-1.5 text-sm text-fg-muted hover:text-fg bg-surface-strong hover:bg-surface-soft rounded-lg transition-colors"
           >
-            Cancel
+            {m.portability_cancel()}
           </button>
           <button
             type="button"

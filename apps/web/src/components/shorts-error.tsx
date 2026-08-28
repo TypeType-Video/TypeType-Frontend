@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { m } from "../paraglide/messages.js";
 import { YoutubeIcon } from "./youtube-icon";
 
 type Props = {
@@ -21,7 +22,7 @@ export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }
               className="inline-flex h-9 items-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
             >
               <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
-              Connect with YouTube
+              {m.ui_connect_with_youtube()}
             </Link>
           ) : (
             <button
@@ -29,7 +30,7 @@ export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }
               onClick={onRetry}
               className="h-9 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
             >
-              Retry
+              {m.ui_retry()}
             </button>
           )}
           <button
@@ -37,7 +38,7 @@ export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }
             onClick={onNext}
             className="h-9 rounded-md border border-border-strong px-3 text-xs text-fg hover:border-border-strong"
           >
-            Next
+            {m.ui_next()}
           </button>
         </div>
       </div>

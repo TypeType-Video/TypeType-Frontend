@@ -1,6 +1,8 @@
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { YoutubeRemoteInput, YoutubeRemotePhase } from "../hooks/use-youtube-remote-browser";
+import { youtubeRemotePhaseLabel } from "../lib/youtube-remote-phase";
+import { m } from "../paraglide/messages.js";
 
 type Props = {
   frameUrl: string | null;
@@ -101,14 +103,18 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
       ) : null}
       {!frameUrl && (
         <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-          <span className="text-fg text-sm">Remote browser {phase.replace(/_/g, " ")}</span>
-          <span className="text-fg-soft text-xs">The YouTube sign-in window will appear here.</span>
+          <span className="text-fg text-sm">
+            {m.ui_remote_browser()} {youtubeRemotePhaseLabel(phase)}
+          </span>
+          <span className="text-fg-soft text-xs">
+            {m.ui_the_youtube_sign_in_window_will_appear_here()}
+          </span>
           {error && <span className="text-danger-strong text-xs">{error}</span>}
         </span>
       )}
       <textarea
         ref={inputRef}
-        aria-label="YouTube sign-in remote browser"
+        aria-label={m.ui_youtube_sign_in_remote_browser()}
         value=""
         onChange={() => undefined}
         className="absolute inset-0 h-full w-full touch-none resize-none cursor-default border-0 bg-transparent p-0 text-base text-transparent caret-transparent outline-none"
