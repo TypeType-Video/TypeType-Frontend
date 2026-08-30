@@ -1,5 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  allowedFiles,
+  allowedTechnicalText,
+  allowedText,
+  helperSourceFiles,
+  propertySourceFiles,
+} from "./localization-source-rules.mjs";
+import { validateMessageCatalog } from "./message-catalog-validation.mjs";
 
 const root = process.cwd();
 const messagesDir = path.join(root, "apps/web/messages");
@@ -12,69 +20,12 @@ function addFailure(file, line, message) {
   failures.push(`${path.relative(root, file)}:${line}: ${message}`);
 }
 
-function placeholders(value) {
-  return [...value.matchAll(/\{([A-Za-z0-9_.-]+)\}/g)].map((match) => match[1]).sort();
-}
-
 for (const fileName of fs.readdirSync(messagesDir).filter((name) => name.endsWith(".json"))) {
   const file = path.join(messagesDir, fileName);
   const locale = JSON.parse(fs.readFileSync(file, "utf8"));
-  const expectedKeys = Object.keys(sourceLocale).sort();
-  const actualKeys = Object.keys(locale).sort();
-  for (const key of expectedKeys) {
-    if (!(key in locale)) addFailure(file, 1, `missing message key ${key}`);
-    else if (
-      JSON.stringify(placeholders(sourceLocale[key])) !== JSON.stringify(placeholders(locale[key]))
-    ) {
-      addFailure(file, 1, `placeholder mismatch for ${key}`);
-    }
-  }
-  for (const key of actualKeys) {
-    if (!(key in sourceLocale)) addFailure(file, 1, `unknown message key ${key}`);
-  }
+  for (const failure of validateMessageCatalog(sourceLocale, locale)) addFailure(file, 1, failure);
 }
 
-const allowedText = new Set([
-  "TYPETYPE",
-  "TypeType",
-  "Reddit",
-  "OpenMoji",
-  "takeout.google.com",
-  "2x",
-  "x",
-  "T",
-  "GitHub",
-  "Google",
-  "YouTube",
-  "NicoNico",
-  "BiliBili",
-  "RSS",
-  "HDR",
-  "3D",
-  "4K",
-  "backward",
-  "forward",
-  "previous",
-  "next",
-  "dark",
-  "light",
-  "members_only",
-  "delete",
-]);
-const allowedFiles = new Set([
-  "apps/web/src/lib/languages.ts",
-  "apps/web/src/lib/openmoji-catalog.ts",
-]);
-const allowedTechnicalText = new Map([
-  ["apps/web/src/components/portability-import-panel.tsx", new Set(["queryClient.setQueryData"])],
-  ["apps/web/src/components/video-player-layout.tsx", new Set(["height"])],
-  ["apps/web/src/hooks/use-interface-locale.tsx", new Set(["Promise"])],
-  ["apps/web/src/routes/youtube-session.tsx", new Set(["unknown"])],
-  [
-    "apps/web/src/settings/settings-about.tsx",
-    new Set(["Frontend", "Server", "Token", "Downloader"]),
-  ],
-]);
 const visibleAttributes =
   /\b(?:aria-label|ariaLabel|title|placeholder|alt|label|description|message|subtitle|heading|confirmLabel|emptyLabel)\s*=\s*(["'])(.*?)\1/g;
 const visibleProperties =
@@ -90,20 +41,6 @@ const visibleFallbackLiteral =
 const jsxConditionalLiteral =
   /\{[^{}\n]*\?\s*(["'`])([^"'`\n]+)\1\s*:\s*(["'`])([^"'`\n]+)\3[^{}\n]*\}/g;
 const jsxText = />\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]*)\s*</g;
-const propertySourceFiles = new Set([
-  "apps/web/src/lib/bug-report-utils.ts",
-  "apps/web/src/lib/channel-sort.ts",
-  "apps/web/src/lib/playlist-sort.ts",
-  "apps/web/src/lib/search-filter-selection.ts",
-  "apps/web/src/lib/sponsorblock-settings.ts",
-  "apps/web/src/lib/video-availability.ts",
-]);
-const helperSourceFiles = new Set([
-  "apps/web/src/lib/format.ts",
-  "apps/web/src/lib/profile-errors.ts",
-  "apps/web/src/lib/profile-validation.ts",
-  "apps/web/src/lib/restore-time.ts",
-]);
 const helperReturnLiteral = /\breturn\s+(["'`])([^"'`\n]*)\1/g;
 
 function isAllowed(value, file, kind) {
