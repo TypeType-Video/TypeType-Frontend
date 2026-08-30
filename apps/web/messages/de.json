@@ -1,9 +1,9 @@
 {
   "$schema": "",
-  "admin_access_description": "",
-  "admin_access_label": "",
-  "admin_access_mode_description": "",
-  "admin_access_mode_label": "",
+  "admin_access_description": "Lege fest, wer beitreten darf und welche Inhalte verfügbar sind.",
+  "admin_access_label": "Zugriff",
+  "admin_access_mode_description": "Die Jugendschutzfunktion beschränkt das Abrufen und Entdecken von Inhalten auf zugelassene Kanäle.",
+  "admin_access_mode_label": "Zugriff auf Inhalte",
   "admin_allow_guest_description": "",
   "admin_allow_guest_label": "",
   "admin_allow_registration_description": "",
