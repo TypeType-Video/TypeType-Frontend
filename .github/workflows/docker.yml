@@ -19,7 +19,7 @@ jobs:
 
   prepare:
     needs: verify
-    runs-on: [self-hosted, Linux, X64, arko, typetype]
+    runs-on: [self-hosted, Linux, X64, r730, typetype]
     permissions:
       contents: read
     outputs:
@@ -70,7 +70,7 @@ jobs:
 
   build-platform:
     needs: prepare
-    runs-on: [self-hosted, Linux, X64, arko, typetype]
+    runs-on: [self-hosted, Linux, X64, r730, typetype]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -138,7 +138,7 @@ jobs:
 
   publish:
     needs: [prepare, build-platform]
-    runs-on: [self-hosted, Linux, X64, arko, typetype]
+    runs-on: [self-hosted, Linux, X64, r730, typetype]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -194,7 +194,7 @@ jobs:
 
   notify-orchestrator:
     needs: [prepare, publish]
-    runs-on: [self-hosted, Linux, X64, arko, typetype]
+    runs-on: [self-hosted, Linux, X64, r730, typetype]
     permissions:
       contents: read
     env:
