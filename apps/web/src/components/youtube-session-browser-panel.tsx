@@ -1,6 +1,9 @@
+import { useState } from "react";
 import type { YoutubeRemoteInput, YoutubeRemotePhase } from "../hooks/use-youtube-remote-browser";
 import { youtubeRemotePhaseLabel } from "../lib/youtube-remote-phase";
 import { m } from "../paraglide/messages.js";
+import { ReportBugModal } from "./report-bug-modal";
+import { BugIcon } from "./watch-icons";
 import { YoutubeIcon } from "./youtube-icon";
 import { YoutubeRemoteBrowser } from "./youtube-remote-browser";
 
@@ -37,6 +40,8 @@ export function YoutubeSessionBrowserPanel({
   onCancel,
   onInput,
 }: Props) {
+  const [reportOpen, setReportOpen] = useState(false);
+
   if (browserOpen) {
     return (
       <div className="flex flex-col gap-3">
@@ -46,14 +51,25 @@ export function YoutubeSessionBrowserPanel({
             {m.ui_phase()} {youtubeRemotePhaseLabel(phase)}.{" "}
             {m.ui_click_the_browser_area_before_typing()}
           </p>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="h-10 border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
-          >
-            {m.ui_cancel_sign_in()}
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setReportOpen(true)}
+              className="inline-flex h-10 items-center gap-2 border border-border-strong px-3 text-fg-muted text-sm transition-colors hover:border-fg hover:text-fg"
+            >
+              <BugIcon />
+              {m.ui_report_a_bug()}
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="h-10 border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
+            >
+              {m.ui_cancel_sign_in()}
+            </button>
+          </div>
         </div>
+        {reportOpen && <ReportBugModal onClose={() => setReportOpen(false)} />}
       </div>
     );
   }
