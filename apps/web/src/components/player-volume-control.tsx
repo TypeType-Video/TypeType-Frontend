@@ -6,6 +6,7 @@ import {
   useMediaRemote,
   useMediaState,
   VolumeSlider,
+  type VolumeSliderInstance,
 } from "../lib/vidstack";
 import { volumeAfterWheel } from "../lib/volume-wheel";
 import { m } from "../paraglide/messages.js";
@@ -53,28 +54,49 @@ function useVolumeWheelTarget(handleWheel: (event: globalThis.WheelEvent) => voi
   return targetRef;
 }
 
+function useVolumeWheelInstanceTarget(handleWheel: (event: globalThis.WheelEvent) => void) {
+  const cleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => () => cleanupRef.current?.(), []);
+
+  return useCallback(
+    (instance: VolumeSliderInstance | null) => {
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+      const target = instance?.el;
+      if (!target) return;
+
+      target.addEventListener("wheel", handleWheel, {
+        capture: true,
+        passive: false,
+      });
+      cleanupRef.current = () => target.removeEventListener("wheel", handleWheel, true);
+    },
+    [handleWheel],
+  );
+}
+
 export function PlayerVolumeSlider() {
   const { locale } = useInterfaceLocale();
   const canSetVolume = useMediaState("canSetVolume");
   const handleWheel = useVolumeWheel();
-  const wheelTargetRef = useVolumeWheelTarget(handleWheel);
+  const wheelTargetRef = useVolumeWheelInstanceTarget(handleWheel);
 
   if (!canSetVolume) return null;
 
   return (
-    <div ref={wheelTargetRef} className="contents">
-      <VolumeSlider.Root
-        className="vds-volume-slider vds-slider"
-        aria-label={m.player_volume({}, { locale })}
-      >
-        <VolumeSlider.Track className="vds-slider-track" />
-        <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
-        <VolumeSlider.Thumb className="vds-slider-thumb" />
-        <VolumeSlider.Preview className="vds-slider-preview" noClamp>
-          <VolumeSlider.Value className="vds-slider-value" />
-        </VolumeSlider.Preview>
-      </VolumeSlider.Root>
-    </div>
+    <VolumeSlider.Root
+      ref={wheelTargetRef}
+      className="vds-volume-slider vds-slider"
+      aria-label={m.player_volume({}, { locale })}
+    >
+      <VolumeSlider.Track className="vds-slider-track" />
+      <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
+      <VolumeSlider.Thumb className="vds-slider-thumb" />
+      <VolumeSlider.Preview className="vds-slider-preview" noClamp>
+        <VolumeSlider.Value className="vds-slider-value" />
+      </VolumeSlider.Preview>
+    </VolumeSlider.Root>
   );
 }
 

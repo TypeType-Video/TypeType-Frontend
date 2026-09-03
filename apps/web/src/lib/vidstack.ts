@@ -8,6 +8,7 @@ export type {
   Src,
   VideoProvider,
   VideoQualityOption,
+  VolumeSliderInstance,
 } from "@vidstack/react";
 export {
   isAudioProvider,
