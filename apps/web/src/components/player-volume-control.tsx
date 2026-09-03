@@ -31,6 +31,7 @@ function useVolumeWheel() {
 }
 
 export function PlayerVolumeSlider() {
+  const { locale } = useInterfaceLocale();
   const canSetVolume = useMediaState("canSetVolume");
   const handleWheel = useVolumeWheel();
 
@@ -40,7 +41,7 @@ export function PlayerVolumeSlider() {
     <VolumeSlider.Root
       className="vds-volume-slider vds-slider"
       onWheelCapture={handleWheel}
-      aria-label="Volume"
+      aria-label={m.player_volume({}, { locale })}
     >
       <VolumeSlider.Track className="vds-slider-track" />
       <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
@@ -77,7 +78,7 @@ export function PlayerVolumeControl() {
         <VolumeSlider.Root
           className="typetype-mobile-volume-slider"
           onWheelCapture={handleWheel}
-          aria-label="Volume"
+          aria-label={m.player_volume({}, { locale })}
         >
           <VolumeSlider.Track className="typetype-mobile-volume-track">
             <VolumeSlider.TrackFill className="typetype-mobile-volume-fill" />
