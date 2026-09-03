@@ -38,18 +38,19 @@ export function PlayerVolumeSlider() {
   if (!canSetVolume) return null;
 
   return (
-    <VolumeSlider.Root
-      className="vds-volume-slider vds-slider"
-      onWheelCapture={handleWheel}
-      aria-label={m.player_volume({}, { locale })}
-    >
-      <VolumeSlider.Track className="vds-slider-track" />
-      <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
-      <VolumeSlider.Thumb className="vds-slider-thumb" />
-      <VolumeSlider.Preview className="vds-slider-preview" noClamp>
-        <VolumeSlider.Value className="vds-slider-value" />
-      </VolumeSlider.Preview>
-    </VolumeSlider.Root>
+    <div className="contents" onWheelCapture={handleWheel}>
+      <VolumeSlider.Root
+        className="vds-volume-slider vds-slider"
+        aria-label={m.player_volume({}, { locale })}
+      >
+        <VolumeSlider.Track className="vds-slider-track" />
+        <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
+        <VolumeSlider.Thumb className="vds-slider-thumb" />
+        <VolumeSlider.Preview className="vds-slider-preview" noClamp>
+          <VolumeSlider.Value className="vds-slider-value" />
+        </VolumeSlider.Preview>
+      </VolumeSlider.Root>
+    </div>
   );
 }
 
@@ -67,7 +68,7 @@ export function PlayerVolumeControl() {
         : defaultLayoutIcons.MuteButton.VolumeHigh;
 
   return (
-    <div className="typetype-mobile-volume-control">
+    <div className="typetype-mobile-volume-control" onWheelCapture={handleWheel}>
       <MuteButton
         className="typetype-mobile-volume-mute"
         aria-label={muted ? m.player_unmute({}, { locale }) : m.player_mute({}, { locale })}
@@ -77,7 +78,6 @@ export function PlayerVolumeControl() {
       {canSetVolume ? (
         <VolumeSlider.Root
           className="typetype-mobile-volume-slider"
-          onWheelCapture={handleWheel}
           aria-label={m.player_volume({}, { locale })}
         >
           <VolumeSlider.Track className="typetype-mobile-volume-track">
