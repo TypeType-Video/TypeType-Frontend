@@ -15,7 +15,12 @@ import { proxyImage } from "../lib/proxy";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
 import { shouldLoadFullWatchStream } from "../lib/watch-stream-loading";
-import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
+import {
+  isYoutubeShortShareUrl,
+  toPublicWatchParam,
+  toWatchSourceUrl,
+  youtubeThumbnailUrl,
+} from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 
 const WatchLayout = lazy(() =>
@@ -27,6 +32,7 @@ function WatchPage() {
   const navigate = useNavigate({ from: "/watch" });
   const sourceUrl = toWatchSourceUrl(v);
   const publicParam = toPublicWatchParam(sourceUrl);
+  const shortShareUrl = isYoutubeShortShareUrl(v);
   const { authReady, isAuthed } = useAuth();
   const { isPending: instancePending } = useInstance();
   const { settings, settingsReady } = useSettings();
@@ -51,6 +57,7 @@ function WatchPage() {
     publicParam,
     previewRelated,
   );
+  const fullStream = streamQuery.isPlaceholderData ? undefined : streamQuery.data;
   useDocumentTitle(activeStream?.title ?? previewStream?.title);
   const loadingPage = (
     <WatchPageSkeleton
@@ -72,10 +79,19 @@ function WatchPage() {
   );
 
   useEffect(() => {
-    if (v.trim() && publicParam !== v.trim()) {
+    if (v.trim() && publicParam !== v.trim() && (!shortShareUrl || list || shuffle)) {
       navigate({ search: (prev) => ({ ...prev, v: publicParam }), replace: true });
     }
-  }, [navigate, publicParam, v]);
+  }, [list, navigate, publicParam, shortShareUrl, shuffle, v]);
+
+  useEffect(() => {
+    if (!shortShareUrl || list || shuffle || !fullStream || resumePending) return;
+    if (fullStream.isShortFormContent) {
+      void navigate({ to: "/shorts", search: { v: publicParam }, replace: true });
+      return;
+    }
+    void navigate({ search: (prev) => ({ ...prev, v: publicParam }), replace: true });
+  }, [fullStream, list, navigate, publicParam, resumePending, shortShareUrl, shuffle]);
 
   useEffect(() => {
     if (!activeStream || resumePending) return;
