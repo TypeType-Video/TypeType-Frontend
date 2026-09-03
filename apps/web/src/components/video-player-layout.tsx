@@ -9,7 +9,7 @@ import { AudioTrackSelector } from "./audio-track-selector";
 import { CinemaModeControl } from "./cinema-mode-control";
 import { FormatSelector } from "./format-selector";
 import { PlayerTrackButton } from "./player-track-button";
-import { PlayerVolumeControl } from "./player-volume-control";
+import { PlayerVolumeControl, PlayerVolumeSlider } from "./player-volume-control";
 import { QualitySelector } from "./quality-selector";
 import { SabrCurrentTime } from "./sabr-current-time";
 import { SabrTimeSlider } from "./sabr-time-slider";
@@ -97,6 +97,7 @@ export function VideoPlayerLayout({
             ),
             afterCaptionButton: <PlayerTrackButton direction="next" onClick={onNextVideo} />,
             beforeSettingsMenu: <PlayerVolumeControl />,
+            volumeSlider: <PlayerVolumeSlider />,
             fullscreenButton: null,
             pipButton: null,
             title: null,
@@ -121,6 +122,7 @@ export function VideoPlayerLayout({
           beforeCaptionButton: <PlayerTrackButton direction="previous" onClick={onPreviousVideo} />,
           afterCaptionButton: <PlayerTrackButton direction="next" onClick={onNextVideo} />,
           beforeSettingsMenu: <PlayerVolumeControl />,
+          volumeSlider: <PlayerVolumeSlider />,
         }}
       />
     );
@@ -155,6 +157,7 @@ export function VideoPlayerLayout({
             {!hideCinemaMode && <CinemaModeControl />}
           </>
         ),
+        volumeSlider: <PlayerVolumeSlider />,
       }}
     />
   );

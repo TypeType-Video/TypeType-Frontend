@@ -1,12 +1,63 @@
+import type { WheelEvent } from "react";
+import { useRef } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
-import { defaultLayoutIcons, MuteButton, useMediaState, VolumeSlider } from "../lib/vidstack";
+import {
+  defaultLayoutIcons,
+  MuteButton,
+  useMediaRemote,
+  useMediaState,
+  VolumeSlider,
+} from "../lib/vidstack";
+import { volumeAfterWheel } from "../lib/volume-wheel";
 import { m } from "../paraglide/messages.js";
+
+function useVolumeWheel() {
+  const remote = useMediaRemote();
+  const volume = useMediaState("volume");
+  const canSetVolume = useMediaState("canSetVolume");
+  const volumeRef = useRef(volume);
+  volumeRef.current = volume;
+
+  return (event: WheelEvent<HTMLElement>) => {
+    if (!canSetVolume || !Number.isFinite(event.deltaY) || event.deltaY === 0) return;
+
+    const nextVolume = volumeAfterWheel(volumeRef.current, event.deltaY);
+    if (nextVolume === volumeRef.current) return;
+
+    event.preventDefault();
+    volumeRef.current = nextVolume;
+    remote.changeVolume(nextVolume, event.nativeEvent);
+  };
+}
+
+export function PlayerVolumeSlider() {
+  const canSetVolume = useMediaState("canSetVolume");
+  const handleWheel = useVolumeWheel();
+
+  if (!canSetVolume) return null;
+
+  return (
+    <VolumeSlider.Root
+      className="vds-volume-slider vds-slider"
+      onWheelCapture={handleWheel}
+      aria-label="Volume"
+    >
+      <VolumeSlider.Track className="vds-slider-track" />
+      <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
+      <VolumeSlider.Thumb className="vds-slider-thumb" />
+      <VolumeSlider.Preview className="vds-slider-preview" noClamp>
+        <VolumeSlider.Value className="vds-slider-value" />
+      </VolumeSlider.Preview>
+    </VolumeSlider.Root>
+  );
+}
 
 export function PlayerVolumeControl() {
   const { locale } = useInterfaceLocale();
   const muted = useMediaState("muted");
   const volume = useMediaState("volume");
   const canSetVolume = useMediaState("canSetVolume");
+  const handleWheel = useVolumeWheel();
   const Icon =
     muted || volume === 0
       ? defaultLayoutIcons.MuteButton.Mute
@@ -23,7 +74,11 @@ export function PlayerVolumeControl() {
         <Icon />
       </MuteButton>
       {canSetVolume ? (
-        <VolumeSlider.Root className="typetype-mobile-volume-slider">
+        <VolumeSlider.Root
+          className="typetype-mobile-volume-slider"
+          onWheelCapture={handleWheel}
+          aria-label="Volume"
+        >
           <VolumeSlider.Track className="typetype-mobile-volume-track">
             <VolumeSlider.TrackFill className="typetype-mobile-volume-fill" />
           </VolumeSlider.Track>
