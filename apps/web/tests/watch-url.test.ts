@@ -11,7 +11,16 @@ test("builds a YouTube thumbnail URL from watch values", () => {
   expect(youtubeThumbnailUrl("https://www.youtube.com/watch?v=Z05XGDSTe7U")).toBe(
     "https://i.ytimg.com/vi/Z05XGDSTe7U/hq720.jpg",
   );
+  expect(youtubeThumbnailUrl("https://youtu.be/RjdGmIUbYIQ?is=zpKL5N9GylwAIBHO")).toBe(
+    "https://i.ytimg.com/vi/RjdGmIUbYIQ/hq720.jpg",
+  );
   expect(youtubeThumbnailUrl("sm46525483")).toBeNull();
+});
+
+test("normalizes a YouTube short URL while ignoring share parameters", () => {
+  const sourceUrl = "https://youtu.be/RjdGmIUbYIQ?is=zpKL5N9GylwAIBHO";
+  expect(toPublicWatchParam(sourceUrl)).toBe("RjdGmIUbYIQ");
+  expect(toWatchSourceUrl(sourceUrl)).toBe(sourceUrl);
 });
 
 test("shortens and expands NicoNico watch URLs", () => {
