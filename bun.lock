@@ -16,7 +16,7 @@
       "dependencies": {
         "@tanstack/react-query": "^5.101.2",
         "@tanstack/react-router": "^1.170.17",
-        "@typetype/mse": "0.1.56",
+        "@typetype/mse": "0.1.57",
         "@vidstack/react": "1.12.13",
         "dashjs": "^5.2.0",
         "hls.js": "1.6.16",
@@ -371,7 +371,7 @@
 
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
 
-    "@typetype/mse": ["@typetype/mse@0.1.56", "", {}, "sha512-zOEcOpiJDdHKF+vxCogg2kEupqBghuNs42T5Py2ahNpwm2cTXmNqsUOkynilQ4h9x2t7IcnEa26hP5OaxQgEEQ=="],
+    "@typetype/mse": ["@typetype/mse@0.1.57", "", {}, "sha512-ydSpqIZw3Ll8LUysxP80Yz7YCYRZBHcsHO5U0kS5nf+bGEMBRFcNOgUwBQ/pJqBWIGdnNQ678A0PP19gs4NdpQ=="],
 
     "@typetype/web": ["@typetype/web@workspace:apps/web"],
 
