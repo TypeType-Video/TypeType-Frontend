@@ -1,5 +1,4 @@
-import type { WheelEvent } from "react";
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   defaultLayoutIcons,
@@ -16,29 +15,54 @@ function useVolumeWheel() {
   const volume = useMediaState("volume");
   const canSetVolume = useMediaState("canSetVolume");
   const volumeRef = useRef(volume);
+  const canSetVolumeRef = useRef(canSetVolume);
   volumeRef.current = volume;
+  canSetVolumeRef.current = canSetVolume;
 
-  return (event: WheelEvent<HTMLElement>) => {
-    if (!canSetVolume || !Number.isFinite(event.deltaY) || event.deltaY === 0) return;
+  return useCallback(
+    (event: globalThis.WheelEvent) => {
+      if (!canSetVolumeRef.current || !Number.isFinite(event.deltaY) || event.deltaY === 0) {
+        return;
+      }
 
-    const nextVolume = volumeAfterWheel(volumeRef.current, event.deltaY);
-    if (nextVolume === volumeRef.current) return;
+      const nextVolume = volumeAfterWheel(volumeRef.current, event.deltaY);
+      if (nextVolume === volumeRef.current) return;
 
-    event.preventDefault();
-    volumeRef.current = nextVolume;
-    remote.changeVolume(nextVolume, event.nativeEvent);
-  };
+      event.preventDefault();
+      volumeRef.current = nextVolume;
+      remote.changeVolume(nextVolume, event);
+    },
+    [remote],
+  );
+}
+
+function useVolumeWheelTarget(handleWheel: (event: globalThis.WheelEvent) => void) {
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = targetRef.current;
+    if (!target) return;
+
+    target.addEventListener("wheel", handleWheel, {
+      capture: true,
+      passive: false,
+    });
+    return () => target.removeEventListener("wheel", handleWheel, true);
+  }, [handleWheel]);
+
+  return targetRef;
 }
 
 export function PlayerVolumeSlider() {
   const { locale } = useInterfaceLocale();
   const canSetVolume = useMediaState("canSetVolume");
   const handleWheel = useVolumeWheel();
+  const wheelTargetRef = useVolumeWheelTarget(handleWheel);
 
   if (!canSetVolume) return null;
 
   return (
-    <div className="contents" onWheelCapture={handleWheel}>
+    <div ref={wheelTargetRef} className="contents">
       <VolumeSlider.Root
         className="vds-volume-slider vds-slider"
         aria-label={m.player_volume({}, { locale })}
@@ -60,6 +84,7 @@ export function PlayerVolumeControl() {
   const volume = useMediaState("volume");
   const canSetVolume = useMediaState("canSetVolume");
   const handleWheel = useVolumeWheel();
+  const wheelTargetRef = useVolumeWheelTarget(handleWheel);
   const Icon =
     muted || volume === 0
       ? defaultLayoutIcons.MuteButton.Mute
@@ -68,7 +93,7 @@ export function PlayerVolumeControl() {
         : defaultLayoutIcons.MuteButton.VolumeHigh;
 
   return (
-    <div className="typetype-mobile-volume-control" onWheelCapture={handleWheel}>
+    <div ref={wheelTargetRef} className="typetype-mobile-volume-control">
       <MuteButton
         className="typetype-mobile-volume-mute"
         aria-label={muted ? m.player_unmute({}, { locale }) : m.player_mute({}, { locale })}
