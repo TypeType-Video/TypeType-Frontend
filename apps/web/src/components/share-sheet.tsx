@@ -67,7 +67,8 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
     const panel = panelRef.current.getBoundingClientRect();
     const vw = document.documentElement.clientWidth;
     const vh = document.documentElement.clientHeight;
-    let left = anchor.right - panel.width;
+    let left = anchor.left;
+    if (left + panel.width > vw - MARGIN) left = anchor.right - panel.width;
     left = Math.max(MARGIN, Math.min(left, vw - panel.width - MARGIN));
     const spaceBelow = vh - anchor.bottom - MARGIN;
     const spaceAbove = anchor.top - MARGIN;
