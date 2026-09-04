@@ -39,6 +39,7 @@ type Props = {
   cinemaMode: boolean;
   hideComments: boolean;
   mobilePanel: ReactNode;
+  mobileSecondaryContent: ReactNode | null;
   seekRef: MutableRefObject<((seconds: number) => void) | null>;
   audioOnlyControls: WatchAudioOnlyControls;
   onCaptionStylesChange: (styles: CaptionStyles) => void;
@@ -85,6 +86,7 @@ export function WatchStage({
   cinemaMode,
   hideComments,
   mobilePanel,
+  mobileSecondaryContent,
   seekRef,
   audioOnlyControls,
   onCaptionStylesChange,
@@ -180,6 +182,7 @@ export function WatchStage({
           audioOnly={audioOnlyControls}
         />
       )}
+      {mobileSecondaryContent ? <div className="mt-6">{mobileSecondaryContent}</div> : null}
     </div>
   );
 }

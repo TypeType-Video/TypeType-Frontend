@@ -122,6 +122,17 @@ export function WatchLayout({
     cinemaMode,
     Boolean(!isMobile && (playlist.panel || relatedStreams.length > 0)),
   );
+  const secondaryContent = (
+    <WatchSecondaryContent
+      cinemaMode={cinemaMode}
+      stream={displayStream}
+      relatedStreams={relatedStreams}
+      showComments={!settings.hideComments}
+      playlistPanel={isMobile ? null : playlist.panel}
+      onSeekTimestamp={(seconds) => seekRef.current?.(seconds)}
+      audioOnly={audioOnly.controls}
+    />
+  );
   return (
     <div className={classes.containerClass}>
       <WatchStage
@@ -162,6 +173,9 @@ export function WatchLayout({
         cinemaMode={cinemaMode}
         hideComments={settings.hideComments}
         mobilePanel={isMobile ? playlist.panel : null}
+        mobileSecondaryContent={
+          isMobile && !cinemaMode && relatedStreams.length > 0 ? secondaryContent : null
+        }
         seekRef={seekRef}
         audioOnlyControls={audioOnly.controls}
         onCaptionStylesChange={(captionStyles) => update.mutate({ captionStyles })}
@@ -183,15 +197,7 @@ export function WatchLayout({
         }
         onReset={player.reset}
       />
-      <WatchSecondaryContent
-        cinemaMode={cinemaMode}
-        stream={displayStream}
-        relatedStreams={relatedStreams}
-        showComments={!settings.hideComments}
-        playlistPanel={isMobile ? null : playlist.panel}
-        onSeekTimestamp={(seconds) => seekRef.current?.(seconds)}
-        audioOnly={audioOnly.controls}
-      />
+      {(!isMobile || cinemaMode) && secondaryContent}
       <Toast message={toast} />
     </div>
   );
