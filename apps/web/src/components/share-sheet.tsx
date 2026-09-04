@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
@@ -26,27 +27,24 @@ const PROVIDER_ICONS: Record<ShareProvider, { path: string; color: string }> = {
 function ShareOption({
   icon,
   label,
-  url,
   onClick,
 }: {
   icon: React.ReactNode;
   label: string;
-  url: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-surface-strong"
+      role="menuitem"
+      className="group flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-surface-strong">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-surface-strong transition-colors group-hover:bg-surface-soft">
         {icon}
       </span>
-      <span className="min-w-0">
-        <span className="block text-sm font-medium text-fg">{label}</span>
-        <span className="block truncate text-xs text-fg-muted">{url}</span>
-      </span>
+      <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
+      <ChevronRight className="h-4 w-4 shrink-0 text-fg-soft transition-transform group-hover:translate-x-0.5 group-hover:text-fg-muted" />
     </button>
   );
 }
@@ -67,8 +65,7 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
     const panel = panelRef.current.getBoundingClientRect();
     const vw = document.documentElement.clientWidth;
     const vh = document.documentElement.clientHeight;
-    let left = anchor.left;
-    if (left + panel.width > vw - MARGIN) left = anchor.right - panel.width;
+    let left = anchor.right - panel.width;
     left = Math.max(MARGIN, Math.min(left, vw - panel.width - MARGIN));
     const spaceBelow = vh - anchor.bottom - MARGIN;
     const spaceAbove = anchor.top - MARGIN;
@@ -107,31 +104,15 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
     <div
       ref={panelRef}
       role="menu"
+      aria-orientation="vertical"
       aria-label={m.watch_share({}, { locale })}
       style={panelStyle}
-      className="fixed z-50 w-[min(22rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-border-strong bg-surface p-2 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
+      className="fixed z-50 w-64 overflow-hidden rounded-lg border border-border-strong bg-surface p-1 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
     >
-      <div className="flex items-center justify-between gap-3 px-2 pb-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <img src="/logo.svg" alt="TypeType" className="h-6 w-6 shrink-0" />
-          <h2 className="truncate text-sm font-semibold text-fg">
-            {m.watch_share({}, { locale })}
-          </h2>
-        </div>
-        <button
-          type="button"
-          aria-label={m.admin_users_close({}, { locale })}
-          onClick={onClose}
-          className="shrink-0 rounded-md px-2 py-1 text-xs text-fg-muted hover:bg-surface-strong hover:text-fg"
-        >
-          {m.admin_users_close({}, { locale })}
-        </button>
-      </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col">
         <ShareOption
           icon={<img src="/logo.svg" alt="" className="h-5 w-5" />}
           label={m.watch_share_typetype_link({}, { locale })}
-          url={typetypeUrl}
           onClick={() => {
             onClose();
             onShare(typetypeUrl, title);
@@ -147,7 +128,6 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
               />
             }
             label={m.watch_share_source_link({ provider: source.label }, { locale })}
-            url={source.url}
             onClick={() => {
               onClose();
               onShare(source.url, title);
