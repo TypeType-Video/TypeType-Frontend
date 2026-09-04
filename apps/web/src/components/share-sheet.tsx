@@ -39,7 +39,7 @@ function ShareOption({
       role="menuitem"
       aria-label={label}
       title={label}
-      className="group flex h-10 w-10 items-center justify-center rounded-md text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
+      className="group flex h-9 w-9 items-center justify-center rounded-full text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
     >
       <span className="flex h-7 w-7 items-center justify-center transition-transform group-hover:scale-105">
         {icon}
@@ -106,9 +106,9 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
       aria-orientation="vertical"
       aria-label={m.watch_share({}, { locale })}
       style={panelStyle}
-      className="fixed z-50 overflow-hidden rounded-lg border border-border-strong bg-surface p-1 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
+      className="fixed z-50 overflow-hidden rounded-full border border-border-strong bg-surface p-1.5 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <ShareOption
           icon={<img src="/logo.svg" alt="" className="h-5 w-5" />}
           label={m.watch_share_typetype_link({}, { locale })}
@@ -118,20 +118,23 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
           }}
         />
         {source && (
-          <ShareOption
-            icon={
-              <ServiceIcon
-                path={PROVIDER_ICONS[source.provider].path}
-                color={PROVIDER_ICONS[source.provider].color}
-                label={source.label}
-              />
-            }
-            label={m.watch_share_source_link({ provider: source.label }, { locale })}
-            onClick={() => {
-              onClose();
-              onShare(source.url, title);
-            }}
-          />
+          <>
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
+            <ShareOption
+              icon={
+                <ServiceIcon
+                  path={PROVIDER_ICONS[source.provider].path}
+                  color={PROVIDER_ICONS[source.provider].color}
+                  label={source.label}
+                />
+              }
+              label={m.watch_share_source_link({ provider: source.label }, { locale })}
+              onClick={() => {
+                onClose();
+                onShare(source.url, title);
+              }}
+            />
+          </>
         )}
       </div>
     </div>,
