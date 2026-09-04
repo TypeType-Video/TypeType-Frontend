@@ -67,19 +67,24 @@ export function usePersistentWatchPlayer(
   enabled: boolean,
 ) {
   const ownerRef = useRef<PlayerOwner | null>(null);
+  const anchorElementRef = useRef<HTMLElement | null>(null);
   if (!ownerRef.current) ownerRef.current = Symbol("watch-player");
   const owner = ownerRef.current;
   const register = usePersistentWatchPlayerStore((state) => state.register);
   const setAnchor = usePersistentWatchPlayerStore((state) => state.setAnchor);
   const detach = usePersistentWatchPlayerStore((state) => state.detach);
   const anchorRef = useCallback(
-    (anchor: HTMLDivElement | null) => setAnchor(owner, anchor),
+    (anchor: HTMLDivElement | null) => {
+      anchorElementRef.current = anchor;
+      setAnchor(owner, anchor);
+    },
     [owner, setAnchor],
   );
 
   useLayoutEffect(() => {
     register(owner, streamId, props, enabled);
-  }, [enabled, owner, props, register, streamId]);
+    setAnchor(owner, anchorElementRef.current);
+  }, [enabled, owner, props, register, setAnchor, streamId]);
 
   useEffect(() => () => detach(owner), [detach, owner]);
 
