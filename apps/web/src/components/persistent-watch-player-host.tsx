@@ -1,0 +1,190 @@
+import { useRouterState } from "@tanstack/react-router";
+import { GripVertical, X } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useMobile } from "../hooks/use-mobile";
+import {
+  type PlayerPosition,
+  usePersistentWatchPlayerStore,
+} from "../hooks/use-persistent-watch-player";
+import { m } from "../paraglide/messages.js";
+import { useWatchLayoutStore } from "../stores/watch-layout-store";
+import { WatchStagePlayer } from "./watch-stage-player";
+
+const HEADER_OFFSET = 56;
+const VIEWPORT_MARGIN = 8;
+
+type AnchorRect = { left: number; top: number; width: number; height: number };
+type DragState = { offsetX: number; offsetY: number };
+
+function clampPosition(left: number, top: number, width: number, height: number): PlayerPosition {
+  return {
+    left: Math.min(
+      Math.max(VIEWPORT_MARGIN, left),
+      Math.max(VIEWPORT_MARGIN, innerWidth - width - VIEWPORT_MARGIN),
+    ),
+    top: Math.min(
+      Math.max(VIEWPORT_MARGIN, top),
+      Math.max(VIEWPORT_MARGIN, innerHeight - height - VIEWPORT_MARGIN),
+    ),
+  };
+}
+
+export function PersistentWatchPlayerHost() {
+  const entry = usePersistentWatchPlayerStore((state) => state.entry);
+  const position = usePersistentWatchPlayerStore((state) => state.position);
+  const setPosition = usePersistentWatchPlayerStore((state) => state.setPosition);
+  const close = usePersistentWatchPlayerStore((state) => state.close);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
+  const isMobile = useMobile();
+  const frameRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<DragState | null>(null);
+  const [anchorRect, setAnchorRect] = useState<AnchorRect | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [landscapeWatch, setLandscapeWatch] = useState(false);
+  const watchPage = pathname === "/watch" && !cinemaMode;
+  const hiddenPage =
+    pathname === "/shorts" || pathname === "/hide-everything" || pathname.startsWith("/embed/");
+
+  useEffect(() => {
+    const media = window.matchMedia(
+      "(orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)",
+    );
+    const update = () => setLandscapeWatch(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  const updateAnchorRect = useCallback(() => {
+    const anchor = entry?.anchor;
+    if (!watchPage || !anchor) {
+      setAnchorRect(null);
+      return;
+    }
+    const rect = anchor.getBoundingClientRect();
+    setAnchorRect((previous) =>
+      previous &&
+      previous.left === rect.left &&
+      previous.top === rect.top &&
+      previous.width === rect.width &&
+      previous.height === rect.height
+        ? previous
+        : { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+    );
+  }, [entry?.anchor, watchPage]);
+
+  useLayoutEffect(() => {
+    updateAnchorRect();
+  }, [updateAnchorRect]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", updateAnchorRect, true);
+    window.addEventListener("resize", updateAnchorRect);
+    return () => {
+      window.removeEventListener("scroll", updateAnchorRect, true);
+      window.removeEventListener("resize", updateAnchorRect);
+    };
+  }, [updateAnchorRect]);
+
+  const floating =
+    !watchPage || (!landscapeWatch && (!anchorRect || anchorRect.top <= HEADER_OFFSET));
+  const handlePointerMove = useCallback(
+    (event: PointerEvent) => {
+      const drag = dragRef.current;
+      const frame = frameRef.current;
+      if (!drag || !frame) return;
+      const rect = frame.getBoundingClientRect();
+      setPosition(
+        clampPosition(
+          event.clientX - drag.offsetX,
+          event.clientY - drag.offsetY,
+          rect.width,
+          rect.height,
+        ),
+      );
+    },
+    [setPosition],
+  );
+  const handlePointerUp = useCallback(() => {
+    dragRef.current = null;
+    setDragging(false);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [handlePointerMove, handlePointerUp]);
+
+  useEffect(() => {
+    if (!position || !floating) return;
+    const frame = frameRef.current;
+    if (!frame) return;
+    const rect = frame.getBoundingClientRect();
+    const clamped = clampPosition(position.left, position.top, rect.width, rect.height);
+    if (clamped.left !== position.left || clamped.top !== position.top) setPosition(clamped);
+  }, [floating, position, setPosition]);
+
+  if (!entry?.enabled || hiddenPage) return null;
+
+  const style =
+    !floating && anchorRect
+      ? {
+          left: anchorRect.left,
+          top: Math.max(HEADER_OFFSET, anchorRect.top),
+          width: anchorRect.width,
+          height: anchorRect.height,
+        }
+      : position
+        ? { left: position.left, top: position.top }
+        : {
+            right: "1rem",
+            bottom: `calc(${isMobile ? "4.5rem" : "1rem"} + env(safe-area-inset-bottom, 0px))`,
+          };
+
+  const beginDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!floating || !frameRef.current) return;
+    const rect = frameRef.current.getBoundingClientRect();
+    const next = position ?? clampPosition(rect.left, rect.top, rect.width, rect.height);
+    setPosition(next);
+    dragRef.current = { offsetX: event.clientX - next.left, offsetY: event.clientY - next.top };
+    setDragging(true);
+    event.preventDefault();
+  };
+
+  return (
+    <div
+      ref={frameRef}
+      className="typetype-persistent-player-frame fixed z-[65] overflow-hidden rounded-lg bg-black shadow-2xl ring-1 ring-black/30"
+      data-floating={floating ? "" : undefined}
+      data-dragging={dragging ? "" : undefined}
+      style={style}
+    >
+      {floating && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex h-9 items-start justify-between bg-gradient-to-b from-black/70 to-transparent px-1 pt-1">
+          <button
+            type="button"
+            aria-label={m.ui_move_player()}
+            className="pointer-events-auto flex h-7 w-7 touch-none items-center justify-center rounded text-white/80 hover:bg-white/15 hover:text-white"
+            onPointerDown={beginDrag}
+          >
+            <GripVertical size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label={m.ui_close_player()}
+            className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded text-white/80 hover:bg-white/15 hover:text-white"
+            onClick={() => close(entry.owner)}
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+      <WatchStagePlayer {...entry.props} />
+    </div>
+  );
+}
