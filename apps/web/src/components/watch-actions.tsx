@@ -14,6 +14,7 @@ import { DanmakuControls } from "./danmaku-controls";
 import { DownloadSheet } from "./download-sheet";
 import { PlaylistAddDropdown } from "./playlist-add-dropdown";
 import { ReportBugModal } from "./report-bug-modal";
+import { ShareSheet } from "./share-sheet";
 import { Toast } from "./toast";
 import { WatchActionButton } from "./watch-action-button";
 import {
@@ -36,6 +37,7 @@ export function WatchActions({ stream, audioOnly }: Props) {
   const [playlistOpen, setPlaylistOpen] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [toastLabel, setToastLabel] = useState<string | null>(null);
   const saveAnchorRef = useRef<HTMLButtonElement>(null);
   const { authReady, isAuthed } = useAuth();
@@ -113,11 +115,20 @@ export function WatchActions({ stream, audioOnly }: Props) {
             : m.watch_audio_only({}, { locale })}
         </WatchActionButton>
       )}
-      <WatchActionButton onClick={() => share(toPublicWatchUrl(stream.id, window.location.origin))}>
+      <WatchActionButton onClick={() => setShareOpen(true)}>
         <ShareIcon />
         {m.watch_share({}, { locale })}
       </WatchActionButton>
       <Toast message={copied ? m.watch_link_copied({}, { locale }) : toastLabel} />
+      {shareOpen && (
+        <ShareSheet
+          sourceUrl={stream.id}
+          typetypeUrl={toPublicWatchUrl(stream.id, window.location.origin)}
+          title={stream.title}
+          onShare={(url, title) => void share(url, title)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
       {showSave && (
         <button
           ref={saveAnchorRef}

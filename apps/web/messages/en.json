@@ -99,6 +99,8 @@
   "watch_saved_later": "Saved to Watch later",
   "watch_saving": "Saving...",
   "watch_share": "Share",
+  "watch_share_source_link": "Share {provider} link",
+  "watch_share_typetype_link": "Share TypeType link",
   "watch_show_less": "Show less",
   "watch_show_more": "Show more",
   "watch_show_replies": "Show replies",

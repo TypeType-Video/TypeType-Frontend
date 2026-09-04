@@ -99,6 +99,8 @@
   "watch_saved_later": "Ajouté à À regarder plus tard",
   "watch_saving": "Enregistrement...",
   "watch_share": "Partager",
+  "watch_share_source_link": "Partager le lien {provider}",
+  "watch_share_typetype_link": "Partager le lien TypeType",
   "watch_show_less": "Afficher moins",
   "watch_show_more": "Afficher plus",
   "watch_show_replies": "Afficher les réponses",
