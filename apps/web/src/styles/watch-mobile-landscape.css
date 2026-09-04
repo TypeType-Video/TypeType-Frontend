@@ -6,6 +6,30 @@
   position: sticky;
   top: calc(3.5rem + env(safe-area-inset-top, 0px));
   z-index: 30;
+  transition:
+    width 180ms ease,
+    margin 180ms ease,
+    border-radius 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.watch-sticky-player[data-sticky-compact] {
+  width: min(100%, 22rem);
+  margin-inline: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 24%);
+}
+
+@media (max-width: 640px) {
+  .watch-sticky-player[data-sticky-compact] {
+    width: min(100%, 18rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watch-sticky-player {
+    transition: none;
+  }
 }
 
 @media (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
@@ -39,6 +63,9 @@
     position: static;
     top: auto;
     z-index: auto;
+    width: 100%;
+    margin-inline: 0;
+    box-shadow: none;
   }
 
   .watch-page-shell .watch-player-box > .aspect-video,

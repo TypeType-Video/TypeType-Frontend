@@ -1,6 +1,7 @@
 import type { MutableRefObject, ReactNode } from "react";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import type { AutoplayState } from "../hooks/use-watch-ended-navigation";
+import { useWatchPlayerSticky } from "../hooks/use-watch-player-sticky";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
@@ -106,6 +107,9 @@ export function WatchStage({
   onError,
   onReset,
 }: Props) {
+  const { compact: stickyCompact, sentinelRef: stickySentinelRef } = useWatchPlayerSticky(
+    !cinemaMode,
+  );
   const playerOverlay = (
     <>
       {overlay}
@@ -124,7 +128,7 @@ export function WatchStage({
 
   return (
     <div className={classes.playerWrapClass}>
-      <div className={classes.playerBoxClass}>
+      <div className={classes.playerBoxClass} data-sticky-compact={stickyCompact ? "" : undefined}>
         {navigating ? (
           <div className="flex aspect-video w-full items-center justify-center bg-black">
             <PageSpinner fullScreen={false} />
@@ -173,6 +177,7 @@ export function WatchStage({
           />
         )}
       </div>
+      <div ref={stickySentinelRef} aria-hidden="true" className="h-px w-full" />
       {mobilePanel ? <div className="mt-4">{mobilePanel}</div> : null}
       {!cinemaMode && (
         <WatchMeta
