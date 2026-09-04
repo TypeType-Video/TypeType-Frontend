@@ -1,4 +1,3 @@
-import { ChevronRight } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
@@ -38,13 +37,13 @@ function ShareOption({
       type="button"
       onClick={onClick}
       role="menuitem"
-      className="group flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
+      aria-label={label}
+      title={label}
+      className="group flex h-10 w-10 items-center justify-center rounded-md text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
     >
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-surface-strong transition-colors group-hover:bg-surface-soft">
+      <span className="flex h-7 w-7 items-center justify-center transition-transform group-hover:scale-105">
         {icon}
       </span>
-      <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
-      <ChevronRight className="h-4 w-4 shrink-0 text-fg-soft transition-transform group-hover:translate-x-0.5 group-hover:text-fg-muted" />
     </button>
   );
 }
@@ -107,9 +106,9 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
       aria-orientation="vertical"
       aria-label={m.watch_share({}, { locale })}
       style={panelStyle}
-      className="fixed z-50 w-64 overflow-hidden rounded-lg border border-border-strong bg-surface p-1 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
+      className="fixed z-50 overflow-hidden rounded-lg border border-border-strong bg-surface p-1 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
     >
-      <div className="flex flex-col">
+      <div className="flex items-center gap-1">
         <ShareOption
           icon={<img src="/logo.svg" alt="" className="h-5 w-5" />}
           label={m.watch_share_typetype_link({}, { locale })}
