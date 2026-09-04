@@ -6,6 +6,7 @@ import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
 import { NotFoundPage } from "../components/not-found-page";
+import { PersistentWatchPlayerHost } from "../components/persistent-watch-player-host";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -35,7 +36,7 @@ function AuthShell() {
   );
 }
 
-function RootLayout() {
+function RootLayoutContent() {
   const isMobile = useMobile();
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
@@ -196,6 +197,7 @@ function RootLayout() {
 
   return (
     <div className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell" : ""}`}>
+      <PersistentWatchPlayerHost />
       <div className="watch-page-chrome">
         <Navbar />
       </div>
@@ -212,5 +214,4 @@ function RootLayout() {
     </div>
   );
 }
-
-export const Route = createRootRoute({ component: RootLayout });
+export const Route = createRootRoute({ component: RootLayoutContent });

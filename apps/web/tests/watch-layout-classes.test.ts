@@ -7,7 +7,7 @@ test("exposes stable watch hooks without changing the player identity", () => {
   expect(classes.containerClass).toContain("watch-layout-container");
   expect(classes.playerWrapClass).toContain("watch-player-wrap");
   expect(classes.playerBoxClass).toContain("watch-player-box");
-  expect(classes.playerBoxClass).toContain("watch-sticky-player");
+  expect(classes.playerBoxClass).toContain("watch-player-anchor");
   expect(classes.playerClassName).toBe("watch-player-surface");
 });
 
@@ -15,7 +15,7 @@ test("keeps cinema sizing alongside the mobile landscape hooks", () => {
   const classes = getWatchLayoutClasses(true, false);
 
   expect(classes.playerBoxClass).toContain("aspect-video");
-  expect(classes.playerBoxClass).not.toContain("watch-sticky-player");
+  expect(classes.playerBoxClass).not.toContain("watch-player-anchor");
   expect(classes.playerClassName).toContain("[--video-aspect-ratio:16/9]");
   expect(classes.playerClassName).toContain("watch-player-surface");
 });
