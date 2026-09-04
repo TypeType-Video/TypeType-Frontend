@@ -1,18 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { siBilibili, siNiconico, siYoutube } from "simple-icons";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { getSourceShareTarget, type ShareProvider } from "../lib/share-link";
 import { m } from "../paraglide/messages.js";
 import { ServiceIcon } from "./service-icon";
-import { ShareIcon } from "./watch-icons";
 
 type Props = {
+  anchorEl: HTMLElement | null;
   sourceUrl: string;
   typetypeUrl: string;
   title: string;
   onShare: (url: string, title: string) => void;
   onClose: () => void;
 };
+
+const MARGIN = 8;
 
 const PROVIDER_ICONS: Record<ShareProvider, { path: string; color: string }> = {
   youtube: { path: siYoutube.path, color: "#FF0000" },
@@ -48,71 +51,111 @@ function ShareOption({
   );
 }
 
-export function ShareSheet({ sourceUrl, typetypeUrl, title, onShare, onClose }: Props) {
+export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, onClose }: Props) {
   const { locale } = useInterfaceLocale();
   const source = getSourceShareTarget(sourceUrl);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({ visibility: "hidden" });
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const anchorElRef = useRef(anchorEl);
+  anchorElRef.current = anchorEl;
+
+  useLayoutEffect(() => {
+    if (!anchorEl || !panelRef.current) return;
+    const anchor = anchorEl.getBoundingClientRect();
+    const panel = panelRef.current.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    let left = anchor.left;
+    if (left + panel.width > vw - MARGIN) left = anchor.right - panel.width;
+    left = Math.max(MARGIN, Math.min(left, vw - panel.width - MARGIN));
+    const spaceBelow = vh - anchor.bottom - MARGIN;
+    const spaceAbove = anchor.top - MARGIN;
+    let top =
+      spaceBelow >= panel.height || spaceBelow >= spaceAbove
+        ? anchor.bottom + MARGIN
+        : anchor.top - panel.height - MARGIN;
+    top = Math.max(MARGIN, Math.min(top, vh - panel.height - MARGIN));
+    setPanelStyle({ position: "fixed", top, left, visibility: "visible" });
+  }, [anchorEl]);
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
+    }
+    function onMouseDown(event: MouseEvent) {
+      const target = event.target as Node;
+      const outsidePanel = panelRef.current && !panelRef.current.contains(target);
+      const outsideAnchor = !anchorElRef.current?.contains(target);
+      if (outsidePanel && outsideAnchor) onCloseRef.current();
+    }
+    function onScroll() {
+      onCloseRef.current();
     }
     document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("scroll", onScroll);
     };
-  }, [onClose]);
+  }, []);
 
-  return (
-    <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
-      <button
-        type="button"
-        aria-label={m.admin_users_close({}, { locale })}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-      />
-      <section className="absolute inset-x-3 bottom-3 mx-auto w-auto max-w-md rounded-xl border border-border-strong bg-app p-3 shadow-2xl md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:w-[min(28rem,calc(100vw-2rem))] md:-translate-x-1/2 md:-translate-y-1/2">
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-sm font-semibold text-fg">{m.watch_share({}, { locale })}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md px-2 py-1 text-xs text-fg-muted hover:bg-surface-strong hover:text-fg"
-          >
-            {m.admin_users_close({}, { locale })}
-          </button>
+  return createPortal(
+    <div
+      ref={panelRef}
+      role="menu"
+      aria-label={m.watch_share({}, { locale })}
+      style={panelStyle}
+      className="fixed z-50 w-[min(22rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-border-strong bg-surface p-2 shadow-2xl [animation:dropdown-fade-in_0.15s_ease-out]"
+    >
+      <div className="flex items-center justify-between gap-3 px-2 pb-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <img src="/logo.svg" alt="TypeType" className="h-6 w-6 shrink-0" />
+          <h2 className="truncate text-sm font-semibold text-fg">
+            {m.watch_share({}, { locale })}
+          </h2>
         </div>
-        <div className="flex flex-col gap-1">
+        <button
+          type="button"
+          aria-label={m.admin_users_close({}, { locale })}
+          onClick={onClose}
+          className="shrink-0 rounded-md px-2 py-1 text-xs text-fg-muted hover:bg-surface-strong hover:text-fg"
+        >
+          {m.admin_users_close({}, { locale })}
+        </button>
+      </div>
+      <div className="flex flex-col gap-1">
+        <ShareOption
+          icon={<img src="/logo.svg" alt="" className="h-5 w-5" />}
+          label={m.watch_share_typetype_link({}, { locale })}
+          url={typetypeUrl}
+          onClick={() => {
+            onClose();
+            onShare(typetypeUrl, title);
+          }}
+        />
+        {source && (
           <ShareOption
-            icon={<ShareIcon />}
-            label={m.watch_share_typetype_link({}, { locale })}
-            url={typetypeUrl}
+            icon={
+              <ServiceIcon
+                path={PROVIDER_ICONS[source.provider].path}
+                color={PROVIDER_ICONS[source.provider].color}
+                label={source.label}
+              />
+            }
+            label={m.watch_share_source_link({ provider: source.label }, { locale })}
+            url={source.url}
             onClick={() => {
               onClose();
-              onShare(typetypeUrl, title);
+              onShare(source.url, title);
             }}
           />
-          {source && (
-            <ShareOption
-              icon={
-                <ServiceIcon
-                  path={PROVIDER_ICONS[source.provider].path}
-                  color={PROVIDER_ICONS[source.provider].color}
-                  label={source.label}
-                />
-              }
-              label={m.watch_share_source_link({ provider: source.label }, { locale })}
-              url={source.url}
-              onClick={() => {
-                onClose();
-                onShare(source.url, title);
-              }}
-            />
-          )}
-        </div>
-      </section>
-    </div>
+        )}
+      </div>
+    </div>,
+    document.body,
   );
 }

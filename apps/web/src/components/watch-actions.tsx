@@ -40,6 +40,7 @@ export function WatchActions({ stream, audioOnly }: Props) {
   const [shareOpen, setShareOpen] = useState(false);
   const [toastLabel, setToastLabel] = useState<string | null>(null);
   const saveAnchorRef = useRef<HTMLButtonElement>(null);
+  const shareAnchorRef = useRef<HTMLButtonElement>(null);
   const { authReady, isAuthed } = useAuth();
   const {
     add: addFavorite,
@@ -115,13 +116,14 @@ export function WatchActions({ stream, audioOnly }: Props) {
             : m.watch_audio_only({}, { locale })}
         </WatchActionButton>
       )}
-      <WatchActionButton onClick={() => setShareOpen(true)}>
+      <WatchActionButton buttonRef={shareAnchorRef} onClick={() => setShareOpen(true)}>
         <ShareIcon />
         {m.watch_share({}, { locale })}
       </WatchActionButton>
       <Toast message={copied ? m.watch_link_copied({}, { locale }) : toastLabel} />
       {shareOpen && (
         <ShareSheet
+          anchorEl={shareAnchorRef.current}
           sourceUrl={stream.id}
           typetypeUrl={toPublicWatchUrl(stream.id, window.location.origin)}
           title={stream.title}

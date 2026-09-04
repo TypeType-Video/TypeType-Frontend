@@ -1,5 +1,5 @@
 import { Clock3, MessageCircle, Share2, Star } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useFavoriteStatus } from "../hooks/use-favorite-status";
 import { useShareUrl } from "../hooks/use-share-url";
@@ -29,6 +29,7 @@ export function ShortsActions({
   const { isAuthed } = useAuth();
   const { copied, share } = useShareUrl();
   const [shareOpen, setShareOpen] = useState(false);
+  const shareAnchorRef = useRef<HTMLButtonElement>(null);
   const {
     add: addFavorite,
     remove: removeFavorite,
@@ -89,6 +90,7 @@ export function ShortsActions({
         />
       )}
       <ShortsActionButton
+        buttonRef={shareAnchorRef}
         icon={Share2}
         label={m.watch_share()}
         stateLabel={copied ? m.ui_copied() : m.ui_link()}
@@ -97,6 +99,7 @@ export function ShortsActions({
       />
       {shareOpen && (
         <ShareSheet
+          anchorEl={shareAnchorRef.current}
           sourceUrl={stream.id}
           typetypeUrl={toPublicShortsUrl(stream.id, window.location.origin)}
           title={stream.title}

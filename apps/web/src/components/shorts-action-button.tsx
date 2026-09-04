@@ -1,4 +1,5 @@
 type Props = {
+  buttonRef?: React.Ref<HTMLButtonElement>;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   stateLabel?: string;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function ShortsActionButton({
+  buttonRef,
   icon: Icon,
   label,
   stateLabel,
@@ -28,6 +30,7 @@ export function ShortsActionButton({
   const activeClass = compact ? "border-white/80 bg-white text-black" : "border-fg bg-fg text-app";
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       disabled={disabled}
