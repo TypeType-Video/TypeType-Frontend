@@ -26,10 +26,12 @@ const PROVIDER_ICONS: Record<ShareProvider, { path: string; color: string }> = {
 function ShareOption({
   icon,
   label,
+  name,
   onClick,
 }: {
   icon: React.ReactNode;
   label: string;
+  name: string;
   onClick: () => void;
 }) {
   return (
@@ -39,11 +41,12 @@ function ShareOption({
       role="menuitem"
       aria-label={label}
       title={label}
-      className="group flex h-9 w-9 items-center justify-center rounded-full text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
+      className="group flex h-9 items-center gap-1.5 rounded-full px-2.5 text-fg transition-colors hover:bg-surface-strong focus-visible:bg-surface-strong focus-visible:outline-none"
     >
       <span className="flex h-7 w-7 items-center justify-center transition-transform group-hover:scale-105">
         {icon}
       </span>
+      <span className="text-xs font-medium leading-none">{name}</span>
     </button>
   );
 }
@@ -112,6 +115,7 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
         <ShareOption
           icon={<img src="/logo.svg" alt="" className="h-5 w-5" />}
           label={m.watch_share_typetype_link({}, { locale })}
+          name="TypeType"
           onClick={() => {
             onClose();
             onShare(typetypeUrl, title);
@@ -129,6 +133,7 @@ export function ShareSheet({ anchorEl, sourceUrl, typetypeUrl, title, onShare, o
                 />
               }
               label={m.watch_share_source_link({ provider: source.label }, { locale })}
+              name={source.label}
               onClick={() => {
                 onClose();
                 onShare(source.url, title);
