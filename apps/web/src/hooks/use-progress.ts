@@ -1,12 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchProgress, updateProgress } from "../lib/api-collections";
+import { useMemo } from "react";
+import { fetchProgress, fetchProgressBatch, updateProgress } from "../lib/api-collections";
 import {
   type HistoryPageData,
   type HistoryPagesData,
   updateHistoryPageProgress,
   updateHistoryPagesProgress,
 } from "../lib/history-progress-cache";
+import { progressItemsByUrl, updateProgressItems, videoProgressUrl } from "../lib/video-progress";
 import { useAuthStore } from "../stores/auth-store";
+import type { VideoStream } from "../types/stream";
 import type { ProgressItem } from "../types/user";
 import { useAuth } from "./use-auth";
 
@@ -25,6 +28,20 @@ export function useProgress(videoUrl: string) {
   });
 }
 
+export function useVideoProgressMap(streams: VideoStream[]): Map<string, ProgressItem> {
+  const { authReady, isAuthed } = useAuth();
+  const videoUrls = useMemo(() => [...new Set(streams.map(videoProgressUrl))].sort(), [streams]);
+  const query = useQuery({
+    queryKey: ["progress-batch", videoUrls],
+    queryFn: () => fetchProgressBatch(videoUrls),
+    enabled: authReady && isAuthed && videoUrls.length > 0,
+    staleTime: 30_000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+  return useMemo(() => progressItemsByUrl(query.data ?? []), [query.data]);
+}
+
 export function useSaveProgress(videoUrl: string) {
   const { authReady, isAuthed } = useAuth();
   const qc = useQueryClient();
@@ -41,6 +58,9 @@ export function useSaveProgress(videoUrl: string) {
         updatedAt: Date.now(),
       };
       qc.setQueryData(["progress", videoUrl], next);
+      qc.setQueriesData<ProgressItem[]>({ queryKey: ["progress-batch"] }, (items) =>
+        updateProgressItems(items, next),
+      );
       qc.setQueriesData<HistoryPagesData>({ queryKey: ["history"] }, (data) =>
         updateHistoryPagesProgress(data, videoUrl, position),
       );

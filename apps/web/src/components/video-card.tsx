@@ -4,6 +4,7 @@ import { useClientLocale } from "../hooks/use-client-locale";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { useVideoCardPreview } from "../hooks/use-video-card-preview";
 import { formatDuration, formatPublishedDate, formatViews } from "../lib/format";
+import { isVideoWatched } from "../lib/watch-progress";
 import { watchListSearch } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 import type { VideoStream } from "../types/stream";
@@ -12,8 +13,10 @@ import { ChannelRouteLink } from "./channel-route-link";
 import { VideoCardFeedbackMenu } from "./video-card-feedback-menu";
 import { VideoMembershipBadge } from "./video-membership-badge";
 import { VideoPreview } from "./video-preview";
+import { VideoProgressBar } from "./video-progress-bar";
 import { VideoStatusBadge } from "./video-status-badge";
 import { VerifiedBadgeIcon } from "./watch-icons";
+import { WatchedBadge } from "./watched-badge";
 
 type Props = {
   stream: VideoStream;
@@ -21,9 +24,17 @@ type Props = {
   onImpression?: () => void;
   listId?: string;
   relatedStreams?: VideoStream[];
+  progressMs?: number;
 };
 
-function VideoCardComponent({ stream, onOpen, onImpression, listId, relatedStreams }: Props) {
+function VideoCardComponent({
+  stream,
+  onOpen,
+  onImpression,
+  listId,
+  relatedStreams,
+  progressMs = 0,
+}: Props) {
   const locale = useClientLocale();
   const rootRef = useRef<HTMLElement | null>(null);
   const setNavigation = useWatchNavigationStore((state) => state.setNavigation);
@@ -35,6 +46,8 @@ function VideoCardComponent({ stream, onOpen, onImpression, listId, relatedStrea
     stream.duration,
   );
   const publishedText = formatPublishedDate(stream.publishedAt, undefined, locale);
+  const progressSeconds = Math.max(0, progressMs / 1_000);
+  const watched = !stream.isLive && isVideoWatched(progressSeconds, stream.duration);
   const watchSearch = watchListSearch(stream.id, listId);
   const handleOpen = useCallback(() => {
     setNavigation(stream, relatedStreams);
@@ -78,14 +91,18 @@ function VideoCardComponent({ stream, onOpen, onImpression, listId, relatedStrea
         onClick={handleOpen}
       >
         <div className="relative aspect-video overflow-hidden rounded-xl bg-surface-strong sm:rounded-lg">
-          <img
-            src={thumbnail}
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-            loading="lazy"
-            decoding="async"
-          />
-          <VideoPreview stream={preview.previewStream} show={preview.showPreview} />
+          <div
+            className={`absolute inset-0 transition-opacity ${watched ? "grayscale opacity-60" : ""}`}
+          >
+            <img
+              src={thumbnail}
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              loading="lazy"
+              decoding="async"
+            />
+            <VideoPreview stream={preview.previewStream} show={preview.showPreview} />
+          </div>
           {preview.memberOnly && (
             <span className="absolute left-2 top-2">
               <VideoMembershipBadge />
@@ -96,10 +113,18 @@ function VideoCardComponent({ stream, onOpen, onImpression, listId, relatedStrea
               <VideoStatusBadge stream={stream} />
             </span>
           )}
+          {watched && (
+            <span className="absolute right-2 top-2">
+              <WatchedBadge />
+            </span>
+          )}
           {!stream.isLive && stream.duration > 0 && (
             <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs px-1 rounded">
               {formatDuration(stream.duration)}
             </span>
+          )}
+          {!stream.isLive && (
+            <VideoProgressBar progress={progressSeconds} duration={stream.duration} />
           )}
         </div>
       </Link>

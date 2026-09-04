@@ -11,6 +11,7 @@ import { authed, authedJson } from "./authed";
 
 import { API_BASE as BASE } from "./env";
 import { progressWriteQueue } from "./progress-write-queue";
+import { progressBatches } from "./video-progress";
 
 async function throwIfFailed(res: Response, fallback: string): Promise<void> {
   if (res.ok) return;
@@ -27,6 +28,22 @@ export async function fetchProgress(videoUrl: string): Promise<ProgressItem> {
   const body = await res.json();
   if (!res.ok) throw new ApiError((body as { error: string }).error, res.status);
   return body as ProgressItem;
+}
+
+export async function fetchProgressBatch(videoUrls: string[]): Promise<ProgressItem[]> {
+  await Promise.all(videoUrls.map((videoUrl) => progressWriteQueue.settle(videoUrl)));
+  const pages = await Promise.all(
+    progressBatches(videoUrls).map(async (batch) => {
+      const res = await authed(`${BASE}/progress/batch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoUrls: batch }),
+      });
+      await throwIfFailed(res, "progress lookup failed");
+      return (await res.json()) as ProgressItem[];
+    }),
+  );
+  return pages.flat();
 }
 
 export async function updateProgress(

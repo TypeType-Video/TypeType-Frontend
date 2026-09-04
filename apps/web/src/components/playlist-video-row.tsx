@@ -60,7 +60,7 @@ export function PlaylistVideoRow({ video, onRemove, reorderable, listId, onDragS
             <img
               src={thumbnail}
               alt={branding.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${watched ? "grayscale opacity-60" : ""}`}
               loading="lazy"
               decoding="async"
             />
