@@ -36,7 +36,9 @@
   }
 
   .watch-page-shell .watch-sticky-player {
-    top: 0;
+    position: static;
+    top: auto;
+    z-index: auto;
   }
 
   .watch-page-shell .watch-player-box > .aspect-video,
