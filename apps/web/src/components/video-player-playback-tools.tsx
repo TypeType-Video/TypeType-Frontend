@@ -1,3 +1,4 @@
+import { useCompactPlayer } from "../hooks/use-compact-player";
 import { shouldRunSponsorBlockAutoSkip } from "../lib/sponsorblock-playback-tools";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import { PlayerHotkeys } from "./player-hotkeys";
@@ -20,19 +21,20 @@ type Props = {
 };
 
 export function VideoPlayerPlaybackTools(props: Props) {
+  const compact = useCompactPlayer();
   return (
     <>
-      <PlayerHotkeys canSeek={props.canSeek} sabrVideo={props.sabrVideo} />
-      {!props.audioOnly && <PlayerPlayPauseIndicator />}
+      {!compact && <PlayerHotkeys canSeek={props.canSeek} sabrVideo={props.sabrVideo} />}
+      {!compact && !props.audioOnly && <PlayerPlayPauseIndicator />}
       {shouldRunSponsorBlockAutoSkip(props) && props.autoSkipSegments && (
         <SponsorBlockSkipper
           segments={props.autoSkipSegments}
           muteInsteadOfSkip={props.mutedSkip}
         />
       )}
-      {props.segments && <SponsorBlockBar segments={props.segments} />}
-      {props.segments && <SponsorBlockSkipNotice />}
-      {props.showCurrent && props.segments && (
+      {!compact && props.segments && <SponsorBlockBar segments={props.segments} />}
+      {!compact && props.segments && <SponsorBlockSkipNotice />}
+      {!compact && props.showCurrent && props.segments && (
         <SponsorBlockCurrentSegment
           segments={props.segments}
           autoSkipSegments={props.autoSkipSegments}

@@ -1,11 +1,13 @@
 import { useRouterState } from "@tanstack/react-router";
 import { GripVertical, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { CompactPlayerContext } from "../hooks/use-compact-player";
 import { useMobile } from "../hooks/use-mobile";
 import {
   type PlayerPosition,
   usePersistentWatchPlayerStore,
 } from "../hooks/use-persistent-watch-player";
+import { isPlayerOutsideViewport } from "../lib/compact-player-position";
 import { m } from "../paraglide/messages.js";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import { WatchStagePlayer } from "./watch-stage-player";
@@ -14,7 +16,7 @@ const HEADER_OFFSET = 56;
 const VIEWPORT_MARGIN = 8;
 
 type AnchorRect = { left: number; top: number; width: number; height: number };
-type DragState = { offsetX: number; offsetY: number };
+type DragState = { offsetX: number; offsetY: number; pointerId: number };
 
 function clampPosition(left: number, top: number, width: number, height: number): PlayerPosition {
   return {
@@ -23,8 +25,8 @@ function clampPosition(left: number, top: number, width: number, height: number)
       Math.max(VIEWPORT_MARGIN, innerWidth - width - VIEWPORT_MARGIN),
     ),
     top: Math.min(
-      Math.max(VIEWPORT_MARGIN, top),
-      Math.max(VIEWPORT_MARGIN, innerHeight - height - VIEWPORT_MARGIN),
+      Math.max(HEADER_OFFSET + VIEWPORT_MARGIN, top),
+      Math.max(HEADER_OFFSET + VIEWPORT_MARGIN, innerHeight - height - VIEWPORT_MARGIN),
     ),
   };
 }
@@ -41,6 +43,7 @@ export function PersistentWatchPlayerHost() {
   const dragRef = useRef<DragState | null>(null);
   const [anchorRect, setAnchorRect] = useState<AnchorRect | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [outsideViewport, setOutsideViewport] = useState(false);
   const [landscapeWatch, setLandscapeWatch] = useState(false);
   const watchPage = pathname === "/watch" && !cinemaMode;
   const hiddenPage =
@@ -60,9 +63,11 @@ export function PersistentWatchPlayerHost() {
     const anchor = entry?.anchor;
     if (!watchPage || !anchor) {
       setAnchorRect(null);
+      setOutsideViewport(false);
       return;
     }
     const rect = anchor.getBoundingClientRect();
+    setOutsideViewport((previous) => isPlayerOutsideViewport(rect.bottom, previous));
     setAnchorRect((previous) =>
       previous &&
       previous.left === rect.left &&
@@ -79,21 +84,23 @@ export function PersistentWatchPlayerHost() {
   }, [updateAnchorRect]);
 
   useEffect(() => {
+    const observer = new ResizeObserver(updateAnchorRect);
+    if (entry?.anchor) observer.observe(entry.anchor);
     window.addEventListener("scroll", updateAnchorRect, true);
     window.addEventListener("resize", updateAnchorRect);
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", updateAnchorRect, true);
       window.removeEventListener("resize", updateAnchorRect);
     };
-  }, [updateAnchorRect]);
+  }, [updateAnchorRect, entry?.anchor]);
 
-  const floating =
-    !watchPage || (!landscapeWatch && (!anchorRect || anchorRect.top <= HEADER_OFFSET));
+  const floating = !watchPage || (!landscapeWatch && outsideViewport);
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       const drag = dragRef.current;
       const frame = frameRef.current;
-      if (!drag || !frame) return;
+      if (!drag || !frame || event.pointerId !== drag.pointerId) return;
       const rect = frame.getBoundingClientRect();
       setPosition(
         clampPosition(
@@ -114,19 +121,28 @@ export function PersistentWatchPlayerHost() {
   useEffect(() => {
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
+    window.addEventListener("blur", handlePointerUp);
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+      window.removeEventListener("blur", handlePointerUp);
     };
   }, [handlePointerMove, handlePointerUp]);
 
   useEffect(() => {
     if (!position || !floating) return;
-    const frame = frameRef.current;
-    if (!frame) return;
-    const rect = frame.getBoundingClientRect();
-    const clamped = clampPosition(position.left, position.top, rect.width, rect.height);
-    if (clamped.left !== position.left || clamped.top !== position.top) setPosition(clamped);
+    const update = () => {
+      const frame = frameRef.current;
+      if (!frame) return;
+      const rect = frame.getBoundingClientRect();
+      const clamped = clampPosition(position.left, position.top, rect.width, rect.height);
+      if (clamped.left !== position.left || clamped.top !== position.top) setPosition(clamped);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, [floating, position, setPosition]);
 
   if (!entry?.enabled || hiddenPage) return null;
@@ -135,7 +151,7 @@ export function PersistentWatchPlayerHost() {
     !floating && anchorRect
       ? {
           left: anchorRect.left,
-          top: Math.max(HEADER_OFFSET, anchorRect.top),
+          top: anchorRect.top,
           width: anchorRect.width,
           height: anchorRect.height,
         }
@@ -147,11 +163,16 @@ export function PersistentWatchPlayerHost() {
           };
 
   const beginDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!floating || !frameRef.current) return;
+    if (!floating || !frameRef.current || !event.isPrimary || event.button !== 0) return;
     const rect = frameRef.current.getBoundingClientRect();
     const next = position ?? clampPosition(rect.left, rect.top, rect.width, rect.height);
     setPosition(next);
-    dragRef.current = { offsetX: event.clientX - next.left, offsetY: event.clientY - next.top };
+    dragRef.current = {
+      offsetX: event.clientX - next.left,
+      offsetY: event.clientY - next.top,
+      pointerId: event.pointerId,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
     event.preventDefault();
   };
@@ -159,7 +180,7 @@ export function PersistentWatchPlayerHost() {
   return (
     <div
       ref={frameRef}
-      className="typetype-persistent-player-frame fixed z-[65] overflow-hidden rounded-lg bg-black shadow-2xl ring-1 ring-black/30"
+      className="typetype-persistent-player-frame fixed z-30 overflow-hidden rounded-lg bg-black shadow-2xl ring-1 ring-black/30"
       data-floating={floating ? "" : undefined}
       data-dragging={dragging ? "" : undefined}
       style={style}
@@ -169,22 +190,27 @@ export function PersistentWatchPlayerHost() {
           <button
             type="button"
             aria-label={m.ui_move_player()}
-            className="pointer-events-auto flex h-7 w-7 touch-none items-center justify-center rounded text-white/80 hover:bg-white/15 hover:text-white"
+            title={m.ui_move_player()}
+            className="pointer-events-auto flex h-10 w-10 touch-none cursor-grab items-center justify-center rounded text-white hover:bg-white/15 active:cursor-grabbing"
             onPointerDown={beginDrag}
+            onLostPointerCapture={handlePointerUp}
           >
             <GripVertical size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label={m.ui_close_player()}
-            className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded text-white/80 hover:bg-white/15 hover:text-white"
+            title={m.ui_close_player()}
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded text-white hover:bg-white/15"
             onClick={() => close(entry.owner)}
           >
             <X size={16} aria-hidden="true" />
           </button>
         </div>
       )}
-      <WatchStagePlayer {...entry.props} />
+      <CompactPlayerContext.Provider value={floating}>
+        <WatchStagePlayer {...entry.props} />
+      </CompactPlayerContext.Provider>
     </div>
   );
 }

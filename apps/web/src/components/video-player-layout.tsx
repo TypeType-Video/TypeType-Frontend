@@ -1,3 +1,4 @@
+import { useCompactPlayer } from "../hooks/use-compact-player";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { PLAYBACK_RATES } from "../lib/playback-rates";
 import { playerLayoutTranslations } from "../lib/player-layout-translations";
@@ -7,6 +8,7 @@ import { AudioSeekButton } from "./audio-seek-button";
 import { AudioTimeSlider } from "./audio-time-slider";
 import { AudioTrackSelector } from "./audio-track-selector";
 import { CinemaModeControl } from "./cinema-mode-control";
+import { CompactPlayerControls } from "./compact-player-controls";
 import { FormatSelector } from "./format-selector";
 import { PlayerTrackButton } from "./player-track-button";
 import { PlayerVolumeControl, PlayerVolumeSlider } from "./player-volume-control";
@@ -43,7 +45,10 @@ export function VideoPlayerLayout({
   onNextVideo,
 }: Props) {
   const { locale } = useInterfaceLocale();
+  const compact = useCompactPlayer();
   const translations = playerLayoutTranslations(locale);
+
+  if (compact) return <CompactPlayerControls video={sabrVideo} seeking={seeking} />;
 
   if (layoutMode === "shorts") {
     return (
