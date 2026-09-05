@@ -22,9 +22,9 @@ export function CompactPlayerControls({
   return (
     <div className="typetype-compact-controls">
       <AudioSeekButton direction="backward" video={video} disabled={seeking || !canSeek} />
-      <AudioPlayButton video={video} />
+      <AudioPlayButton video={video} disabled={seeking} />
       <AudioSeekButton direction="forward" video={video} disabled={seeking || !canSeek} />
-      <MuteButton aria-label={label} title={label}>
+      <MuteButton aria-label={label} title={label} disabled={seeking}>
         <Icon size={20} aria-hidden="true" />
       </MuteButton>
     </div>

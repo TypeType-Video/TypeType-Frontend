@@ -23,7 +23,7 @@ export function AudioSeekButton({ direction, disabled = false, video = null }: P
   const Icon = direction === "backward" ? AudioSeekBackward10Icon : AudioSeekForward10Icon;
 
   const seek = () => {
-    const target = currentTime + seconds;
+    const target = (video?.currentTime ?? currentTime) + seconds;
     const bounded = Math.min(Math.max(target, 0), duration > 0 ? duration : target);
     if (video && requestSabrSeek(video, bounded)) return;
     remote.seek(bounded);
