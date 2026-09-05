@@ -12,6 +12,10 @@ import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
 import { SabrVideoHandoff } from "../lib/sabr-video-handoff";
+import {
+  captureSabrVideoHandoffCleanupPosition as captureCleanupPosition,
+  registerSabrVideoHandoffPositionCapture as registerPosition,
+} from "../lib/sabr-video-handoff-events";
 import { registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
 import { useAuthStore } from "../stores/auth-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
@@ -32,8 +36,9 @@ export function SabrMsePlayer({
 }: SabrMsePlayerProps) {
   const token = useAuthStore((state) => state.token);
   const headersRef = useRef(new Headers());
-  if (token) headersRef.current.set("authorization", `Bearer ${token}`);
-  else headersRef.current.delete("authorization");
+  token
+    ? headersRef.current.set("authorization", `Bearer ${token}`)
+    : headersRef.current.delete("authorization");
   const engineRef = useRef<TypeTypeMsePlayer | null>(null);
   const qualityRef = useRef<TypeTypeMseQuality | null>(null);
   const pendingPlayRef = useRef(false);
@@ -101,10 +106,9 @@ export function SabrMsePlayer({
       if (engine.isApplyingTransientMediaState()) return;
       latestHandlers().onVolumeChange?.(video.volume, video.muted);
     };
-    const capturePosition = () => {
-      videoHandoffRef.current.capture(video, config.videoId, positionMs(video));
-    };
-    let playbackRateSettled = false;
+    const offPosition = registerPosition(video, videoHandoffRef.current, config.videoId);
+    let playbackRateSettled = false,
+      engineLoaded = false;
     const playbackRateChange = () => {
       playbackRate.capture(video, !playbackRateSettled || engine.isApplyingTransientMediaState());
     };
@@ -117,11 +121,6 @@ export function SabrMsePlayer({
     playbackRate.initialize(video);
     video.addEventListener("volumechange", volumeChange);
     video.addEventListener("ratechange", playbackRateChange);
-    video.addEventListener("timeupdate", capturePosition);
-    video.addEventListener("seeking", capturePosition);
-    video.addEventListener("seeked", capturePosition);
-    video.addEventListener("pause", capturePosition);
-    let engineLoaded = false;
     const autoplayDeadline = new SabrAutoplayDeadline(() => {
       if (!autoplayAttempt.expire()) return;
       pendingPlayRef.current = false;
@@ -187,20 +186,13 @@ export function SabrMsePlayer({
     });
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
-      videoHandoffRef.current.capture(
-        video,
-        config.videoId,
-        Number.isFinite(video.currentTime) ? positionMs(video) : 0,
-      );
+      captureCleanupPosition(video, videoHandoffRef.current, config.videoId);
       offError();
       unguardAutoplay();
       unregisterControls();
       video.removeEventListener("volumechange", volumeChange);
       video.removeEventListener("ratechange", playbackRateChange);
-      video.removeEventListener("timeupdate", capturePosition);
-      video.removeEventListener("seeking", capturePosition);
-      video.removeEventListener("seeked", capturePosition);
-      video.removeEventListener("pause", capturePosition);
+      offPosition();
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);
       autoplayDeadline.clear();
