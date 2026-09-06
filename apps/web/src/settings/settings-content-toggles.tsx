@@ -49,7 +49,7 @@ type ToggleOption = {
   key: ToggleKey;
   label: string;
   description: string;
-  area: string;
+  area?: string;
 };
 
 function watchOptions(): ToggleOption[] {
@@ -58,7 +58,6 @@ function watchOptions(): ToggleOption[] {
       key: "autoplay",
       label: m.ui_autoplay_next_video(),
       description: m.ui_automatically_continue_with_the_first_item_in_the_suggestions_column(),
-      area: m.ui_watch_page(),
     },
   ];
 }
@@ -123,7 +122,7 @@ function ToggleRows({ options }: { options: ToggleOption[] }) {
       <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-fg text-sm">{option.label}</span>
-          <span className="text-[10px] uppercase text-fg-soft">{option.area}</span>
+          {option.area && <span className="text-[10px] uppercase text-fg-soft">{option.area}</span>}
         </div>
         <span className="text-fg-soft text-xs">{option.description}</span>
       </div>
