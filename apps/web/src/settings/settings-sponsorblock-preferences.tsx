@@ -1,8 +1,8 @@
-import { ToggleSwitch } from "../components/toggle-switch";
 import { useSettings } from "../hooks/use-settings";
 import { SPONSORBLOCK_CATEGORIES, type SponsorBlockCategory } from "../lib/sponsorblock-settings";
 import { m } from "../paraglide/messages.js";
 import type { SponsorBlockCategoryAction, SponsorBlockMode } from "../types/user";
+import { ROW, ToggleSwitch } from "./settings-toggle-switch";
 
 function actions(): { value: SponsorBlockCategoryAction; label: string }[] {
   return [
@@ -47,7 +47,7 @@ function GlobalMode() {
           {m.ui_global_behavior_first_then_category_rules_decide_what_gets_skipped_or()}
         </span>
       </div>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-3">
         {options.map((option) => {
           const selected = settings.sponsorBlockMode === option.value;
           return (
@@ -60,14 +60,16 @@ function GlobalMode() {
                   sponsorBlockCategoryActions: globalCategoryActions(option.value),
                 })
               }
-              className={`rounded-sm border px-3 py-2 text-left transition-colors ${
+              className={`typetype-adaptive-control min-w-0 rounded-sm border px-3 py-2 text-left transition-colors ${
                 selected
                   ? "border-fg-soft text-fg"
                   : "border-border text-fg-muted hover:border-fg-soft hover:text-fg"
               }`}
             >
-              <span className="block text-xs font-medium">{option.label}</span>
-              <span className="mt-1 block text-[11px] leading-4 text-fg-soft">
+              <span className="typetype-adaptive-label block text-xs font-medium">
+                {option.label}
+              </span>
+              <span className="typetype-adaptive-label mt-1 block text-[11px] leading-4 text-fg-soft">
                 {option.description}
               </span>
             </button>
@@ -83,18 +85,18 @@ function CategoryAction({ category }: { category: SponsorBlockCategory }) {
   const options = actions();
   const value = settings.sponsorBlockCategoryActions[category.id] ?? category.defaultAction;
   return (
-    <div className="grid gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-center">
+    <div className="grid min-w-0 gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] sm:items-center">
       <div className="flex min-w-0 gap-3">
         <span
           className="mt-1 h-3 w-3 flex-shrink-0 rounded-full border border-border"
           style={{ backgroundColor: category.color }}
         />
-        <div className="min-w-0">
+        <div className="typetype-adaptive-label min-w-0">
           <div className="text-sm text-fg">{category.label()}</div>
           <div className="text-xs leading-5 text-fg-soft">{category.description()}</div>
         </div>
       </div>
-      <div className="grid grid-cols-3 rounded-sm border border-border p-1">
+      <div className="typetype-adaptive-segmented rounded-sm border border-border p-1">
         {options.map((action) => {
           const selected = action.value === value;
           return (
@@ -109,7 +111,7 @@ function CategoryAction({ category }: { category: SponsorBlockCategory }) {
                   },
                 })
               }
-              className={`rounded-sm px-2 py-1.5 text-[11px] transition-colors ${
+              className={`typetype-adaptive-control rounded-sm px-1 py-1.5 text-[11px] transition-colors ${
                 selected ? "bg-fg/10 text-fg" : "text-fg-soft hover:text-fg"
               }`}
             >
@@ -133,11 +135,8 @@ function ExtraToggles() {
     ["sponsorBlockMuteInsteadOfSkip", m.ui_mute_segments_instead_of_skipping()],
   ] as const;
   return toggles.map(([key, label]) => (
-    <div
-      key={key}
-      className="flex items-center justify-between gap-3 py-3 text-left text-sm text-fg"
-    >
-      <span>{label}</span>
+    <div key={key} className={`${ROW} text-left text-sm text-fg`}>
+      <span className="typetype-adaptive-label flex min-w-0 flex-1">{label}</span>
       <ToggleSwitch
         checked={settings[key]}
         ariaLabel={label}
@@ -161,8 +160,10 @@ export function SettingsSponsorBlockPreferences() {
       <div className="py-2 text-[11px] font-medium uppercase tracking-wider text-fg-soft">
         {m.ui_advanced_display()}
       </div>
-      <div className="flex items-center justify-between gap-4 py-3">
-        <span className="text-sm text-fg">{m.ui_minimum_segment_duration()}</span>
+      <div className={ROW}>
+        <span className="typetype-adaptive-label flex min-w-0 flex-1 text-sm text-fg">
+          {m.ui_minimum_segment_duration()}
+        </span>
         <input
           type="number"
           min="0"
@@ -170,7 +171,7 @@ export function SettingsSponsorBlockPreferences() {
           onChange={(event) =>
             update.mutate({ sponsorBlockMinimumDuration: Number(event.currentTarget.value) })
           }
-          className="w-20 rounded-sm border border-border bg-app px-2 py-1 text-right text-sm text-fg"
+          className="typetype-adaptive-control w-20 shrink-0 rounded-sm border border-border bg-app px-2 py-1 text-right text-sm text-fg"
         />
       </div>
       <ExtraToggles />

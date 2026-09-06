@@ -37,3 +37,29 @@
   overflow-wrap: anywhere;
   line-height: 1.2;
 }
+
+/* Segmented actions stay tactile while translated labels are allowed to wrap. */
+.typetype-adaptive-segmented {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.typetype-adaptive-segmented > button {
+  min-width: 0;
+  min-height: 2rem;
+  flex: 1 1 4.5rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .typetype-adaptive-segmented {
+    width: min(100%, 18rem);
+  }
+}
