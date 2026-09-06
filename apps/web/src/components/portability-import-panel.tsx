@@ -85,7 +85,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   }, [toast]);
 
   function choose(file: File | undefined) {
-    if (file) upload.mutate(file);
+    if (file && !upload.isPending) upload.mutate(file);
   }
 
   function drop(event: DragEvent<HTMLButtonElement>) {
@@ -126,6 +126,8 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           <PortabilityImportGuide format={format.format} />
           <button
             type="button"
+            disabled={upload.isPending}
+            aria-busy={upload.isPending}
             onClick={() => input.current?.click()}
             onDragEnter={(event) => {
               event.preventDefault();
@@ -138,7 +140,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           >
             <FileUp size={24} className="text-fg" />
             <span className="mt-3 text-sm font-medium text-fg">
-              {m.portability_choose_or_drop()}
+              {upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()}
             </span>
             <span className="mt-1 max-w-md text-xs text-fg-soft">
               {m.portability_drop_original_prefix()} .{format.defaultExtension}{" "}
@@ -209,7 +211,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
       )}
       {failure && (
         <p role="alert" className="text-sm text-danger">
-          {m.portability_import_failed()}
+          {failure instanceof Error ? failure.message : m.portability_import_failed()}
         </p>
       )}
       <Toast message={toast} />

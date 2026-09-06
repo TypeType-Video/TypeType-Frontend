@@ -101,6 +101,10 @@ export async function getPortabilityFormats(): Promise<PortabilityFormatDescript
 }
 
 export async function startPortabilityImport(file: File, format: string): Promise<PortabilityJob> {
+  if (format === "youtube-takeout") {
+    const { prepareYoutubeTakeout } = await import("./prepare-youtube-takeout");
+    file = await prepareYoutubeTakeout(file);
+  }
   const body = new FormData();
   body.append("file", file);
   return portabilityResponse(
