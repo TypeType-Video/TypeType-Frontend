@@ -54,13 +54,13 @@ export function ChannelFilterBar({
     <section className="border-y border-border py-3">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         {searchAvailable && (
-          <div className="flex w-fit items-center gap-2 text-sm">
+          <div className="flex max-w-full flex-wrap items-center gap-2 text-sm">
             {channelTabs().map((item) => (
               <button
                 key={item.tab}
                 type="button"
                 onClick={() => onTabChange(item.tab)}
-                className={`border-border-strong border-b py-1 font-medium transition-colors ${
+                className={`typetype-adaptive-control inline-flex max-w-full border-border-strong border-b py-1 font-medium transition-colors ${
                   tab === item.tab
                     ? "border-fg text-fg"
                     : "border-transparent text-fg-soft hover:text-fg"
@@ -104,7 +104,7 @@ export function ChannelFilterBar({
           </div>
         )}
         {!isSearching && tab === "videos" && (
-          <div className="flex w-fit items-center gap-2 text-sm">
+          <div className="flex max-w-full flex-wrap items-center gap-2 text-sm">
             {CHANNEL_SORT_OPTIONS.map((option) => {
               const selected = option.value === sort;
               return (
@@ -112,7 +112,7 @@ export function ChannelFilterBar({
                   key={option.value}
                   type="button"
                   onClick={() => onSortChange(channelSortOrDefault(option.value))}
-                  className={`border-border-strong border-b py-1 font-medium transition-colors ${
+                  className={`typetype-adaptive-control inline-flex max-w-full border-border-strong border-b py-1 font-medium transition-colors ${
                     selected ? "border-fg text-fg" : "border-transparent text-fg-soft hover:text-fg"
                   }`}
                 >

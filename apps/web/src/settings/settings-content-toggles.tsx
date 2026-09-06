@@ -120,7 +120,7 @@ function ToggleRows({ options }: { options: ToggleOption[] }) {
   const { settings, update } = useSettings();
   return options.map((option) => (
     <div key={option.key} className={ROW}>
-      <div className="flex flex-col gap-1">
+      <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-fg text-sm">{option.label}</span>
           <span className="text-[10px] uppercase text-fg-soft">{option.area}</span>

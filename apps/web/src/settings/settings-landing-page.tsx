@@ -23,7 +23,7 @@ export function SettingsLandingPage() {
         {m.ui_startup()}
       </p>
       <div className="flex min-w-0 flex-col items-start gap-3 border-y border-border py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
+        <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
           <span className="text-sm text-fg">{m.ui_default_landing_page()}</span>
           <span className="text-xs text-fg-soft">
             {m.ui_the_page_typetype_opens_on_when_you_launch_it()}
@@ -33,7 +33,7 @@ export function SettingsLandingPage() {
           aria-label={m.ui_default_landing_page()}
           value={settings.defaultLandingPage}
           onChange={(event) => update.mutate({ defaultLandingPage: event.target.value })}
-          className="h-9 w-full rounded-sm border border-border-strong bg-app px-2.5 text-sm text-fg sm:w-48"
+          className="typetype-adaptive-control h-9 w-full max-w-full rounded-sm border border-border-strong bg-app px-2.5 text-sm text-fg sm:w-56"
         >
           {landingOptions().map((option) => (
             <option key={option.value} value={option.value}>

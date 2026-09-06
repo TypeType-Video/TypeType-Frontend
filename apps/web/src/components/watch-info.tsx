@@ -65,8 +65,10 @@ export function WatchInfo({ stream }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-4">
-        <h1 className="text-base font-semibold text-fg leading-snug">{stream.title}</h1>
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        <h1 className="typetype-adaptive-label min-w-0 flex-1 text-base font-semibold leading-snug text-fg">
+          {stream.title}
+        </h1>
         <span className="mt-0.5 flex flex-shrink-0 items-center gap-1.5 text-sm text-fg-muted">
           <Eye className="size-4" aria-hidden="true" />
           {formatViews(stream.views)}
@@ -106,7 +108,7 @@ export function WatchInfo({ stream }: Props) {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between gap-3 flex-shrink-0 sm:justify-start">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 sm:justify-start">
           <WatchLikeDislike stream={stream} />
           {stream.channelUrl && (
             <>
@@ -123,15 +125,17 @@ export function WatchInfo({ stream }: Props) {
                 onClick={handleSubscribe}
                 disabled={add.isPending || remove.isPending}
                 aria-pressed={subscribed}
-                className={`flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-border disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`typetype-adaptive-control inline-flex min-h-8 max-w-full flex-wrap items-center justify-center px-4 py-1.5 text-center text-sm font-medium leading-tight rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-border disabled:opacity-50 disabled:cursor-not-allowed ${
                   subscribed
                     ? "ring-1 ring-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
                     : "bg-fg text-app hover:bg-fg-strong"
                 }`}
               >
-                {subscribed
-                  ? m.watch_subscribed({}, { locale })
-                  : m.watch_subscribe({}, { locale })}
+                <span className="typetype-adaptive-label">
+                  {subscribed
+                    ? m.watch_subscribed({}, { locale })
+                    : m.watch_subscribe({}, { locale })}
+                </span>
               </button>
             </>
           )}

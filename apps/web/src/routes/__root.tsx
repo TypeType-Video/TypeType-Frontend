@@ -158,7 +158,7 @@ function RootLayoutContent() {
 
   if (shortsPage) {
     const shortsMainClass = `transition-[margin] duration-200 ${
-      isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
+      isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
     }`;
     return (
       <div className="min-h-screen bg-app text-fg">
@@ -192,7 +192,7 @@ function RootLayoutContent() {
   const mainClasses = watchCinemaPage
     ? "watch-page-main transition-all duration-200 ml-0"
     : `watch-page-main px-3 sm:px-4 ${mainBottomPad} transition-all duration-200 ${
-        isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
+        isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
       }`;
 
   return (
