@@ -1111,7 +1111,7 @@
   "ui_submit": "Einreichen",
   "ui_history_count": "{count} Einträge",
   "ui_subscription_count": "{count} Kanäle",
-  "ui_search_history_count": "(count} Einträge",
+  "ui_search_history_count": "{count} Einträge",
   "ui_clear_history_question": "{label} leeren?",
   "ui_unsubscribe_from_count_question": "{label} deabonnieren?",
   "ui_clear_search_history_question": "{label} leeren?",
@@ -1293,5 +1293,8 @@
   "watch_share_source_link": "{provider} Link teilen",
   "watch_share_typetype_link": "TypeType Link teilen",
   "ui_close_player": "Player schließen",
-  "ui_move_player": "Player bewegen"
+  "ui_move_player": "Player bewegen",
+  "portability_preparing_upload": "Kontodaten werden vorbereitet und hochgeladen...",
+  "portability_takeout_metadata_limit": "Die Kontodaten in diesem Archiv überschreiten die Importgrenzen oder sind verschlüsselt. Exportiere YouTube separat in kleineren ZIP-Dateien.",
+  "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält."
 }
