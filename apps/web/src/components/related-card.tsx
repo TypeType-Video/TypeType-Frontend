@@ -42,7 +42,7 @@ function RelatedCardComponent({ stream, relatedStreams, progressMs = 0 }: Props)
         to="/watch"
         search={watchRouteSearch(stream.id)}
         preload="intent"
-        className="relative w-40 aspect-video rounded-md overflow-hidden bg-surface-strong flex-shrink-0"
+        className="relative w-32 aspect-video rounded-md overflow-hidden bg-surface-strong flex-shrink-0 sm:w-40"
         onClick={() => setNavigation(stream, relatedStreams)}
       >
         <img
@@ -89,26 +89,26 @@ function RelatedCardComponent({ stream, relatedStreams, progressMs = 0 }: Props)
         {stream.channelUrl ? (
           <ChannelRouteLink
             url={stream.channelUrl}
-            className="flex items-center gap-1.5 mt-0.5 w-fit group/channel"
+            className="flex min-w-0 max-w-full items-center gap-1.5 mt-0.5 w-fit group/channel"
           >
             <ChannelAvatar
               src={stream.channelAvatar}
               name={stream.channelName}
               className="w-4 h-4"
             />
-            <span className="text-xs text-fg-muted group-hover/channel:text-fg truncate flex items-center gap-1">
+            <span className="min-w-0 text-xs text-fg-muted group-hover/channel:text-fg truncate flex items-center gap-1">
               {stream.channelName}
               {stream.uploaderVerified && <VerifiedBadgeIcon />}
             </span>
           </ChannelRouteLink>
         ) : (
-          <div className="flex items-center gap-1.5 mt-0.5">
+          <div className="flex min-w-0 max-w-full items-center gap-1.5 mt-0.5">
             <ChannelAvatar
               src={stream.channelAvatar}
               name={stream.channelName}
               className="w-4 h-4"
             />
-            <span className="text-xs text-fg-muted truncate flex items-center gap-1">
+            <span className="min-w-0 text-xs text-fg-muted truncate flex items-center gap-1">
               {stream.channelName}
               {stream.uploaderVerified && <VerifiedBadgeIcon />}
             </span>
