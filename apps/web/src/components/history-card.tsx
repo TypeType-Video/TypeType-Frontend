@@ -41,7 +41,7 @@ export function HistoryCard({ item, onRemove }: HistoryCardProps) {
             <img
               src={branding.thumbnail}
               alt={branding.title}
-              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+              className={`h-full w-full object-cover transition-transform duration-200 group-hover:scale-105 ${watched ? "grayscale opacity-60" : ""}`}
               loading="lazy"
               decoding="async"
             />

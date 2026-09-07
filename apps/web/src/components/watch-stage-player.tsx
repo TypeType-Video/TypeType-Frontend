@@ -8,7 +8,7 @@ import { PlayerPlaybackSpeedDefault } from "./player-defaults";
 import { VideoPlayer } from "./video-player";
 import { WatchPlayerCrossfade } from "./watch-player-crossfade";
 
-type Props = {
+export type WatchStagePlayerProps = {
   audioOnly: boolean;
   streamTitle: string;
   poster?: string;
@@ -46,7 +46,7 @@ type Props = {
   onNextVideo?: () => void;
 };
 
-export function WatchStagePlayer(props: Props) {
+export function WatchStagePlayer(props: WatchStagePlayerProps) {
   const settings = props.settings;
   const playbackRatePreference = useRef(
     new SabrPlaybackRatePreference(settings.defaultPlaybackSpeed),

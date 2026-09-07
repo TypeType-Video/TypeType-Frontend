@@ -1,4 +1,5 @@
 import { Clock3, MessageCircle, Share2, Star } from "lucide-react";
+import { useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useFavoriteStatus } from "../hooks/use-favorite-status";
 import { useShareUrl } from "../hooks/use-share-url";
@@ -7,6 +8,7 @@ import { shortsRouteKey, toPublicShortsUrl } from "../lib/shorts-route";
 import { toWatchLaterPayload } from "../lib/watch-later-mappers";
 import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
+import { ShareSheet } from "./share-sheet";
 import { ShortsActionButton } from "./shorts-action-button";
 
 type Props = {
@@ -26,6 +28,8 @@ export function ShortsActions({
 }: Props) {
   const { isAuthed } = useAuth();
   const { copied, share } = useShareUrl();
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareAnchorRef = useRef<HTMLButtonElement>(null);
   const {
     add: addFavorite,
     remove: removeFavorite,
@@ -57,10 +61,6 @@ export function ShortsActions({
     await watchLater.toggle(toWatchLaterPayload(stream));
   }
 
-  function handleShare() {
-    void share(toPublicShortsUrl(stream.id, window.location.origin));
-  }
-
   return (
     <div className={`pointer-events-auto flex flex-col items-center gap-3 ${className ?? ""}`}>
       <ShortsActionButton
@@ -90,12 +90,23 @@ export function ShortsActions({
         />
       )}
       <ShortsActionButton
+        buttonRef={shareAnchorRef}
         icon={Share2}
         label={m.watch_share()}
         stateLabel={copied ? m.ui_copied() : m.ui_link()}
         compact={compact}
-        onClick={handleShare}
+        onClick={() => setShareOpen(true)}
       />
+      {shareOpen && (
+        <ShareSheet
+          anchorEl={shareAnchorRef.current}
+          sourceUrl={stream.id}
+          typetypeUrl={toPublicShortsUrl(stream.id, window.location.origin)}
+          title={stream.title}
+          onShare={(url, title) => void share(url, title)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   );
 }

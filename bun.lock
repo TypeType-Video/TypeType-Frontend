@@ -16,8 +16,9 @@
       "dependencies": {
         "@tanstack/react-query": "^5.101.2",
         "@tanstack/react-router": "^1.170.17",
-        "@typetype/mse": "0.1.57",
+        "@typetype/mse": "0.1.59",
         "@vidstack/react": "1.12.13",
+        "@zip.js/zip.js": "^2.11.2",
         "dashjs": "^5.2.0",
         "hls.js": "1.6.16",
         "lucide-react": "^1.24.0",
@@ -371,13 +372,15 @@
 
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
 
-    "@typetype/mse": ["@typetype/mse@0.1.57", "", {}, "sha512-ydSpqIZw3Ll8LUysxP80Yz7YCYRZBHcsHO5U0kS5nf+bGEMBRFcNOgUwBQ/pJqBWIGdnNQ678A0PP19gs4NdpQ=="],
+    "@typetype/mse": ["@typetype/mse@0.1.59", "", {}, "sha512-TlkEtfzI7a5Lce/VkYtJnhB+VojvcxUPh2qFkCHgYusKkhpM8kDHt5GVAKlFE5PnRZCQVFzcihNHmoXIZaRAqw=="],
 
     "@typetype/web": ["@typetype/web@workspace:apps/web"],
 
     "@vidstack/react": ["@vidstack/react@1.12.13", "", { "dependencies": { "@floating-ui/dom": "^1.6.10", "media-captions": "^1.0.4" }, "peerDependencies": { "@types/react": "^18.0.0 || ^19.0.0", "react": "^18.0.0 || ^19.0.0" } }, "sha512-zyNydy1+HtoK6cJ8EmqFNkPPGHIFMrr2KH+ef3654EqXx4IcJ8A5LCNMXBuALQE8IMxtk040JMoR9OKyeXjBOQ=="],
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@6.0.3", "", { "dependencies": { "@rolldown/pluginutils": "^1.0.1" }, "peerDependencies": { "@rolldown/plugin-babel": "^0.1.7 || ^0.2.0", "babel-plugin-react-compiler": "^1.0.0", "vite": "^8.0.0" }, "optionalPeers": ["@rolldown/plugin-babel", "babel-plugin-react-compiler"] }, "sha512-vmFvco5/QuC2f9Oj+wTk0+9XeDFkHxSamwZKYc7MxYwKICfvUvlMhqKI0VuICPltGqh1neqBKDvO4kes1ya8vg=="],
+
+    "@zip.js/zip.js": ["@zip.js/zip.js@2.11.2", "", {}, "sha512-gvlhhtTzqoGcl3bpFpMieJgFiVGnEgD777JgERXhbU89cCnYc2Srl5gs+kcCoy31hfx+xD4UCDO1MB2+UtqcZA=="],
 
     "acorn": ["acorn@8.18.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ=="],
 

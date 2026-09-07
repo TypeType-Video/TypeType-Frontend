@@ -1,7 +1,9 @@
 import { TypeTypeMsePlayer, type TypeTypeMseQuality } from "@typetype/mse";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLatestValue } from "../hooks/use-latest-value";
+import { useSabrEngineHandlers } from "../hooks/use-sabr-engine-handlers";
 import { useSabrErrorReporter } from "../hooks/use-sabr-error-reporter";
+import { useSabrMediaSettings } from "../hooks/use-sabr-media-settings";
 import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { toAbsoluteApiUrl } from "../lib/env";
@@ -9,6 +11,11 @@ import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
+import { SabrVideoHandoff } from "../lib/sabr-video-handoff";
+import {
+  captureSabrVideoHandoffCleanupPosition as captureCleanupPosition,
+  registerSabrVideoHandoffPositionCapture as registerPosition,
+} from "../lib/sabr-video-handoff-events";
 import { registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
 import { useAuthStore } from "../stores/auth-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
@@ -29,14 +36,15 @@ export function SabrMsePlayer({
 }: SabrMsePlayerProps) {
   const token = useAuthStore((state) => state.token);
   const headersRef = useRef(new Headers());
-  if (token) headersRef.current.set("authorization", `Bearer ${token}`);
-  else headersRef.current.delete("authorization");
+  token
+    ? headersRef.current.set("authorization", `Bearer ${token}`)
+    : headersRef.current.delete("authorization");
   const engineRef = useRef<TypeTypeMsePlayer | null>(null);
   const qualityRef = useRef<TypeTypeMseQuality | null>(null);
   const pendingPlayRef = useRef(false);
   const seekingRef = useRef(false);
   const errorReportedRef = useRef(false);
-  const attachedVideoRef = useRef(false);
+  const videoHandoffRef = useRef(new SabrVideoHandoff());
   const fallbackPlaybackRateRef = useRef(new SabrPlaybackRatePreference());
   const playbackRate = playbackRatePreference ?? fallbackPlaybackRateRef.current;
   const [engineReady, setEngineReady] = useState(false);
@@ -50,16 +58,9 @@ export function SabrMsePlayer({
     onVolumeChange,
   });
   const reportError = useSabrErrorReporter(errorReportedRef, onError);
-  const latestEngineHandlers = useCallback(() => {
-    const handlers = latestHandlers();
-    return {
-      onError: reportError,
-      onSeekStateChange: handlers.onSeekStateChange,
-    };
-  }, [latestHandlers, reportError]);
-  const setQualityTransitioning = useCallback(
-    (transitioning: boolean) => latestHandlers().onSeekStateChange(transitioning),
-    [latestHandlers],
+  const { latestEngineHandlers, setQualityTransitioning } = useSabrEngineHandlers(
+    latestHandlers,
+    reportError,
   );
   useSabrQualitySwitch(
     config,
@@ -70,16 +71,15 @@ export function SabrMsePlayer({
     setQualityTransitioning,
   );
   useSabrModeSwitch(config.audioOnly === true, engineRef, seekingRef, latestEngineHandlers);
-  useEffect(() => {
-    if (!video || !settingsReady) return;
-    video.volume = Math.min(1, Math.max(0, initialVolume));
-    video.muted = initialMuted;
-  }, [initialMuted, initialVolume, settingsReady, video]);
+  useSabrMediaSettings(video, settingsReady, initialVolume, initialMuted);
   useEffect(() => {
     if (!video) return;
     errorReportedRef.current = false;
-    const replacingVideo = attachedVideoRef.current;
-    attachedVideoRef.current = true;
+    const { startTimeMs: initialStartTimeMs, replacingVideo } = videoHandoffRef.current.attach(
+      video,
+      config.videoId,
+      latestStartTime(),
+    );
     const autoplayAttempt = new SabrAutoplayAttempt();
     const initialConfig = latestConfig();
     const engine = new TypeTypeMsePlayer(video, {
@@ -90,7 +90,7 @@ export function SabrMsePlayer({
       audioTrackId: initialConfig.audioTrackId,
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
-      startTimeMs: Math.max(0, Math.round(latestStartTime())),
+      startTimeMs: initialStartTimeMs,
       headers: headersRef.current,
     });
     engineRef.current = engine;
@@ -106,7 +106,9 @@ export function SabrMsePlayer({
       if (engine.isApplyingTransientMediaState()) return;
       latestHandlers().onVolumeChange?.(video.volume, video.muted);
     };
-    let playbackRateSettled = false;
+    const offPosition = registerPosition(video, videoHandoffRef.current, config.videoId);
+    let playbackRateSettled = false,
+      engineLoaded = false;
     const playbackRateChange = () => {
       playbackRate.capture(video, !playbackRateSettled || engine.isApplyingTransientMediaState());
     };
@@ -119,7 +121,6 @@ export function SabrMsePlayer({
     playbackRate.initialize(video);
     video.addEventListener("volumechange", volumeChange);
     video.addEventListener("ratechange", playbackRateChange);
-    let engineLoaded = false;
     const autoplayDeadline = new SabrAutoplayDeadline(() => {
       if (!autoplayAttempt.expire()) return;
       pendingPlayRef.current = false;
@@ -185,11 +186,13 @@ export function SabrMsePlayer({
     });
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
+      captureCleanupPosition(video, videoHandoffRef.current, config.videoId);
       offError();
       unguardAutoplay();
       unregisterControls();
       video.removeEventListener("volumechange", volumeChange);
       video.removeEventListener("ratechange", playbackRateChange);
+      offPosition();
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);
       autoplayDeadline.clear();

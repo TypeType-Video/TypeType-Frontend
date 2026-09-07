@@ -1,13 +1,11 @@
 import { InterfaceLanguagePicker } from "../components/interface-language-picker";
-import { ToggleSwitch } from "../components/toggle-switch";
 import { useSettings } from "../hooks/use-settings";
 import { m } from "../paraglide/messages.js";
 import { LanguageDropdown } from "./language-dropdown";
+import { ROW, ToggleSwitch } from "./settings-toggle-switch";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
 const GROUP = "divide-y divide-border border-y border-border";
-const ROW = "flex min-w-0 items-center justify-between gap-4 py-4";
-
 export function SettingsLanguage() {
   const { settings, update } = useSettings();
 
@@ -16,7 +14,7 @@ export function SettingsLanguage() {
       <p className={SECTION_LABEL}>{m.settings_language_section()}</p>
       <div className={GROUP}>
         <div className={ROW}>
-          <div className="min-w-0 flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.settings_ui_language_label()}</span>
             <span className="text-xs text-fg-soft">{m.settings_ui_language_description()}</span>
           </div>
@@ -24,7 +22,7 @@ export function SettingsLanguage() {
         </div>
         {settings.defaultService === 0 && (
           <div className={ROW}>
-            <div className="flex flex-col gap-1">
+            <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-sm text-fg">{m.settings_subtitle_default_label()}</span>
               <span className="text-xs text-fg-soft">
                 {m.settings_subtitle_default_description()}
@@ -32,14 +30,14 @@ export function SettingsLanguage() {
             </div>
             <ToggleSwitch
               checked={settings.subtitlesEnabled}
-              className="ml-6"
+              className="ml-0 sm:ml-6"
               onClick={() => update.mutate({ subtitlesEnabled: !settings.subtitlesEnabled })}
             />
           </div>
         )}
         {settings.defaultService === 0 && (
           <div className={ROW}>
-            <div className="flex flex-col gap-1">
+            <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-sm text-fg">{m.settings_subtitle_language_label()}</span>
               <span className="text-xs text-fg-soft">
                 {m.settings_subtitle_language_description()}
@@ -53,7 +51,7 @@ export function SettingsLanguage() {
         )}
         {settings.defaultService === 0 && (
           <div className={ROW}>
-            <div className="flex flex-col gap-1">
+            <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-sm text-fg">{m.settings_audio_language_label()}</span>
               <span className="text-xs text-fg-soft">
                 {settings.preferOriginalLanguage
@@ -70,7 +68,7 @@ export function SettingsLanguage() {
         )}
         {settings.defaultService === 0 && (
           <div className={ROW}>
-            <div className="flex flex-col gap-1">
+            <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-sm text-fg">{m.settings_original_audio_label()}</span>
               <span className="text-xs text-fg-soft">
                 {m.settings_original_audio_description()}
@@ -78,7 +76,7 @@ export function SettingsLanguage() {
             </div>
             <ToggleSwitch
               checked={settings.preferOriginalLanguage}
-              className="ml-6"
+              className="ml-0 sm:ml-6"
               onClick={() =>
                 update.mutate({ preferOriginalLanguage: !settings.preferOriginalLanguage })
               }

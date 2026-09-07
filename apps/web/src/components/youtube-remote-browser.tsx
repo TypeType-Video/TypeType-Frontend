@@ -2,6 +2,7 @@ import type { KeyboardEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { YoutubeRemoteInput, YoutubeRemotePhase } from "../hooks/use-youtube-remote-browser";
 import { youtubeRemotePhaseLabel } from "../lib/youtube-remote-phase";
+import { mapYoutubeRemotePointer, type RemotePointerSize } from "../lib/youtube-remote-pointer";
 import { m } from "../paraglide/messages.js";
 
 type Props = {
@@ -9,11 +10,6 @@ type Props = {
   phase: YoutubeRemotePhase;
   error: string | null;
   onInput: (message: YoutubeRemoteInput) => void;
-};
-
-type FrameSize = {
-  width: number;
-  height: number;
 };
 
 function modifiers(event: KeyboardEvent): string[] {
@@ -36,7 +32,9 @@ function isPasteShortcut(event: KeyboardEvent): boolean {
 export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [frameSize, setFrameSize] = useState<FrameSize | null>(null);
+  const pointerIdRef = useRef<number | null>(null);
+  const [frameSize, setFrameSize] = useState<RemotePointerSize | null>(null);
+  const [viewportSize, setViewportSize] = useState<RemotePointerSize | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -44,11 +42,22 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
     const observer = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
       const height = Math.round(entry.contentRect.height);
-      if (width > 0 && height > 0) onInput({ type: "resize", width, height });
+      if (width <= 0 || height <= 0) return;
+      setViewportSize((previous) =>
+        previous?.width === width && previous.height === height ? previous : { width, height },
+      );
+      onInput({ type: "resize", width, height });
     });
     observer.observe(root);
     return () => observer.disconnect();
   }, [onInput]);
+
+  useEffect(() => {
+    if (!frameUrl) {
+      setFrameSize(null);
+      pointerIdRef.current = null;
+    }
+  }, [frameUrl]);
 
   useEffect(() => {
     const input = inputRef.current;
@@ -62,25 +71,15 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
   }, [onInput]);
 
   function point(event: PointerEvent) {
-    const rect =
-      rootRef.current?.getBoundingClientRect() ?? event.currentTarget.getBoundingClientRect();
-    const rawX = event.clientX - rect.left;
-    const rawY = event.clientY - rect.top;
-    if (!frameSize) {
-      return { x: Math.round(rawX), y: Math.round(rawY) };
+    const rect = event.currentTarget.getBoundingClientRect();
+    return mapYoutubeRemotePointer(event.clientX, event.clientY, rect, frameSize, viewportSize);
+  }
+
+  function releasePointer(event: PointerEvent) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    const scale = Math.min(rect.width / frameSize.width, rect.height / frameSize.height);
-    if (!Number.isFinite(scale) || scale <= 0) {
-      return { x: Math.round(rawX), y: Math.round(rawY) };
-    }
-    const offsetX = (rect.width - frameSize.width * scale) / 2;
-    const offsetY = (rect.height - frameSize.height * scale) / 2;
-    const x = Math.round((rawX - offsetX) / scale);
-    const y = Math.round((rawY - offsetY) / scale);
-    return {
-      x: Math.max(0, Math.min(frameSize.width - 1, x)),
-      y: Math.max(0, Math.min(frameSize.height - 1, y)),
-    };
+    pointerIdRef.current = null;
   }
 
   return (
@@ -119,16 +118,32 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
         onChange={() => undefined}
         className="absolute inset-0 h-full w-full touch-none resize-none cursor-default border-0 bg-transparent p-0 text-base text-transparent caret-transparent outline-none"
         onPointerDown={(event) => {
+          if (pointerIdRef.current !== null && pointerIdRef.current !== event.pointerId) return;
+          event.preventDefault();
           event.currentTarget.focus();
           event.currentTarget.setPointerCapture(event.pointerId);
+          pointerIdRef.current = event.pointerId;
           onInput({ type: "pointer", event: "down", ...point(event), button: "left" });
         }}
-        onPointerMove={(event) =>
-          onInput({ type: "pointer", event: "move", ...point(event), button: "left" })
-        }
-        onPointerUp={(event) =>
-          onInput({ type: "pointer", event: "up", ...point(event), button: "left" })
-        }
+        onPointerMove={(event) => {
+          if (pointerIdRef.current !== null && pointerIdRef.current !== event.pointerId) return;
+          event.preventDefault();
+          onInput({ type: "pointer", event: "move", ...point(event), button: "left" });
+        }}
+        onPointerUp={(event) => {
+          event.preventDefault();
+          if (pointerIdRef.current === event.pointerId) {
+            onInput({ type: "pointer", event: "up", ...point(event), button: "left" });
+            releasePointer(event);
+          }
+        }}
+        onPointerCancel={(event) => {
+          event.preventDefault();
+          if (pointerIdRef.current === event.pointerId) {
+            onInput({ type: "pointer", event: "up", ...point(event), button: "left" });
+            releasePointer(event);
+          }
+        }}
         onKeyDown={(event) => {
           if (isPasteShortcut(event)) return;
           event.preventDefault();

@@ -95,7 +95,7 @@ export function Sidebar({ overlay = false }: Props) {
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       }`
     : `fixed top-14 left-0 bottom-0 ${desktopShell} ${desktopMotion} flex flex-col py-4 transition-all duration-200 ${
-        visualCollapsed ? "w-14" : "w-48"
+        visualCollapsed ? "w-14" : "typetype-sidebar-expanded"
       }`;
   const sectionPadding = isMobile ? "px-3" : "px-2";
   const itemLayout = isMobile
@@ -134,7 +134,9 @@ export function Sidebar({ overlay = false }: Props) {
               >
                 <NavIcon label={label}>{item.icon}</NavIcon>
                 {(!visualCollapsed || isMobile) && (
-                  <span className="text-sm font-medium">{label}</span>
+                  <span className="typetype-adaptive-label flex-1 text-sm font-medium leading-tight">
+                    {label}
+                  </span>
                 )}
               </Link>
             );
@@ -161,7 +163,11 @@ export function Sidebar({ overlay = false }: Props) {
               } ${service === svc.id ? BTN_ACTIVE : BTN_INACTIVE}`}
             >
               <ServiceIcon path={svc.path} color={svc.color} label={svc.label} />
-              {(!visualCollapsed || isMobile) && <span className="text-sm">{svc.label}</span>}
+              {(!visualCollapsed || isMobile) && (
+                <span className="typetype-adaptive-label flex-1 text-sm leading-tight">
+                  {svc.label}
+                </span>
+              )}
             </button>
           ))}
         </div>

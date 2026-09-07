@@ -31,8 +31,10 @@ export function SectionShell<Key extends string>({
   return (
     <div className="min-w-0 pt-5 [animation:page-fade-in_0.2s_ease-out] sm:pt-8">
       <header data-interface-copy className="mb-7 border-b border-border pb-6">
-        <h1 className="text-2xl font-bold text-fg">{title}</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-6 text-fg-muted">{subtitle}</p>
+        <h1 className="typetype-adaptive-label text-2xl font-bold text-fg">{title}</h1>
+        <p className="typetype-adaptive-label mt-1.5 max-w-2xl text-sm leading-6 text-fg-muted">
+          {subtitle}
+        </p>
       </header>
       <div className="mb-5 lg:hidden">
         <label htmlFor="section-navigation" className="sr-only">
@@ -63,14 +65,16 @@ export function SectionShell<Key extends string>({
                   type="button"
                   aria-current={selected ? "page" : undefined}
                   onClick={() => onSelect(item.key)}
-                  className={`grid min-h-11 w-full grid-cols-[20px_1fr] items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors ${
+                  className={`grid min-h-11 w-full min-w-0 grid-cols-[20px_minmax(0,1fr)] items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors ${
                     selected
                       ? "border-accent text-fg"
                       : "border-transparent text-fg-muted hover:border-border-strong hover:text-fg"
                   }`}
                 >
                   <Icon className="size-4" aria-hidden="true" />
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <span className="typetype-adaptive-label text-sm font-medium leading-tight">
+                    {item.label}
+                  </span>
                 </button>
               );
             })}
@@ -80,9 +84,13 @@ export function SectionShell<Key extends string>({
           <header data-interface-copy className="mb-6">
             <div className="flex items-center gap-2">
               {CurrentIcon && <CurrentIcon className="size-5 text-fg-muted" aria-hidden="true" />}
-              <h2 className="text-lg font-semibold text-fg">{current?.label}</h2>
+              <h2 className="typetype-adaptive-label text-lg font-semibold text-fg">
+                {current?.label}
+              </h2>
             </div>
-            <p className="mt-1 text-sm text-fg-muted">{current?.description}</p>
+            <p className="typetype-adaptive-label mt-1 text-sm text-fg-muted">
+              {current?.description}
+            </p>
           </header>
           <div data-interface-copy>{children}</div>
         </main>

@@ -38,7 +38,10 @@ test("portability imports send the selected source format", async () => {
     }),
   );
 
-  await startPortabilityImport(new File(["backup"], "takeout.zip"), "youtube-takeout");
+  const { ZipWriter, BlobWriter, TextReader } = await import("@zip.js/zip.js");
+  const archive = new ZipWriter(new BlobWriter());
+  await archive.add("Takeout/YouTube/subscriptions.csv", new TextReader("Channel Id\nUC1"));
+  await startPortabilityImport(new File([await archive.close()], "takeout.zip"), "youtube-takeout");
 
   const [url, request] = (globalThis.fetch as ReturnType<typeof mock>).mock.calls[0] as [
     string,

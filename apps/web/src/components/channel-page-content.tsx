@@ -2,11 +2,13 @@ import { useMemo } from "react";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useChannel } from "../hooks/use-channel";
 import { useDocumentTitle } from "../hooks/use-document-title";
+import { useVideoProgressMap } from "../hooks/use-progress";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { isChannelNotAllowedError } from "../lib/allow-list-error";
 import type { ChannelSort } from "../lib/api-discovery";
 import type { ChannelTab } from "../lib/channel-route-url";
 import { detectProvider } from "../lib/provider";
+import { videoProgressUrl } from "../lib/video-progress";
 import { m } from "../paraglide/messages.js";
 import { ChannelFilterBar } from "./channel-filter-bar";
 import { ChannelPageHeader } from "./channel-page-header";
@@ -47,6 +49,7 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
   const subscribed = isSubscribed(sourceUrl);
   const searchAvailable = detectProvider(sourceUrl) === "youtube";
   const visibleVideos = useMemo(() => filter(videos), [filter, videos]);
+  const progressByUrl = useVideoProgressMap(visibleVideos);
   const isInitialLoading = isLoading && !meta;
   const isReplacingVideos = isFetching && !isFetchingNextPage && visibleVideos.length === 0;
 
@@ -144,7 +147,10 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
                   className="animate-card-pop-in"
                   style={{ animationDelay: `${Math.min(index * 45, 270)}ms` }}
                 >
-                  <VideoCard stream={v} />
+                  <VideoCard
+                    stream={v}
+                    progressMs={progressByUrl.get(videoProgressUrl(v))?.position}
+                  />
                 </div>
               ))}
             </div>

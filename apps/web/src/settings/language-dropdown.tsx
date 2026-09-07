@@ -41,17 +41,17 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
   }, [open]);
 
   return (
-    <div ref={ref} className="relative ml-6 flex-shrink-0">
+    <div ref={ref} className="relative ml-0 shrink-0 sm:ml-6">
       <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
-        className={`flex items-center gap-2 bg-surface-strong border border-border-strong text-xs rounded-lg px-3 py-1.5 transition-colors ${disabled ? "text-fg-soft cursor-not-allowed" : "text-fg hover:bg-surface-soft"}`}
+        className={`typetype-adaptive-control flex min-h-9 max-w-full min-w-0 items-center justify-center gap-2 rounded-lg border border-border-strong bg-surface-strong px-3 py-1.5 text-xs transition-colors ${disabled ? "cursor-not-allowed text-fg-soft" : "text-fg hover:bg-surface-soft"}`}
       >
         {selected?.flag && (
           <FlagIcon code={selected.flag} className="w-4 h-3 rounded-sm flex-shrink-0" />
         )}
-        {label}
+        <span className="typetype-adaptive-label min-w-0 flex-1">{label}</span>
         <svg
           width="12"
           height="12"
@@ -86,7 +86,7 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
                 onChange("");
                 setOpen(false);
               }}
-              className={`block w-full text-left px-3 py-2 text-xs transition-colors ${value === "" ? "text-fg bg-surface-soft" : "text-fg-muted hover:bg-surface-soft hover:text-fg"}`}
+              className={`typetype-adaptive-control block w-full px-3 py-2 text-left text-xs transition-colors ${value === "" ? "text-fg bg-surface-soft" : "text-fg-muted hover:bg-surface-soft hover:text-fg"}`}
             >
               {m.ui_no_preference()}
             </button>
@@ -98,12 +98,12 @@ export function LanguageDropdown({ value, onChange, disabled = false }: Props) {
                   onChange(language.code);
                   setOpen(false);
                 }}
-                className={`flex items-center gap-2 w-full text-left px-3 py-2 text-xs transition-colors ${language.code === value ? "text-fg bg-surface-soft" : "text-fg-muted hover:bg-surface-soft hover:text-fg"}`}
+                className={`typetype-adaptive-control flex w-full min-w-0 items-center gap-2 px-3 py-2 text-left text-xs transition-colors ${language.code === value ? "text-fg bg-surface-soft" : "text-fg-muted hover:bg-surface-soft hover:text-fg"}`}
               >
                 {language.flag && (
                   <FlagIcon code={language.flag} className="w-4 h-3 rounded-sm flex-shrink-0" />
                 )}
-                {language.label}
+                <span className="typetype-adaptive-label min-w-0 flex-1">{language.label}</span>
               </button>
             ))}
           </div>

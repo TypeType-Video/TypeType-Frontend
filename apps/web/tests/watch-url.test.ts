@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  isYoutubeShortShareUrl,
   toPublicWatchParam,
   toWatchSourceUrl,
   watchServiceId,
@@ -11,7 +12,28 @@ test("builds a YouTube thumbnail URL from watch values", () => {
   expect(youtubeThumbnailUrl("https://www.youtube.com/watch?v=Z05XGDSTe7U")).toBe(
     "https://i.ytimg.com/vi/Z05XGDSTe7U/hq720.jpg",
   );
+  expect(youtubeThumbnailUrl("https://youtu.be/RjdGmIUbYIQ?is=zpKL5N9GylwAIBHO")).toBe(
+    "https://i.ytimg.com/vi/RjdGmIUbYIQ/hq720.jpg",
+  );
   expect(youtubeThumbnailUrl("sm46525483")).toBeNull();
+});
+
+test("normalizes a YouTube short URL while ignoring share parameters", () => {
+  const sourceUrl = "https://youtu.be/RjdGmIUbYIQ?is=zpKL5N9GylwAIBHO";
+  expect(toPublicWatchParam(sourceUrl)).toBe("RjdGmIUbYIQ");
+  expect(toWatchSourceUrl(sourceUrl)).toBe(sourceUrl);
+});
+
+test("normalizes YouTube Shorts links without a protocol", () => {
+  const sourceUrl = "youtube.com/shorts/2-J9d2VbA6o?si=abc";
+  expect(toPublicWatchParam(sourceUrl)).toBe("2-J9d2VbA6o");
+  expect(toWatchSourceUrl(sourceUrl)).toBe("https://youtube.com/shorts/2-J9d2VbA6o?si=abc");
+});
+
+test("identifies youtu.be share links as Shorts candidates without guessing their type", () => {
+  expect(isYoutubeShortShareUrl("youtu.be/2-J9d2VbA6o?si=abc")).toBe(true);
+  expect(isYoutubeShortShareUrl("https://www.youtube.com/shorts/2-J9d2VbA6o")).toBe(false);
+  expect(isYoutubeShortShareUrl("https://youtu.be/not-video")).toBe(false);
 });
 
 test("shortens and expands NicoNico watch URLs", () => {

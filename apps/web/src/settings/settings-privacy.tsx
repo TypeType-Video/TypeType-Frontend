@@ -6,12 +6,10 @@ import { useSearchHistory } from "../hooks/use-search-history";
 import { useSettings } from "../hooks/use-settings";
 import { useSubscriptions } from "../hooks/use-subscriptions";
 import { m } from "../paraglide/messages.js";
-import { ToggleSwitch } from "./settings-toggle-switch";
+import { ROW, ToggleSwitch } from "./settings-toggle-switch";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
 const GROUP = "divide-y divide-border border-y border-border";
-const ROW = "flex min-w-0 items-center justify-between gap-4 py-4";
-
 type ActiveModal = "history" | "subscriptions" | "search-history" | null;
 
 export function SettingsPrivacy() {
@@ -70,7 +68,7 @@ export function SettingsPrivacy() {
       <p className={SECTION_LABEL}>{m.settings_privacy_label()}</p>
       <div className={GROUP}>
         <div className={ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.ui_watch_history_tracking()}</span>
             <span className="text-xs text-fg-soft">
               {m.ui_save_watched_videos_and_playback_progress()}
@@ -82,7 +80,7 @@ export function SettingsPrivacy() {
           />
         </div>
         <div className={ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.portability_category_history()}</span>
             <span className="text-xs text-fg-soft">{historyLabel}</span>
           </div>
@@ -90,13 +88,13 @@ export function SettingsPrivacy() {
             type="button"
             disabled={historyTotal === 0}
             onClick={() => setModal("history")}
-            className="text-xs text-danger hover:text-danger-strong disabled:text-fg-soft disabled:cursor-not-allowed transition-colors ml-6 flex-shrink-0"
+            className="typetype-adaptive-control ml-0 shrink-0 text-xs text-danger transition-colors hover:text-danger-strong disabled:cursor-not-allowed disabled:text-fg-soft sm:ml-6"
           >
             {m.groups_preview_clear()}
           </button>
         </div>
         <div className={ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.portability_category_search_history()}</span>
             <span className="text-xs text-fg-soft">{searchLabel}</span>
           </div>
@@ -104,13 +102,13 @@ export function SettingsPrivacy() {
             type="button"
             disabled={searchHistoryTotal === 0}
             onClick={() => setModal("search-history")}
-            className="text-xs text-danger hover:text-danger-strong disabled:text-fg-soft disabled:cursor-not-allowed transition-colors ml-6 flex-shrink-0"
+            className="typetype-adaptive-control ml-0 shrink-0 text-xs text-danger transition-colors hover:text-danger-strong disabled:cursor-not-allowed disabled:text-fg-soft sm:ml-6"
           >
             {m.groups_preview_clear()}
           </button>
         </div>
         <div className={ROW}>
-          <div className="flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.portability_category_subscriptions()}</span>
             <span className="text-xs text-fg-soft">{subsLabel}</span>
           </div>
@@ -118,7 +116,7 @@ export function SettingsPrivacy() {
             type="button"
             disabled={subscriptions.length === 0}
             onClick={() => setModal("subscriptions")}
-            className="text-xs text-danger hover:text-danger-strong disabled:text-fg-soft disabled:cursor-not-allowed transition-colors ml-6 flex-shrink-0"
+            className="typetype-adaptive-control ml-0 shrink-0 text-xs text-danger transition-colors hover:text-danger-strong disabled:cursor-not-allowed disabled:text-fg-soft sm:ml-6"
           >
             {m.ui_unsubscribe_all()}
           </button>

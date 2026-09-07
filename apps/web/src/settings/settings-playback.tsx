@@ -42,11 +42,11 @@ function QualityDropdown({ value, onChange }: DropdownProps) {
   }, [open]);
 
   return (
-    <div ref={ref} className="relative ml-6 flex-shrink-0">
+    <div ref={ref} className="relative ml-0 shrink-0 sm:ml-6">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft"
+        className="typetype-adaptive-control flex min-h-9 max-w-full items-center justify-center gap-2 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft"
       >
         {value === "auto" ? m.ui_auto() : value}
         <ChevronDown
@@ -85,7 +85,7 @@ function SpeedDropdown({ value, onChange }: SpeedDropdownProps) {
       aria-label={m.ui_default_playback_speed()}
       value={value}
       onChange={(event) => onChange(Number(event.target.value))}
-      className="flex-shrink-0 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft"
+      className="typetype-adaptive-control ml-0 max-w-full shrink-0 rounded-sm border border-border-strong bg-app px-3 py-1.5 text-xs text-fg transition-colors hover:border-fg-soft sm:ml-6"
     >
       {DEFAULT_PLAYBACK_SPEED_OPTIONS.map((speed) => (
         <option key={speed} value={speed}>
@@ -138,7 +138,7 @@ export function SettingsPlayback() {
           onClick={() => update.mutate({ audioOnlyPlayback: !settings.audioOnlyPlayback })}
         />
         <div className={PLAYBACK_ROW}>
-          <div className="min-w-0 flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.ui_default_quality()}</span>
             <span className="text-xs text-fg-soft">{m.ui_preferred_video_resolution()}</span>
           </div>
@@ -148,7 +148,7 @@ export function SettingsPlayback() {
           />
         </div>
         <div className={PLAYBACK_ROW}>
-          <div className="min-w-0 flex flex-col gap-1">
+          <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-sm text-fg">{m.ui_default_playback_speed()}</span>
             <span className="text-xs text-fg-soft">{m.ui_applied_when_a_video_starts()}</span>
           </div>

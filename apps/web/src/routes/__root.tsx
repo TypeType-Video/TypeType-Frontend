@@ -6,6 +6,7 @@ import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
 import { NotFoundPage } from "../components/not-found-page";
+import { PersistentWatchPlayerHost } from "../components/persistent-watch-player-host";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -35,7 +36,7 @@ function AuthShell() {
   );
 }
 
-function RootLayout() {
+function RootLayoutContent() {
   const isMobile = useMobile();
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
@@ -157,7 +158,7 @@ function RootLayout() {
 
   if (shortsPage) {
     const shortsMainClass = `transition-[margin] duration-200 ${
-      isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
+      isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
     }`;
     return (
       <div className="min-h-screen bg-app text-fg">
@@ -191,11 +192,12 @@ function RootLayout() {
   const mainClasses = watchCinemaPage
     ? "watch-page-main transition-all duration-200 ml-0"
     : `watch-page-main px-3 sm:px-4 ${mainBottomPad} transition-all duration-200 ${
-        isMobile ? "ml-0" : collapsed ? "ml-14" : "ml-48"
+        isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
       }`;
 
   return (
     <div className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell" : ""}`}>
+      <PersistentWatchPlayerHost />
       <div className="watch-page-chrome">
         <Navbar />
       </div>
@@ -212,5 +214,4 @@ function RootLayout() {
     </div>
   );
 }
-
-export const Route = createRootRoute({ component: RootLayout });
+export const Route = createRootRoute({ component: RootLayoutContent });

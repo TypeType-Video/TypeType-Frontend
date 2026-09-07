@@ -1,4 +1,5 @@
 import type { MutableRefObject, ReactNode } from "react";
+import { usePersistentWatchPlayer } from "../hooks/use-persistent-watch-player";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import type { AutoplayState } from "../hooks/use-watch-ended-navigation";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
@@ -39,6 +40,7 @@ type Props = {
   cinemaMode: boolean;
   hideComments: boolean;
   mobilePanel: ReactNode;
+  mobileSecondaryContent: ReactNode | null;
   seekRef: MutableRefObject<((seconds: number) => void) | null>;
   audioOnlyControls: WatchAudioOnlyControls;
   onCaptionStylesChange: (styles: CaptionStyles) => void;
@@ -85,6 +87,7 @@ export function WatchStage({
   cinemaMode,
   hideComments,
   mobilePanel,
+  mobileSecondaryContent,
   seekRef,
   audioOnlyControls,
   onCaptionStylesChange,
@@ -119,56 +122,67 @@ export function WatchStage({
       )}
     </>
   );
+  const playerProps = {
+    audioOnly,
+    streamTitle: stream.title,
+    poster: stream.thumbnail,
+    playerKey,
+    manifestSrc,
+    sabrConfig,
+    isLive,
+    startTime,
+    seekIntervalSeconds,
+    subtitles: stream.subtitles,
+    sponsorBlockSegments,
+    autoSkipSegments,
+    manualSkipSegments,
+    settings,
+    settingsReady,
+    autoplay,
+    originalLocale,
+    overlay: playerOverlay,
+    seekRef,
+    thumbnailVtt,
+    chaptersVtt,
+    playerClassName: classes.playerClassName,
+    mediaClassName: classes.mediaClassName,
+    onCaptionStylesChange,
+    onVolumeChange,
+    onTimeUpdate,
+    onPlay,
+    onPause,
+    onSeeking,
+    onSeeked,
+    onError,
+    onPositionReaderChange,
+    onEnded,
+    onPreviousVideo,
+    onNextVideo,
+  };
+  const persistent = usePersistentWatchPlayer(
+    stream.id,
+    playerProps,
+    !cinemaMode && !navigating && !playerFailed,
+  );
+  const localPlayer = navigating ? (
+    <div className="flex aspect-video w-full items-center justify-center bg-black">
+      <PageSpinner fullScreen={false} />
+    </div>
+  ) : playerFailed ? (
+    <div className="flex aspect-video w-full items-center justify-center bg-black">
+      <PlayerError onRetry={onReset} />
+    </div>
+  ) : (
+    <WatchStagePlayer {...playerProps} />
+  );
 
   return (
     <div className={classes.playerWrapClass}>
-      <div className={classes.playerBoxClass}>
-        {navigating ? (
-          <div className="flex aspect-video w-full items-center justify-center bg-black">
-            <PageSpinner fullScreen={false} />
-          </div>
-        ) : playerFailed ? (
-          <div className="flex aspect-video w-full items-center justify-center bg-black">
-            <PlayerError onRetry={onReset} />
-          </div>
+      <div ref={persistent.anchorRef} className={classes.playerBoxClass}>
+        {cinemaMode || navigating || playerFailed ? (
+          localPlayer
         ) : (
-          <WatchStagePlayer
-            audioOnly={audioOnly}
-            streamTitle={stream.title}
-            poster={stream.thumbnail}
-            playerKey={playerKey}
-            manifestSrc={manifestSrc}
-            sabrConfig={sabrConfig}
-            isLive={isLive}
-            startTime={startTime}
-            seekIntervalSeconds={seekIntervalSeconds}
-            subtitles={stream.subtitles}
-            sponsorBlockSegments={sponsorBlockSegments}
-            autoSkipSegments={autoSkipSegments}
-            manualSkipSegments={manualSkipSegments}
-            settings={settings}
-            settingsReady={settingsReady}
-            autoplay={autoplay}
-            originalLocale={originalLocale}
-            overlay={playerOverlay}
-            seekRef={seekRef}
-            thumbnailVtt={thumbnailVtt}
-            chaptersVtt={chaptersVtt}
-            playerClassName={classes.playerClassName}
-            mediaClassName={classes.mediaClassName}
-            onCaptionStylesChange={onCaptionStylesChange}
-            onVolumeChange={onVolumeChange}
-            onTimeUpdate={onTimeUpdate}
-            onPlay={onPlay}
-            onPause={onPause}
-            onSeeking={onSeeking}
-            onSeeked={onSeeked}
-            onError={onError}
-            onPositionReaderChange={onPositionReaderChange}
-            onEnded={onEnded}
-            onPreviousVideo={onPreviousVideo}
-            onNextVideo={onNextVideo}
-          />
+          <div aria-hidden="true" className="aspect-video w-full bg-black" />
         )}
       </div>
       {mobilePanel ? <div className="mt-4">{mobilePanel}</div> : null}
@@ -180,6 +194,7 @@ export function WatchStage({
           audioOnly={audioOnlyControls}
         />
       )}
+      {mobileSecondaryContent ? <div className="mt-6">{mobileSecondaryContent}</div> : null}
     </div>
   );
 }

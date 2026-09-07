@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useVideoProgressMap } from "../hooks/use-progress";
+import { videoProgressUrl } from "../lib/video-progress";
 import type { VideoStream } from "../types/stream";
 import { VideoCard } from "./video-card";
 
@@ -20,6 +22,7 @@ export function VideoGrid({ streams, onCardOpen, onCardImpression, listId }: Vid
     }
     return result;
   }, [streams]);
+  const progressByUrl = useVideoProgressMap(unique);
   return (
     <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
       {unique.map((stream, index) => (
@@ -34,6 +37,7 @@ export function VideoGrid({ streams, onCardOpen, onCardImpression, listId }: Vid
             onImpression={onCardImpression ? () => onCardImpression(stream) : undefined}
             listId={listId}
             relatedStreams={unique}
+            progressMs={progressByUrl.get(videoProgressUrl(stream))?.position}
           />
         </div>
       ))}

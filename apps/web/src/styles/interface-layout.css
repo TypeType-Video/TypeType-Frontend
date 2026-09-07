@@ -1,0 +1,65 @@
+:root {
+  --typetype-sidebar-width: 12rem;
+}
+
+/* Keep the shell and its content offset tied to one metric as labels grow. */
+.typetype-sidebar-expanded {
+  width: var(--typetype-sidebar-width);
+}
+
+.typetype-sidebar-offset {
+  margin-inline-start: var(--typetype-sidebar-width);
+}
+
+/* Settings rows can place their control below the translated copy when needed. */
+.typetype-adaptive-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+  row-gap: 0.5rem;
+  padding-block: 1rem;
+}
+
+/* Translated controls may need a second line; icon-only controls stay unchanged. */
+.typetype-adaptive-label {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.typetype-adaptive-control {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+/* Segmented actions stay tactile while translated labels are allowed to wrap. */
+.typetype-adaptive-segmented {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.typetype-adaptive-segmented > button {
+  min-width: 0;
+  min-height: 2rem;
+  flex: 1 1 4.5rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .typetype-adaptive-segmented {
+    width: min(100%, 18rem);
+  }
+}

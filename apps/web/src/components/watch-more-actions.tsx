@@ -84,7 +84,7 @@ export function WatchMoreActions({ stream, isAuthed, onSaved, className }: Props
         className={className}
       >
         <MoreIcon />
-        {m.watch_more({}, { locale })}
+        <span className="typetype-adaptive-label">{m.watch_more({}, { locale })}</span>
       </button>
       {menuOpen && (
         <VideoBlockActionsDropdown

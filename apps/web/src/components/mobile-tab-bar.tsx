@@ -7,7 +7,7 @@ import { NAV_ITEMS } from "./nav-items";
 
 const BOTTOM_NAV_PATHS = ["/", "/subscriptions", "/history", "/playlists"];
 const ITEM =
-  "flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors";
+  "flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium leading-3 transition-colors";
 const ACTIVE = "text-fg";
 const INACTIVE = "text-fg-muted";
 
@@ -55,7 +55,9 @@ export function MobileTabBar() {
             inactiveProps={{ className: INACTIVE }}
           >
             <TabIcon label={label}>{item.icon}</TabIcon>
-            <span className="w-full truncate px-0.5 text-center">{label}</span>
+            <span className="typetype-adaptive-label line-clamp-2 w-full px-0.5 text-center">
+              {label}
+            </span>
           </Link>
         );
       })}
@@ -67,7 +69,9 @@ export function MobileTabBar() {
         className={`${ITEM} ${mobileOpen ? ACTIVE : INACTIVE}`}
       >
         <Menu size={22} className="flex-shrink-0" aria-hidden />
-        <span className="w-full truncate px-0.5 text-center">{m.nav_more()}</span>
+        <span className="typetype-adaptive-label line-clamp-2 w-full px-0.5 text-center">
+          {m.nav_more()}
+        </span>
       </button>
     </nav>
   );

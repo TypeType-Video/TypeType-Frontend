@@ -7,7 +7,8 @@ type Props = {
   children: React.ReactNode;
 };
 
-const BTN = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors";
+const BTN =
+  "inline-flex min-h-8 min-w-0 max-w-full flex-wrap items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-center text-sm leading-tight transition-colors";
 const BTN_IDLE = "text-fg-muted hover:text-fg hover:bg-surface-strong";
 const BTN_ON = "text-fg bg-surface-strong";
 

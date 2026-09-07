@@ -14,6 +14,7 @@ import { DanmakuControls } from "./danmaku-controls";
 import { DownloadSheet } from "./download-sheet";
 import { PlaylistAddDropdown } from "./playlist-add-dropdown";
 import { ReportBugModal } from "./report-bug-modal";
+import { ShareSheet } from "./share-sheet";
 import { Toast } from "./toast";
 import { WatchActionButton } from "./watch-action-button";
 import {
@@ -36,8 +37,10 @@ export function WatchActions({ stream, audioOnly }: Props) {
   const [playlistOpen, setPlaylistOpen] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [toastLabel, setToastLabel] = useState<string | null>(null);
   const saveAnchorRef = useRef<HTMLButtonElement>(null);
+  const shareAnchorRef = useRef<HTMLButtonElement>(null);
   const { authReady, isAuthed } = useAuth();
   const {
     add: addFavorite,
@@ -90,15 +93,17 @@ export function WatchActions({ stream, audioOnly }: Props) {
         active={favorited}
       >
         <StarIcon filled={favorited} />
-        {favPending
-          ? m.watch_saving({}, { locale })
-          : favorited
-            ? m.watch_favorited({}, { locale })
-            : m.watch_favorite({}, { locale })}
+        <span className="typetype-adaptive-label">
+          {favPending
+            ? m.watch_saving({}, { locale })
+            : favorited
+              ? m.watch_favorited({}, { locale })
+              : m.watch_favorite({}, { locale })}
+        </span>
       </WatchActionButton>
       <WatchActionButton onClick={handleDownloadMock}>
         <DownloadIcon />
-        {m.watch_download({}, { locale })}
+        <span className="typetype-adaptive-label">{m.watch_download({}, { locale })}</span>
       </WatchActionButton>
       {audioOnlyAvailable && (
         <WatchActionButton
@@ -108,43 +113,55 @@ export function WatchActions({ stream, audioOnly }: Props) {
           active={audioOnly.active}
         >
           <HeadphonesIcon />
-          {audioOnly.loading
-            ? m.watch_audio_loading({}, { locale })
-            : m.watch_audio_only({}, { locale })}
+          <span className="typetype-adaptive-label">
+            {audioOnly.loading
+              ? m.watch_audio_loading({}, { locale })
+              : m.watch_audio_only({}, { locale })}
+          </span>
         </WatchActionButton>
       )}
-      <WatchActionButton onClick={() => share(toPublicWatchUrl(stream.id, window.location.origin))}>
+      <WatchActionButton buttonRef={shareAnchorRef} onClick={() => setShareOpen(true)}>
         <ShareIcon />
-        {m.watch_share({}, { locale })}
+        <span className="typetype-adaptive-label">{m.watch_share({}, { locale })}</span>
       </WatchActionButton>
       <Toast message={copied ? m.watch_link_copied({}, { locale }) : toastLabel} />
+      {shareOpen && (
+        <ShareSheet
+          anchorEl={shareAnchorRef.current}
+          sourceUrl={stream.id}
+          typetypeUrl={toPublicWatchUrl(stream.id, window.location.origin)}
+          title={stream.title}
+          onShare={(url, title) => void share(url, title)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
       {showSave && (
         <button
           ref={saveAnchorRef}
           type="button"
           onClick={() => setPlaylistOpen((o) => !o)}
           disabled={!isAuthed}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`typetype-adaptive-control inline-flex min-h-8 min-w-0 max-w-full flex-wrap items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-center text-sm leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             playlistOpen
               ? "text-fg bg-surface-strong"
               : "text-fg-muted hover:text-fg hover:bg-surface-strong"
           }`}
         >
           <ListPlusIcon />
-          {m.watch_save({}, { locale })}
+          <span className="typetype-adaptive-label">{m.watch_save({}, { locale })}</span>
         </button>
       )}
       <WatchMoreActions
         stream={stream}
         isAuthed={isAuthed}
         onSaved={handleSaved}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors text-fg-muted hover:text-fg hover:bg-surface-strong"
+        className="typetype-adaptive-control inline-flex min-h-8 min-w-0 max-w-full flex-wrap items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-center text-sm leading-tight text-fg-muted transition-colors hover:bg-surface-strong hover:text-fg"
       />
       {showDanmaku && <DanmakuControls />}
       {showReport && isAuthed && (
         <WatchActionButton onClick={() => setReportOpen(true)}>
           <BugIcon />
-          {m.watch_report({}, { locale })}
+          <span className="typetype-adaptive-label">{m.watch_report({}, { locale })}</span>
         </WatchActionButton>
       )}
       {playlistOpen && (

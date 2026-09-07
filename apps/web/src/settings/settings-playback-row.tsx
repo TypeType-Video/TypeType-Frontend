@@ -1,4 +1,5 @@
 import { ToggleSwitch } from "../components/toggle-switch";
+import { ROW } from "./settings-toggle-switch";
 
 type ToggleRowProps = {
   title: string;
@@ -16,12 +17,12 @@ type NumberRowProps = {
   onChange: (value: number) => void;
 };
 
-export const PLAYBACK_ROW = "flex min-w-0 items-center justify-between gap-4 py-4";
+export const PLAYBACK_ROW = ROW;
 
 export function PlaybackToggleRow({ title, description, checked, onClick }: ToggleRowProps) {
   return (
     <div className={PLAYBACK_ROW}>
-      <div className="min-w-0 flex flex-col gap-1">
+      <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-sm text-fg">{title}</span>
         <span className="text-xs text-fg-soft">{description}</span>
       </div>
@@ -40,7 +41,7 @@ export function PlaybackNumberRow({
 }: NumberRowProps) {
   return (
     <div className={PLAYBACK_ROW}>
-      <div className="min-w-0 flex flex-col gap-1">
+      <div className="typetype-adaptive-label flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-sm text-fg">{title}</span>
         <span className="text-xs text-fg-soft">{description}</span>
       </div>

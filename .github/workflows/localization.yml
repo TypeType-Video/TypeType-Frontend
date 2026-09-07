@@ -12,7 +12,7 @@ env:
 
 jobs:
   report:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-24.04' || fromJSON('["self-hosted","Linux","X64","r730","typetype"]') }}
     steps:
       - uses: actions/checkout@v7.0.1
 

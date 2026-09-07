@@ -2,6 +2,71 @@
   padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
 }
 
+.typetype-compact-controls {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 8px 6px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 18%) 35%, rgb(0 0 0 / 58%));
+  pointer-events: none;
+  z-index: 10;
+}
+
+.typetype-compact-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  color: white;
+  border-radius: 4px;
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.typetype-compact-controls .typetype-audio-play-button {
+  background: rgb(255 255 255 / 16%);
+  border-radius: 50%;
+}
+
+.typetype-compact-controls button:hover:not(:disabled) {
+  background: rgb(255 255 255 / 24%);
+}
+
+.typetype-compact-controls button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.typetype-compact-controls button:disabled {
+  opacity: 0.4;
+}
+
+.typetype-compact-controls svg {
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 65%));
+}
+
+.typetype-persistent-player-frame[data-floating] {
+  width: min(22rem, calc(100vw - 1rem));
+  aspect-ratio: 16 / 9;
+}
+
+.typetype-persistent-player-frame[data-dragging] {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typetype-persistent-player-frame {
+    transition: none;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   .watch-page-shell .watch-page-chrome {
     display: none;
