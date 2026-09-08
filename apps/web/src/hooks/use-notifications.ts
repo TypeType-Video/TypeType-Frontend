@@ -8,7 +8,7 @@ import { useAuth } from "./use-auth";
 
 const PAGE_SIZE = 20;
 
-export const notificationsKey = (profileId: string | null) => ["notifications", profileId] as const;
+const notificationsKey = (profileId: string | null) => ["notifications", profileId] as const;
 export const notificationsUnreadKey = (profileId: string | null) =>
   ["notifications-unread-count", profileId] as const;
 

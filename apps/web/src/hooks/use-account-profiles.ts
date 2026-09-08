@@ -9,7 +9,7 @@ import {
 import { switchProfileSession } from "../lib/auth-session";
 import { useAuth } from "./use-auth";
 
-export const ACCOUNT_PROFILES_KEY = ["account-profiles"];
+const ACCOUNT_PROFILES_KEY = ["account-profiles"];
 
 export function useAccountProfiles() {
   const queryClient = useQueryClient();
