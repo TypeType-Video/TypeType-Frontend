@@ -32,7 +32,7 @@ export function NavbarSearch() {
       <div ref={rootRef} className="relative w-full min-w-0 max-w-2xl">
         <SearchField state={state} onFocus={() => setOpen(true)} />
         {open && (
-          <div className="absolute left-1/2 top-full z-50 mt-2 max-h-[calc(100dvh-5rem)] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto overscroll-contain">
+          <div className="absolute left-1/2 top-full z-50 mt-2 max-h-[calc(100dvh-5rem)] w-[min(46rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto overscroll-contain">
             <SearchPanel state={state} onClose={close} />
           </div>
         )}
