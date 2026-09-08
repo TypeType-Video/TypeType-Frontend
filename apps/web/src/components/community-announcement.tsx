@@ -10,6 +10,7 @@ import {
   isCommunityAnnouncementDismissed,
   LEMMY_COMMUNITY_URL,
 } from "../lib/community-announcement";
+import { getOpenMojiUrl } from "../lib/openmoji";
 import { m } from "../paraglide/messages.js";
 import { ServiceIcon } from "./service-icon";
 
@@ -90,8 +91,28 @@ export function CommunityAnnouncement() {
         </button>
       </div>
       <div className="space-y-3 leading-relaxed text-fg-muted">
-        <p>{m.community_lemmy_reason()}</p>
-        <p>{m.community_lemmy_move()}</p>
+        <p>
+          <img
+            src={getOpenMojiUrl("1F61E")}
+            alt=""
+            aria-hidden="true"
+            width={24}
+            height={24}
+            className="mr-1 inline-block align-text-bottom"
+          />
+          {m.community_lemmy_reason()}
+        </p>
+        <p>
+          <img
+            src={getOpenMojiUrl("1F60A")}
+            alt=""
+            aria-hidden="true"
+            width={24}
+            height={24}
+            className="mr-1 inline-block align-text-bottom"
+          />
+          {m.community_lemmy_move()}
+        </p>
         <p>{m.community_lemmy_support()}</p>
       </div>
       <a
