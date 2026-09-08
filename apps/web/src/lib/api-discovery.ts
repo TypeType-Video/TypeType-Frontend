@@ -20,12 +20,13 @@ export function fetchSearch(
   nextpage?: string,
   contentFilter?: string,
   filters: readonly string[] = [],
+  signal?: AbortSignal,
 ): Promise<SearchPageResponse> {
   const params = new URLSearchParams({ q, service: String(service) });
   if (nextpage) params.set("nextpage", nextpage);
   if (contentFilter) params.set("contentFilter", contentFilter);
   for (const filter of filters) params.append("filter", filter);
-  return request(`${BASE}/search?${params}`, optionalBearer());
+  return request(`${BASE}/search?${params}`, optionalBearer({ signal }));
 }
 
 export function fetchChannel(

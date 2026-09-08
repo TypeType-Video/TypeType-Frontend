@@ -18,10 +18,10 @@ export function SearchPanel({ state, onClose }: { state: SearchPanelState; onClo
   const loading = state.showHistory ? state.history.query.isLoading : state.suggestions.isFetching;
   const error = state.showHistory ? state.history.query.isError : state.suggestions.isError;
   return (
-    <div className="rounded-lg border border-border-strong bg-surface p-3 text-fg shadow-xl motion-safe:animate-[dropdown-fade-in_0.15s_ease-out]">
+    <div className="rounded-lg border border-border bg-surface p-2 text-fg shadow-md motion-safe:animate-[dropdown-fade-in_0.15s_ease-out]">
       <fieldset
         aria-label={m.nav_services()}
-        className="mb-4 flex flex-wrap gap-1 border-b border-border pb-3"
+        className="mb-2 flex flex-wrap gap-1 border-b border-border pb-2"
       >
         {services.map((service) => (
           <button
@@ -38,7 +38,7 @@ export function SearchPanel({ state, onClose }: { state: SearchPanelState; onClo
         ))}
       </fieldset>
       <div
-        className={`grid min-w-0 gap-4 ${settings.hideHomeRecommendations ? "" : "md:grid-cols-2"}`}
+        className={`grid min-w-0 gap-2 ${settings.hideHomeRecommendations ? "" : "md:grid-cols-2"}`}
       >
         <section className="min-w-0">
           <SearchOverlayList
@@ -49,7 +49,7 @@ export function SearchPanel({ state, onClose }: { state: SearchPanelState; onClo
             onScroll={state.scroll}
             onClearAll={() => state.setConfirmClearOpen(true)}
             onSelect={state.selectTerm}
-            className="max-h-64 overflow-y-auto overscroll-contain md:max-h-80"
+            className="max-h-56 overflow-y-auto overscroll-contain"
           />
           {loading && (
             <p role="status" className="px-3 py-3 text-xs text-fg-soft">
@@ -80,7 +80,7 @@ export function SearchPanel({ state, onClose }: { state: SearchPanelState; onClo
             </p>
           )}
         </section>
-        <SearchPanelVideos service={state.service} onClose={onClose} />
+        <SearchPanelVideos service={state.service} search={state.query} onClose={onClose} />
       </div>
       {state.confirmClearOpen && (
         <ConfirmModal
