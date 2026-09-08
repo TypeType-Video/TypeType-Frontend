@@ -1306,6 +1306,12 @@
   "ui_close_player": "Player schließen",
   "ui_move_player": "Player bewegen",
   "player_return_to_video": "Zurück zum Video",
+  "community_lemmy_title": "TypeType zieht zu Lemmy um",
+  "community_lemmy_reason": "Die TypeType-Community wurde auf Reddit gesperrt. Ich versuche noch herauszufinden, warum.",
+  "community_lemmy_move": "Nach Rücksprache habe ich beschlossen, mit der Community zu Lemmy zu wechseln. Ich hoffe dort auf mehr Verständnis und Respekt für das Projekt. Entschuldigt die Umstände, aber unter diesen Bedingungen braucht es einen anderen Ort, um weiterzumachen.",
+  "community_lemmy_support": "Um TypeType zu unterstützen, schließt euch der Community und ihrem Forum auf Lemmy an. Veröffentlicht Beiträge, teilt sie und diskutiert mit: Eure Beteiligung hält TypeType am Leben. Vielen Dank für eure Unterstützung.",
+  "community_lemmy_join": "TypeType auf Lemmy beitreten",
+  "community_lemmy_voyager": "Voyager für Lemmy auf dem Smartphone",
   "portability_preparing_upload": "Kontodaten werden vorbereitet und hochgeladen...",
   "portability_takeout_metadata_limit": "Die Kontodaten in diesem Archiv überschreiten die Importgrenzen oder sind verschlüsselt. Exportiere YouTube separat in kleineren ZIP-Dateien.",
   "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält."
