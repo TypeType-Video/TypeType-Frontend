@@ -25,6 +25,7 @@ const PROFILE_QUERIES = new Set([
   "rss-feeds",
   "saved-playlists",
   "search-history",
+  "search-panel-videos",
   "settings",
   "shorts-recommendations",
   "shorts-subscriptions-fallback",
