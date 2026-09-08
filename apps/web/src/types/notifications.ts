@@ -8,6 +8,8 @@ type SubscriptionNewVideoNotification = {
   channelUrl: string;
   channelName: string;
   channelAvatarUrl: string;
+  serviceId: number;
+  serviceName: string;
   video: VideoItem;
 };
 
@@ -16,14 +18,17 @@ export type NotificationItem = SubscriptionNewVideoNotification;
 export type NotificationsPage = {
   items: NotificationItem[];
   unreadCount: number;
-  nextpage: number | null;
+  nextpage: string | null;
+  available: boolean;
 };
 
 export type ReadAllNotificationsResponse = {
   readAt: number;
   unreadCount: number;
+  available: boolean;
 };
 
 export type UnreadNotificationsCount = {
   unreadCount: number;
+  available: boolean;
 };

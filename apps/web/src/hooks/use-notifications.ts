@@ -6,29 +6,38 @@ import {
 } from "../lib/api-notifications";
 import { useAuth } from "./use-auth";
 
-const KEY = ["notifications"];
-export const NOTIFICATIONS_UNREAD_KEY = ["notifications-unread-count"];
 const PAGE_SIZE = 20;
+
+export const notificationsKey = (profileId: string | null) => ["notifications", profileId] as const;
+export const notificationsUnreadKey = (profileId: string | null) =>
+  ["notifications-unread-count", profileId] as const;
 
 export function useNotifications(open: boolean) {
   const qc = useQueryClient();
-  const { authReady, isAuthed, isGuest } = useAuth();
+  const { authReady, isAuthed, isGuest, me } = useAuth();
   const enabled = authReady && isAuthed && !isGuest;
+  const profileId = me?.id ?? null;
+  const unreadKey = notificationsUnreadKey(profileId);
+  const key = notificationsKey(profileId);
 
   const unreadQuery = useQuery({
-    queryKey: NOTIFICATIONS_UNREAD_KEY,
+    queryKey: unreadKey,
     queryFn: () => fetchUnreadNotificationsCount(),
-    enabled,
-    refetchInterval: enabled ? 90_000 : false,
+    enabled: enabled && profileId !== null,
+    refetchInterval: enabled ? 15_000 : false,
     retry: false,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
 
   const query = useInfiniteQuery({
-    queryKey: KEY,
+    queryKey: key,
     queryFn: ({ pageParam = 0 }) => fetchNotifications(pageParam, PAGE_SIZE),
-    getNextPageParam: (lastPage) => lastPage.nextpage ?? undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.nextpage == null) return undefined;
+      const nextPage = Number(lastPage.nextpage);
+      return Number.isInteger(nextPage) && nextPage >= 0 ? nextPage : undefined;
+    },
     initialPageParam: 0,
     enabled: enabled && open,
     staleTime: 30_000,
@@ -39,9 +48,10 @@ export function useNotifications(open: boolean) {
 
   const markAllRead = useMutation({
     mutationFn: () => markAllNotificationsRead(),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: KEY });
-      qc.invalidateQueries({ queryKey: NOTIFICATIONS_UNREAD_KEY });
+    onSuccess: (result) => {
+      if (!result.available) return;
+      qc.invalidateQueries({ queryKey: key });
+      qc.invalidateQueries({ queryKey: unreadKey });
     },
   });
 
@@ -49,7 +59,8 @@ export function useNotifications(open: boolean) {
     query,
     unreadQuery,
     markAllRead,
-    unreadCount: unreadQuery.data?.unreadCount ?? 0,
+    unreadCount: unreadQuery.data?.unreadCount ?? null,
+    badgeUnavailable: unreadQuery.isError || unreadQuery.data?.available === false,
     items: query.data?.pages.flatMap((page) => page.items) ?? [],
     hasNextPage: query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
