@@ -17,12 +17,19 @@ import { ServiceIcon } from "./service-icon";
 const stores = [
   {
     icon: siGoogleplay,
+    color: "#34A853",
     name: "Google Play",
     url: "https://play.google.com/store/apps/details?id=app.vger.voyager&pcampaignid=web_share",
   },
-  { icon: siFdroid, name: "F-Droid", url: "https://f-droid.org/fr/packages/app.vger.voyager/" },
+  {
+    icon: siFdroid,
+    color: `#${siFdroid.hex}`,
+    name: "F-Droid",
+    url: "https://f-droid.org/fr/packages/app.vger.voyager/",
+  },
   {
     icon: siAppstore,
+    color: `#${siAppstore.hex}`,
     name: "App Store",
     url: "https://apps.apple.com/us/app/voyager-for-lemmy/id6451429762",
   },
@@ -90,7 +97,7 @@ export function CommunityAnnouncement() {
           <X size={20} aria-hidden="true" />
         </button>
       </div>
-      <div className="space-y-3 leading-relaxed text-fg-muted">
+      <div className="space-y-5 whitespace-pre-line leading-relaxed text-fg-muted">
         <p>
           <img
             src={getOpenMojiUrl("1F61E")}
@@ -130,7 +137,7 @@ export function CommunityAnnouncement() {
       >
         <p className="mb-3 text-sm font-medium">{m.community_lemmy_voyager()}</p>
         <div className="flex flex-wrap gap-2">
-          {stores.map(({ icon, name, url }) => (
+          {stores.map(({ icon, color, name, url }) => (
             <a
               key={name}
               href={url}
@@ -138,7 +145,7 @@ export function CommunityAnnouncement() {
               rel="noreferrer"
               className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border-strong px-3 py-2 hover:bg-surface-strong"
             >
-              <ServiceIcon path={icon.path} color="currentColor" label={name} />
+              <ServiceIcon path={icon.path} color={color} label={name} />
               {name}
             </a>
           ))}
