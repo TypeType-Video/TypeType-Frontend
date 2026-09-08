@@ -40,7 +40,7 @@ const visibleFallbackLiteral =
   /\b(?:title|label|placeholder|alt|ariaLabel)\s*[:=][^;\n]*?\?\?\s*(["'`])([^"'`\n]+)\1/g;
 const jsxConditionalLiteral =
   /\{[^{}\n]*\?\s*(["'`])([^"'`\n]+)\1\s*:\s*(["'`])([^"'`\n]+)\3[^{}\n]*\}/g;
-const jsxText = />\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]*)\s*</g;
+const jsxText = />\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]*)\s*<\/[A-Za-z][^<>\n]*>/g;
 const helperReturnLiteral = /\breturn\s+(["'`])([^"'`\n]*)\1/g;
 
 function isAllowed(value, file, kind) {
