@@ -2,7 +2,13 @@ import { useCompactPlayer } from "../hooks/use-compact-player";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { PLAYBACK_RATES } from "../lib/playback-rates";
 import { playerLayoutTranslations } from "../lib/player-layout-translations";
-import { DefaultAudioLayout, DefaultVideoLayout, defaultLayoutIcons, Time } from "../lib/vidstack";
+import {
+  DefaultAudioLayout,
+  DefaultVideoLayout,
+  defaultLayoutIcons,
+  Time,
+  useMediaState,
+} from "../lib/vidstack";
 import { AudioPlayButton } from "./audio-play-button";
 import { AudioSeekButton } from "./audio-seek-button";
 import { AudioTimeSlider } from "./audio-time-slider";
@@ -46,9 +52,10 @@ export function VideoPlayerLayout({
 }: Props) {
   const { locale } = useInterfaceLocale();
   const compact = useCompactPlayer();
+  const fullscreen = useMediaState("fullscreen");
   const translations = playerLayoutTranslations(locale);
 
-  if (compact) return <CompactPlayerControls video={sabrVideo} seeking={seeking} />;
+  if (compact && !fullscreen) return <CompactPlayerControls video={sabrVideo} seeking={seeking} />;
 
   if (layoutMode === "shorts") {
     return (
