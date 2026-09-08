@@ -22,7 +22,13 @@ ARG BUILD_REVISION=development
 ARG BUILD_TIME=unknown
 
 # Let the official entrypoint derive the resolver from the runtime network.
-ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 \
+    TYPETYPE_SERVER_HOST=typetype-server \
+    TYPETYPE_SERVER_PORT=8080 \
+    TYPETYPE_TOKEN_HOST=typetype-token \
+    TYPETYPE_TOKEN_PORT=8081 \
+    TYPETYPE_DOWNLOADER_HOST=typetype-downloader \
+    TYPETYPE_DOWNLOADER_PORT=18093
 
 RUN apk upgrade --no-cache libxml2 libcrypto3 libssl3 libexpat
 
