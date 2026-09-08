@@ -4,6 +4,7 @@ import { FullscreenButton, MuteButton, useMediaState } from "../lib/vidstack";
 import { m } from "../paraglide/messages.js";
 import { AudioPlayButton } from "./audio-play-button";
 import { AudioSeekButton } from "./audio-seek-button";
+import { ReturnToVideoButton } from "./return-to-video-button";
 
 export function CompactPlayerControls({
   video,
@@ -22,6 +23,7 @@ export function CompactPlayerControls({
   const label = silent ? m.player_unmute({}, { locale }) : m.player_mute({}, { locale });
   return (
     <div className="typetype-compact-controls">
+      <ReturnToVideoButton />
       <AudioSeekButton direction="backward" video={video} disabled={seeking || !canSeek} />
       <AudioPlayButton video={video} disabled={seeking} />
       <AudioSeekButton direction="forward" video={video} disabled={seeking || !canSeek} />

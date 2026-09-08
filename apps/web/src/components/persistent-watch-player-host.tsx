@@ -191,7 +191,7 @@ export function PersistentWatchPlayerHost() {
             type="button"
             aria-label={m.ui_move_player()}
             title={m.ui_move_player()}
-            className="pointer-events-auto flex h-10 w-10 touch-none cursor-grab items-center justify-center rounded text-white hover:bg-white/15 active:cursor-grabbing"
+            className="pointer-events-auto flex h-10 w-10 touch-none cursor-grab items-center justify-center rounded text-white hover:opacity-80 active:cursor-grabbing"
             onPointerDown={beginDrag}
             onLostPointerCapture={handlePointerUp}
           >
@@ -201,7 +201,7 @@ export function PersistentWatchPlayerHost() {
             type="button"
             aria-label={m.ui_close_player()}
             title={m.ui_close_player()}
-            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded text-white hover:bg-white/15"
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded text-white hover:opacity-80"
             onClick={() => close(entry.owner)}
           >
             <X size={16} aria-hidden="true" />

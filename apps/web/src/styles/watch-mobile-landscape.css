@@ -23,18 +23,14 @@
   min-width: 40px;
   padding: 0;
   color: white;
+  background: transparent;
   border-radius: 4px;
   touch-action: manipulation;
   pointer-events: auto;
 }
 
-.typetype-compact-controls .typetype-audio-play-button {
-  background: rgb(255 255 255 / 16%);
-  border-radius: 50%;
-}
-
 .typetype-compact-controls button:hover:not(:disabled) {
-  background: rgb(255 255 255 / 24%);
+  opacity: 0.8;
 }
 
 .typetype-compact-controls button:focus-visible {

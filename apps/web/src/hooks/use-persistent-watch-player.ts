@@ -7,6 +7,7 @@ type PlayerOwner = symbol;
 type PersistentWatchPlayerEntry = {
   owner: PlayerOwner;
   streamId: string;
+  href: string;
   props: WatchStagePlayerProps;
   enabled: boolean;
   anchor: HTMLElement | null;
@@ -23,6 +24,7 @@ type PersistentWatchPlayerStore = {
     streamId: string,
     props: WatchStagePlayerProps,
     enabled: boolean,
+    href: string,
   ) => void;
   setAnchor: (owner: PlayerOwner, anchor: HTMLElement | null) => void;
   detach: (owner: PlayerOwner) => void;
@@ -33,11 +35,12 @@ type PersistentWatchPlayerStore = {
 export const usePersistentWatchPlayerStore = create<PersistentWatchPlayerStore>((set) => ({
   entry: null,
   position: null,
-  register: (owner, streamId, props, enabled) =>
+  register: (owner, streamId, props, enabled, href) =>
     set((state) => ({
       entry: {
         owner,
         streamId,
+        href,
         props,
         enabled,
         anchor: state.entry?.owner === owner ? state.entry.anchor : null,
@@ -82,7 +85,7 @@ export function usePersistentWatchPlayer(
   );
 
   useLayoutEffect(() => {
-    register(owner, streamId, props, enabled);
+    register(owner, streamId, props, enabled, window.location.pathname + window.location.search);
     setAnchor(owner, anchorElementRef.current);
   }, [enabled, owner, props, register, setAnchor, streamId]);
 
