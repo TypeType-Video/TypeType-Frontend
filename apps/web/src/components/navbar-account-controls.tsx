@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LogIn } from "lucide-react";
 import { logoutSession } from "../lib/auth-session";
 import { goto } from "../lib/route-redirect";
 import { m } from "../paraglide/messages.js";
@@ -51,9 +52,11 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
+            aria-label={m.nav_sign_in()}
+            title={m.nav_sign_in()}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-fg hover:text-fg-muted"
           >
-            {m.nav_sign_in()}
+            <LogIn size={18} aria-hidden="true" />
           </a>
         </div>
       );
