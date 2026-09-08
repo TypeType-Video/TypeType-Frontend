@@ -1,5 +1,10 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "search_panel_suggestions": "Suggestions",
+  "search_panel_no_history": "No recent searches",
+  "search_panel_no_suggestions": "No suggestions. You can still search with your text.",
+  "search_panel_no_videos": "No recommendations right now",
+  "search_panel_clear_failed": "Could not clear search history. Please try again.",
   "admin_access_description": "Define who can join and which content is available.",
   "admin_access_label": "Access",
   "admin_access_mode_description": "Parental controls restrict extraction and discovery to approved channels.",

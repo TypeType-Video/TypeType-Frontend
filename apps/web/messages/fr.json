@@ -1,5 +1,10 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "search_panel_suggestions": "Suggestions",
+  "search_panel_no_history": "Aucune recherche récente",
+  "search_panel_no_suggestions": "Aucune suggestion. Vous pouvez rechercher avec votre texte.",
+  "search_panel_no_videos": "Aucune recommandation pour le moment",
+  "search_panel_clear_failed": "Impossible d'effacer l'historique. Veuillez réessayer.",
   "admin_access_description": "Définissez qui peut rejoindre l'instance et quels contenus sont disponibles.",
   "admin_access_label": "Accès",
   "admin_access_mode_description": "Le contrôle parental limite l'extraction et la découverte aux chaînes approuvées.",

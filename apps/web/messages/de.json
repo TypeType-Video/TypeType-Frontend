@@ -1,5 +1,10 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "search_panel_suggestions": "Vorschläge",
+  "search_panel_no_history": "Keine letzten Suchanfragen",
+  "search_panel_no_suggestions": "Keine Vorschläge. Sie können trotzdem nach Ihrem Text suchen.",
+  "search_panel_no_videos": "Zurzeit keine Empfehlungen",
+  "search_panel_clear_failed": "Der Suchverlauf konnte nicht gelöscht werden. Bitte erneut versuchen.",
   "admin_access_description": "Lege fest, wer beitreten darf und welche Inhalte verfügbar sind.",
   "admin_access_label": "Zugriff",
   "admin_access_mode_description": "Die Jugendschutzfunktion beschränkt das Abrufen und Entdecken von Inhalten auf zugelassene Kanäle.",
