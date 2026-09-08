@@ -1,5 +1,5 @@
 export const COMMUNITY_ANNOUNCEMENT_KEY = "typetype-announcement-lemmy-1";
-export const LEMMY_COMMUNITY_URL = "https://lemmy.zip/c/TypeType";
+export const LEMMY_COMMUNITY_URL = "https://blorp.lemmy.zip/home/c/TypeType@lemmy.zip";
 
 let dismissedInSession = false;
 
