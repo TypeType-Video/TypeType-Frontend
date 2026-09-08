@@ -3,6 +3,7 @@ import { type FormEvent, type ReactNode, useState } from "react";
 import { useAccountProfiles } from "../hooks/use-account-profiles";
 import { m } from "../paraglide/messages.js";
 import type { AccountProfile } from "../types/auth";
+import { ProfileAvatar } from "./profile-avatar";
 
 type Props = { onClose: () => void };
 
@@ -111,9 +112,7 @@ export function NavbarProfileSwitcher({ onClose }: Props) {
                 className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1.5 text-left text-sm text-fg disabled:cursor-wait"
                 aria-current={profile.isActive ? "page" : undefined}
               >
-                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-strong text-xs font-semibold text-fg-muted">
-                  {profile.name.trim().slice(0, 1).toUpperCase() || "P"}
-                </span>
+                <ProfileAvatar me={profile} className="h-6 w-6 shrink-0" plain />
                 <span className="min-w-0 flex-1 truncate">{profile.name}</span>
                 {profile.isActive && (
                   <Check
