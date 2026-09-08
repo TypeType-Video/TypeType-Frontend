@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, LogOut, Settings, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAccountProfiles } from "../hooks/use-account-profiles";
 import { getStoredAdminSection } from "../lib/admin-console-section";
 import { getStoredSettingsSection } from "../lib/settings-section";
 import { m } from "../paraglide/messages.js";
 import type { AuthMe } from "../types/auth";
+import { NavbarProfileSwitcher } from "./navbar-profile-switcher";
 import { ProfileAvatar } from "./profile-avatar";
 
 type Props = {
@@ -20,6 +22,7 @@ export function NavbarProfileMenu({ me, isAdmin, isMobile, onSignOut }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const { query: profilesQuery } = useAccountProfiles();
 
   useEffect(() => {
     if (!open) return;
@@ -49,7 +52,8 @@ export function NavbarProfileMenu({ me, isAdmin, isMobile, onSignOut }: Props) {
     await onSignOut();
   }
 
-  const profileName = me.publicUsername?.trim() || "Profile";
+  const activeProfileName = profilesQuery.data?.profiles.find((profile) => profile.isActive)?.name;
+  const profileName = activeProfileName || me.publicUsername?.trim() || "Profile";
   const menuClass = isMobile
     ? "fixed right-2 top-16 z-50 w-[min(18rem,calc(100vw-1rem))]"
     : "absolute right-0 top-full z-50 mt-2 w-64";
@@ -85,6 +89,7 @@ export function NavbarProfileMenu({ me, isAdmin, isMobile, onSignOut }: Props) {
             <p className="truncate text-sm font-semibold text-fg">{profileName}</p>
             <p className="truncate text-xs text-fg-muted">{me.id}</p>
           </div>
+          <NavbarProfileSwitcher onClose={close} />
           <div className="p-1.5">
             <Link
               to="/profile"
