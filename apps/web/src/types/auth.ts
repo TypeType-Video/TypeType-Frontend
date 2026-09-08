@@ -18,6 +18,29 @@ export type AuthResponse = {
   accessToken: string;
 };
 
+export type AccountProfile = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  isDefault: boolean;
+  lastUsedAt: number;
+  publicUsername: string | null;
+  avatarUrl: string | null;
+  avatarType: "custom" | "emoji" | null;
+  avatarCode: string | null;
+};
+
+export type AccountProfilesResponse = {
+  profiles: AccountProfile[];
+  activeProfileId: string;
+  defaultProfileId: string;
+};
+
+export type ProfileSwitchResponse = {
+  accessToken: string;
+  profile: AccountProfile;
+};
+
 export type OidcStatus = {
   enabled: boolean;
   providerName: string | null;
