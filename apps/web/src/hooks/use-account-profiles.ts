@@ -35,11 +35,6 @@ export function useAccountProfiles() {
   const remove = useMutation({ mutationFn: deleteAccountProfile, onSuccess: invalidate });
   const switchProfile = useMutation({
     mutationFn: switchProfileSession,
-    onSuccess: () => {
-      queryClient.removeQueries({ queryKey: ["notifications"] });
-      queryClient.removeQueries({ queryKey: ["notifications-unread-count"] });
-      invalidate();
-    },
   });
 
   return { query, create, rename, setDefault, remove, switchProfile };
