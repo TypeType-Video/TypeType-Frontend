@@ -7,3 +7,8 @@ export function detectProvider(url: string): Provider {
   if (normalized.includes("bilibili.com") || normalized.includes("b23.tv")) return "bilibili";
   return "unknown";
 }
+
+export function supportsBulletComments(url: string): boolean {
+  const provider = detectProvider(url);
+  return provider === "nicovideo" || provider === "bilibili";
+}

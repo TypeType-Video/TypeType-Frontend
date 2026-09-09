@@ -7,7 +7,7 @@ import { DanmakuOverlay } from "./danmaku-overlay";
 import { WatchPlayerDefaults } from "./watch-player-defaults";
 
 type Props = {
-  isNicoNico: boolean;
+  canLoadBulletComments: boolean;
   hideComments: boolean;
   bulletCommentsOn: boolean;
   bulletComments: BulletCommentItem[] | undefined;
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function WatchPlayerOverlay({
-  isNicoNico,
+  canLoadBulletComments,
   hideComments,
   bulletCommentsOn,
   bulletComments,
@@ -33,7 +33,7 @@ export function WatchPlayerOverlay({
 }: Props) {
   return (
     <>
-      {isNicoNico && !hideComments && bulletCommentsOn && bulletComments && (
+      {canLoadBulletComments && !hideComments && bulletCommentsOn && bulletComments && (
         <DanmakuOverlay comments={bulletComments} positionRef={positionRef} />
       )}
       <WatchPlayerDefaults

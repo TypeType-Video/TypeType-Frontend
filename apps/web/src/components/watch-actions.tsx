@@ -5,7 +5,7 @@ import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useShareUrl } from "../hooks/use-share-url";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import { prepareAudioSpectrum } from "../lib/audio-spectrum";
-import { detectProvider } from "../lib/provider";
+import { supportsBulletComments } from "../lib/provider";
 import { goto } from "../lib/route-redirect";
 import { toPublicWatchUrl } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
@@ -48,7 +48,6 @@ export function WatchActions({ stream, audioOnly }: Props) {
     isFavorite: favorited,
     isPending: favPending,
   } = useFavoriteStatus(stream.id);
-  const isNicoNico = detectProvider(stream.id) === "nicovideo";
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
   const audioOnlyAvailable = !isLive;
   const audioOnlyDisabled = !authReady || audioOnly.loading;
@@ -82,7 +81,7 @@ export function WatchActions({ stream, audioOnly }: Props) {
 
   const showSave = true;
   const showReport = true;
-  const showDanmaku = isNicoNico;
+  const showDanmaku = supportsBulletComments(stream.id);
 
   return (
     <div className="flex items-center gap-1 flex-wrap">
