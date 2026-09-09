@@ -18,9 +18,31 @@ test("does not retry failed HLS", () => {
 
 test("keeps opaque provider media handles out of the generic proxy", () => {
   expect(isMediaHandleUrl(MEDIA_HANDLE)).toBe(true);
-  expect(proxyUrl(MEDIA_HANDLE)).toBe(`/api${MEDIA_HANDLE}`);
-  expect(proxyDashManifest(MEDIA_HANDLE)).toBe(`/api${MEDIA_HANDLE}`);
+  expect(new URL(proxyUrl(MEDIA_HANDLE), "https://typetype.test").pathname).toBe(
+    `/api${MEDIA_HANDLE}`,
+  );
+  expect(new URL(proxyDashManifest(MEDIA_HANDLE), "https://typetype.test").pathname).toBe(
+    `/api${MEDIA_HANDLE}`,
+  );
   expect(proxyUrl(MEDIA_HANDLE)).not.toContain("/proxy?url=");
+});
+
+test("uses an absolute media handle URL in the browser", () => {
+  const runtime = globalThis as typeof globalThis & {
+    window?: { location: { origin: string } };
+  };
+  const previousWindow = runtime.window;
+  Object.defineProperty(runtime, "window", {
+    configurable: true,
+    value: { location: { origin: "https://watch.example" } },
+  });
+  try {
+    expect(proxyUrl(MEDIA_HANDLE)).toBe(`https://watch.example/api${MEDIA_HANDLE}`);
+    expect(proxyDashManifest(MEDIA_HANDLE)).toBe(`https://watch.example/api${MEDIA_HANDLE}`);
+  } finally {
+    if (previousWindow === undefined) delete runtime.window;
+    else runtime.window = previousWindow;
+  }
 });
 
 test("does not treat signed-looking media paths with a query as handles", () => {

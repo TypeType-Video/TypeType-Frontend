@@ -1,4 +1,4 @@
-import { API_BASE, toApiUrl } from "./env";
+import { API_BASE } from "./env";
 
 const RAW: string = API_BASE;
 
@@ -25,7 +25,7 @@ export function isMediaHandleUrl(url: string): boolean {
 
 function localMediaUrl(url: string): string | null {
   const path = mediaHandlePath(url);
-  return path ? toApiUrl(path) : null;
+  return path ? `${absoluteBase()}${path}` : null;
 }
 
 export function proxyUrl(url: string): string {
