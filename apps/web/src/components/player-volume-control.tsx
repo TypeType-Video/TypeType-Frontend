@@ -89,6 +89,7 @@ export function PlayerVolumeSlider() {
       ref={wheelTargetRef}
       className="vds-volume-slider vds-slider"
       aria-label={m.player_volume({}, { locale })}
+      orientation="horizontal"
     >
       <VolumeSlider.Track className="vds-slider-track" />
       <VolumeSlider.TrackFill className="vds-slider-track-fill vds-slider-track" />
@@ -126,6 +127,7 @@ export function PlayerVolumeControl() {
         <VolumeSlider.Root
           className="typetype-mobile-volume-slider"
           aria-label={m.player_volume({}, { locale })}
+          orientation="horizontal"
         >
           <VolumeSlider.Track className="typetype-mobile-volume-track">
             <VolumeSlider.TrackFill className="typetype-mobile-volume-fill" />

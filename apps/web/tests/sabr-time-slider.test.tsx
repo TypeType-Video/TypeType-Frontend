@@ -54,6 +54,7 @@ test("keeps the video SABR slider interactive while a seek is pending", () => {
 
   expect(sliderProps.disabled).toBeUndefined();
   expect(sliderProps["aria-busy"]).toBe(true);
+  expect(sliderProps.orientation).toBe("horizontal");
   expect(sliderProps["data-seeking"]).toBe("true");
 
   const onDragEnd = sliderProps.onDragEnd as (percent: number) => void;
@@ -74,6 +75,7 @@ test("keeps the audio SABR slider interactive while a seek is pending", () => {
 
   expect(sliderProps.disabled).toBeUndefined();
   expect(sliderProps["aria-busy"]).toBe(true);
+  expect(sliderProps.orientation).toBe("horizontal");
   expect(sliderProps["data-seeking"]).toBe("true");
 
   const onDragEnd = sliderProps.onDragEnd as (percent: number) => void;

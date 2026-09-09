@@ -13,6 +13,12 @@ type Props = {
   onVolumeChange?: (volume: number, muted: boolean) => void;
 };
 
+type RestoreState = {
+  root: Element;
+  sourceKey: string;
+  target: PlayerVolumeState;
+};
+
 export function VolumeRestorer({
   initialVolume,
   initialMuted,
@@ -24,8 +30,16 @@ export function VolumeRestorer({
   const volume = useMediaState("volume");
   const muted = useMediaState("muted");
   const canPlay = useMediaState("canPlay");
+  const currentSrc = useMediaState("currentSrc");
+  const sourceKey = currentSrc
+    ? `${currentSrc.type}:${typeof currentSrc.src === "string" ? currentSrc.src : ""}`
+    : "";
+  const volumeRef = useRef(volume);
+  const mutedRef = useRef(muted);
+  volumeRef.current = volume;
+  mutedRef.current = muted;
   const pendingTargetRef = useRef<PlayerVolumeState | null>(null);
-  const restoredTargetRef = useRef<PlayerVolumeState | null>(null);
+  const restoredTargetRef = useRef<RestoreState | null>(null);
 
   useEffect(() => {
     if (!settingsReady) {
@@ -34,17 +48,28 @@ export function VolumeRestorer({
       return;
     }
     const target = { volume: clampPlayerVolume(initialVolume), muted: initialMuted };
-    if (!canPlay) return;
+    if (!canPlay) {
+      pendingTargetRef.current = null;
+      restoredTargetRef.current = null;
+      return;
+    }
     const root = player?.el;
     if (!root?.isConnected) return;
-    if (matchesPlayerVolume({ volume, muted }, target)) {
+    const restored = restoredTargetRef.current;
+    if (
+      restored?.root === root &&
+      restored.sourceKey === sourceKey &&
+      matchesPlayerVolume(restored.target, target)
+    ) {
+      return;
+    }
+    if (matchesPlayerVolume({ volume: volumeRef.current, muted: mutedRef.current }, target)) {
       pendingTargetRef.current = null;
-      restoredTargetRef.current = target;
+      restoredTargetRef.current = { root, sourceKey, target };
       return;
     }
     restoredTargetRef.current = null;
     pendingTargetRef.current = target;
-    restoredTargetRef.current = null;
     try {
       if (target.muted) {
         remote.changeVolume(target.volume);
@@ -55,15 +80,18 @@ export function VolumeRestorer({
       }
     } catch {
       pendingTargetRef.current = null;
+      restoredTargetRef.current = null;
     }
-  }, [settingsReady, canPlay, remote, initialVolume, initialMuted, player, volume, muted]);
+  }, [settingsReady, canPlay, remote, initialVolume, initialMuted, player, sourceKey]);
 
   useEffect(() => {
     const target = pendingTargetRef.current;
     if (!target || !matchesPlayerVolume({ volume, muted }, target)) return;
+    const root = player?.el;
+    if (!root?.isConnected) return;
     pendingTargetRef.current = null;
-    restoredTargetRef.current = target;
-  }, [volume, muted]);
+    restoredTargetRef.current = { root, sourceKey, target };
+  }, [player, sourceKey, volume, muted]);
 
   useEffect(() => {
     if (pendingTargetRef.current) return;
