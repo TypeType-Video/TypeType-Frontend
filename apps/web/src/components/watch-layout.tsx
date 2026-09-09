@@ -56,7 +56,7 @@ export function WatchLayout({
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
   const seekRef = useRef<((seconds: number) => void) | null>(null);
   const positionReaderRef = useRef<(() => number | null) | null>(null);
-  const handleVolumeChange = useVolumeSync(update.mutate);
+  const handleVolumeChange = useVolumeSync(update.mutate, settings);
   const { thumbnailVtt, chaptersVtt } = useWatchVttAssets(
     stream,
     sponsor.segments,
