@@ -3,7 +3,7 @@ import { buildBilibiliDashManifest } from "./bilibili-manifest";
 import { API_BASE as BASE, toApiUrl } from "./env";
 import { buildNicoHlsManifest } from "./nico-hls-manifest";
 import { detectProvider } from "./provider";
-import { proxyDashManifest } from "./proxy";
+import { isMediaHandleUrl, proxyDashManifest } from "./proxy";
 import { hasCompatibleMp4, pickCompatibleProgressiveSrc } from "./stream-compatibility";
 import { hasDirectDashPair } from "./stream-delivery";
 import { resolveDirectSrc } from "./stream-direct-src";
@@ -32,7 +32,9 @@ export function isSignedHlsManifestUrl(value: string): boolean {
 }
 
 export function resolveHlsManifestUrl(stream: VideoStream): string {
-  if (stream.hlsUrl && isSignedHlsManifestUrl(stream.hlsUrl)) return toApiUrl(stream.hlsUrl);
+  if (stream.hlsUrl && (isSignedHlsManifestUrl(stream.hlsUrl) || isMediaHandleUrl(stream.hlsUrl))) {
+    return toApiUrl(stream.hlsUrl);
+  }
   return proxyDashManifest(`${BASE}/streams/hls-manifest?url=${encodeURIComponent(stream.id)}`);
 }
 
@@ -43,7 +45,9 @@ export function shouldUseHls(
   directDashPair: boolean,
 ): boolean {
   return Boolean(
-    hlsUrl && !hlsFailed && (isLive || isSignedHlsManifestUrl(hlsUrl) || !directDashPair),
+    hlsUrl &&
+      !hlsFailed &&
+      (isLive || isSignedHlsManifestUrl(hlsUrl) || isMediaHandleUrl(hlsUrl) || !directDashPair),
   );
 }
 

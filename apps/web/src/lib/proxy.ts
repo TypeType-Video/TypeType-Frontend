@@ -1,4 +1,4 @@
-import { API_BASE } from "./env";
+import { API_BASE, toApiUrl } from "./env";
 
 const RAW: string = API_BASE;
 
@@ -8,7 +8,29 @@ function absoluteBase(): string {
   return window.location.origin + RAW;
 }
 
+function mediaHandlePath(url: string): string | null {
+  try {
+    const parsed = new URL(url, "https://typetype.invalid");
+    const match = parsed.pathname.match(/\/media\/(m1_[A-Za-z0-9_-]{24})$/);
+    if (!match || parsed.search || parsed.hash) return null;
+    return `/media/${match[1]}`;
+  } catch {
+    return null;
+  }
+}
+
+export function isMediaHandleUrl(url: string): boolean {
+  return mediaHandlePath(url) !== null;
+}
+
+function localMediaUrl(url: string): string | null {
+  const path = mediaHandlePath(url);
+  return path ? toApiUrl(path) : null;
+}
+
 export function proxyUrl(url: string): string {
+  const local = localMediaUrl(url);
+  if (local) return local;
   return `${absoluteBase()}/proxy?url=${encodeURIComponent(url)}`;
 }
 
@@ -28,6 +50,8 @@ function extractProxyTarget(url: string): string | null {
 
 export function proxyDashManifest(url: string): string {
   if (!url) return url;
+  const local = localMediaUrl(url);
+  if (local) return local;
   return isRemoteUrl(url) ? proxyUrl(url) : url;
 }
 
