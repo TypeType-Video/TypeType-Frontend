@@ -1,9 +1,10 @@
-import type { MutableRefObject, ReactNode } from "react";
+import { type MutableRefObject, type ReactNode, useLayoutEffect, useRef } from "react";
 import { usePersistentWatchPlayer } from "../hooks/use-persistent-watch-player";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import type { AutoplayState } from "../hooks/use-watch-ended-navigation";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
+import { resolveWatchPlayerStartTime } from "../lib/watch-player-position";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
 import type { CaptionStyles, SettingsItem } from "../types/user";
@@ -107,6 +108,40 @@ export function WatchStage({
   onError,
   onReset,
 }: Props) {
+  const playerPositionRef = useRef(startTime);
+  const playerStartTimeRef = useRef(startTime);
+  const playerKeyRef = useRef(playerKey);
+  const cinemaModeRef = useRef(cinemaMode);
+  const sourceChanged = playerKeyRef.current !== playerKey;
+  const cinemaModeChanged = cinemaModeRef.current !== cinemaMode;
+
+  if (sourceChanged) {
+    playerKeyRef.current = playerKey;
+    playerPositionRef.current = startTime;
+    playerStartTimeRef.current = startTime;
+  }
+
+  const playerStartTime = resolveWatchPlayerStartTime(
+    playerStartTimeRef.current,
+    playerPositionRef.current,
+    cinemaModeChanged && !sourceChanged,
+  );
+
+  useLayoutEffect(() => {
+    cinemaModeRef.current = cinemaMode;
+    if (cinemaModeChanged && !sourceChanged) {
+      playerStartTimeRef.current = playerPositionRef.current;
+    }
+  }, [cinemaMode, cinemaModeChanged, sourceChanged]);
+
+  const handleTimeUpdate = (positionMs: number) => {
+    playerPositionRef.current = Math.max(0, positionMs);
+    onTimeUpdate(positionMs);
+  };
+  const handleSeeking = (positionMs: number) => {
+    playerPositionRef.current = Math.max(0, positionMs);
+    onSeeking(positionMs);
+  };
   const playerOverlay = (
     <>
       {overlay}
@@ -130,7 +165,7 @@ export function WatchStage({
     manifestSrc,
     sabrConfig,
     isLive,
-    startTime,
+    startTime: playerStartTime,
     seekIntervalSeconds,
     subtitles: stream.subtitles,
     sponsorBlockSegments,
@@ -148,10 +183,10 @@ export function WatchStage({
     mediaClassName: classes.mediaClassName,
     onCaptionStylesChange,
     onVolumeChange,
-    onTimeUpdate,
+    onTimeUpdate: handleTimeUpdate,
     onPlay,
     onPause,
-    onSeeking,
+    onSeeking: handleSeeking,
     onSeeked,
     onError,
     onPositionReaderChange,

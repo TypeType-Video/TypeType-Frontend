@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { clampPlayerVolume } from "../lib/player-volume-state";
 
 export function useSabrMediaSettings(
   video: HTMLVideoElement | null,
@@ -8,7 +9,7 @@ export function useSabrMediaSettings(
 ): void {
   useEffect(() => {
     if (!video || !settingsReady) return;
-    video.volume = Math.min(1, Math.max(0, initialVolume));
+    video.volume = clampPlayerVolume(initialVolume);
     video.muted = initialMuted;
   }, [initialMuted, initialVolume, settingsReady, video]);
 }

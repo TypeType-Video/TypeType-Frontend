@@ -1,4 +1,9 @@
 import { useEffect, useRef } from "react";
+import {
+  clampPlayerVolume,
+  matchesPlayerVolume,
+  type PlayerVolumeState,
+} from "../lib/player-volume-state";
 import { useMediaPlayer, useMediaRemote, useMediaState } from "../lib/vidstack";
 
 type Props = {
@@ -19,23 +24,47 @@ export function VolumeRestorer({
   const volume = useMediaState("volume");
   const muted = useMediaState("muted");
   const canPlay = useMediaState("canPlay");
-  const restoredRef = useRef(false);
+  const pendingTargetRef = useRef<PlayerVolumeState | null>(null);
+  const restoredTargetRef = useRef<PlayerVolumeState | null>(null);
 
   useEffect(() => {
-    if (!settingsReady || !canPlay || restoredRef.current) return;
+    if (!settingsReady) {
+      pendingTargetRef.current = null;
+      restoredTargetRef.current = null;
+      return;
+    }
+    const target = { volume: clampPlayerVolume(initialVolume), muted: initialMuted };
+    if (restoredTargetRef.current && matchesPlayerVolume(restoredTargetRef.current, target)) {
+      return;
+    }
+    if (!canPlay) return;
     const root = player?.el;
     if (!root?.isConnected) return;
-    restoredRef.current = true;
+    pendingTargetRef.current = target;
+    restoredTargetRef.current = null;
     try {
-      remote.changeVolume(initialVolume);
-      if (initialMuted) remote.mute();
+      if (target.muted) {
+        remote.changeVolume(target.volume);
+        remote.mute();
+      } else {
+        remote.unmute();
+        remote.changeVolume(target.volume);
+      }
     } catch {
-      restoredRef.current = false;
+      pendingTargetRef.current = null;
     }
   }, [settingsReady, canPlay, remote, initialVolume, initialMuted, player]);
 
   useEffect(() => {
-    if (!restoredRef.current) return;
+    const target = pendingTargetRef.current;
+    if (!target || !matchesPlayerVolume({ volume, muted }, target)) return;
+    pendingTargetRef.current = null;
+    restoredTargetRef.current = target;
+  }, [volume, muted]);
+
+  useEffect(() => {
+    if (pendingTargetRef.current) return;
+    if (!restoredTargetRef.current) return;
     onVolumeChange?.(volume, muted);
   }, [volume, muted, onVolumeChange]);
 
