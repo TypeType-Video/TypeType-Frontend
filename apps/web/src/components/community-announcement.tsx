@@ -8,6 +8,7 @@ import {
   COMMUNITY_ANNOUNCEMENT_KEY,
   dismissCommunityAnnouncement,
   isCommunityAnnouncementDismissed,
+  LEMMY_ANNOUNCEMENT_URL,
   LEMMY_COMMUNITY_URL,
 } from "../lib/community-announcement";
 import { getOpenMojiUrl } from "../lib/openmoji";
@@ -130,6 +131,14 @@ export function CommunityAnnouncement() {
       >
         <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
         {m.community_lemmy_join()}
+      </a>
+      <a
+        href={LEMMY_ANNOUNCEMENT_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-2 inline-flex min-h-10 w-full items-center justify-center px-3 py-2 text-center font-medium text-accent underline-offset-4 hover:underline"
+      >
+        {m.community_lemmy_announcement()}
       </a>
       <section
         className="mt-5 border-t border-border pt-4"
