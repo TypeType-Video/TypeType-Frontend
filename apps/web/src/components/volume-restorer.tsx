@@ -34,12 +34,15 @@ export function VolumeRestorer({
       return;
     }
     const target = { volume: clampPlayerVolume(initialVolume), muted: initialMuted };
-    if (restoredTargetRef.current && matchesPlayerVolume(restoredTargetRef.current, target)) {
-      return;
-    }
     if (!canPlay) return;
     const root = player?.el;
     if (!root?.isConnected) return;
+    if (matchesPlayerVolume({ volume, muted }, target)) {
+      pendingTargetRef.current = null;
+      restoredTargetRef.current = target;
+      return;
+    }
+    restoredTargetRef.current = null;
     pendingTargetRef.current = target;
     restoredTargetRef.current = null;
     try {
@@ -53,7 +56,7 @@ export function VolumeRestorer({
     } catch {
       pendingTargetRef.current = null;
     }
-  }, [settingsReady, canPlay, remote, initialVolume, initialMuted, player]);
+  }, [settingsReady, canPlay, remote, initialVolume, initialMuted, player, volume, muted]);
 
   useEffect(() => {
     const target = pendingTargetRef.current;
