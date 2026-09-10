@@ -1,4 +1,3 @@
-import { useRouterState } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -6,10 +5,10 @@ import { siAppstore, siFdroid, siGoogleplay, siLemmy } from "simple-icons";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   COMMUNITY_ANNOUNCEMENT_KEY,
-  dismissCommunityAnnouncement,
   isCommunityAnnouncementDismissed,
   LEMMY_ANNOUNCEMENT_URL,
   LEMMY_COMMUNITY_URL,
+  rememberCommunityAnnouncementDismissal,
 } from "../lib/community-announcement";
 import { getOpenMojiUrl } from "../lib/openmoji";
 import { m } from "../paraglide/messages.js";
@@ -38,10 +37,8 @@ const stores = [
 
 export function CommunityAnnouncement() {
   useInterfaceLocale();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const [dismissed, setDismissed] = useState(isCommunityAnnouncementDismissed);
+  const [visible, setVisible] = useState(!isCommunityAnnouncementDismissed());
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const visible = pathname === "/" && !dismissed;
 
   useEffect(() => {
     if (!visible) return;
@@ -58,16 +55,21 @@ export function CommunityAnnouncement() {
 
   useEffect(() => {
     const sync = (event: StorageEvent) => {
-      if (event.key === COMMUNITY_ANNOUNCEMENT_KEY && event.newValue === "dismissed")
-        setDismissed(true);
+      if (event.key === COMMUNITY_ANNOUNCEMENT_KEY) {
+        setVisible(event.newValue !== "dismissed");
+      }
     };
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
   }, []);
 
-  function dismiss() {
-    dismissCommunityAnnouncement();
-    setDismissed(true);
+  function acknowledge() {
+    setVisible(false);
+  }
+
+  function neverShowAgain() {
+    rememberCommunityAnnouncementDismissal();
+    setVisible(false);
   }
 
   if (!visible) return null;
@@ -75,9 +77,10 @@ export function CommunityAnnouncement() {
     <dialog
       ref={dialogRef}
       aria-labelledby="community-announcement-title"
+      aria-describedby="community-announcement-description"
       onCancel={(event) => {
         event.preventDefault();
-        dismiss();
+        acknowledge();
       }}
       className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border border-border-strong bg-surface p-5 text-sm text-fg shadow-xl backdrop:bg-black/60 sm:p-6"
     >
@@ -90,7 +93,7 @@ export function CommunityAnnouncement() {
         </div>
         <button
           type="button"
-          onClick={dismiss}
+          onClick={acknowledge}
           aria-label={m.admin_users_close()}
           title={m.admin_users_close()}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded hover:bg-surface-strong"
@@ -98,7 +101,10 @@ export function CommunityAnnouncement() {
           <X size={20} aria-hidden="true" />
         </button>
       </div>
-      <div className="space-y-5 whitespace-pre-line leading-relaxed text-fg-muted">
+      <div
+        id="community-announcement-description"
+        className="space-y-5 whitespace-pre-line leading-relaxed text-fg-muted"
+      >
         <p>
           <img
             src={getOpenMojiUrl("1F61E")}
@@ -132,6 +138,22 @@ export function CommunityAnnouncement() {
         <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
         {m.community_lemmy_join()}
       </a>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          onClick={acknowledge}
+          className="min-h-11 rounded-md bg-surface-strong px-3 py-2 text-center font-semibold text-fg hover:bg-border"
+        >
+          {m.community_lemmy_acknowledge()}
+        </button>
+        <button
+          type="button"
+          onClick={neverShowAgain}
+          className="min-h-11 rounded-md px-3 py-2 text-center text-fg-muted underline-offset-4 hover:text-fg hover:underline"
+        >
+          {m.community_lemmy_never_again()}
+        </button>
+      </div>
       <a
         href={LEMMY_ANNOUNCEMENT_URL}
         target="_blank"

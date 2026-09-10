@@ -1,24 +1,34 @@
-export const COMMUNITY_ANNOUNCEMENT_KEY = "typetype-announcement-lemmy-1";
+export const COMMUNITY_ANNOUNCEMENT_KEY = "typetype-announcement-lemmy-2";
 export const LEMMY_COMMUNITY_URL = "https://blorp.lemmy.zip/home/c/TypeType@lemmy.zip";
 export const LEMMY_ANNOUNCEMENT_URL =
   "https://blorp.lemmy.zip/home/posts/https%3A%2F%2Flemmy.zip%2Fpost%2F71134875";
 
-let dismissedInSession = false;
+type AnnouncementStorage = Pick<Storage, "getItem" | "setItem">;
 
-export function isCommunityAnnouncementDismissed(): boolean {
-  if (dismissedInSession) return true;
+function getAnnouncementStorage(): AnnouncementStorage | undefined {
   try {
-    return localStorage.getItem(COMMUNITY_ANNOUNCEMENT_KEY) === "dismissed";
+    return localStorage;
+  } catch {
+    return undefined;
+  }
+}
+
+export function isCommunityAnnouncementDismissed(
+  storage: AnnouncementStorage | undefined = getAnnouncementStorage(),
+): boolean {
+  try {
+    return storage?.getItem(COMMUNITY_ANNOUNCEMENT_KEY) === "dismissed";
   } catch {
     return false;
   }
 }
 
-export function dismissCommunityAnnouncement(): void {
-  dismissedInSession = true;
+export function rememberCommunityAnnouncementDismissal(
+  storage: AnnouncementStorage | undefined = getAnnouncementStorage(),
+): void {
   try {
-    localStorage.setItem(COMMUNITY_ANNOUNCEMENT_KEY, "dismissed");
+    storage?.setItem(COMMUNITY_ANNOUNCEMENT_KEY, "dismissed");
   } catch {
-    // Keep dismissal for this session when browser storage is unavailable.
+    // A storage failure leaves the announcement visible on the next visit.
   }
 }
