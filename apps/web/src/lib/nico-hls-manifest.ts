@@ -75,7 +75,9 @@ function audioName(stream: AudioStreamItem, index: number): string {
 }
 
 function playlistUrl(url: string, playbackKey: string): string {
-  return `${proxyUrl(url)}&playback=${encodeURIComponent(playbackKey)}`;
+  const proxied = proxyUrl(url);
+  const separator = proxied.includes("?") ? "&" : "?";
+  return `${proxied}${separator}playback=${encodeURIComponent(playbackKey)}`;
 }
 
 function audioMedia(stream: AudioStreamItem, index: number, playbackKey: string): string {
