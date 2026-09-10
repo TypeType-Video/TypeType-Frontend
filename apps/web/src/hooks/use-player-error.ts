@@ -53,7 +53,6 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
   const [bilibiliVariant, setBilibiliVariant] = useState(0);
   const [playerFailed, setPlayerFailed] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-  const nicoPlaybackKey = useRef(crypto.randomUUID());
   const sabrRecoveryRef = useRef(false);
   const bilibiliVariants =
     provider === "bilibili"
@@ -69,7 +68,6 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
     hlsFailed,
     allowServerManifests: preferServerManifests,
     bilibiliVariant,
-    nicoPlaybackKey: `${nicoPlaybackKey.current}-${retryKey}`,
   });
   const manifestSrc: MediaSrc = sabrSelected ? { src: "", type: "video/mp4" } : fallbackSrc;
   const handleError = useCallback(() => {

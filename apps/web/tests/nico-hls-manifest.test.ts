@@ -17,25 +17,10 @@ const audio = {
 } as AudioStreamItem;
 
 test("describes Nico codecs and independent segments", () => {
-  const source = buildNicoHlsManifest([video], [audio], "playback key");
+  const source = buildNicoHlsManifest([video], [audio]);
   expect(source).not.toBeNull();
 
   const manifest = atob(source?.split(",", 2)[1] ?? "");
   expect(manifest).toContain("#EXT-X-INDEPENDENT-SEGMENTS");
   expect(manifest).toContain('CODECS="avc1.4d4020,mp4a.40.2"');
-  expect(manifest).toContain("&playback=playback%20key");
-});
-
-test("adds a query separator to opaque media playlist URLs", () => {
-  const videoHandle = "m1_0123456789abcdefghijklmn";
-  const audioHandle = "m1_nmlkjihgfedcba9876543210";
-  const source = buildNicoHlsManifest(
-    [{ ...video, url: `https://example.test/api/media/${videoHandle}` }],
-    [{ ...audio, url: `https://example.test/api/media/${audioHandle}` }],
-    "reload",
-  );
-  const manifest = atob(source?.split(",", 2)[1] ?? "");
-
-  expect(manifest).toContain(`/api/media/${videoHandle}?playback=reload`);
-  expect(manifest).toContain(`/api/media/${audioHandle}?playback=reload`);
 });

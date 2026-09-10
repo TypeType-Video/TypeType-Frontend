@@ -1,7 +1,7 @@
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
-import { HLS_BUFFER_CONFIG } from "../lib/hls-buffer-config";
+import { createHlsConfig } from "../lib/hls-buffer-config";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
@@ -73,7 +73,7 @@ export function ChaptersTrack({ src }: { src: string }) {
 export function onProviderChange(provider: MediaProviderAdapter | null) {
   if (isHLSProvider(provider)) {
     provider.library = loadHlsLibrary;
-    provider.config = HLS_BUFFER_CONFIG;
+    provider.config = createHlsConfig();
     return;
   }
   const dashProvider = isDASHProvider(provider);
