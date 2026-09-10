@@ -9,6 +9,9 @@ import { useMediaState } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
 
 const TRACK_HEIGHT = 3;
+const TIME_SLIDER_SELECTOR = ".vds-time-slider, .typetype-audio-time-slider";
+const TRACK_SELECTOR =
+  ".vds-slider-track:not(.vds-slider-track-fill):not(.vds-slider-progress), .typetype-audio-time-slider-track";
 
 type SegmentBarProps = {
   segment: SponsorBlockSegmentItem;
@@ -56,8 +59,7 @@ export function SponsorBlockBar({ segments }: Props) {
     const player = anchor.closest<HTMLElement>("[data-media-player]");
     if (!player) return;
 
-    const sliders = [...player.querySelectorAll<HTMLElement>(".vds-time-slider")];
-    const visibleSlider = () =>
+    const visibleSlider = (sliders: HTMLElement[]) =>
       sliders.find((candidate) => {
         const rect = candidate.getBoundingClientRect();
         const style = getComputedStyle(candidate);
@@ -69,12 +71,20 @@ export function SponsorBlockBar({ segments }: Props) {
         );
       }) ?? sliders[0];
 
+    const getSliders = () => [...player.querySelectorAll<HTMLElement>(TIME_SLIDER_SELECTOR)];
+
+    let resizeObserver: ResizeObserver | undefined;
+
     const update = () => {
-      const slider = visibleSlider();
+      const sliders = getSliders();
+      for (const candidate of sliders) {
+        resizeObserver?.observe(candidate);
+        const track = candidate.querySelector<HTMLElement>(TRACK_SELECTOR);
+        if (track) resizeObserver?.observe(track);
+      }
+      const slider = visibleSlider(sliders);
       if (!slider) return;
-      const track = slider.querySelector<HTMLElement>(
-        ".vds-slider-track:not(.vds-slider-track-fill):not(.vds-slider-progress)",
-      );
+      const track = slider.querySelector<HTMLElement>(TRACK_SELECTOR);
       const pRect = player.getBoundingClientRect();
       const trackRect = (track ?? slider).getBoundingClientRect();
       const position = sponsorBlockBarPosition(pRect, trackRect, TRACK_HEIGHT);
@@ -83,15 +93,8 @@ export function SponsorBlockBar({ segments }: Props) {
       overlay.style.width = `${position.width}px`;
     };
 
-    const ro = new ResizeObserver(update);
-    ro.observe(player);
-    for (const slider of sliders) {
-      ro.observe(slider);
-      const track = slider.querySelector<HTMLElement>(
-        ".vds-slider-track:not(.vds-slider-track-fill):not(.vds-slider-progress)",
-      );
-      if (track) ro.observe(track);
-    }
+    resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(player);
     const mo = new MutationObserver(update);
     mo.observe(player, {
       attributes: true,
@@ -101,7 +104,7 @@ export function SponsorBlockBar({ segments }: Props) {
     });
     update();
     return () => {
-      ro.disconnect();
+      resizeObserver?.disconnect();
       mo.disconnect();
     };
   }, [controlsVisible, duration]);
