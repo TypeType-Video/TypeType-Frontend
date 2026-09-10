@@ -15,7 +15,7 @@ describe("community announcement persistence", () => {
     ).toBe(false);
   });
 
-  test("persists only the explicit never-again choice", () => {
+  test("persists the explicit acknowledgement choice", () => {
     const values = new Map<string, string>();
     const storage = {
       getItem: (key: string) => values.get(key) ?? null,

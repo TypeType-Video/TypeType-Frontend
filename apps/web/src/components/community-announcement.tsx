@@ -1,13 +1,13 @@
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { siAppstore, siFdroid, siGoogleplay, siLemmy } from "simple-icons";
+import { siLemmy } from "simple-icons";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   COMMUNITY_ANNOUNCEMENT_KEY,
-  isCommunityAnnouncementDismissed,
   LEMMY_ANNOUNCEMENT_URL,
   LEMMY_COMMUNITY_URL,
+  isCommunityAnnouncementDismissed,
   rememberCommunityAnnouncementDismissal,
 } from "../lib/community-announcement";
 import { getOpenMojiUrl } from "../lib/openmoji";
@@ -16,20 +16,17 @@ import { ServiceIcon } from "./service-icon";
 
 const stores = [
   {
-    icon: siGoogleplay,
-    color: "#34A853",
+    icon: "/brand/google-play.svg",
     name: "Google Play",
     url: "https://play.google.com/store/apps/details?id=app.vger.voyager&pcampaignid=web_share",
   },
   {
-    icon: siFdroid,
-    color: `#${siFdroid.hex}`,
+    icon: "/brand/fdroid.svg",
     name: "F-Droid",
     url: "https://f-droid.org/fr/packages/app.vger.voyager/",
   },
   {
-    icon: siAppstore,
-    color: `#${siAppstore.hex}`,
+    icon: "/brand/app-store.svg",
     name: "App Store",
     url: "https://apps.apple.com/us/app/voyager-for-lemmy/id6451429762",
   },
@@ -63,11 +60,11 @@ export function CommunityAnnouncement() {
     return () => window.removeEventListener("storage", sync);
   }, []);
 
-  function acknowledge() {
+  function closeForNow() {
     setVisible(false);
   }
 
-  function neverShowAgain() {
+  function dismissPermanently() {
     rememberCommunityAnnouncementDismissal();
     setVisible(false);
   }
@@ -80,7 +77,7 @@ export function CommunityAnnouncement() {
       aria-describedby="community-announcement-description"
       onCancel={(event) => {
         event.preventDefault();
-        acknowledge();
+        closeForNow();
       }}
       className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border border-border-strong bg-surface p-5 text-sm text-fg shadow-xl backdrop:bg-black/60 sm:p-6"
     >
@@ -93,7 +90,7 @@ export function CommunityAnnouncement() {
         </div>
         <button
           type="button"
-          onClick={acknowledge}
+          onClick={closeForNow}
           aria-label={m.admin_users_close()}
           title={m.admin_users_close()}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded hover:bg-surface-strong"
@@ -138,22 +135,13 @@ export function CommunityAnnouncement() {
         <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
         {m.community_lemmy_join()}
       </a>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          onClick={acknowledge}
-          className="min-h-11 rounded-md bg-surface-strong px-3 py-2 text-center font-semibold text-fg hover:bg-border"
-        >
-          {m.community_lemmy_acknowledge()}
-        </button>
-        <button
-          type="button"
-          onClick={neverShowAgain}
-          className="min-h-11 rounded-md px-3 py-2 text-center text-fg-muted underline-offset-4 hover:text-fg hover:underline"
-        >
-          {m.community_lemmy_never_again()}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={dismissPermanently}
+        className="mt-4 min-h-11 w-full whitespace-normal rounded-md bg-surface-strong px-3 py-2 text-center font-semibold text-fg hover:bg-border"
+      >
+        {m.community_lemmy_acknowledge()}
+      </button>
       <a
         href={LEMMY_ANNOUNCEMENT_URL}
         target="_blank"
@@ -168,7 +156,7 @@ export function CommunityAnnouncement() {
       >
         <p className="mb-3 text-sm font-medium">{m.community_lemmy_voyager()}</p>
         <div className="flex flex-wrap gap-2">
-          {stores.map(({ icon, color, name, url }) => (
+          {stores.map(({ icon, name, url }) => (
             <a
               key={name}
               href={url}
@@ -176,7 +164,14 @@ export function CommunityAnnouncement() {
               rel="noreferrer"
               className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border-strong px-3 py-2 hover:bg-surface-strong"
             >
-              <ServiceIcon path={icon.path} color={color} label={name} />
+              <img
+                src={icon}
+                alt=""
+                aria-hidden="true"
+                width={20}
+                height={20}
+                className="size-5 shrink-0 object-contain"
+              />
               {name}
             </a>
           ))}

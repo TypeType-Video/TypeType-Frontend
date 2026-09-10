@@ -1318,8 +1318,7 @@
   "community_lemmy_join": "Zu TypeType auf Lemmy!",
   "community_lemmy_announcement": "Die vollständige Ankündigung lesen",
   "community_lemmy_voyager": "Unterwegs? Probiert Voyager aus!",
-  "community_lemmy_acknowledge": "ICH HABE ES VERSTANDEN! (Beim nächsten Mal ruhig wieder fragen)",
-  "community_lemmy_never_again": "Dieses Fenster nie wieder anzeigen",
+  "community_lemmy_acknowledge": "ICH HABE ES VERSTANDEN! Alles klar",
   "portability_preparing_upload": "Kontodaten werden vorbereitet und hochgeladen...",
   "portability_takeout_metadata_limit": "Die Kontodaten in diesem Archiv überschreiten die Importgrenzen oder sind verschlüsselt. Exportiere YouTube separat in kleineren ZIP-Dateien.",
   "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält."
