@@ -12,7 +12,7 @@ const DASH_TOP_QUALITY_BUFFER_SECONDS = 24;
 const DASH_BACK_BUFFER_SECONDS = 30;
 type DashLibraryModule = { default: typeof dashjs };
 type DashRuntimeModule = typeof dashjs & { default?: typeof dashjs };
-type HlsLibraryModule = { default: typeof Hls; XhrLoader: typeof import("hls.js").XhrLoader };
+type HlsLibraryModule = { default: typeof Hls };
 type HlsRuntimeModule = { default?: typeof Hls };
 let dashLibrary: typeof dashjs | null = null;
 let dashLibraryPromise: Promise<DashLibraryModule> | null = null;
@@ -31,7 +31,6 @@ const loadDashLibrary = (): Promise<DashLibraryModule> => {
 const loadHlsLibrary = (): Promise<HlsLibraryModule> => {
   hlsLibraryPromise ??= import("hls.js").then((module) => ({
     default: (module as HlsRuntimeModule).default ?? (module as unknown as typeof Hls),
-    XhrLoader: module.XhrLoader,
   }));
   return hlsLibraryPromise;
 };
@@ -77,7 +76,7 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
     let providerLibrary = hlsProviderLibraries.get(provider);
     if (!providerLibrary) {
       providerLibrary = loadHlsLibrary().then((library) => {
-        provider.config = createHlsConfig(library.XhrLoader);
+        provider.config = createHlsConfig();
         return library;
       });
       hlsProviderLibraries.set(provider, providerLibrary);
