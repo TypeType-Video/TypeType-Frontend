@@ -1,17 +1,19 @@
 import { DollarSign } from "lucide-react";
-import { siGithub, siReddit } from "simple-icons";
+import { siGithub, siLemmy } from "simple-icons";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
+import { LEMMY_COMMUNITY_URL } from "../lib/community-announcement";
 import { m } from "../paraglide/messages.js";
+import { CommunityAnnouncement } from "./community-announcement";
 import { ServiceIcon } from "./service-icon";
 
 const COMMUNITY_URL = "https://github.com/TypeType-Video";
-const REDDIT_URL = "https://www.reddit.com/r/TypeType/";
 const SPONSOR_URL = "https://github.com/sponsors/Priveetee";
 
 export function AppFooter() {
   useInterfaceLocale();
   return (
     <footer className="mt-12 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-border px-3 py-5 text-xs text-fg-soft">
+      <CommunityAnnouncement />
       <a
         href={COMMUNITY_URL}
         target="_blank"
@@ -22,13 +24,13 @@ export function AppFooter() {
         {m.shell_built_by_community()}
       </a>
       <a
-        href={REDDIT_URL}
+        href={LEMMY_COMMUNITY_URL}
         target="_blank"
         rel="noreferrer"
         className="inline-flex items-center gap-1.5 text-fg-muted hover:text-fg"
       >
-        <ServiceIcon path={siReddit.path} color="currentColor" label="Reddit" />
-        Reddit
+        <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
+        Lemmy
       </a>
       <a
         href={SPONSOR_URL}

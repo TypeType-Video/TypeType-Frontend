@@ -13,7 +13,7 @@ export function useSearchOverlayNavigation({ onClose }: Params) {
   const service = settings.defaultService;
   const { add } = useSearchHistory();
 
-  function navigateAndClose(term: string) {
+  function navigateAndClose(term: string, selectedService = service) {
     const trimmed = term.trim();
     if (!trimmed) return;
     const directWatchUrl = toDirectWatchUrl(trimmed);
@@ -23,7 +23,7 @@ export function useSearchOverlayNavigation({ onClose }: Params) {
       return;
     }
     add.mutate(trimmed);
-    navigate({ to: "/search", search: { q: trimmed, service } });
+    navigate({ to: "/search", search: { q: trimmed, service: selectedService } });
     onClose();
   }
 

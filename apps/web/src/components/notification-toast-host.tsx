@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
-import { NOTIFICATIONS_UNREAD_KEY } from "../hooks/use-notifications";
+import { notificationsUnreadKey } from "../hooks/use-notifications";
 import { useSettings } from "../hooks/use-settings";
 import { fetchNotifications } from "../lib/api-notifications";
 import {
@@ -19,7 +19,7 @@ import { useUiStore } from "../stores/ui-store";
 import type { NotificationItem } from "../types/notifications";
 import { NotificationToast } from "./notification-toast";
 
-const POLL_INTERVAL_MS = 60_000;
+const POLL_INTERVAL_MS = 15_000;
 const DISMISS_AFTER_MS = 6_000;
 const STORAGE_PREFIX = "typetype-notification-toast:";
 
@@ -70,8 +70,10 @@ export function NotificationToastHost() {
 
   useEffect(() => {
     if (!enabled || !owner || !query.data || !visibilityFilterReady || !settingsReady) return;
-    queryClient.setQueryData(NOTIFICATIONS_UNREAD_KEY, {
+    if (!query.data.available) return;
+    queryClient.setQueryData(notificationsUnreadKey(owner), {
       unreadCount: query.data.unreadCount,
+      available: true,
     });
     let current = cursorRef.current?.owner === owner ? cursorRef.current.cursor : readCursor(owner);
     if (!current) {

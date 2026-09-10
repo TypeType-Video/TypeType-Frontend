@@ -23,6 +23,7 @@ export function SabrTimeSlider({ seeking = false, thumbnails, video }: Props) {
       style={style}
       aria-label={m.ui_seek()}
       aria-busy={seeking}
+      orientation="horizontal"
       data-seeking={seeking ? "true" : undefined}
       onDragEnd={(percent) => {
         setSeekTarget(percent);

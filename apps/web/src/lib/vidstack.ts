@@ -11,6 +11,7 @@ export type {
   VolumeSliderInstance,
 } from "@vidstack/react";
 export {
+  FullscreenButton,
   isAudioProvider,
   isDASHProvider,
   isHLSProvider,

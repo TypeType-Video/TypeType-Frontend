@@ -3,6 +3,7 @@ import type { AuthMe } from "../types/auth";
 import { ApiError } from "./api";
 import { fetchMe, loginAuth, logoutAuth, refreshAuth, registerAuth } from "./api-auth";
 import { completeOidc } from "./api-oidc";
+import { switchAccountProfile } from "./api-profiles";
 
 type Credentials = {
   identifier: string;
@@ -97,6 +98,11 @@ export async function oidcCallbackSession(payload: {
   const result = await completeOidc(payload);
   await hydrateSession(result.accessToken);
   return result.returnTo;
+}
+
+export async function switchProfileSession(profileId: string): Promise<void> {
+  const result = await switchAccountProfile(profileId);
+  await hydrateSession(result.accessToken);
 }
 
 export async function logoutSession(): Promise<void> {

@@ -1,5 +1,6 @@
 import { useCompactPlayer } from "../hooks/use-compact-player";
 import { shouldRunSponsorBlockAutoSkip } from "../lib/sponsorblock-playback-tools";
+import { useMediaState } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import { PlayerHotkeys } from "./player-hotkeys";
 import { SponsorBlockSkipper } from "./player-internals";
@@ -21,7 +22,9 @@ type Props = {
 };
 
 export function VideoPlayerPlaybackTools(props: Props) {
-  const compact = useCompactPlayer();
+  const floating = useCompactPlayer();
+  const fullscreen = useMediaState("fullscreen");
+  const compact = floating && !fullscreen;
   return (
     <>
       {!compact && <PlayerHotkeys canSeek={props.canSeek} sabrVideo={props.sabrVideo} />}

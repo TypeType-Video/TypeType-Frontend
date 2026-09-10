@@ -1,5 +1,24 @@
 TypeType Frontend includes software distributed under third-party licenses.
 
+Brand assets
+------------
+
+The store icons used by the community announcement are downloaded from the
+following sources and remain under their respective trademark and license
+terms:
+
+Google Play icon
+https://commons.wikimedia.org/wiki/File:Google_Play_2022_icon.svg
+Source: Google Play
+
+App Store icon
+https://commons.wikimedia.org/wiki/File:App_Store_(iOS).svg
+Source: Apple
+
+F-Droid icon
+https://gitlab.com/fdroid/fdroid-website/-/blob/master/assets/fdroid-logo.svg
+The F-Droid logo is available under CC BY-SA 3.0 or GPLv3+.
+
 zip.js
 https://github.com/gildas-lormeau/zip.js
 BSD 3-Clause License

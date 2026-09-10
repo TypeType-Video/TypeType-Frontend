@@ -1,12 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { DollarSign, Search } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
+import { siLemmy } from "simple-icons";
 import { useAuth } from "../hooks/use-auth";
 import { useAuthToasts } from "../hooks/use-auth-toasts";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useMobile } from "../hooks/use-mobile";
 import { useSearchShortcut } from "../hooks/use-search-shortcut";
 import { isAuthPage } from "../lib/auth-routes";
+import { LEMMY_COMMUNITY_URL } from "../lib/community-announcement";
 import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import { InterfaceLanguagePicker } from "./interface-language-picker";
@@ -14,6 +16,7 @@ import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
 import { NavbarSearch } from "./navbar-search";
+import { ServiceIcon } from "./service-icon";
 import { Toast } from "./toast";
 
 const SearchOverlay = lazy(() =>
@@ -37,7 +40,7 @@ export function Navbar() {
   const canOpenSearch = !authPage;
   const showBackButton = isMobile && canOpenSearch && pathname !== "/";
   const navClass = isMobile
-    ? "fixed top-0 left-0 right-0 z-50 h-14 bg-app/95 backdrop-blur border-b border-border flex items-center px-2 gap-2"
+    ? "fixed top-0 left-0 right-0 z-50 h-14 bg-app/95 backdrop-blur border-b border-border flex items-center px-2 gap-1.5"
     : "fixed top-0 left-0 right-0 z-50 h-14 bg-app/95 backdrop-blur border-b border-border flex items-center px-4 gap-4";
 
   function handleBack() {
@@ -53,14 +56,14 @@ export function Navbar() {
   return (
     <>
       <nav className={navClass}>
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <NavbarLeadingControl
             authPage={authPage}
             showBackButton={showBackButton}
             onBack={handleBack}
             onToggleSidebar={isMobile ? toggleMobileSidebar : toggleSidebar}
           />
-          <Link to="/" className="flex min-w-0 shrink items-center gap-2">
+          <Link to="/" className="flex shrink-0 items-center gap-2">
             <img src="/logo.svg" alt="TypeType" width={28} height={28} />
             <span className="hidden max-w-28 truncate text-fg text-sm font-semibold tracking-widest min-[430px]:inline sm:max-w-none">
               TYPETYPE
@@ -72,10 +75,21 @@ export function Navbar() {
             rel="noreferrer"
             aria-label={m.shell_support_typetype()}
             title={m.shell_support_typetype()}
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-fg-muted hover:bg-surface-strong hover:text-fg"
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
           >
             <DollarSign size={15} />
             <span className="hidden sm:inline">{m.shell_support()}</span>
+          </a>
+          <a
+            href={LEMMY_COMMUNITY_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Lemmy"
+            title="Lemmy"
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
+          >
+            <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
+            <span className="hidden sm:inline">Lemmy</span>
           </a>
         </div>
 
@@ -83,7 +97,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
+            className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border-strong bg-surface-strong text-fg hover:bg-surface-soft"
             aria-label={m.shell_search()}
           >
             <Search size={18} />

@@ -9,7 +9,7 @@ test("keeps the player entry after its watch route detaches", () => {
   const anchor = {} as HTMLElement;
   const store = usePersistentWatchPlayerStore.getState();
 
-  store.register(owner, "stream-1", props, true);
+  store.register(owner, "stream-1", props, true, "/watch?v=stream-1&list=playlist");
   store.setAnchor(owner, anchor);
   store.setPosition({ left: 24, top: 48 });
   store.detach(owner);
@@ -19,6 +19,7 @@ test("keeps the player entry after its watch route detaches", () => {
     entry: {
       owner,
       streamId: "stream-1",
+      href: "/watch?v=stream-1&list=playlist",
       props,
       enabled: true,
       anchor: null,
@@ -37,8 +38,8 @@ test("ignores lifecycle updates from an old route owner", () => {
   const secondAnchor = {} as HTMLElement;
   const store = usePersistentWatchPlayerStore.getState();
 
-  store.register(firstOwner, "stream-1", props, true);
-  store.register(secondOwner, "stream-2", props, true);
+  store.register(firstOwner, "stream-1", props, true, "/watch?v=stream-1");
+  store.register(secondOwner, "stream-2", props, true, "/watch?v=stream-2");
   store.setAnchor(firstOwner, firstAnchor);
   store.detach(firstOwner);
   store.setAnchor(secondOwner, secondAnchor);
@@ -46,6 +47,7 @@ test("ignores lifecycle updates from an old route owner", () => {
   expect(usePersistentWatchPlayerStore.getState().entry).toMatchObject({
     owner: secondOwner,
     streamId: "stream-2",
+    href: "/watch?v=stream-2",
     anchor: secondAnchor,
     attached: true,
   });

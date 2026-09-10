@@ -1,16 +1,68 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  type MutateOptions,
+  type QueryClient,
+  type UseMutationResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { fetchSettings, updateSettings } from "../lib/api-user";
 import { EMPTY_CAPTION_STYLES } from "../lib/caption-styles";
+import { SettingsWriteQueue } from "../lib/settings-write-queue";
 import { DEFAULT_SPONSORBLOCK_CATEGORY_ACTIONS } from "../lib/sponsorblock-settings";
 import type { SettingsItem } from "../types/user";
 import { useAuth } from "./use-auth";
 
 const KEY = ["settings"];
 const AUDIO_ONLY_STORAGE_KEY = "typetype-audio-only-playback";
+const writeQueues = new WeakMap<QueryClient, SettingsWriteQueue>();
 
 type UseSettingsOptions = {
   forceAnonymous?: boolean;
 };
+
+type QueuedSettingsPatch = {
+  id: number;
+  base: SettingsItem;
+  patch: Partial<SettingsItem>;
+};
+
+type SettingsMutationContext = {
+  patch: Partial<SettingsItem>;
+};
+
+type PublicMutateOptions = MutateOptions<
+  SettingsItem,
+  Error,
+  Partial<SettingsItem>,
+  SettingsMutationContext
+>;
+
+type PublicSettingsMutation = Omit<
+  UseMutationResult<SettingsItem, Error, QueuedSettingsPatch, SettingsMutationContext>,
+  "mutate" | "mutateAsync"
+> & {
+  mutate: (patch: Partial<SettingsItem>, options?: PublicMutateOptions) => void;
+  mutateAsync: (
+    patch: Partial<SettingsItem>,
+    options?: PublicMutateOptions,
+  ) => Promise<SettingsItem>;
+};
+
+type QueuedMutateOptions = MutateOptions<
+  SettingsItem,
+  Error,
+  QueuedSettingsPatch,
+  SettingsMutationContext
+>;
+
+function getWriteQueue(client: QueryClient): SettingsWriteQueue {
+  const existing = writeQueues.get(client);
+  if (existing) return existing;
+  const queue = new SettingsWriteQueue();
+  writeQueues.set(client, queue);
+  return queue;
+}
 
 const DEFAULTS: SettingsItem = {
   defaultService: 0,
@@ -72,6 +124,7 @@ function withLocalAudioOnly(settings: SettingsItem): SettingsItem {
 
 export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {}) {
   const qc = useQueryClient();
+  const writeQueue = getWriteQueue(qc);
   const { authReady, isAuthed } = useAuth();
   const useAccountSettings = isAuthed && !forceAnonymous;
 
@@ -88,25 +141,25 @@ export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {})
     (query.isSuccess && !query.isPlaceholderData) ||
     query.isError;
 
-  const update = useMutation({
-    mutationFn: (patch: Partial<SettingsItem>) => {
-      const stored = qc.getQueryData<SettingsItem>(KEY);
-      const current = stored ? { ...DEFAULTS, ...stored } : DEFAULTS;
-      const next = { ...current, ...patch };
-      if (!useAccountSettings) return Promise.resolve(next);
-      return updateSettings(next);
-    },
-    onMutate: async (patch) => {
+  const mutation = useMutation<SettingsItem, Error, QueuedSettingsPatch, SettingsMutationContext>({
+    mutationFn: ({ id, base }) =>
+      writeQueue.execute(
+        id,
+        (settings) => (useAccountSettings ? updateSettings(settings) : Promise.resolve(settings)),
+        () => base,
+        (settings) => qc.setQueryData<SettingsItem>(KEY, settings),
+      ),
+    onMutate: async ({ patch }) => {
       await qc.cancelQueries({ queryKey: KEY });
       if (typeof patch.audioOnlyPlayback === "boolean")
         writeAudioOnlyPlayback(patch.audioOnlyPlayback);
       const previous = qc.getQueryData<SettingsItem>(KEY);
       qc.setQueryData<SettingsItem>(KEY, { ...DEFAULTS, ...previous, ...patch });
-      return { previous, patch };
+      return { patch };
     },
-    onSuccess: (data, _patch, context) => {
+    onSuccess: (data, _variables, context) => {
       const current = qc.getQueryData<SettingsItem>(KEY);
-      qc.setQueryData(KEY, { ...DEFAULTS, ...current, ...data, ...context?.patch });
+      qc.setQueryData<SettingsItem>(KEY, { ...DEFAULTS, ...data, ...context?.patch, ...current });
       if (
         context?.patch.hideSubscriptionLiveStreams !== undefined ||
         context?.patch.hideMembersOnlyContent !== undefined
@@ -114,11 +167,35 @@ export function useSettings({ forceAnonymous = false }: UseSettingsOptions = {})
         void qc.resetQueries({ queryKey: ["subscription-feed"] });
       }
     },
-    onError: (err, _patch, context) => {
-      if (context?.previous) qc.setQueryData(KEY, context.previous);
+    onError: (err) => {
       console.error("[settings] PUT failed", err);
     },
   });
+
+  function queuePatch(patch: Partial<SettingsItem>): QueuedSettingsPatch {
+    const normalizedPatch = { ...patch };
+    const base = { ...DEFAULTS, ...qc.getQueryData<SettingsItem>(KEY) };
+    const id = writeQueue.stage(normalizedPatch, base);
+    return { id, base, patch: normalizedPatch };
+  }
+
+  function mapOptions(options?: PublicMutateOptions): QueuedMutateOptions | undefined {
+    if (!options) return undefined;
+    return {
+      onSuccess: (data, variables, context, mutationContext) =>
+        options.onSuccess?.(data, variables.patch, context, mutationContext),
+      onError: (error, variables, context, mutationContext) =>
+        options.onError?.(error, variables.patch, context, mutationContext),
+      onSettled: (data, error, variables, context, mutationContext) =>
+        options.onSettled?.(data, error, variables.patch, context, mutationContext),
+    };
+  }
+
+  const update: PublicSettingsMutation = {
+    ...mutation,
+    mutate: (patch, options) => mutation.mutate(queuePatch(patch), mapOptions(options)),
+    mutateAsync: (patch, options) => mutation.mutateAsync(queuePatch(patch), mapOptions(options)),
+  };
 
   const settings = withLocalAudioOnly(query.data ? { ...DEFAULTS, ...query.data } : DEFAULTS);
 

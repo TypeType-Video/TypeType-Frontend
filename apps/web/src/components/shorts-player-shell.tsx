@@ -64,7 +64,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
   const originalAudioTrackId = getOriginalAudioTrackId(stream);
   const preferredDefaultAudioTrackId = getPreferredDefaultAudioTrackId(stream);
   const originalAudioLocale = getOriginalAudioLocale(stream);
-  const onVolumeChange = useVolumeSync(update.mutate);
+  const onVolumeChange = useVolumeSync(update.mutate, settings);
   useShortsPrefetch(
     shorts.map((item) => item.id),
     index,

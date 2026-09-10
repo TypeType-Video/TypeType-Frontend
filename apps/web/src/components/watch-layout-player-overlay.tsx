@@ -6,7 +6,7 @@ import type { SettingsItem } from "../types/user";
 import { WatchPlayerOverlay } from "./watch-player-overlay";
 
 type Props = {
-  isNicoNico: boolean;
+  canLoadBulletComments: boolean;
   hideComments: boolean;
   bulletCommentsOn: boolean;
   bulletComments: BulletCommentItem[] | undefined;
@@ -20,7 +20,7 @@ type Props = {
 export function WatchLayoutPlayerOverlay(props: Props) {
   return (
     <WatchPlayerOverlay
-      isNicoNico={props.isNicoNico}
+      canLoadBulletComments={props.canLoadBulletComments}
       hideComments={props.hideComments}
       bulletCommentsOn={props.bulletCommentsOn}
       bulletComments={props.bulletComments}

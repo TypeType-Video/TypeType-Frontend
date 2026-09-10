@@ -10,7 +10,10 @@ export function fetchUnreadNotificationsCount(): Promise<UnreadNotificationsCoun
   return authedJson(`${BASE}/notifications/unread-count`);
 }
 
-export function fetchNotifications(page = 0, limit = 20): Promise<NotificationsPage> {
+export function fetchNotifications(
+  page: number | string = 0,
+  limit = 20,
+): Promise<NotificationsPage> {
   const search = new URLSearchParams({ page: String(page), limit: String(limit) });
   return authedJson(`${BASE}/notifications?${search.toString()}`);
 }

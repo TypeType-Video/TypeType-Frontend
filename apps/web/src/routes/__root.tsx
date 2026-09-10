@@ -6,7 +6,7 @@ import { GuestDisabledScreen } from "../components/guest-disabled-screen";
 import { MobileTabBar } from "../components/mobile-tab-bar";
 import { Navbar } from "../components/navbar";
 import { NotFoundPage } from "../components/not-found-page";
-import { PersistentWatchPlayerHost } from "../components/persistent-watch-player-host";
+import { PersistentWatchPlayer } from "../components/persistent-watch-player";
 import { Sidebar } from "../components/sidebar";
 import { useAuth } from "../hooks/use-auth";
 import { useInstance } from "../hooks/use-instance";
@@ -197,7 +197,7 @@ function RootLayoutContent() {
 
   return (
     <div className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell" : ""}`}>
-      <PersistentWatchPlayerHost />
+      <PersistentWatchPlayer />
       <div className="watch-page-chrome">
         <Navbar />
       </div>

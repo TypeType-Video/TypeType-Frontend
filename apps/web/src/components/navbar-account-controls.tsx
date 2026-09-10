@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { getStoredAdminSection } from "../lib/admin-console-section";
+import { LogIn } from "lucide-react";
 import { logoutSession } from "../lib/auth-session";
 import { goto } from "../lib/route-redirect";
-import { getStoredSettingsSection } from "../lib/settings-section";
 import { m } from "../paraglide/messages.js";
 import type { AuthMe, AuthStatus } from "../types/auth";
-import { ProfileAvatar } from "./profile-avatar";
+import { NavbarProfileMenu } from "./navbar-profile-menu";
 import { ThemeToggleButton } from "./theme-toggle-button";
 
 type Props = {
@@ -41,8 +40,6 @@ export function NavbarAccountControls({
   isMobile,
   signOut,
 }: Props) {
-  const profileName = me?.publicUsername?.trim() ? me.publicUsername : null;
-
   async function handleSignOut() {
     await logoutSession();
     signOut();
@@ -55,9 +52,11 @@ export function NavbarAccountControls({
           <ThemeToggleButton />
           <a
             href={loginHref()}
-            className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
+            aria-label={m.nav_sign_in()}
+            title={m.nav_sign_in()}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-fg hover:text-fg-muted"
           >
-            {m.nav_sign_in()}
+            <LogIn size={18} aria-hidden="true" />
           </a>
         </div>
       );
@@ -65,44 +64,42 @@ export function NavbarAccountControls({
     return (
       <div className="inline-flex items-center gap-2">
         <ThemeToggleButton />
-        <Link to="/profile" className="inline-flex h-9 w-9 items-center justify-center">
-          <ProfileAvatar me={me} className="h-8 w-8" plain />
-        </Link>
+        <NavbarProfileMenu me={me} isAdmin={isAdmin} isMobile onSignOut={handleSignOut} />
+      </div>
+    );
+  }
+
+  if (isAuthed && !isGuest && me) {
+    return (
+      <div className="hidden sm:inline-flex items-center gap-2">
+        <NavbarProfileMenu me={me} isAdmin={isAdmin} isMobile={false} onSignOut={handleSignOut} />
+        <ThemeToggleButton />
       </div>
     );
   }
 
   return (
     <>
-      {!isAuthed || isGuest || !me ? (
-        <span className="hidden sm:inline text-[11px] uppercase tracking-wider text-fg-soft px-2">
-          {statusLabel(status)}
-        </span>
-      ) : (
-        <div className="hidden sm:inline-flex items-center gap-2">
-          <Link to="/profile" className="inline-flex h-8 w-8 items-center justify-center">
-            <ProfileAvatar me={me} className="h-7 w-7" plain />
-          </Link>
-          <ThemeToggleButton />
-          {profileName && (
-            <Link
-              to="/profile"
-              className="max-w-28 truncate text-sm font-medium text-fg hover:text-accent"
-            >
-              {profileName}
-            </Link>
-          )}
-        </div>
-      )}
-      {!isAuthed && (
-        <div className="flex items-center gap-2">
-          <ThemeToggleButton />
-          <a
-            href={loginHref()}
-            className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
+      <span className="hidden sm:inline text-[11px] uppercase tracking-wider text-fg-soft px-2">
+        {statusLabel(status)}
+      </span>
+      <div className="flex items-center gap-2">
+        <ThemeToggleButton />
+        <a
+          href={loginHref()}
+          className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
+        >
+          {isGuest ? m.nav_login() : m.nav_sign_in()}
+        </a>
+        {isGuest ? (
+          <Link
+            to="/register"
+            search={{ redirect: undefined }}
+            className="inline-flex h-8 items-center rounded-md bg-fg px-3 text-xs text-app hover:bg-fg/90"
           >
-            {m.nav_sign_in()}
-          </a>
+            {m.nav_register()}
+          </Link>
+        ) : (
           <button
             type="button"
             onClick={() => goto("/")}
@@ -110,63 +107,8 @@ export function NavbarAccountControls({
           >
             {m.nav_browse()}
           </button>
-        </div>
-      )}
-      {isAuthed && (
-        <div className="flex items-center gap-2">
-          {(isGuest || !me) && <ThemeToggleButton />}
-          {!isGuest && me && (
-            <Link
-              to="/profile"
-              className="inline-flex h-8 w-8 items-center justify-center sm:hidden"
-            >
-              <ProfileAvatar me={me} className="h-7 w-7" plain />
-            </Link>
-          )}
-          {isGuest && (
-            <>
-              <a
-                href={loginHref()}
-                className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
-              >
-                {m.nav_login()}
-              </a>
-              <Link
-                to="/register"
-                search={{ redirect: undefined }}
-                className="inline-flex h-8 items-center rounded-md bg-fg px-3 text-xs text-app hover:bg-fg/90"
-              >
-                {m.nav_register()}
-              </Link>
-            </>
-          )}
-          {!isGuest && !isAdmin && (
-            <Link
-              to="/settings"
-              search={{ section: getStoredSettingsSection() }}
-              className="hidden h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft sm:inline-flex"
-            >
-              {m.nav_account()}
-            </Link>
-          )}
-          {isAdmin && (
-            <Link
-              to="/admin-console"
-              search={{ section: getStoredAdminSection() }}
-              className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
-            >
-              {m.nav_admin()}
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={() => void handleSignOut()}
-            className="h-8 rounded-sm border border-border px-3 text-xs text-fg hover:border-fg-soft"
-          >
-            {m.nav_sign_out()}
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

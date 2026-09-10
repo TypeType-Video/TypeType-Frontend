@@ -50,3 +50,16 @@ test("describes BiliBili initialization and index byte ranges", () => {
   expect(xml).toContain('<SegmentBase indexRange="908-1371">');
   expect(xml).toContain('<Initialization range="0-907"/>');
 });
+
+test("keeps the audio bandwidth in bits per second", () => {
+  Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+  const source = buildBilibiliDashManifest(
+    [video],
+    [{ ...audio, bitrate: 64762, url: "https://example.com/audio.m4s?bw=66923" }],
+    179,
+  );
+  expect(source).not.toBeNull();
+  const xml = atob(source?.split(",")[1] ?? "");
+  expect(xml).toContain('bandwidth="66923"');
+  expect(xml).not.toContain('bandwidth="64762000"');
+});

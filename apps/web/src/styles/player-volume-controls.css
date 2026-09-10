@@ -1,6 +1,7 @@
 .typetype-mobile-volume-control {
   display: flex;
   width: min(5.2rem, 21vw);
+  min-width: 0;
   align-items: center;
   gap: 0;
 }
@@ -25,7 +26,7 @@
 .typetype-mobile-volume-slider {
   position: relative;
   height: 2rem;
-  min-width: 2.2rem;
+  min-width: 2rem;
   flex: 1 1 auto;
   cursor: pointer;
   touch-action: none;
@@ -74,4 +75,12 @@
   .vds-video-layout .vds-volume {
     display: none;
   }
+}
+
+.vds-video-layout[data-sm] .vds-volume {
+  display: none;
+}
+
+.vds-video-layout[data-sm] .typetype-mobile-volume-control {
+  display: flex;
 }

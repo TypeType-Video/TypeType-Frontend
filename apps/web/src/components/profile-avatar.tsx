@@ -3,7 +3,7 @@ import { getOpenMojiUrl, pickOpenMojiCode } from "../lib/openmoji";
 import type { AuthMe } from "../types/auth";
 
 type ProfileAvatarProps = {
-  me: AuthMe;
+  me: Pick<AuthMe, "id" | "publicUsername" | "avatarUrl" | "avatarType" | "avatarCode">;
   className: string;
   plain?: boolean;
 };

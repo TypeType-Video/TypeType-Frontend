@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { MediaProviderLifecycle } from "../lib/media-provider-lifecycle";
 import { mediaSrcDetails } from "../lib/player-src-debug";
 import type { MediaSrc } from "../lib/vidstack";
 import { onProviderChange } from "./video-player-core";
@@ -11,12 +12,17 @@ type Args = {
 };
 
 export function useVideoPlayerEvents({ src, onError, onEnded }: Args) {
+  const providerLifecycle = useRef(new MediaProviderLifecycle());
+
   useEffect(() => {
     recordClientEvent("player.src", mediaSrcDetails(src));
   }, [src]);
 
+  useEffect(() => () => providerLifecycle.current.dispose(), []);
+
   function handleProviderChange(provider: Parameters<typeof onProviderChange>[0]) {
     recordClientEvent("player.provider_change", { present: provider !== null });
+    providerLifecycle.current.replace(provider);
     onProviderChange(provider);
   }
 

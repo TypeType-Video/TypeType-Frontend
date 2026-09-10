@@ -1,6 +1,7 @@
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
+import { createHlsConfig } from "../lib/hls-buffer-config";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
@@ -9,15 +10,14 @@ type DashRequestInterceptor = Parameters<dashjs.MediaPlayerClass["addRequestInte
 
 const DASH_TOP_QUALITY_BUFFER_SECONDS = 24;
 const DASH_BACK_BUFFER_SECONDS = 30;
-const HLS_FORWARD_BUFFER_SECONDS = 30;
-const HLS_BACK_BUFFER_SECONDS = 30;
 type DashLibraryModule = { default: typeof dashjs };
 type DashRuntimeModule = typeof dashjs & { default?: typeof dashjs };
-type HlsLibraryModule = { default: typeof Hls };
+type HlsLibraryModule = { default: typeof Hls; FetchLoader: typeof import("hls.js").FetchLoader };
 type HlsRuntimeModule = { default?: typeof Hls };
 let dashLibrary: typeof dashjs | null = null;
 let dashLibraryPromise: Promise<DashLibraryModule> | null = null;
 let hlsLibraryPromise: Promise<HlsLibraryModule> | null = null;
+const hlsProviderLibraries = new WeakMap<MediaProviderAdapter, Promise<HlsLibraryModule>>();
 
 const loadDashLibrary = (): Promise<DashLibraryModule> => {
   dashLibraryPromise ??= import("dashjs").then((module) => {
@@ -31,6 +31,7 @@ const loadDashLibrary = (): Promise<DashLibraryModule> => {
 const loadHlsLibrary = (): Promise<HlsLibraryModule> => {
   hlsLibraryPromise ??= import("hls.js").then((module) => ({
     default: (module as HlsRuntimeModule).default ?? (module as unknown as typeof Hls),
+    FetchLoader: module.FetchLoader,
   }));
   return hlsLibraryPromise;
 };
@@ -73,12 +74,15 @@ export function ChaptersTrack({ src }: { src: string }) {
 
 export function onProviderChange(provider: MediaProviderAdapter | null) {
   if (isHLSProvider(provider)) {
-    provider.library = loadHlsLibrary;
-    provider.config = {
-      backBufferLength: HLS_BACK_BUFFER_SECONDS,
-      maxBufferLength: HLS_FORWARD_BUFFER_SECONDS,
-      maxMaxBufferLength: HLS_FORWARD_BUFFER_SECONDS * 2,
-    };
+    let providerLibrary = hlsProviderLibraries.get(provider);
+    if (!providerLibrary) {
+      providerLibrary = loadHlsLibrary().then((library) => {
+        provider.config = createHlsConfig(library.FetchLoader);
+        return library;
+      });
+      hlsProviderLibraries.set(provider, providerLibrary);
+    }
+    provider.library = () => providerLibrary;
     return;
   }
   const dashProvider = isDASHProvider(provider);

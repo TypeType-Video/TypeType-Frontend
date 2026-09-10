@@ -50,6 +50,8 @@ export function SabrMsePlayer({
   const [engineReady, setEngineReady] = useState(false);
   const latestConfig = useLatestValue(config);
   const latestStartTime = useLatestValue(startTime);
+  const settingsReadyRef = useRef(settingsReady);
+  settingsReadyRef.current = settingsReady;
   const latestHandlers = useLatestValue({
     autoplay,
     onSeekStateChange,
@@ -103,7 +105,7 @@ export function SabrMsePlayer({
       if (event.type === "error") reportError(event.error, event.recoveryPositionMs);
     });
     const volumeChange = () => {
-      if (engine.isApplyingTransientMediaState()) return;
+      if (!settingsReadyRef.current || engine.isApplyingTransientMediaState()) return;
       latestHandlers().onVolumeChange?.(video.volume, video.muted);
     };
     const offPosition = registerPosition(video, videoHandoffRef.current, config.videoId);

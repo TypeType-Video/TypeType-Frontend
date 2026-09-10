@@ -33,7 +33,7 @@ export function EmbedPlayerShell({
   });
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
   const player = usePlayerError(stream, isLive);
-  const handleVolumeChange = useVolumeSync(update.mutate);
+  const handleVolumeChange = useVolumeSync(update.mutate, settings);
 
   const positionRef = useRef(0);
   const playbackIntentRef = useRef(autoplay);

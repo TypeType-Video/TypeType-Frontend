@@ -21,6 +21,7 @@ export function NotificationsDropdown() {
     unreadQuery,
     items,
     unreadCount,
+    badgeUnavailable,
     markAllRead,
     hasNextPage,
     fetchNextPage,
@@ -56,9 +57,16 @@ export function NotificationsDropdown() {
         aria-label={m.ui_notifications()}
       >
         <NotificationBellIcon />
-        {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-danger-strong px-1 text-[10px] font-semibold text-white">
-            {unreadCount > 99 ? "99+" : unreadCount}
+        {(badgeUnavailable || (unreadCount !== null && unreadCount > 0)) && (
+          <span
+            title={badgeUnavailable ? m.ui_badge_temporarily_unavailable() : undefined}
+            className="absolute -right-1 -top-1 min-w-4 rounded-full bg-danger-strong px-1 text-center text-[10px] font-semibold text-white"
+          >
+            {badgeUnavailable
+              ? "!"
+              : unreadCount !== null && unreadCount > 99
+                ? "99+"
+                : unreadCount}
           </span>
         )}
       </button>
@@ -78,7 +86,12 @@ export function NotificationsDropdown() {
             <button
               type="button"
               onClick={() => markAllRead.mutate()}
-              disabled={unreadCount === 0 || markAllRead.isPending}
+              disabled={
+                unreadCount === null ||
+                unreadCount === 0 ||
+                badgeUnavailable ||
+                markAllRead.isPending
+              }
               className="text-xs text-fg-muted hover:text-fg-strong disabled:cursor-not-allowed disabled:text-fg-soft"
             >
               {m.ui_mark_all_read()}
@@ -99,9 +112,18 @@ export function NotificationsDropdown() {
                 {m.ui_failed_to_load_notifications_retry_in_a_few_seconds()}
               </p>
             )}
-            {hasLoaded && !query.isFetching && !query.isError && items.length === 0 && (
-              <p className="px-2 py-3 text-xs text-fg-soft">{m.ui_no_notifications_yet()}</p>
+            {hasLoaded && query.data?.pages.some((page) => !page.available) && (
+              <p className="px-2 py-3 text-xs text-fg-soft">
+                {m.ui_badge_temporarily_unavailable()}
+              </p>
             )}
+            {hasLoaded &&
+              !query.isFetching &&
+              !query.isError &&
+              !query.data?.pages.some((page) => !page.available) &&
+              items.length === 0 && (
+                <p className="px-2 py-3 text-xs text-fg-soft">{m.ui_no_notifications_yet()}</p>
+              )}
             {items.map((item) => (
               <NotificationRow
                 key={`${item.type}-${item.video.id}-${item.createdAt}`}

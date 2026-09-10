@@ -112,8 +112,7 @@ function videoRepresentation(stream: VideoCandidate): string | null {
 }
 
 function audioRepresentation(stream: AudioCandidate): string {
-  const streamBitrate = (stream.bitrate ?? 0) * 1000;
-  const bandwidth = Math.max(1, streamBitrate || bandwidthFromUrl(stream.url) || 128000);
+  const bandwidth = Math.max(1, bandwidthFromUrl(stream.url) ?? stream.bitrate ?? 128000);
   return (
     `<Representation id="a0" bandwidth="${bandwidth}" codecs="${escapeXml(audioCodec(stream.codec))}">` +
     `<AudioChannelConfiguration` +

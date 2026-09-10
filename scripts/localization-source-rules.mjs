@@ -1,7 +1,7 @@
 export const allowedText = new Set([
   "TYPETYPE",
   "TypeType",
-  "Reddit",
+  "Lemmy",
   "OpenMoji",
   "takeout.google.com",
   "2x",

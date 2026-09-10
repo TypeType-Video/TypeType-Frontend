@@ -1,9 +1,13 @@
-import { detectProvider } from "../lib/provider";
+import { detectProvider, supportsBulletComments } from "../lib/provider";
 import { useBulletComments } from "./use-bullet-comments";
 
 export function useWatchBulletComments(videoUrl: string, hideComments: boolean) {
   const isNicoNico = detectProvider(videoUrl) === "nicovideo";
-  const { data: bulletComments } = useBulletComments(videoUrl, isNicoNico && !hideComments);
+  const canLoadBulletComments = supportsBulletComments(videoUrl);
+  const { data: bulletComments } = useBulletComments(
+    videoUrl,
+    canLoadBulletComments && !hideComments,
+  );
 
-  return { isNicoNico, bulletComments };
+  return { isNicoNico, canLoadBulletComments, bulletComments };
 }

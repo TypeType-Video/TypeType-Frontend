@@ -22,6 +22,7 @@ export function AudioTimeSlider({ seeking = false, video = null }: Props) {
       className="typetype-audio-time-slider"
       style={style}
       aria-busy={seeking}
+      orientation="horizontal"
       data-seeking={seeking ? "true" : undefined}
       onDragEnd={(percent) => {
         setSeekTarget(percent);

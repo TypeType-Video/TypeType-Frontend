@@ -44,7 +44,10 @@ export function WatchLayout({
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
   const player = usePlayerError(stream, isLive);
   const { on: bulletCommentsOn } = useDanmakuStore();
-  const { isNicoNico, bulletComments } = useWatchBulletComments(stream.id, settings.hideComments);
+  const { isNicoNico, canLoadBulletComments, bulletComments } = useWatchBulletComments(
+    stream.id,
+    settings.hideComments,
+  );
   const sponsor = useWatchSponsorBlock(stream, settings);
   const recommendations = useWatchRecommendations(
     stream,
@@ -56,7 +59,7 @@ export function WatchLayout({
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
   const seekRef = useRef<((seconds: number) => void) | null>(null);
   const positionReaderRef = useRef<(() => number | null) | null>(null);
-  const handleVolumeChange = useVolumeSync(update.mutate);
+  const handleVolumeChange = useVolumeSync(update.mutate, settings);
   const { thumbnailVtt, chaptersVtt } = useWatchVttAssets(
     stream,
     sponsor.segments,
@@ -152,7 +155,7 @@ export function WatchLayout({
         originalLocale={getOriginalAudioLocale(stream)}
         overlay={
           <WatchLayoutPlayerOverlay
-            isNicoNico={isNicoNico}
+            canLoadBulletComments={canLoadBulletComments}
             hideComments={settings.hideComments}
             bulletCommentsOn={bulletCommentsOn}
             bulletComments={bulletComments}

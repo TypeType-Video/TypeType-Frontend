@@ -9,58 +9,133 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as YoutubeSessionRouteImport } from './routes/youtube-session'
-import { Route as WatchLaterRouteImport } from './routes/watch-later'
-import { Route as WatchRouteImport } from './routes/watch'
-import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
-import { Route as SubscriptionGroupsPreviewRouteImport } from './routes/subscription-groups-preview'
-import { Route as ShortsRouteImport } from './routes/shorts'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PodcastsRouteImport } from './routes/podcasts'
-import { Route as PlaylistsRouteImport } from './routes/playlists'
-import { Route as PlaylistRouteImport } from './routes/playlist'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ImportRouteImport } from './routes/import'
-import { Route as HistoryRouteImport } from './routes/history'
-import { Route as HideEverythingRouteImport } from './routes/hide-everything'
-import { Route as FavoritesRouteImport } from './routes/favorites'
-import { Route as ExportRouteImport } from './routes/export'
-import { Route as ChannelRouteImport } from './routes/channel'
-import { Route as AdminConsoleRouteImport } from './routes/admin-console'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ImportIndexRouteImport } from './routes/import/index'
-import { Route as SubscriptionsChannelsRouteImport } from './routes/subscriptions_.channels'
-import { Route as ShortsVideoIdRouteImport } from './routes/shorts_.$videoId'
-import { Route as PlaylistsIdRouteImport } from './routes/playlists_.$id'
-import { Route as ImportYoutubeRouteImport } from './routes/import/youtube'
-import { Route as ImportPipepipeRouteImport } from './routes/import/pipepipe'
-import { Route as EmbedVideoIdRouteImport } from './routes/embed_.$videoId'
+import { Route as AdminConsoleRouteImport } from './routes/admin-console'
+import { Route as ChannelRouteImport } from './routes/channel'
+import { Route as ExportRouteImport } from './routes/export'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as HideEverythingRouteImport } from './routes/hide-everything'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as ImportRouteImport } from './routes/import'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PlaylistRouteImport } from './routes/playlist'
+import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as PodcastsRouteImport } from './routes/podcasts'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ShortsRouteImport } from './routes/shorts'
+import { Route as SubscriptionGroupsPreviewRouteImport } from './routes/subscription-groups-preview'
+import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as WatchRouteImport } from './routes/watch'
+import { Route as WatchLaterRouteImport } from './routes/watch-later'
+import { Route as YoutubeSessionRouteImport } from './routes/youtube-session'
 import { Route as ChannelChannelIdRouteImport } from './routes/channel_.$channelId'
+import { Route as EmbedVideoIdRouteImport } from './routes/embed_.$videoId'
+import { Route as ImportIndexRouteImport } from './routes/import/index'
+import { Route as ImportPipepipeRouteImport } from './routes/import/pipepipe'
+import { Route as ImportYoutubeRouteImport } from './routes/import/youtube'
+import { Route as PlaylistsIdRouteImport } from './routes/playlists_.$id'
+import { Route as ShortsVideoIdRouteImport } from './routes/shorts_.$videoId'
+import { Route as SubscriptionsChannelsRouteImport } from './routes/subscriptions_.channels'
 import { Route as AuthOidcCallbackRouteImport } from './routes/auth.oidc.callback'
 
-const YoutubeSessionRoute = YoutubeSessionRouteImport.update({
-  id: '/youtube-session',
-  path: '/youtube-session',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WatchLaterRoute = WatchLaterRouteImport.update({
-  id: '/watch-later',
-  path: '/watch-later',
+const AdminConsoleRoute = AdminConsoleRouteImport.update({
+  id: '/admin-console',
+  path: '/admin-console',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WatchRoute = WatchRouteImport.update({
-  id: '/watch',
-  path: '/watch',
+const ChannelRoute = ChannelRouteImport.update({
+  id: '/channel',
+  path: '/channel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SubscriptionsRoute = SubscriptionsRouteImport.update({
-  id: '/subscriptions',
-  path: '/subscriptions',
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HideEverythingRoute = HideEverythingRouteImport.update({
+  id: '/hide-everything',
+  path: '/hide-everything',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistRoute = PlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistsRoute = PlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodcastsRoute = PodcastsRouteImport.update({
+  id: '/podcasts',
+  path: '/podcasts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShortsRoute = ShortsRouteImport.update({
+  id: '/shorts',
+  path: '/shorts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubscriptionGroupsPreviewRoute =
@@ -69,99 +144,34 @@ const SubscriptionGroupsPreviewRoute =
     path: '/subscription-groups-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ShortsRoute = ShortsRouteImport.update({
-  id: '/shorts',
-  path: '/shorts',
+const SubscriptionsRoute = SubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const WatchRoute = WatchRouteImport.update({
+  id: '/watch',
+  path: '/watch',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
+const WatchLaterRoute = WatchLaterRouteImport.update({
+  id: '/watch-later',
+  path: '/watch-later',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const YoutubeSessionRoute = YoutubeSessionRouteImport.update({
+  id: '/youtube-session',
+  path: '/youtube-session',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+const ChannelChannelIdRoute = ChannelChannelIdRouteImport.update({
+  id: '/channel_/$channelId',
+  path: '/channel/$channelId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PodcastsRoute = PodcastsRouteImport.update({
-  id: '/podcasts',
-  path: '/podcasts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaylistsRoute = PlaylistsRouteImport.update({
-  id: '/playlists',
-  path: '/playlists',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaylistRoute = PlaylistRouteImport.update({
-  id: '/playlist',
-  path: '/playlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImportRoute = ImportRouteImport.update({
-  id: '/import',
-  path: '/import',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HistoryRoute = HistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HideEverythingRoute = HideEverythingRouteImport.update({
-  id: '/hide-everything',
-  path: '/hide-everything',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FavoritesRoute = FavoritesRouteImport.update({
-  id: '/favorites',
-  path: '/favorites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExportRoute = ExportRouteImport.update({
-  id: '/export',
-  path: '/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChannelRoute = ChannelRouteImport.update({
-  id: '/channel',
-  path: '/channel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminConsoleRoute = AdminConsoleRouteImport.update({
-  id: '/admin-console',
-  path: '/admin-console',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const EmbedVideoIdRoute = EmbedVideoIdRouteImport.update({
+  id: '/embed_/$videoId',
+  path: '/embed/$videoId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImportIndexRoute = ImportIndexRouteImport.update({
@@ -169,9 +179,19 @@ const ImportIndexRoute = ImportIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ImportRoute,
 } as any)
-const SubscriptionsChannelsRoute = SubscriptionsChannelsRouteImport.update({
-  id: '/subscriptions_/channels',
-  path: '/subscriptions/channels',
+const ImportPipepipeRoute = ImportPipepipeRouteImport.update({
+  id: '/pipepipe',
+  path: '/pipepipe',
+  getParentRoute: () => ImportRoute,
+} as any)
+const ImportYoutubeRoute = ImportYoutubeRouteImport.update({
+  id: '/youtube',
+  path: '/youtube',
+  getParentRoute: () => ImportRoute,
+} as any)
+const PlaylistsIdRoute = PlaylistsIdRouteImport.update({
+  id: '/playlists_/$id',
+  path: '/playlists/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShortsVideoIdRoute = ShortsVideoIdRouteImport.update({
@@ -179,29 +199,9 @@ const ShortsVideoIdRoute = ShortsVideoIdRouteImport.update({
   path: '/shorts/$videoId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlaylistsIdRoute = PlaylistsIdRouteImport.update({
-  id: '/playlists_/$id',
-  path: '/playlists/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImportYoutubeRoute = ImportYoutubeRouteImport.update({
-  id: '/youtube',
-  path: '/youtube',
-  getParentRoute: () => ImportRoute,
-} as any)
-const ImportPipepipeRoute = ImportPipepipeRouteImport.update({
-  id: '/pipepipe',
-  path: '/pipepipe',
-  getParentRoute: () => ImportRoute,
-} as any)
-const EmbedVideoIdRoute = EmbedVideoIdRouteImport.update({
-  id: '/embed_/$videoId',
-  path: '/embed/$videoId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChannelChannelIdRoute = ChannelChannelIdRouteImport.update({
-  id: '/channel_/$channelId',
-  path: '/channel/$channelId',
+const SubscriptionsChannelsRoute = SubscriptionsChannelsRouteImport.update({
+  id: '/subscriptions_/channels',
+  path: '/subscriptions/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthOidcCallbackRoute = AuthOidcCallbackRouteImport.update({
@@ -457,158 +457,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/youtube-session': {
-      id: '/youtube-session'
-      path: '/youtube-session'
-      fullPath: '/youtube-session'
-      preLoaderRoute: typeof YoutubeSessionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/watch-later': {
-      id: '/watch-later'
-      path: '/watch-later'
-      fullPath: '/watch-later'
-      preLoaderRoute: typeof WatchLaterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/watch': {
-      id: '/watch'
-      path: '/watch'
-      fullPath: '/watch'
-      preLoaderRoute: typeof WatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscriptions': {
-      id: '/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/subscriptions'
-      preLoaderRoute: typeof SubscriptionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscription-groups-preview': {
-      id: '/subscription-groups-preview'
-      path: '/subscription-groups-preview'
-      fullPath: '/subscription-groups-preview'
-      preLoaderRoute: typeof SubscriptionGroupsPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shorts': {
-      id: '/shorts'
-      path: '/shorts'
-      fullPath: '/shorts'
-      preLoaderRoute: typeof ShortsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/podcasts': {
-      id: '/podcasts'
-      path: '/podcasts'
-      fullPath: '/podcasts'
-      preLoaderRoute: typeof PodcastsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playlists': {
-      id: '/playlists'
-      path: '/playlists'
-      fullPath: '/playlists'
-      preLoaderRoute: typeof PlaylistsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playlist': {
-      id: '/playlist'
-      path: '/playlist'
-      fullPath: '/playlist'
-      preLoaderRoute: typeof PlaylistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/import': {
-      id: '/import'
-      path: '/import'
-      fullPath: '/import'
-      preLoaderRoute: typeof ImportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/history': {
-      id: '/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof HistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hide-everything': {
-      id: '/hide-everything'
-      path: '/hide-everything'
-      fullPath: '/hide-everything'
-      preLoaderRoute: typeof HideEverythingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/favorites': {
-      id: '/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof FavoritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/export': {
-      id: '/export'
-      path: '/export'
-      fullPath: '/export'
-      preLoaderRoute: typeof ExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/channel': {
-      id: '/channel'
-      path: '/channel'
-      fullPath: '/channel'
-      preLoaderRoute: typeof ChannelRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-console': {
@@ -618,11 +471,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/channel': {
+      id: '/channel'
+      path: '/channel'
+      fullPath: '/channel'
+      preLoaderRoute: typeof ChannelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hide-everything': {
+      id: '/hide-everything'
+      path: '/hide-everything'
+      fullPath: '/hide-everything'
+      preLoaderRoute: typeof HideEverythingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlist': {
+      id: '/playlist'
+      path: '/playlist'
+      fullPath: '/playlist'
+      preLoaderRoute: typeof PlaylistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlists': {
+      id: '/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podcasts': {
+      id: '/podcasts'
+      path: '/podcasts'
+      fullPath: '/podcasts'
+      preLoaderRoute: typeof PodcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shorts': {
+      id: '/shorts'
+      path: '/shorts'
+      fullPath: '/shorts'
+      preLoaderRoute: typeof ShortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscription-groups-preview': {
+      id: '/subscription-groups-preview'
+      path: '/subscription-groups-preview'
+      fullPath: '/subscription-groups-preview'
+      preLoaderRoute: typeof SubscriptionGroupsPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscriptions': {
+      id: '/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof SubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch': {
+      id: '/watch'
+      path: '/watch'
+      fullPath: '/watch'
+      preLoaderRoute: typeof WatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch-later': {
+      id: '/watch-later'
+      path: '/watch-later'
+      fullPath: '/watch-later'
+      preLoaderRoute: typeof WatchLaterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/youtube-session': {
+      id: '/youtube-session'
+      path: '/youtube-session'
+      fullPath: '/youtube-session'
+      preLoaderRoute: typeof YoutubeSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channel_/$channelId': {
+      id: '/channel_/$channelId'
+      path: '/channel/$channelId'
+      fullPath: '/channel/$channelId'
+      preLoaderRoute: typeof ChannelChannelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed_/$videoId': {
+      id: '/embed_/$videoId'
+      path: '/embed/$videoId'
+      fullPath: '/embed/$videoId'
+      preLoaderRoute: typeof EmbedVideoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/import/': {
@@ -632,11 +646,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImportIndexRouteImport
       parentRoute: typeof ImportRoute
     }
-    '/subscriptions_/channels': {
-      id: '/subscriptions_/channels'
-      path: '/subscriptions/channels'
-      fullPath: '/subscriptions/channels'
-      preLoaderRoute: typeof SubscriptionsChannelsRouteImport
+    '/import/pipepipe': {
+      id: '/import/pipepipe'
+      path: '/pipepipe'
+      fullPath: '/import/pipepipe'
+      preLoaderRoute: typeof ImportPipepipeRouteImport
+      parentRoute: typeof ImportRoute
+    }
+    '/import/youtube': {
+      id: '/import/youtube'
+      path: '/youtube'
+      fullPath: '/import/youtube'
+      preLoaderRoute: typeof ImportYoutubeRouteImport
+      parentRoute: typeof ImportRoute
+    }
+    '/playlists_/$id': {
+      id: '/playlists_/$id'
+      path: '/playlists/$id'
+      fullPath: '/playlists/$id'
+      preLoaderRoute: typeof PlaylistsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shorts_/$videoId': {
@@ -646,39 +674,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShortsVideoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/playlists_/$id': {
-      id: '/playlists_/$id'
-      path: '/playlists/$id'
-      fullPath: '/playlists/$id'
-      preLoaderRoute: typeof PlaylistsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/import/youtube': {
-      id: '/import/youtube'
-      path: '/youtube'
-      fullPath: '/import/youtube'
-      preLoaderRoute: typeof ImportYoutubeRouteImport
-      parentRoute: typeof ImportRoute
-    }
-    '/import/pipepipe': {
-      id: '/import/pipepipe'
-      path: '/pipepipe'
-      fullPath: '/import/pipepipe'
-      preLoaderRoute: typeof ImportPipepipeRouteImport
-      parentRoute: typeof ImportRoute
-    }
-    '/embed_/$videoId': {
-      id: '/embed_/$videoId'
-      path: '/embed/$videoId'
-      fullPath: '/embed/$videoId'
-      preLoaderRoute: typeof EmbedVideoIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/channel_/$channelId': {
-      id: '/channel_/$channelId'
-      path: '/channel/$channelId'
-      fullPath: '/channel/$channelId'
-      preLoaderRoute: typeof ChannelChannelIdRouteImport
+    '/subscriptions_/channels': {
+      id: '/subscriptions_/channels'
+      path: '/subscriptions/channels'
+      fullPath: '/subscriptions/channels'
+      preLoaderRoute: typeof SubscriptionsChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/oidc/callback': {

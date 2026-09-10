@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { sponsorBlockBarPosition } from "../lib/sponsorblock-bar-layout";
 import {
   getSponsorBlockCategoryColor,
   getSponsorBlockEndTime,
@@ -8,7 +9,9 @@ import { useMediaState } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
 
 const TRACK_HEIGHT = 3;
-const THUMB_MARGIN = 7.5;
+const TIME_SLIDER_SELECTOR = ".vds-time-slider, .typetype-audio-time-slider";
+const TRACK_SELECTOR =
+  ".vds-slider-track:not(.vds-slider-track-fill):not(.vds-slider-progress), .typetype-audio-time-slider-track";
 
 type SegmentBarProps = {
   segment: SponsorBlockSegmentItem;
@@ -51,25 +54,60 @@ export function SponsorBlockBar({ segments }: Props) {
     const anchor = anchorRef.current;
     const overlay = overlayRef.current;
     if (!anchor || !overlay || !duration) return;
+    if (!controlsVisible) return;
 
     const player = anchor.closest<HTMLElement>("[data-media-player]");
-    const slider = player?.querySelector<HTMLElement>(".vds-time-slider");
-    if (!player || !slider) return;
+    if (!player) return;
+
+    const visibleSlider = (sliders: HTMLElement[]) =>
+      sliders.find((candidate) => {
+        const rect = candidate.getBoundingClientRect();
+        const style = getComputedStyle(candidate);
+        return (
+          rect.width > 0 &&
+          rect.height > 0 &&
+          style.display !== "none" &&
+          style.visibility !== "hidden"
+        );
+      }) ?? sliders[0];
+
+    const getSliders = () => [...player.querySelectorAll<HTMLElement>(TIME_SLIDER_SELECTOR)];
+
+    let resizeObserver: ResizeObserver | undefined;
 
     const update = () => {
+      const sliders = getSliders();
+      for (const candidate of sliders) {
+        resizeObserver?.observe(candidate);
+        const track = candidate.querySelector<HTMLElement>(TRACK_SELECTOR);
+        if (track) resizeObserver?.observe(track);
+      }
+      const slider = visibleSlider(sliders);
+      if (!slider) return;
+      const track = slider.querySelector<HTMLElement>(TRACK_SELECTOR);
       const pRect = player.getBoundingClientRect();
-      const sRect = slider.getBoundingClientRect();
-      const trackCenterY = sRect.top - pRect.top + sRect.height / 2;
-      overlay.style.top = `${trackCenterY - TRACK_HEIGHT / 2}px`;
-      overlay.style.left = `${sRect.left - pRect.left + THUMB_MARGIN}px`;
-      overlay.style.width = `${sRect.width - THUMB_MARGIN * 2}px`;
+      const trackRect = (track ?? slider).getBoundingClientRect();
+      const position = sponsorBlockBarPosition(pRect, trackRect, TRACK_HEIGHT);
+      overlay.style.top = `${position.top}px`;
+      overlay.style.left = `${position.left}px`;
+      overlay.style.width = `${position.width}px`;
     };
 
-    const ro = new ResizeObserver(update);
-    ro.observe(player);
+    resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(player);
+    const mo = new MutationObserver(update);
+    mo.observe(player, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      attributeFilter: ["aria-hidden", "data-match", "data-sm", "data-visible"],
+    });
     update();
-    return () => ro.disconnect();
-  }, [duration]);
+    return () => {
+      resizeObserver?.disconnect();
+      mo.disconnect();
+    };
+  }, [controlsVisible, duration]);
 
   if (!duration || segments.length === 0) return null;
 
