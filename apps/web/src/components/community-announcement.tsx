@@ -5,9 +5,9 @@ import { siLemmy } from "simple-icons";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import {
   COMMUNITY_ANNOUNCEMENT_KEY,
+  isCommunityAnnouncementDismissed,
   LEMMY_ANNOUNCEMENT_URL,
   LEMMY_COMMUNITY_URL,
-  isCommunityAnnouncementDismissed,
   rememberCommunityAnnouncementDismissal,
 } from "../lib/community-announcement";
 import { getOpenMojiUrl } from "../lib/openmoji";

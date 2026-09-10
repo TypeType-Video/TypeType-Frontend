@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!node_modules", "!dist", "!build", "!**/routeTree.gen.ts"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!dist",
+      "!build",
+      "!**/routeTree.gen.ts",
+      "!apps/web/public/brand/*.svg"
+    ]
   },
   "formatter": {
     "enabled": true,
