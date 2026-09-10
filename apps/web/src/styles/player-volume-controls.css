@@ -76,3 +76,11 @@
     display: none;
   }
 }
+
+.vds-video-layout[data-sm] .vds-volume {
+  display: none;
+}
+
+.vds-video-layout[data-sm] .typetype-mobile-volume-control {
+  display: flex;
+}
