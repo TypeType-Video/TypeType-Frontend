@@ -17,6 +17,7 @@ type HlsRuntimeModule = { default?: typeof Hls };
 let dashLibrary: typeof dashjs | null = null;
 let dashLibraryPromise: Promise<DashLibraryModule> | null = null;
 let hlsLibraryPromise: Promise<HlsLibraryModule> | null = null;
+const hlsProviderLibraries = new WeakMap<MediaProviderAdapter, Promise<HlsLibraryModule>>();
 
 const loadDashLibrary = (): Promise<DashLibraryModule> => {
   dashLibraryPromise ??= import("dashjs").then((module) => {
@@ -73,11 +74,15 @@ export function ChaptersTrack({ src }: { src: string }) {
 
 export function onProviderChange(provider: MediaProviderAdapter | null) {
   if (isHLSProvider(provider)) {
-    provider.library = async () => {
-      const library = await loadHlsLibrary();
-      provider.config = createHlsConfig(library.XhrLoader);
-      return library;
-    };
+    let providerLibrary = hlsProviderLibraries.get(provider);
+    if (!providerLibrary) {
+      providerLibrary = loadHlsLibrary().then((library) => {
+        provider.config = createHlsConfig(library.XhrLoader);
+        return library;
+      });
+      hlsProviderLibraries.set(provider, providerLibrary);
+    }
+    provider.library = () => providerLibrary;
     return;
   }
   const dashProvider = isDASHProvider(provider);
