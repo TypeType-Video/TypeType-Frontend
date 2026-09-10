@@ -3,7 +3,7 @@ import { createHlsConfig, hlsRequestUrl } from "../src/lib/hls-buffer-config";
 
 describe("HLS buffer policy", () => {
   it("matches the TypeType MSE VOD policy", () => {
-    expect(createHlsConfig("generation-1")).toMatchObject({
+    expect(createHlsConfig(class {} as never, "generation-1")).toMatchObject({
       backBufferLength: 30,
       maxBufferLength: 10,
       maxMaxBufferLength: 10,
@@ -21,13 +21,21 @@ describe("HLS buffer policy", () => {
   });
 
   it("versions the network request without changing the logical context", () => {
-    let openedUrl = "";
-    const xhr = { open: (_method: string, url: string) => (openedUrl = url) };
-    const setup = createHlsConfig("generation-1").xhrSetup;
-    if (!setup) throw new Error("HLS XHR setup is missing");
-    setup(xhr as XMLHttpRequest, "/api/media/m1_0123456789abcdefghijklmn", {} as never);
-    expect(openedUrl).toBe("/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-0");
-    setup(xhr as XMLHttpRequest, "/api/media/m1_0123456789abcdefghijklmn", {} as never);
-    expect(openedUrl).toBe("/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-1");
+    const setup = createHlsConfig(class {} as never, "generation-1").fetchSetup;
+    if (!setup) throw new Error("HLS fetch setup is missing");
+    const first = setup(
+      { url: "https://example.test/api/media/m1_0123456789abcdefghijklmn" } as never,
+      {},
+    );
+    expect(first.url).toBe(
+      "https://example.test/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-0",
+    );
+    const second = setup(
+      { url: "https://example.test/api/media/m1_0123456789abcdefghijklmn" } as never,
+      {},
+    );
+    expect(second.url).toBe(
+      "https://example.test/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-1",
+    );
   });
 });

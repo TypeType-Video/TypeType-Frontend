@@ -9,13 +9,19 @@ export function hlsRequestUrl(url: string, playbackKey: string): string {
   return absolute ? parsed.toString() : `${parsed.pathname}${parsed.search}`;
 }
 
-export function createHlsConfig(playbackKey = crypto.randomUUID()): Partial<HlsConfig> {
+type HlsLoader = HlsConfig["loader"];
+
+export function createHlsConfig(
+  FetchLoader: HlsLoader,
+  playbackKey = crypto.randomUUID(),
+): Partial<HlsConfig> {
   let requestSequence = 0;
   return {
     backBufferLength: 30,
+    fetchSetup: (context, initParams) =>
+      new Request(hlsRequestUrl(context.url, `${playbackKey}-${requestSequence++}`), initParams),
+    loader: FetchLoader,
     maxBufferLength: 10,
     maxMaxBufferLength: 10,
-    xhrSetup: (xhr, url) =>
-      xhr.open("GET", hlsRequestUrl(url, `${playbackKey}-${requestSequence++}`), true),
   };
 }
