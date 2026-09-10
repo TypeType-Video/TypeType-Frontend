@@ -74,7 +74,11 @@ function audioName(stream: AudioStreamItem, index: number): string {
   );
 }
 
-function audioMedia(stream: AudioStreamItem, index: number): string {
+function playlistUrl(url: string, playbackKey: string): string {
+  return `${proxyUrl(url)}&playback=${encodeURIComponent(playbackKey)}`;
+}
+
+function audioMedia(stream: AudioStreamItem, index: number, playbackKey: string): string {
   const name = quote(audioName(stream, index));
   const isDefault = index === 0 ? "YES" : "NO";
   return [
@@ -83,7 +87,7 @@ function audioMedia(stream: AudioStreamItem, index: number): string {
     `NAME="${name}"`,
     `DEFAULT=${isDefault}`,
     `AUTOSELECT=YES`,
-    `URI="${quote(proxyUrl(stream.url))}"`,
+    `URI="${quote(playlistUrl(stream.url, playbackKey))}"`,
   ].join(",");
 }
 
@@ -102,6 +106,7 @@ function streamInfo(stream: VideoStreamItem, audio: AudioStreamItem | undefined)
 export function buildNicoHlsManifest(
   videoStreams: VideoStreamItem[],
   audioStreams: AudioStreamItem[],
+  playbackKey = "default",
 ): string | null {
   const videos = videoStreams.filter((stream) => stream.url.length > 0);
   const audios = audioStreams.filter((stream) => stream.url.length > 0);
@@ -112,10 +117,10 @@ export function buildNicoHlsManifest(
     "#EXTM3U",
     "#EXT-X-VERSION:6",
     "#EXT-X-INDEPENDENT-SEGMENTS",
-    ...audios.map(audioMedia),
+    ...audios.map((stream, index) => audioMedia(stream, index, playbackKey)),
   ];
   for (const video of videos) {
-    lines.push(streamInfo(video, primaryAudio), proxyUrl(video.url));
+    lines.push(streamInfo(video, primaryAudio), playlistUrl(video.url, playbackKey));
   }
 
   const manifest = `${lines.join("\n")}\n`;

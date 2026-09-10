@@ -20,6 +20,7 @@ type ResolveManifestOptions = {
   hlsFailed?: boolean;
   allowServerManifests?: boolean;
   bilibiliVariant?: number;
+  nicoPlaybackKey?: string;
 };
 
 export function isSignedHlsManifestUrl(value: string): boolean {
@@ -74,7 +75,11 @@ export function resolveManifestSrc(
   }
 
   if (provider === "nicovideo") {
-    const built = buildNicoHlsManifest(stream.videoOnlyStreams ?? [], stream.audioStreams ?? []);
+    const built = buildNicoHlsManifest(
+      stream.videoOnlyStreams ?? [],
+      stream.audioStreams ?? [],
+      options?.nicoPlaybackKey,
+    );
     if (built) return { src: built, type: "application/x-mpegurl" };
   }
 

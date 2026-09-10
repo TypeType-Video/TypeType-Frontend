@@ -17,10 +17,11 @@ const audio = {
 } as AudioStreamItem;
 
 test("describes Nico codecs and independent segments", () => {
-  const source = buildNicoHlsManifest([video], [audio]);
+  const source = buildNicoHlsManifest([video], [audio], "playback key");
   expect(source).not.toBeNull();
 
   const manifest = atob(source?.split(",", 2)[1] ?? "");
   expect(manifest).toContain("#EXT-X-INDEPENDENT-SEGMENTS");
   expect(manifest).toContain('CODECS="avc1.4d4020,mp4a.40.2"');
+  expect(manifest).toContain("&playback=playback%20key");
 });
