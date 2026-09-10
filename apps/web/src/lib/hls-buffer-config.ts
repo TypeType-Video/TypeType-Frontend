@@ -10,10 +10,12 @@ export function hlsRequestUrl(url: string, playbackKey: string): string {
 }
 
 export function createHlsConfig(playbackKey = crypto.randomUUID()): Partial<HlsConfig> {
+  let requestSequence = 0;
   return {
     backBufferLength: 30,
     maxBufferLength: 10,
     maxMaxBufferLength: 10,
-    xhrSetup: (xhr, url) => xhr.open("GET", hlsRequestUrl(url, playbackKey), true),
+    xhrSetup: (xhr, url) =>
+      xhr.open("GET", hlsRequestUrl(url, `${playbackKey}-${requestSequence++}`), true),
   };
 }

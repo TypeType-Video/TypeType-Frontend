@@ -26,6 +26,8 @@ describe("HLS buffer policy", () => {
     const setup = createHlsConfig("generation-1").xhrSetup;
     if (!setup) throw new Error("HLS XHR setup is missing");
     setup(xhr as XMLHttpRequest, "/api/media/m1_0123456789abcdefghijklmn", {} as never);
-    expect(openedUrl).toBe("/api/media/m1_0123456789abcdefghijklmn?playback=generation-1");
+    expect(openedUrl).toBe("/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-0");
+    setup(xhr as XMLHttpRequest, "/api/media/m1_0123456789abcdefghijklmn", {} as never);
+    expect(openedUrl).toBe("/api/media/m1_0123456789abcdefghijklmn?playback=generation-1-1");
   });
 });
