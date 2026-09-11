@@ -3,7 +3,7 @@ export type RichTextSegment =
   | { id: string; type: "url"; value: string }
   | { id: string; type: "timecode"; value: string; seconds: number };
 
-export type RichTextFormat = "strong" | "em" | "u" | "s" | "code" | "kbd" | "mark";
+type RichTextFormat = "strong" | "em" | "u" | "s" | "code" | "kbd" | "mark";
 
 export type RichTextNode =
   | { type: "text"; value: string }
