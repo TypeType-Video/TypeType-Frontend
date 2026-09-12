@@ -4,7 +4,6 @@ import { useMediaState } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import { PlayerHotkeys } from "./player-hotkeys";
 import { SponsorBlockSkipper } from "./player-internals";
-import { PlayerPlayPauseIndicator } from "./player-play-pause-indicator";
 import { SponsorBlockBar } from "./sponsorblock-bar";
 import { SponsorBlockCurrentSegment } from "./sponsorblock-current-segment";
 import { SponsorBlockSkipNotice } from "./sponsorblock-skip-notice";
@@ -28,7 +27,6 @@ export function VideoPlayerPlaybackTools(props: Props) {
   return (
     <>
       {!compact && <PlayerHotkeys canSeek={props.canSeek} sabrVideo={props.sabrVideo} />}
-      {!compact && !props.audioOnly && <PlayerPlayPauseIndicator />}
       {shouldRunSponsorBlockAutoSkip(props) && props.autoSkipSegments && (
         <SponsorBlockSkipper
           segments={props.autoSkipSegments}
