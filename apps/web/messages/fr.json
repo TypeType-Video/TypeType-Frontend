@@ -1321,5 +1321,9 @@
   "ui_remote_phase_capturing_session": "Capture de la session",
   "ui_remote_phase_connected": "Connecté",
   "ui_remote_phase_closed": "Fermé",
-  "ui_remote_phase_error": "Erreur"
+  "ui_remote_phase_error": "Erreur",
+  "ui_remote_diagnostics": "Diagnostics",
+  "ui_copy_diagnostics": "Copier les diagnostics",
+  "ui_diagnostics_copied": "Copié",
+  "ui_remote_diagnostics_hint": "Partage ces lignes dans un rapport de bug. Elles ne contiennent ni mot de passe ni valeur de cookie."
 }

@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { createYoutubeRemoteInputQueue } from "../lib/youtube-remote-input-queue";
+import {
+  appendYoutubeRemoteLog,
+  parseYoutubeRemoteMessage,
+  type YoutubeRemoteLogLine,
+  type YoutubeRemotePhase,
+} from "../lib/youtube-remote-messages";
 import { m } from "../paraglide/messages.js";
 
-export type YoutubeRemotePhase =
-  | "idle"
-  | "connecting"
-  | "opening"
-  | "awaiting_login"
-  | "capturing_session"
-  | "connected"
-  | "closed"
-  | "error";
+export type { YoutubeRemotePhase } from "../lib/youtube-remote-messages";
 
 export type YoutubeRemoteInput =
   | { type: "resize"; width: number; height: number }
@@ -23,60 +21,25 @@ export type YoutubeRemoteInput =
   | { type: "text"; value: string }
   | { type: "cancel" };
 
-type RemoteStatus = {
-  type: "status";
-  phase: YoutubeRemotePhase;
-};
-
-type RemoteError = {
-  type: "error";
-  message: string;
-};
-
-function isYoutubeRemotePhase(value: string): value is YoutubeRemotePhase {
-  return (
-    value === "idle" ||
-    value === "connecting" ||
-    value === "opening" ||
-    value === "awaiting_login" ||
-    value === "capturing_session" ||
-    value === "connected" ||
-    value === "closed" ||
-    value === "error"
-  );
-}
-
-function parseRemoteMessage(value: string): RemoteStatus | RemoteError | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(value);
-  } catch {
-    return null;
-  }
-  if (!parsed || typeof parsed !== "object" || !("type" in parsed)) return null;
-  if (
-    parsed.type === "status" &&
-    "phase" in parsed &&
-    typeof parsed.phase === "string" &&
-    isYoutubeRemotePhase(parsed.phase)
-  ) {
-    return { type: "status", phase: parsed.phase };
-  }
-  if (parsed.type === "error" && "message" in parsed && typeof parsed.message === "string") {
-    return { type: "error", message: parsed.message };
-  }
-  return null;
-}
-
 export function useYoutubeRemoteBrowser(wsUrl: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
   const frameRef = useRef<string | null>(null);
   const inputCountRef = useRef(0);
   const lastResizeRef = useRef<Extract<YoutubeRemoteInput, { type: "resize" }> | null>(null);
   const inputQueueRef = useRef<ReturnType<typeof createYoutubeRemoteInputQueue> | null>(null);
+  const startedAtRef = useRef(Date.now());
   const [phase, setPhase] = useState<YoutubeRemotePhase>(wsUrl ? "connecting" : "idle");
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<YoutubeRemoteLogLine[]>([]);
+
+  const pushLog = useCallback(
+    (source: YoutubeRemoteLogLine["source"], message: string, at?: number) => {
+      const line = { at: at ?? Date.now() - startedAtRef.current, source, message };
+      setLogs((previous) => appendYoutubeRemoteLog(previous, line));
+    },
+    [],
+  );
 
   const sendImmediate = useCallback((message: YoutubeRemoteInput) => {
     const ws = wsRef.current;
@@ -120,6 +83,8 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     let active = true;
     let finished = false;
     let frameCount = 0;
+    startedAtRef.current = Date.now();
+    setLogs([]);
     setPhase("connecting");
     setError(null);
     const ws = new WebSocket(wsUrl);
@@ -127,27 +92,39 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     wsRef.current = ws;
 
     recordClientEvent("youtube_remote.ws_connecting", { hasUrl: true });
+    pushLog("client", `websocket connecting ${navigator.userAgent}`);
 
     ws.onopen = () => {
       if (!active) return;
       recordClientEvent("youtube_remote.ws_open");
+      pushLog("client", "websocket open");
       if (lastResizeRef.current) sendImmediate(lastResizeRef.current);
     };
 
     ws.onmessage = (event) => {
       if (!active) return;
       if (typeof event.data === "string") {
-        const message = parseRemoteMessage(event.data);
+        const message = parseYoutubeRemoteMessage(event.data);
+        if (message?.type === "log") {
+          pushLog("token", message.message, message.at);
+          recordClientEvent("youtube_remote.token_log", {
+            at: message.at,
+            message: message.message,
+          });
+        }
         if (message?.type === "status") {
           if (message.phase === "connected") finished = true;
           setPhase(message.phase);
           recordClientEvent("youtube_remote.status", { phase: message.phase });
+          pushLog("client", `status ${message.phase}`);
         }
         if (message?.type === "error") {
           setPhase("error");
           setError(m.ui_remote_browser_error());
           recordClientEvent("youtube_remote.backend_error", { message: message.message });
+          pushLog("client", `backend error: ${message.message}`);
         }
+        if (!message) pushLog("client", `unreadable text message ${event.data.slice(0, 80)}`);
         return;
       }
       const blob = event.data instanceof Blob ? event.data : new Blob([event.data]);
@@ -158,6 +135,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       frameCount += 1;
       if (frameCount === 1 || frameCount % 50 === 0) {
         recordClientEvent("youtube_remote.frame", { count: frameCount, bytes: blob.size });
+        pushLog("client", `frame #${frameCount} ${blob.size} bytes`);
       }
     };
 
@@ -167,11 +145,16 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       setPhase("error");
       setError(m.ui_remote_browser_connection_failed());
       recordClientEvent("youtube_remote.ws_error");
+      pushLog("client", "websocket error");
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       if (!active) return;
       recordClientEvent("youtube_remote.ws_close", { finished });
+      pushLog(
+        "client",
+        `websocket closed code=${event.code} reason=${event.reason} finished=${finished}`,
+      );
       if (!finished) setPhase("closed");
     };
 
@@ -184,7 +167,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       inputQueueRef.current?.reset();
       setFrameUrl(null);
     };
-  }, [wsUrl, sendImmediate]);
+  }, [wsUrl, sendImmediate, pushLog]);
 
   const send = useCallback(
     (message: YoutubeRemoteInput) => {
@@ -194,5 +177,5 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     [sendImmediate],
   );
 
-  return { phase, frameUrl, error, send };
+  return { phase, frameUrl, error, logs, send };
 }

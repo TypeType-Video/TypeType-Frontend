@@ -1321,5 +1321,9 @@
   "community_lemmy_acknowledge": "ICH HABE ES VERSTANDEN! Alles klar",
   "portability_preparing_upload": "Kontodaten werden vorbereitet und hochgeladen...",
   "portability_takeout_metadata_limit": "Die Kontodaten in diesem Archiv überschreiten die Importgrenzen oder sind verschlüsselt. Exportiere YouTube separat in kleineren ZIP-Dateien.",
-  "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält."
+  "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält.",
+  "ui_remote_diagnostics": "Diagnose",
+  "ui_copy_diagnostics": "Diagnose kopieren",
+  "ui_diagnostics_copied": "Kopiert",
+  "ui_remote_diagnostics_hint": "Teile diese Zeilen in einem Fehlerbericht. Sie enthalten keine Passwörter und keine Cookie-Werte."
 }
