@@ -112,6 +112,11 @@ export function YoutubeSessionBrowserPanel({
           {m.ui_retry_video()}
         </a>
       )}
+      {logs.length > 0 && (
+        <div className="mt-5">
+          <YoutubeRemoteDiagnostics logs={logs} />
+        </div>
+      )}
     </div>
   );
 }
