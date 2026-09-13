@@ -25,6 +25,7 @@ type Props = {
   onStart: () => void;
   onCancel: () => void;
   onInput: (input: YoutubeRemoteInput) => void;
+  onLog: (message: string) => void;
 };
 
 export function YoutubeSessionBrowserPanel({
@@ -43,13 +44,20 @@ export function YoutubeSessionBrowserPanel({
   onStart,
   onCancel,
   onInput,
+  onLog,
 }: Props) {
   const [reportOpen, setReportOpen] = useState(false);
 
   if (browserOpen) {
     return (
       <div className="flex flex-col gap-3">
-        <YoutubeRemoteBrowser frameUrl={frameUrl} phase={phase} error={error} onInput={onInput} />
+        <YoutubeRemoteBrowser
+          frameUrl={frameUrl}
+          phase={phase}
+          error={error}
+          onInput={onInput}
+          onLog={onLog}
+        />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-fg-soft text-xs">
             {m.ui_phase()} {youtubeRemotePhaseLabel(phase)}.{" "}

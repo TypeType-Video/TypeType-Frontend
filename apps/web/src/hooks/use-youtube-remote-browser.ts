@@ -21,6 +21,15 @@ export type YoutubeRemoteInput =
   | { type: "text"; value: string }
   | { type: "cancel" };
 
+function describeInput(message: YoutubeRemoteInput): string {
+  if (message.type === "pointer") return `pointer ${message.event} ${message.x},${message.y}`;
+  if (message.type === "key") return `key ${message.event} ${message.key}`;
+  if (message.type === "text") return `text ${message.value.length} chars`;
+  if (message.type === "resize") return `resize ${message.width}x${message.height}`;
+  if (message.type === "wheel") return `wheel ${message.deltaX},${message.deltaY}`;
+  return message.type;
+}
+
 export function useYoutubeRemoteBrowser(wsUrl: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
   const frameRef = useRef<string | null>(null);
@@ -41,27 +50,33 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     [],
   );
 
-  const sendImmediate = useCallback((message: YoutubeRemoteInput) => {
-    const ws = wsRef.current;
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      recordClientEvent("youtube_remote.input_dropped", { type: message.type });
-      return false;
-    }
-    ws.send(JSON.stringify(message));
-    inputCountRef.current += 1;
-    if (
-      message.type !== "pointer" ||
-      message.event !== "move" ||
-      inputCountRef.current % 25 === 0
-    ) {
-      recordClientEvent("youtube_remote.input_sent", {
-        type: message.type,
-        event: "event" in message ? message.event : null,
-        length: message.type === "text" ? message.value.length : null,
-      });
-    }
-    return true;
-  }, []);
+  const sendImmediate = useCallback(
+    (message: YoutubeRemoteInput) => {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        recordClientEvent("youtube_remote.input_dropped", { type: message.type });
+        pushLog(
+          "client",
+          `input dropped ${describeInput(message)} readyState=${ws?.readyState ?? "none"}`,
+        );
+        return false;
+      }
+      ws.send(JSON.stringify(message));
+      inputCountRef.current += 1;
+      const isMove = message.type === "pointer" && message.event === "move";
+      if (!isMove || inputCountRef.current % 25 === 0) {
+        recordClientEvent("youtube_remote.input_sent", {
+          type: message.type,
+          event: "event" in message ? message.event : null,
+          length: message.type === "text" ? message.value.length : null,
+        });
+        const buffered = ws.bufferedAmount > 0 ? ` buffered=${ws.bufferedAmount}` : "";
+        pushLog("client", `sent ${describeInput(message)}${buffered}`);
+      }
+      return true;
+    },
+    [pushLog],
+  );
 
   const canSend = useCallback(() => {
     const ws = wsRef.current;
@@ -83,6 +98,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     let active = true;
     let finished = false;
     let frameCount = 0;
+    let lastFrameAt = 0;
     startedAtRef.current = Date.now();
     setLogs([]);
     setPhase("connecting");
@@ -93,6 +109,17 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
 
     recordClientEvent("youtube_remote.ws_connecting", { hasUrl: true });
     pushLog("client", `websocket connecting ${navigator.userAgent}`);
+    pushLog(
+      "client",
+      `window ${window.innerWidth}x${window.innerHeight} dpr=${window.devicePixelRatio} visible=${document.visibilityState} focus=${document.hasFocus()}`,
+    );
+    const onVisibility = () => pushLog("client", `tab ${document.visibilityState}`);
+    const onError = (event: ErrorEvent) => pushLog("client", `page error ${event.message}`);
+    const onRejection = (event: PromiseRejectionEvent) =>
+      pushLog("client", `unhandled rejection ${String(event.reason).slice(0, 160)}`);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
 
     ws.onopen = () => {
       if (!active) return;
@@ -133,6 +160,11 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       frameRef.current = nextUrl;
       setFrameUrl(nextUrl);
       frameCount += 1;
+      const now = Date.now();
+      if (lastFrameAt > 0 && now - lastFrameAt > 2000) {
+        pushLog("client", `frame gap ${now - lastFrameAt}ms before frame #${frameCount}`);
+      }
+      lastFrameAt = now;
       if (frameCount === 1 || frameCount % 50 === 0) {
         recordClientEvent("youtube_remote.frame", { count: frameCount, bytes: blob.size });
         pushLog("client", `frame #${frameCount} ${blob.size} bytes`);
@@ -160,6 +192,9 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
 
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
       ws.close();
       wsRef.current = null;
       if (frameRef.current) URL.revokeObjectURL(frameRef.current);
@@ -177,5 +212,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     [sendImmediate],
   );
 
-  return { phase, frameUrl, error, logs, send };
+  const log = useCallback((message: string) => pushLog("client", message), [pushLog]);
+
+  return { phase, frameUrl, error, logs, send, log };
 }
