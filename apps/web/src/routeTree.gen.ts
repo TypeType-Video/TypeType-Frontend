@@ -41,6 +41,7 @@ import { Route as ImportYoutubeRouteImport } from './routes/import/youtube'
 import { Route as PlaylistsIdRouteImport } from './routes/playlists_.$id'
 import { Route as ShortsVideoIdRouteImport } from './routes/shorts_.$videoId'
 import { Route as SubscriptionsChannelsRouteImport } from './routes/subscriptions_.channels'
+import { Route as SubscriptionsGroupsRouteImport } from './routes/subscriptions_.groups'
 import { Route as AuthOidcCallbackRouteImport } from './routes/auth.oidc.callback'
 
 const IndexRoute = IndexRouteImport.update({
@@ -204,6 +205,11 @@ const SubscriptionsChannelsRoute = SubscriptionsChannelsRouteImport.update({
   path: '/subscriptions/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubscriptionsGroupsRoute = SubscriptionsGroupsRouteImport.update({
+  id: '/subscriptions_/groups',
+  path: '/subscriptions/groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthOidcCallbackRoute = AuthOidcCallbackRouteImport.update({
   id: '/auth/oidc/callback',
   path: '/auth/oidc/callback',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/playlists/$id': typeof PlaylistsIdRoute
   '/shorts/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions/groups': typeof SubscriptionsGroupsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
 }
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/playlists/$id': typeof PlaylistsIdRoute
   '/shorts/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions/groups': typeof SubscriptionsGroupsRoute
   '/import': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
 }
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/playlists_/$id': typeof PlaylistsIdRoute
   '/shorts_/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions_/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions_/groups': typeof SubscriptionsGroupsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
 }
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/playlists/$id'
     | '/shorts/$videoId'
     | '/subscriptions/channels'
+    | '/subscriptions/groups'
     | '/import/'
     | '/auth/oidc/callback'
   fileRoutesByTo: FileRoutesByTo
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/playlists/$id'
     | '/shorts/$videoId'
     | '/subscriptions/channels'
+    | '/subscriptions/groups'
     | '/import'
     | '/auth/oidc/callback'
   id:
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/playlists_/$id'
     | '/shorts_/$videoId'
     | '/subscriptions_/channels'
+    | '/subscriptions_/groups'
     | '/import/'
     | '/auth/oidc/callback'
   fileRoutesById: FileRoutesById
@@ -452,6 +464,7 @@ export interface RootRouteChildren {
   PlaylistsIdRoute: typeof PlaylistsIdRoute
   ShortsVideoIdRoute: typeof ShortsVideoIdRoute
   SubscriptionsChannelsRoute: typeof SubscriptionsChannelsRoute
+  SubscriptionsGroupsRoute: typeof SubscriptionsGroupsRoute
   AuthOidcCallbackRoute: typeof AuthOidcCallbackRoute
 }
 
@@ -681,6 +694,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscriptionsChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/subscriptions_/groups': {
+      id: '/subscriptions_/groups'
+      path: '/subscriptions/groups'
+      fullPath: '/subscriptions/groups'
+      preLoaderRoute: typeof SubscriptionsGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/oidc/callback': {
       id: '/auth/oidc/callback'
       path: '/auth/oidc/callback'
@@ -736,6 +756,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlaylistsIdRoute: PlaylistsIdRoute,
   ShortsVideoIdRoute: ShortsVideoIdRoute,
   SubscriptionsChannelsRoute: SubscriptionsChannelsRoute,
+  SubscriptionsGroupsRoute: SubscriptionsGroupsRoute,
   AuthOidcCallbackRoute: AuthOidcCallbackRoute,
 }
 export const routeTree = rootRouteImport

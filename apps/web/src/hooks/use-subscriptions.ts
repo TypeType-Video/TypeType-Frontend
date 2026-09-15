@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchFilteredSubscriptions } from "../lib/api-subscription-groups";
 import { fetchSubscriptions, subscribe, unsubscribe } from "../lib/api-user";
 import { normalizeChannelUrl } from "../lib/channel-url";
 import type { SubscriptionItem } from "../types/user";
@@ -23,13 +24,13 @@ function dedupeSubscriptions(data: SubscriptionItem[]): SubscriptionItem[] {
   return output;
 }
 
-export function useSubscriptions() {
+export function useSubscriptions(filter = "all") {
   const qc = useQueryClient();
   const { authReady, isAuthed } = useAuth();
 
   const query = useQuery({
-    queryKey: SUBSCRIPTIONS_KEY,
-    queryFn: fetchSubscriptions,
+    queryKey: filter === "all" ? SUBSCRIPTIONS_KEY : [...SUBSCRIPTIONS_KEY, filter],
+    queryFn: () => (filter === "all" ? fetchSubscriptions() : fetchFilteredSubscriptions(filter)),
     enabled: authReady && isAuthed,
     select: dedupeSubscriptions,
     staleTime: 5 * 60 * 1000,
@@ -44,12 +45,28 @@ export function useSubscriptions() {
         channelUrl: normalizeChannelUrl(item.channelUrl),
       });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: SUBSCRIPTIONS_KEY }),
+    onSuccess: () =>
+      Promise.all(
+        [
+          SUBSCRIPTIONS_KEY,
+          ["subscription-groups"],
+          ["subscription-group-memberships"],
+          ["subscription-feed"],
+        ].map((queryKey) => qc.invalidateQueries({ queryKey })),
+      ),
   });
 
   const remove = useMutation({
     mutationFn: (channelUrl: string) => (isAuthed ? unsubscribe(channelUrl) : Promise.resolve()),
-    onSuccess: () => qc.invalidateQueries({ queryKey: SUBSCRIPTIONS_KEY }),
+    onSuccess: () =>
+      Promise.all(
+        [
+          SUBSCRIPTIONS_KEY,
+          ["subscription-groups"],
+          ["subscription-group-memberships"],
+          ["subscription-feed"],
+        ].map((queryKey) => qc.invalidateQueries({ queryKey })),
+      ),
   });
 
   function isSubscribed(channelUrl: string): boolean {

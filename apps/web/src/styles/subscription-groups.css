@@ -1,0 +1,55 @@
+@reference "../index.css";
+
+@layer components {
+  .sg-button {
+    @apply inline-flex min-h-9 items-center justify-center gap-1.5 border border-border-strong px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .sg-membership-toggle {
+    @apply bg-app;
+  }
+
+  .sg-membership-toggle:enabled {
+    @apply cursor-pointer border-fg-muted bg-surface-strong hover:border-fg hover:bg-surface-soft;
+  }
+
+  .sg-membership-toggle:enabled[aria-pressed="true"] {
+    @apply border-fg bg-fg text-app hover:bg-fg-strong;
+  }
+
+  .sg-chip {
+    @apply border border-border-strong px-2 py-1 text-xs text-fg-muted;
+  }
+
+  .sg-menu-item {
+    @apply px-3 py-2 text-left text-xs hover:bg-surface-strong disabled:opacity-40;
+  }
+}
+
+.sg-manager :is(button, input, select, a):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.sg-manager :is(input, select) {
+  caret-color: var(--color-accent);
+}
+
+.sg-combobox:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.sg-manager .sg-combobox input:focus-visible {
+  outline: none;
+}
+
+.sg-manager ::selection {
+  background: var(--color-accent);
+  color: var(--color-app);
+}
+
+.sg-manager {
+  scrollbar-color: var(--color-border-strong) var(--color-surface);
+  scroll-margin-top: 4rem;
+}

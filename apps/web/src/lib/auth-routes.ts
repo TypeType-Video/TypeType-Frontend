@@ -7,6 +7,7 @@ export type RedirectTarget =
   | "/profile"
   | "/settings"
   | "/subscriptions"
+  | "/subscriptions/groups"
   | "/youtube-session"
   | `/youtube-session?returnTo=${string}`
   | `/shorts?v=${string}`;
@@ -61,6 +62,7 @@ export function sanitizeRedirect(value: string | undefined): RedirectTarget {
   if (value === "/profile") return "/profile";
   if (value === "/settings") return "/settings";
   if (value === "/subscriptions") return "/subscriptions";
+  if (value === "/subscriptions/groups") return "/subscriptions/groups";
   if (value === "/youtube-session") return "/youtube-session";
   if (value === "/playlists" || value.startsWith("/playlists/")) return "/playlists";
   return "/";
