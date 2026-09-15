@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { ArchiveRestore, FileUp } from "lucide-react";
 import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
@@ -63,13 +64,21 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   useEffect(() => {
     const state = job.data?.state ?? null;
     if (state === "completed" && previousState.current !== "completed") {
+      for (const key of [
+        "subscription-groups",
+        "subscription-group-memberships",
+        "subscriptions",
+        "subscription-feed",
+      ]) {
+        void queryClient.invalidateQueries({ queryKey: [key] });
+      }
       const count = Object.values(job.data?.result ?? {}).reduce((sum, value) => sum + value, 0);
       setToast(
         `${m.portability_import_completed()}: ${count.toLocaleString()} ${m.portability_items()}`,
       );
     }
     previousState.current = state;
-  }, [job.data?.result, job.data?.state]);
+  }, [job.data?.result, job.data?.state, queryClient]);
 
   useEffect(() => {
     if (!job.missing || !jobId) return;
@@ -183,6 +192,16 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
 
       {job.data && ["completed", "failed", "cancelled"].includes(job.data.state) && (
         <div className="flex flex-col gap-2 sm:flex-row">
+          {job.data.state === "completed" &&
+            ((job.data.result?.subscriptions ?? 0) > 0 ||
+              (job.data.result?.subscriptionGroups ?? 0) > 0) && (
+              <Link
+                to="/subscriptions/groups"
+                className="inline-flex h-9 items-center border border-border px-3 text-xs text-fg hover:bg-surface-strong"
+              >
+                {m.sg_manage_groups()}
+              </Link>
+            )}
           <button
             type="button"
             onClick={reset}
