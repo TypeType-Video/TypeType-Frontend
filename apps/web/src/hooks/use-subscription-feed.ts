@@ -13,12 +13,13 @@ export const SUBSCRIPTION_FEED_KEY = ["subscription-feed"];
 type Result = {
   streams: VideoStream[];
   isLoading: boolean;
+  isError: boolean;
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   fetchNextPage: () => void;
 };
 
-export function useSubscriptionFeed(): Result {
+export function useSubscriptionFeed(filter = "all"): Result {
   const { authReady, isAuthed } = useAuth();
   const { query: subsQuery } = useSubscriptions();
   const queryClient = useQueryClient();
@@ -28,8 +29,9 @@ export function useSubscriptionFeed(): Result {
   );
 
   const query = useInfiniteQuery({
-    queryKey: SUBSCRIPTION_FEED_KEY,
-    queryFn: ({ pageParam, signal }) => fetchSubscriptionFeed(pageParam as string | null, signal),
+    queryKey: filter === "all" ? SUBSCRIPTION_FEED_KEY : [...SUBSCRIPTION_FEED_KEY, filter],
+    queryFn: ({ pageParam, signal }) =>
+      fetchSubscriptionFeed(pageParam as string | null, signal, filter),
     initialPageParam: null as string | null,
     getNextPageParam: (last) => last.nextpage ?? undefined,
     staleTime: 5 * 60 * 1000,
@@ -43,9 +45,12 @@ export function useSubscriptionFeed(): Result {
         query.error.code ?? "",
       )
     ) {
-      void queryClient.resetQueries({ queryKey: SUBSCRIPTION_FEED_KEY, exact: true });
+      void queryClient.resetQueries({
+        queryKey: filter === "all" ? SUBSCRIPTION_FEED_KEY : [...SUBSCRIPTION_FEED_KEY, filter],
+        exact: true,
+      });
     }
-  }, [query.error, queryClient]);
+  }, [query.error, queryClient, filter]);
 
   const streams = useMemo(
     () =>
@@ -65,6 +70,7 @@ export function useSubscriptionFeed(): Result {
   return {
     streams,
     isLoading: query.isLoading,
+    isError: query.isError,
     isFetchingNextPage: query.isFetchingNextPage,
     hasNextPage: query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
