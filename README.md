@@ -4,6 +4,8 @@
   <p>The React web client for TypeType.</p>
 </div>
 
+You want to know the current position of TypeType about AI ? Go check [this](https://github.com/TypeType-Video/TypeType/blob/dev/AI_TRANSPARENCY.md).
+
 [![Translation status](https://translate.typetype.video/widgets/typetype/-/svg-badge.svg)](https://translate.typetype.video/engage/typetype/)
 
 This repository contains the browser application and its nginx container. It owns the user interface, routing, settings, account flows, library views, and integration with the TypeType API and playback package.
