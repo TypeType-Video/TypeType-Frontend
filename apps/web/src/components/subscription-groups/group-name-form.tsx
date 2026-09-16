@@ -25,7 +25,7 @@ export function GroupNameForm({
   }, [initialName]);
   return (
     <form
-      className="flex gap-2"
+      className="flex h-9 shrink-0 items-center gap-1"
       onKeyDown={(event) => {
         if (event.key === "Escape" && onCancel && !busy) {
           event.preventDefault();
@@ -45,13 +45,13 @@ export function GroupNameForm({
         value={name}
         onChange={(event) => setName(event.target.value)}
         disabled={busy}
-        className="h-9 min-w-0 flex-1 border border-border-strong bg-app px-2 text-sm text-fg placeholder:text-fg-muted"
+        className="h-8 min-w-0 flex-1 border border-border bg-app px-2 text-sm text-fg placeholder:text-fg-muted"
       />
       <button
         type="submit"
         disabled={busy || !name.trim() || (Boolean(onCancel) && name.trim() === initialName)}
         aria-label={onCancel ? m.ui_save() : m.ui_create()}
-        className="sg-button w-9 shrink-0 px-0"
+        className="sg-button w-8 shrink-0 px-0"
       >
         <Check size={15} />
       </button>
@@ -61,7 +61,7 @@ export function GroupNameForm({
           onClick={onCancel}
           disabled={busy}
           aria-label={m.portability_cancel()}
-          className="sg-button w-9 shrink-0 px-0"
+          className="sg-button w-8 shrink-0 px-0"
         >
           <X size={15} />
         </button>

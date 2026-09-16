@@ -22,7 +22,7 @@ export function GroupCombobox({ groups, selected, disabled, onToggle }: Props): 
         if (!event.currentTarget.contains(event.relatedTarget)) combo.setOpen(false);
       }}
     >
-      <div className="sg-combobox flex min-h-9 items-start border border-border-strong bg-app p-1">
+      <div className="sg-combobox flex min-h-8 items-start border border-border bg-app p-1">
         <div className="flex max-h-24 min-w-0 flex-1 flex-wrap items-center gap-1 overflow-y-auto">
           {combo.chosen.map((group) => (
             <button

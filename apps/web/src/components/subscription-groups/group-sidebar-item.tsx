@@ -49,14 +49,14 @@ export function GroupSidebarItem({
     );
   return (
     <div
-      className={`relative flex items-center border ${active ? "border-fg bg-surface-strong/50" : "border-transparent"}`}
+      className={`relative flex h-9 items-center border ${active ? "border-fg bg-surface-strong text-fg" : "border-transparent text-fg-muted"}`}
     >
       <button
         type="button"
         disabled={disabled}
         onClick={onSelect}
         aria-current={active ? "true" : undefined}
-        className="flex min-w-0 flex-1 items-center justify-between gap-2 px-3 py-2.5 text-left text-sm text-fg hover:bg-surface-strong disabled:opacity-50"
+        className="flex h-full min-w-0 flex-1 items-center justify-between gap-2 px-2 text-left text-sm hover:bg-surface-strong hover:text-fg disabled:opacity-50"
       >
         <span className="truncate" title={group.name}>
           {group.name}
@@ -77,7 +77,7 @@ export function GroupSidebarItem({
       {menuOpen && (
         <fieldset
           aria-label={m.sg_group_actions({ group: group.name })}
-          className="absolute top-full right-0 z-30 flex min-w-40 flex-col border border-border-strong bg-surface p-1"
+          className="absolute bottom-full right-0 z-30 mb-1 flex min-w-40 flex-col border border-border-strong bg-surface p-1"
           onKeyDown={(event) => {
             if (event.key === "Escape") {
               setMenuOpen(false);

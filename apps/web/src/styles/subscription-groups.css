@@ -2,7 +2,7 @@
 
 @layer components {
   .sg-button {
-    @apply inline-flex min-h-9 items-center justify-center gap-1.5 border border-border-strong px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-40;
+    @apply inline-flex min-h-8 items-center justify-center gap-1.5 border border-border px-2 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-border-strong hover:bg-surface-strong hover:text-fg disabled:cursor-not-allowed disabled:opacity-40;
   }
 
   .sg-membership-toggle {
@@ -10,7 +10,7 @@
   }
 
   .sg-membership-toggle:enabled {
-    @apply cursor-pointer border-fg-muted bg-surface-strong hover:border-fg hover:bg-surface-soft;
+    @apply cursor-pointer border-fg-muted bg-surface-strong text-fg hover:border-fg hover:bg-surface-soft;
   }
 
   .sg-membership-toggle:enabled[aria-pressed="true"] {
@@ -18,11 +18,11 @@
   }
 
   .sg-chip {
-    @apply border border-border-strong px-2 py-1 text-xs text-fg-muted;
+    @apply border border-border-strong px-1.5 py-0.5 text-xs text-fg-muted;
   }
 
   .sg-menu-item {
-    @apply px-3 py-2 text-left text-xs hover:bg-surface-strong disabled:opacity-40;
+    @apply px-3 py-2 text-left text-xs text-fg-muted hover:bg-surface-strong hover:text-fg disabled:opacity-40;
   }
 }
 
@@ -52,4 +52,28 @@
 .sg-manager {
   scrollbar-color: var(--color-border-strong) var(--color-surface);
   scroll-margin-top: 4rem;
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  .sg-page {
+    display: flex;
+    height: 100dvh;
+    flex-direction: column;
+    padding-bottom: 0.5rem;
+  }
+
+  .sg-page > .sg-manager {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .sg-page .sg-workspace {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .sg-page > footer {
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    padding-block: 0.5rem;
+  }
 }

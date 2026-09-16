@@ -32,7 +32,7 @@ export function ChannelGroupEditor({
   }
   return (
     <form
-      className="pointer-events-auto min-w-0 flex-[2]"
+      className="pointer-events-auto min-w-0 basis-full sm:flex-[2]"
       aria-label={m.sg_edit_named({ channel: channel.name })}
       onSubmit={(event) => {
         event.preventDefault();

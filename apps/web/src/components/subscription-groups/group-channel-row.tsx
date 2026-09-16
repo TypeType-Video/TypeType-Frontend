@@ -32,15 +32,16 @@ export function GroupChannelRow(props: Props): React.JSX.Element {
   return (
     <li
       data-selected={props.selected}
-      className={`relative border-b border-border px-4 py-3 last:border-b-0 ${props.selected ? "bg-surface-strong" : "bg-surface hover:bg-surface-strong/50"}`}
+      className={`relative flex min-h-14 items-center border-b border-border px-3 py-2 last:border-b-0 ${props.selected ? "bg-surface-strong" : "hover:bg-surface-strong/50"}`}
     >
       <label
         htmlFor={selectionId}
+        title={memberships.map((group) => group.name).join(", ")}
         className={`absolute inset-0 ${props.disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
       >
         <span className="sr-only">{m.ui_select_named_channel({ name: channel.name })}</span>
       </label>
-      <div className="pointer-events-none relative flex items-center gap-3">
+      <div className="pointer-events-none relative flex w-full min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap">
         <input
           ref={checkbox}
           id={selectionId}
@@ -54,12 +55,12 @@ export function GroupChannelRow(props: Props): React.JSX.Element {
         <ChannelAvatar
           src={proxyImage(channel.avatarUrl)}
           name={channel.name}
-          className="h-9 w-9 shrink-0"
+          className="h-8 w-8 shrink-0"
         />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1" title={channel.name}>
           <ChannelRouteLink
             url={channel.channelUrl}
-            className="pointer-events-auto w-fit max-w-full truncate text-sm font-medium hover:underline"
+            className="pointer-events-auto block w-fit max-w-full truncate text-sm font-medium hover:underline"
           >
             {channel.name}
           </ChannelRouteLink>
@@ -80,13 +81,34 @@ export function GroupChannelRow(props: Props): React.JSX.Element {
             }}
           />
         ) : (
-          <div className="flex max-w-[50%] flex-wrap items-center justify-end gap-1.5 py-1 text-xs">
+          <div
+            className="flex min-w-0 max-w-[45%] items-center justify-end gap-1 text-xs"
+            title={memberships.map((group) => group.name).join(", ")}
+          >
             {memberships.length > 0 ? (
-              memberships.map((group) => (
-                <span key={group.id} className="sg-chip max-w-36 truncate" title={group.name}>
-                  {group.name}
-                </span>
-              ))
+              <>
+                {memberships.slice(0, 2).map((group) => (
+                  <span
+                    key={group.id}
+                    className="sg-chip min-w-0 max-w-32 truncate"
+                    title={group.name}
+                  >
+                    {group.name}
+                  </span>
+                ))}
+                {memberships.length > 2 && (
+                  <span className="sg-chip shrink-0">
+                    <span aria-hidden="true">+{memberships.length - 2}</span>
+                    <span className="sr-only">
+                      {m.sg_more_groups({ count: memberships.length - 2 })}:{" "}
+                      {memberships
+                        .slice(2)
+                        .map((group) => group.name)
+                        .join(", ")}
+                    </span>
+                  </span>
+                )}
+              </>
             ) : (
               <span className="sg-chip border-dashed">{m.sg_add_groups()}</span>
             )}
