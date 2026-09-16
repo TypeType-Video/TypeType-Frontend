@@ -41,7 +41,7 @@ type GroupActions = {
   run: (action: () => Promise<unknown>, success: string) => Promise<boolean>;
 };
 
-export function useGroupActions(): GroupActions {
+export function useGroupActions(enabled: boolean): GroupActions {
   const client = useQueryClient();
   const lock = useRef(false);
   const [busy, setBusy] = useState(false);
@@ -49,7 +49,7 @@ export function useGroupActions(): GroupActions {
   const [notice, setNotice] = useState<string | null>(null);
 
   async function run(action: () => Promise<unknown>, success: string): Promise<boolean> {
-    if (lock.current) return false;
+    if (!enabled || lock.current) return false;
     lock.current = true;
     setBusy(true);
     setError(null);
