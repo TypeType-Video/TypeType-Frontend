@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { ShortsPlayerStage } from "../components/shorts-player-stage";
 import { ShortsShellLoader } from "../components/shorts-shell-loader";
@@ -85,9 +86,28 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
   }
   if (!active) {
     return (
-      <div className="flex items-center justify-center pt-24">
-        <p className="text-sm text-fg-muted">{m.ui_no_shorts_available_right_now()}</p>
-      </div>
+      <section className="flex min-h-[45vh] items-center justify-center px-4 pt-12">
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface/80 px-6 py-8 text-center">
+          <h1 className="text-base font-semibold text-fg">{m.nav_shorts()}</h1>
+          <p className="mt-2 text-sm leading-6 text-fg-muted">
+            {m.ui_no_shorts_available_right_now()}
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <Link
+              to="/subscriptions/channels"
+              className="rounded-lg bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+            >
+              {m.groups_preview_open_subscriptions()}
+            </Link>
+            <Link
+              to="/import"
+              className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-strong"
+            >
+              {m.ui_import_from_youtube()}
+            </Link>
+          </div>
+        </div>
+      </section>
     );
   }
   const hasPrev = index > 0;
