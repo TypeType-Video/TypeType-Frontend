@@ -5,6 +5,7 @@ export type SettingsSection =
   | "language"
   | "service"
   | "import"
+  | "api"
   | "privacy"
   | "blocked"
   | "rss"
@@ -20,6 +21,7 @@ export function isSettingsSection(value: unknown): value is SettingsSection {
     value === "language" ||
     value === "service" ||
     value === "import" ||
+    value === "api" ||
     value === "privacy" ||
     value === "blocked" ||
     value === "rss" ||

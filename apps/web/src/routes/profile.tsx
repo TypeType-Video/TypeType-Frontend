@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AccountIdentitySettings } from "../components/account-identity-settings";
-import { PresenceKeySettings } from "../components/presence-key-settings";
 import { ProfileAvatar } from "../components/profile-avatar";
 import { ProfileAvatarSettings } from "../components/profile-avatar-settings";
 import { Toast } from "../components/toast";
@@ -149,10 +148,6 @@ function ProfilePage() {
         </div>
       </section>
       <AccountIdentitySettings
-        enabled={Boolean(me && !me.id.startsWith("guest:"))}
-        onMessage={setToast}
-      />
-      <PresenceKeySettings
         enabled={Boolean(me && !me.id.startsWith("guest:"))}
         onMessage={setToast}
       />
