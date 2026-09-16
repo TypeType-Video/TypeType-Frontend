@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-16T13:08:32.722Z",
+  "title": "Design System: TypeType",
+  "extensions": {
+    "colorMeta": {
+      "app": {
+        "role": "neutral",
+        "displayName": "Neutral zinc canvas",
+        "tonalRamp": [
+          "oklch(14.1% 0.005 285.823)",
+          "oklch(21% 0.006 285.885)",
+          "oklch(27.4% 0.006 286.033)",
+          "oklch(37% 0.013 285.805)",
+          "oklch(55.2% 0.016 285.938)",
+          "oklch(87.1% 0.006 286.286)",
+          "oklch(96.7% 0.001 286.375)",
+          "oklch(98.5% 0 0)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Blue state accent",
+        "tonalRamp": [
+          "oklch(28.2% 0.091 267.935)",
+          "oklch(37.9% 0.146 265.522)",
+          "oklch(42.4% 0.199 265.638)",
+          "oklch(48.8% 0.243 264.376)",
+          "oklch(62.3% 0.214 259.815)",
+          "oklch(80.9% 0.105 251.813)",
+          "oklch(93.2% 0.032 255.585)",
+          "oklch(97% 0.014 254.604)"
+        ]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Red destructive feedback",
+        "tonalRamp": [
+          "oklch(25.8% 0.092 26.042)",
+          "oklch(39.6% 0.141 25.723)",
+          "oklch(44.4% 0.177 26.899)",
+          "oklch(50.5% 0.213 27.518)",
+          "oklch(63.7% 0.237 25.331)",
+          "oklch(80.8% 0.114 19.571)",
+          "oklch(93.6% 0.032 17.717)",
+          "oklch(97.1% 0.013 17.38)"
+        ]
+      }
+    },
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Tailwind transition-colors used on the incumbent group's buttons."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Square foreground-filled action from the group prototype, with the manager's visible keyboard focus.",
+      "html": "<button class=\"ds-primary\">Save</button>",
+      "css": ".ds-primary { min-height:32px; padding:4px 8px; border:1px solid var(--color-zinc-800,oklch(27.4% .006 286.033)); border-radius:0; background:var(--color-zinc-100,oklch(96.7% .001 286.375)); color:var(--color-zinc-950,oklch(14.1% .005 285.823)); font:500 12px/16px system-ui,sans-serif; cursor:pointer; transition:background-color .15s; } .ds-primary:hover { background:var(--color-zinc-50,oklch(98.5% 0 0)); } .ds-primary:focus-visible { outline:2px solid var(--color-blue-400,oklch(70.7% .165 254.624)); outline-offset:3px; } .ds-primary:disabled { opacity:.4; cursor:not-allowed; }"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Muted bordered action; hover strengthens the neutral surface and label.",
+      "html": "<button class=\"ds-secondary\">Cancel</button>",
+      "css": ".ds-secondary { min-height:32px; padding:4px 8px; border:1px solid var(--color-zinc-800,oklch(27.4% .006 286.033)); border-radius:0; background:transparent; color:var(--color-zinc-400,oklch(70.5% .015 286.067)); font:500 12px/16px system-ui,sans-serif; cursor:pointer; transition:color .15s,background-color .15s; } .ds-secondary:hover { border-color:var(--color-zinc-700,oklch(37% .013 285.805)); background:var(--color-zinc-800,oklch(27.4% .006 286.033)); color:var(--color-zinc-100,oklch(96.7% .001 286.375)); } .ds-secondary:focus-visible { outline:2px solid var(--color-blue-400,oklch(70.7% .165 254.624)); outline-offset:3px; } .ds-secondary:disabled { opacity:.4; cursor:not-allowed; }"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Square inset field with semantic theme colors and a visible focus outline.",
+      "html": "<input class=\"ds-field\" type=\"search\" aria-label=\"Search channels\" placeholder=\"Search channels\">",
+      "css": ".ds-field { height:32px; max-width:100%; padding:0 8px; border:1px solid var(--color-zinc-800,oklch(27.4% .006 286.033)); border-radius:0; background:var(--color-zinc-950,oklch(14.1% .005 285.823)); color:var(--color-zinc-100,oklch(96.7% .001 286.375)); font:14px/20px system-ui,sans-serif; } .ds-field::placeholder { color:var(--color-zinc-400,oklch(70.5% .015 286.067)); } .ds-field:focus-visible { outline:2px solid var(--color-blue-400,oklch(70.7% .165 254.624)); outline-offset:3px; }"
+    },
+    {
+      "name": "Group filter",
+      "kind": "nav",
+      "refersTo": "group-filter-selected",
+      "description": "A selected group gets an outline and tonal fill; inactive groups remain muted.",
+      "html": "<nav class=\"ds-groups\" aria-label=\"Group filters\"><button class=\"ds-group\" aria-current=\"true\">Tech</button><button class=\"ds-group\">Music</button></nav>",
+      "css": ".ds-groups { display:flex; flex-direction:column; gap:4px; } .ds-group { height:36px; padding:0 8px; border:1px solid transparent; border-radius:0; text-align:left; background:transparent; color:var(--color-zinc-400,oklch(70.5% .015 286.067)); font:14px/20px system-ui,sans-serif; cursor:pointer; } .ds-group:hover,.ds-group[aria-current=\"true\"] { background:var(--color-zinc-800,oklch(27.4% .006 286.033)); color:var(--color-zinc-100,oklch(96.7% .001 286.375)); } .ds-group[aria-current=\"true\"] { border-color:var(--color-zinc-100,oklch(96.7% .001 286.375)); } .ds-group:focus-visible { outline:2px solid var(--color-blue-400,oklch(70.7% .165 254.624)); outline-offset:3px; }"
+    },
+    {
+      "name": "Membership label",
+      "kind": "chip",
+      "refersTo": "membership-chip",
+      "description": "A compact square label with a stronger border; this display variant is not interactive.",
+      "html": "<span class=\"ds-membership\">Tech</span>",
+      "css": ".ds-membership { display:inline-block; padding:2px 6px; border:1px solid var(--color-zinc-700,oklch(37% .013 285.805)); border-radius:0; color:var(--color-zinc-400,oklch(70.5% .015 286.067)); font:12px/16px system-ui,sans-serif; }"
+    },
+    {
+      "name": "Management panel",
+      "kind": "card",
+      "refersTo": "management-panel",
+      "description": "Flat square surface from the clean-main group prototype; border and tone provide structure.",
+      "html": "<section class=\"ds-panel\"><h2 class=\"ds-heading\">Groups</h2><p class=\"ds-copy\">Organize your channels.</p></section>",
+      "css": ".ds-panel { padding:16px; border:1px solid var(--color-zinc-800,oklch(27.4% .006 286.033)); border-radius:0; background:var(--color-zinc-900,oklch(21% .006 285.885)); color:var(--color-zinc-100,oklch(96.7% .001 286.375)); box-shadow:none; font:14px/20px system-ui,sans-serif; } .ds-heading { margin:0 0 8px; font-size:14px; font-weight:600; } .ds-copy { margin:0; color:var(--color-zinc-400,oklch(70.5% .015 286.067)); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "TypeType's existing library and settings.",
+    "overview": "Preserve the application's restrained neutral surfaces, compact system typography, thin borders and recognizable channel identities. Derive new management controls from the closest existing workflow.",
+    "keyCharacteristics": [
+      "Neutral tonal hierarchy, with color reserved for state and feedback.",
+      "Compact system text, ordinary icons and circular channel avatars.",
+      "Flat, bordered management surfaces and square group controls.",
+      "Context-specific shapes elsewhere; the application has no universal corner radius."
+    ],
+    "rules": [],
+    "dos": [
+      "Do use the semantic theme roles and check both light and dark themes.",
+      "Do choose references from the same workflow before borrowing isolated controls from admin or media pages.",
+      "Do keep management controls square, with thin borders and visible keyboard focus.",
+      "Do preserve existing channel identity, icons and navigation patterns."
+    ],
+    "donts": [
+      "Don't introduce a new font, palette, shadow or blanket corner radius for group management.",
+      "Don't remove legitimate rounded media controls or circular avatars elsewhere.",
+      "Don't promote a prototype's presentation scaffolding or one page's density into a global design rule."
+    ]
+  }
+}
