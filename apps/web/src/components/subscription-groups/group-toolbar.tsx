@@ -6,7 +6,6 @@ import type { SubscriptionGroup } from "../../types/subscription-groups";
 type Props = {
   groups: SubscriptionGroup[];
   defaultTarget: string;
-  filterName: string;
   isGroup: boolean;
   excluded: boolean;
   query: string;
@@ -30,12 +29,12 @@ export function GroupToolbar(props: Props): React.JSX.Element {
   const [target, setTarget] = useState(props.defaultTarget);
   const validTarget = props.groups.some((group) => group.id === target) ? target : "";
   return (
-    <div className="sticky top-14 z-20 border border-border bg-surface">
+    <div className="shrink-0 border border-border bg-surface">
       <fieldset
         disabled={props.disabled}
-        className="flex flex-wrap items-center gap-2 border-b border-border p-3"
+        className="flex flex-wrap items-center gap-2 border-b border-border p-2"
       >
-        <label className="flex h-9 min-w-40 flex-1 items-center gap-2 border border-border-strong bg-app px-3">
+        <label className="flex h-8 min-w-40 flex-1 items-center gap-2 border border-border bg-app px-2">
           <Search size={14} className="text-fg-muted" />
           <input
             type="search"
@@ -69,8 +68,8 @@ export function GroupToolbar(props: Props): React.JSX.Element {
           {props.isGroup && props.excluded ? m.sg_not_in_group() : m.sg_in_group()}
         </button>
       </fieldset>
-      <fieldset disabled={props.disabled} className="flex flex-wrap items-center gap-2 p-3">
-        <div className="mr-auto min-w-36 text-xs" role="status" aria-live="polite">
+      <fieldset disabled={props.disabled} className="flex flex-wrap items-center gap-1.5 p-2">
+        <div className="mr-auto text-xs" role="status" aria-live="polite">
           <p className="font-medium">
             {props.busy
               ? m.sg_saving()
@@ -136,26 +135,13 @@ export function GroupToolbar(props: Props): React.JSX.Element {
           type="button"
           disabled={props.selectedCount === 0}
           onClick={props.onClear}
+          aria-label={m.sg_clear()}
+          title={m.sg_clear()}
           className="sg-button border-transparent"
         >
           <X size={13} />
-          {m.sg_clear()}
         </button>
       </fieldset>
-      <div className="flex flex-wrap justify-between gap-2 border-t border-border px-3 py-2 text-xs text-fg-muted">
-        <span>
-          {props.onlySelected
-            ? m.sg_show_selected()
-            : props.isGroup && props.excluded
-              ? m.sg_outside_named({ group: props.filterName })
-              : props.filterName}
-        </span>
-        <span className="tabular-nums">
-          {props.resultCount === 1
-            ? m.sg_one_channel()
-            : m.sg_channel_count({ count: props.resultCount })}
-        </span>
-      </div>
     </div>
   );
 }
