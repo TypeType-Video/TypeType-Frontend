@@ -42,8 +42,9 @@ type State = {
 export function useGroupManager(
   groups: SubscriptionGroup[],
   channels: GroupedSubscription[],
+  canEdit: boolean,
 ): State {
-  const actions = useGroupActions();
+  const actions = useGroupActions(canEdit);
   const [filter, setFilter] = useState("all");
   const [excluded, setExcluded] = useState(false);
   const [query, setQuery] = useState("");
@@ -67,7 +68,7 @@ export function useGroupManager(
     activeGroup?.name ??
     (activeFilter === "ungrouped" ? m.groups_preview_ungrouped() : m.sg_all_channels());
   const editing = chosen.length === 1 ? chosen[0].channelUrl : null;
-  const disabled = actions.busy;
+  const disabled = actions.busy || !canEdit;
 
   function toggle(url: string): void {
     actions.clearError();
