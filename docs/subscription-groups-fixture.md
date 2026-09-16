@@ -36,7 +36,8 @@ Scroll to the bottom. Existing cards should remain visible, with an error and Re
 
 ## Suggested manager checks
 
-- Show more from 50 to 100 to 150 channels; Select results selects all matching channels, including unloaded rows.
+- Page through both lists and search groups. On desktop, changing the viewport height changes page capacity while both pagination bars remain visible without a document or group-list scrollbar.
+- Select results selects all 150 matching channels across pages. Select the final row on a page, edit it, then select another channel; the clicked row should stay visible and drafts should survive page changes.
 - Select channels across group filters; compare In group / Not in group and Show selected.
 - Search for `Atlas` to inspect a long channel name and ten memberships in the combobox.
 - Test the Ungrouped and empty To explore filters, and create or rename a group.
