@@ -13,10 +13,12 @@ export const SUBSCRIPTION_FEED_KEY = ["subscription-feed"];
 type Result = {
   streams: VideoStream[];
   isLoading: boolean;
-  isError: boolean;
+  isLoadingError: boolean;
+  isFetchNextPageError: boolean;
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   fetchNextPage: () => void;
+  refetch: () => void;
 };
 
 export function useSubscriptionFeed(filter = "all"): Result {
@@ -70,9 +72,11 @@ export function useSubscriptionFeed(filter = "all"): Result {
   return {
     streams,
     isLoading: query.isLoading,
-    isError: query.isError,
+    isLoadingError: query.isLoadingError,
+    isFetchNextPageError: query.isFetchNextPageError,
     isFetchingNextPage: query.isFetchingNextPage,
     hasNextPage: query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
+    refetch: query.refetch,
   };
 }
