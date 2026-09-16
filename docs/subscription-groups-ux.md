@@ -44,6 +44,8 @@ The [manager stylesheet](../apps/web/src/styles/subscription-groups.css) consoli
 
 ## Verification scope
 
+- Feed error regression: 346 tests passed after adding coverage for initial-load, pagination, and background-refresh failures. Chromium retained all 30 loaded cards after an injected next-page failure; keyboard Retry appended 30 more distinct cards and cleared the error. `check`, `knip`, `sherif`, the production build and the whitespace check passed.
+- A [reproducible local fixture](subscription-groups-fixture.md) now provides 150 channels, 18 groups and 300 videos, including 109 channels in multiple groups and 22 ungrouped channels. The 50-to-100-row manager expansion was checked in Chromium; fixture CRUD and filtering were checked in memory.
 - Final automated checks after defaulting the bulk target from the sidebar: 343 tests passed; `check`, `knip`, `sherif`, the production build and `git diff --check` passed.
 - Bulk-target browser checks confirmed Tech and Science sidebar selections populate the target, a manual Music override survives inversion and search, and All channels/Ungrouped reset the target. Existing channel selections were preserved throughout.
 - Row-selection checks covered background clicks, checkbox keyboard activation, highlighted rows in both themes, one/two/21 selections, hidden selections, retained drafts across filtering and multiple selection, Cancel, successful Save, and failed-save retry. Exactly one globally selected channel exposed an editor when visible. The local fixture's original memberships were restored after testing.
