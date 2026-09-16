@@ -2,6 +2,7 @@ import { isStreamUnavailableError } from "../hooks/use-stream";
 import { familyListBlockedMessage, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
 import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
+import { resolveStreamErrorMessage } from "../lib/stream-error-message";
 import { resolveVideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
 import { youtubeSessionReturnToForWatch } from "../lib/youtube-session-route";
 import { m } from "../paraglide/messages.js";
@@ -28,6 +29,9 @@ export function WatchStreamError({ error, publicParam, list, shuffle, poster, on
   const youtubeSessionReturnTo = needsYoutubeSession
     ? youtubeSessionReturnToForWatch(publicParam, list, shuffle)
     : undefined;
+  const streamErrorMessage = isStreamUnavailableError(error)
+    ? m.ui_this_video_is_currently_unavailable()
+    : resolveStreamErrorMessage(error);
   const message = availability
     ? videoAvailabilityCopy(availability, error instanceof Error ? error.message : undefined)
         .message
@@ -35,9 +39,7 @@ export function WatchStreamError({ error, publicParam, list, shuffle, poster, on
       ? familyListBlockedMessage()
       : needsYoutubeSession
         ? m.ui_connect_youtube_to_access_this_video()
-        : isStreamUnavailableError(error)
-          ? m.ui_this_video_is_currently_unavailable()
-          : m.ui_failed_to_load_stream();
+        : (streamErrorMessage ?? m.ui_failed_to_load_stream());
 
   return (
     <StreamError

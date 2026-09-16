@@ -1,6 +1,7 @@
 import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { detectProvider } from "../lib/provider";
+import { resolveStreamErrorMessage } from "../lib/stream-error-message";
 import { toPublicWatchParam } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
 import type { VideoStream } from "../types/stream";
@@ -36,7 +37,7 @@ export function useShortsActiveStream({ shorts, index, useAuthenticatedStream, e
     ? !stream && streamQuery.isError && bootstrapQuery.isError
     : streamQuery.isError;
   const error = streamQuery.error ?? bootstrapQuery.error;
-  const errorMessage = m.ui_this_short_stopped_playing();
+  const errorMessage = resolveStreamErrorMessage(error) ?? m.ui_this_short_stopped_playing();
   const isMemberOnlyShort = isMemberOnlyApiError(error);
   const needsYoutubeSession = isYoutubeSessionActionError(error);
 
