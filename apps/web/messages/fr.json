@@ -1357,6 +1357,8 @@
   "sg_in_group": "Dans le groupe",
   "sg_invalid_name": "Le nom du groupe doit contenir entre 1 et 100 caractères.",
   "sg_load_error": "Impossible de charger vos groupes. Vérifiez votre connexion et réessayez.",
+  "sg_refresh_error": "Impossible d’actualiser les groupes. Les données affichées peuvent être obsolètes. Réessayez pour reprendre la modification.",
+  "sg_refreshing": "Actualisation…",
   "sg_load_more": "Afficher plus · {shown} sur {total}",
   "sg_loading": "Chargement des groupes et des chaînes…",
   "sg_manage_groups": "Gérer les groupes",
@@ -1394,5 +1396,10 @@
   "sg_delete_one_confirmation": "Le groupe et son appartenance pour 1 chaîne seront supprimés. La chaîne et votre abonnement seront conservés.",
   "sg_partial_one_failure": "Les modifications de 1 chaîne n’ont pas pu être enregistrées. Certaines ont pu réussir. Vérifiez les groupes actualisés et réessayez.",
   "subscriptions_feed_load_error": "Impossible de charger vos abonnements. Vérifiez votre connexion et réessayez.",
-  "subscriptions_feed_next_page_error": "Impossible de charger plus de vidéos. Les vidéos déjà chargées restent disponibles."
+  "subscriptions_feed_next_page_error": "Impossible de charger plus de vidéos. Les vidéos déjà chargées restent disponibles.",
+  "sg_page_range": "{start}–{end} sur {total}",
+  "sg_previous_page": "Page précédente",
+  "sg_next_page": "Page suivante",
+  "sg_more_groups": "Groupes supplémentaires ({count})",
+  "sg_no_group_results": "Aucun groupe ne correspond à votre recherche."
 }

@@ -1357,6 +1357,8 @@
   "sg_in_group": "In Gruppe",
   "sg_invalid_name": "Der Gruppenname muss zwischen 1 und 100 Zeichen lang sein.",
   "sg_load_error": "Deine Gruppen konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+  "sg_refresh_error": "Die Gruppen konnten nicht aktualisiert werden. Die angezeigten Daten sind möglicherweise veraltet. Versuche es erneut, um die Bearbeitung fortzusetzen.",
+  "sg_refreshing": "Wird aktualisiert…",
   "sg_load_more": "Mehr anzeigen · {shown} von {total}",
   "sg_loading": "Gruppen und Kanäle werden geladen…",
   "sg_manage_groups": "Gruppen verwalten",
@@ -1394,5 +1396,10 @@
   "sg_delete_one_confirmation": "Die Gruppe und die Zugehörigkeit von 1 Kanal werden gelöscht. Der Kanal und dein Abonnement bleiben bestehen.",
   "sg_partial_one_failure": "Änderungen für 1 Kanal konnten nicht gespeichert werden. Einige Änderungen waren möglicherweise erfolgreich. Prüfe die aktualisierten Gruppen und versuche es erneut.",
   "subscriptions_feed_load_error": "Deine Abonnements konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
-  "subscriptions_feed_next_page_error": "Weitere Videos konnten nicht geladen werden. Bereits geladene Videos bleiben verfügbar."
+  "subscriptions_feed_next_page_error": "Weitere Videos konnten nicht geladen werden. Bereits geladene Videos bleiben verfügbar.",
+  "sg_page_range": "{start}–{end} von {total}",
+  "sg_previous_page": "Vorherige Seite",
+  "sg_next_page": "Nächste Seite",
+  "sg_more_groups": "Weitere Gruppen ({count})",
+  "sg_no_group_results": "Keine Gruppen entsprechen deiner Suche."
 }
