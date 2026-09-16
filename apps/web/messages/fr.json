@@ -1392,5 +1392,7 @@
   "sg_removed_one": "1 chaîne retirée de {group}.",
   "sg_clear_one_confirmation": "Retirer la chaîne sélectionnée de tous ses groupes, même si elle est hors de cette vue ? Vous resterez abonné à cette chaîne.",
   "sg_delete_one_confirmation": "Le groupe et son appartenance pour 1 chaîne seront supprimés. La chaîne et votre abonnement seront conservés.",
-  "sg_partial_one_failure": "Les modifications de 1 chaîne n’ont pas pu être enregistrées. Certaines ont pu réussir. Vérifiez les groupes actualisés et réessayez."
+  "sg_partial_one_failure": "Les modifications de 1 chaîne n’ont pas pu être enregistrées. Certaines ont pu réussir. Vérifiez les groupes actualisés et réessayez.",
+  "subscriptions_feed_load_error": "Impossible de charger vos abonnements. Vérifiez votre connexion et réessayez.",
+  "subscriptions_feed_next_page_error": "Impossible de charger plus de vidéos. Les vidéos déjà chargées restent disponibles."
 }

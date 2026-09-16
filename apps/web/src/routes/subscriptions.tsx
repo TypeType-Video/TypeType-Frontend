@@ -28,8 +28,16 @@ function SubscriptionsPage() {
   const navigate = Route.useNavigate();
   const { query } = useSubscriptions(group);
   const subscriptions = query.data ?? [];
-  const { streams, isLoading, isError, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useSubscriptionFeed(group);
+  const {
+    streams,
+    isLoading,
+    isLoadingError,
+    isFetchNextPageError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useSubscriptionFeed(group);
   const { filter } = useBlockedFilter();
   const visible = useMemo(() => filter(streams), [filter, streams]);
 
@@ -80,10 +88,21 @@ function SubscriptionsPage() {
       />
       {query.isLoading || isLoading ? (
         <VideoGridSkeleton idPrefix="subscriptions" />
-      ) : query.isError || isError ? (
-        <p role="alert" className="py-10 text-center text-sm text-fg-muted">
-          {m.sg_load_error()}
-        </p>
+      ) : query.isLoadingError || isLoadingError ? (
+        <div role="alert" className="flex flex-col items-center gap-3 py-10 text-sm text-fg-muted">
+          <p>{m.subscriptions_feed_load_error()}</p>
+          <button
+            type="button"
+            disabled={query.isFetching || isLoading}
+            onClick={() => {
+              void query.refetch();
+              refetch();
+            }}
+            className="min-h-9 border border-border-strong px-3 text-fg hover:bg-surface disabled:opacity-40"
+          >
+            {m.ui_retry()}
+          </button>
+        </div>
       ) : (
         <>
           {visible.length === 0 && (
@@ -95,9 +114,25 @@ function SubscriptionsPage() {
           )}
           <VideoGrid streams={visible} />
           {isFetchingNextPage && <VideoGridSkeleton idPrefix="subscriptions-next" />}
+          {isFetchNextPageError && (
+            <div
+              role="alert"
+              className="flex flex-wrap items-center justify-center gap-3 py-4 text-sm text-fg-muted"
+            >
+              <p>{m.subscriptions_feed_next_page_error()}</p>
+              <button
+                type="button"
+                onClick={fetchNextPage}
+                disabled={isFetchingNextPage}
+                className="min-h-9 border border-border-strong px-3 text-fg hover:bg-surface disabled:opacity-40"
+              >
+                {m.ui_retry()}
+              </button>
+            </div>
+          )}
           <ScrollSentinel
             onIntersect={fetchNextPage}
-            enabled={hasNextPage && !isFetchingNextPage}
+            enabled={hasNextPage && !isFetchingNextPage && !isFetchNextPageError}
           />
         </>
       )}

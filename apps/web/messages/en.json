@@ -1392,5 +1392,7 @@
   "sg_removed_one": "Removed 1 channel from {group}.",
   "sg_clear_one_confirmation": "Remove all group memberships from the selected channel, even if it is outside this view? You will stay subscribed to it.",
   "sg_delete_one_confirmation": "This deletes the group and its membership for 1 channel. The channel and your subscription will be kept.",
-  "sg_partial_one_failure": "Changes for 1 channel could not be saved. Some changes may have succeeded. Review the updated memberships and retry."
+  "sg_partial_one_failure": "Changes for 1 channel could not be saved. Some changes may have succeeded. Review the updated memberships and retry.",
+  "subscriptions_feed_load_error": "Your subscriptions could not be loaded. Check your connection and try again.",
+  "subscriptions_feed_next_page_error": "More videos could not be loaded. Your loaded videos are still available."
 }
