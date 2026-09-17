@@ -1,14 +1,12 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { ApiError } from "../lib/api";
-import { fetchSubscriptionFeed } from "../lib/api-user";
 import { mapVideoItem } from "../lib/mappers";
 import { proxyImage } from "../lib/proxy";
+import { subscriptionFeedQueryOptions } from "../lib/subscription-queries";
 import type { VideoStream } from "../types/stream";
 import { useAuth } from "./use-auth";
 import { useSubscriptions } from "./use-subscriptions";
-
-export const SUBSCRIPTION_FEED_KEY = ["subscription-feed"];
 
 type Result = {
   streams: VideoStream[];
@@ -31,12 +29,7 @@ export function useSubscriptionFeed(filter = "all"): Result {
   );
 
   const query = useInfiniteQuery({
-    queryKey: filter === "all" ? SUBSCRIPTION_FEED_KEY : [...SUBSCRIPTION_FEED_KEY, filter],
-    queryFn: ({ pageParam, signal }) =>
-      fetchSubscriptionFeed(pageParam as string | null, signal, filter),
-    initialPageParam: null as string | null,
-    getNextPageParam: (last) => last.nextpage ?? undefined,
-    staleTime: 5 * 60 * 1000,
+    ...subscriptionFeedQueryOptions(filter),
     enabled: authReady && isAuthed,
   });
 
@@ -48,7 +41,7 @@ export function useSubscriptionFeed(filter = "all"): Result {
       )
     ) {
       void queryClient.resetQueries({
-        queryKey: filter === "all" ? SUBSCRIPTION_FEED_KEY : [...SUBSCRIPTION_FEED_KEY, filter],
+        queryKey: subscriptionFeedQueryOptions(filter).queryKey,
         exact: true,
       });
     }

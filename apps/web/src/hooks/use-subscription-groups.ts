@@ -6,17 +6,19 @@ import {
   fetchSubscriptionGroups,
   MembershipUpdateError,
 } from "../lib/api-subscription-groups";
+import {
+  invalidateSubscriptionQueries,
+  SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY,
+  SUBSCRIPTION_GROUPS_KEY,
+} from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
 import type { GroupedSubscription, SubscriptionGroup } from "../types/subscription-groups";
 import { useAuth } from "./use-auth";
 
-const GROUPS_KEY = ["subscription-groups"];
-const GROUP_MEMBERSHIPS_KEY = ["subscription-group-memberships"];
-
 export function useSubscriptionGroups(): UseQueryResult<SubscriptionGroup[]> {
   const { authReady, isAuthed, me } = useAuth();
   return useQuery({
-    queryKey: [...GROUPS_KEY, me?.id],
+    queryKey: [...SUBSCRIPTION_GROUPS_KEY, me?.id],
     queryFn: fetchSubscriptionGroups,
     enabled: authReady && isAuthed,
     staleTime: 60_000,
@@ -26,7 +28,7 @@ export function useSubscriptionGroups(): UseQueryResult<SubscriptionGroup[]> {
 export function useGroupMemberships(): UseQueryResult<GroupedSubscription[]> {
   const { authReady, isAuthed, me } = useAuth();
   return useQuery({
-    queryKey: [...GROUP_MEMBERSHIPS_KEY, me?.id],
+    queryKey: [...SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY, me?.id],
     queryFn: fetchGroupMemberships,
     enabled: authReady && isAuthed,
     staleTime: 60_000,
@@ -72,11 +74,7 @@ export function useGroupActions(enabled: boolean): GroupActions {
               : m.sg_save_error(),
       );
     } finally {
-      await Promise.all(
-        [GROUPS_KEY, GROUP_MEMBERSHIPS_KEY, ["subscriptions"], ["subscription-feed"]].map(
-          (queryKey) => client.invalidateQueries({ queryKey }),
-        ),
-      );
+      await invalidateSubscriptionQueries(client);
       lock.current = false;
       setBusy(false);
     }

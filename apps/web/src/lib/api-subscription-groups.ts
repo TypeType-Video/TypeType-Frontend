@@ -3,11 +3,9 @@ import type {
   MembershipChange,
   SubscriptionGroup,
 } from "../types/subscription-groups";
-import type { SubscriptionItem } from "../types/user";
 import { ApiError } from "./api";
 import { authed, authedJson } from "./authed";
 import { API_BASE } from "./env";
-import { subscriptionFilterParams } from "./subscription-group-selection";
 
 const GROUPS_URL = `${API_BASE}/subscriptions/groups`;
 
@@ -17,10 +15,6 @@ export function fetchSubscriptionGroups(): Promise<SubscriptionGroup[]> {
 
 export function fetchGroupMemberships(): Promise<GroupedSubscription[]> {
   return authedJson(`${API_BASE}/subscriptions/group-memberships`);
-}
-
-export function fetchFilteredSubscriptions(filter: string): Promise<SubscriptionItem[]> {
-  return authedJson(`${API_BASE}/subscriptions?${subscriptionFilterParams(filter)}`);
 }
 
 async function groupRequest(path: string, method: string, body?: unknown): Promise<Response> {

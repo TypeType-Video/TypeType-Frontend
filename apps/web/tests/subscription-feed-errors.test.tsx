@@ -1,11 +1,13 @@
 import { afterEach, expect, test } from "bun:test";
 import { InfiniteQueryObserver, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SUBSCRIPTION_FEED_KEY, useSubscriptionFeed } from "../src/hooks/use-subscription-feed";
-import { SUBSCRIPTIONS_KEY } from "../src/hooks/use-subscriptions";
-import { fetchSubscriptionFeed } from "../src/lib/api-user";
+import { useSubscriptionFeed } from "../src/hooks/use-subscription-feed";
+import {
+  subscriptionFeedQueryOptions,
+  subscriptionsQueryOptions,
+} from "../src/lib/subscription-queries";
 import { useAuthStore } from "../src/stores/auth-store";
-import type { SubscriptionFeedPage, VideoItem } from "../src/types/api";
+import type { VideoItem } from "../src/types/api";
 
 const originalFetch = globalThis.fetch;
 const clients: QueryClient[] = [];
@@ -15,10 +17,10 @@ afterEach(() => {
   for (const client of clients.splice(0)) client.clear();
 });
 
-function readFeed(client: QueryClient): ReturnType<typeof useSubscriptionFeed> {
+function readFeed(client: QueryClient, filter = "all"): ReturnType<typeof useSubscriptionFeed> {
   let state: ReturnType<typeof useSubscriptionFeed> | undefined;
   function ReadFeed(): null {
-    state = useSubscriptionFeed();
+    state = useSubscriptionFeed(filter);
     return null;
   }
   renderToStaticMarkup(
@@ -30,17 +32,12 @@ function readFeed(client: QueryClient): ReturnType<typeof useSubscriptionFeed> {
   return state;
 }
 
-function setup() {
+function setup(filter = "all") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  client.setQueryData(SUBSCRIPTIONS_KEY, []);
+  client.setQueryData(subscriptionsQueryOptions().queryKey, []);
   useAuthStore.getState().setToken("feed-error-test");
-  const observer = new InfiniteQueryObserver(client, {
-    queryKey: SUBSCRIPTION_FEED_KEY,
-    queryFn: ({ pageParam }) => fetchSubscriptionFeed(pageParam),
-    initialPageParam: null as string | null,
-    getNextPageParam: (last: SubscriptionFeedPage) => last.nextpage ?? undefined,
-  });
+  const observer = new InfiniteQueryObserver(client, subscriptionFeedQueryOptions(filter));
   return { client, observer };
 }
 
@@ -121,4 +118,27 @@ test("a failed background refresh retains cached feed content", async () => {
   expect(failed.isLoadingError).toBe(false);
   expect(failed.isFetchNextPageError).toBe(false);
   expect(failed.streams.map((item) => item.title)).toEqual(["first"]);
+});
+
+test("a prefetched filtered feed is reused and keeps its filter when fetching another page", async () => {
+  const filter = "tech & science/#";
+  const { client } = setup(filter);
+  const calls: URL[] = [];
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input), "https://fixture.invalid");
+    calls.push(url);
+    const cursor = url.searchParams.get("cursor");
+    return Response.json({
+      videos: [video(cursor ? "second" : "first")],
+      nextpage: cursor ? null : "page-2",
+    });
+  };
+  await client.prefetchInfiniteQuery(subscriptionFeedQueryOptions(filter));
+  const feed = readFeed(client, filter);
+  expect(feed.streams.map((item) => item.title)).toEqual(["first"]);
+  expect(calls).toHaveLength(1);
+  await feed.fetchNextPage();
+  expect(readFeed(client, filter).streams.map((item) => item.title)).toEqual(["first", "second"]);
+  expect(calls.map((url) => url.searchParams.get("cursor"))).toEqual([null, "page-2"]);
+  expect(calls.every((url) => url.searchParams.get("groupId") === filter)).toBe(true);
 });

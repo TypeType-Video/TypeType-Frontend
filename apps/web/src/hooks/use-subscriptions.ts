@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchFilteredSubscriptions } from "../lib/api-subscription-groups";
-import { fetchSubscriptions, subscribe, unsubscribe } from "../lib/api-user";
+import { subscribe, unsubscribe } from "../lib/api-user";
 import { normalizeChannelUrl } from "../lib/channel-url";
+import {
+  invalidateSubscriptionQueries,
+  subscriptionsQueryOptions,
+} from "../lib/subscription-queries";
 import type { SubscriptionItem } from "../types/user";
 import { useAuth } from "./use-auth";
-
-export const SUBSCRIPTIONS_KEY = ["subscriptions"];
 
 function hasSubscription(data: SubscriptionItem[] | undefined, channelUrl: string): boolean {
   const target = normalizeChannelUrl(channelUrl);
@@ -29,11 +30,9 @@ export function useSubscriptions(filter = "all") {
   const { authReady, isAuthed } = useAuth();
 
   const query = useQuery({
-    queryKey: filter === "all" ? SUBSCRIPTIONS_KEY : [...SUBSCRIPTIONS_KEY, filter],
-    queryFn: () => (filter === "all" ? fetchSubscriptions() : fetchFilteredSubscriptions(filter)),
+    ...subscriptionsQueryOptions(filter),
     enabled: authReady && isAuthed,
     select: dedupeSubscriptions,
-    staleTime: 5 * 60 * 1000,
   });
 
   const add = useMutation({
@@ -45,28 +44,12 @@ export function useSubscriptions(filter = "all") {
         channelUrl: normalizeChannelUrl(item.channelUrl),
       });
     },
-    onSuccess: () =>
-      Promise.all(
-        [
-          SUBSCRIPTIONS_KEY,
-          ["subscription-groups"],
-          ["subscription-group-memberships"],
-          ["subscription-feed"],
-        ].map((queryKey) => qc.invalidateQueries({ queryKey })),
-      ),
+    onSuccess: () => invalidateSubscriptionQueries(qc),
   });
 
   const remove = useMutation({
     mutationFn: (channelUrl: string) => (isAuthed ? unsubscribe(channelUrl) : Promise.resolve()),
-    onSuccess: () =>
-      Promise.all(
-        [
-          SUBSCRIPTIONS_KEY,
-          ["subscription-groups"],
-          ["subscription-group-memberships"],
-          ["subscription-feed"],
-        ].map((queryKey) => qc.invalidateQueries({ queryKey })),
-      ),
+    onSuccess: () => invalidateSubscriptionQueries(qc),
   });
 
   function isSubscribed(channelUrl: string): boolean {
