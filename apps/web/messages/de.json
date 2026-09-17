@@ -1016,6 +1016,8 @@
   "ui_export_completed": "Export fertiggestellt",
   "ui_restore_failed": "Wiederherstellung fehlgeschlagen",
   "ui_autoplay_next_video": "Nächstes Video automatisch wiedergeben",
+  "ui_autoplay_on_open": "Autoplay beim Öffnen",
+  "ui_automatically_start_playback_when_a_video_is_opened": "Wiedergabe automatisch starten, wenn ein Video geöffnet wird.",
   "ui_automatically_continue_with_the_first_item_in_the_suggestions_column": "Automatisch mit dem ersten Eintrag in der Vorschlagsspalte fortfahren.",
   "ui_dearrow_titles_and_thumbnails": "DeArrow Titel und Vorschaubilder",
   "ui_use_community_written_titles_and_representative_thumbnails_for_youtub": "Verwende Community-Titel und aussagekräftige Vorschaubilder für YouTube-Videos.",

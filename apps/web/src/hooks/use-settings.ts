@@ -70,6 +70,7 @@ const DEFAULTS: SettingsItem = {
   defaultQuality: "1080p",
   defaultPlaybackSpeed: 1,
   autoplay: true,
+  autoplayOnOpen: true,
   autoplayCountdownSeconds: 10,
   skipPlaylistAutoplayScreen: false,
   audioOnlyPlayback: false,

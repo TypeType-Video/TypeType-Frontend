@@ -118,6 +118,7 @@ export function WatchLayout({
     sabrEnabled: player.sabrEnabled,
     settingsReady,
     autoplayEnabled: settings.autoplay,
+    autoplayOnOpen: settings.autoplayOnOpen,
     navigating,
     playbackIntent: playerEvents.playbackIntent,
   });
