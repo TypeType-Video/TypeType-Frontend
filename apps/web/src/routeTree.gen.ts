@@ -42,6 +42,7 @@ import { Route as PlaylistsIdRouteImport } from './routes/playlists_.$id'
 import { Route as ShortsVideoIdRouteImport } from './routes/shorts_.$videoId'
 import { Route as SubscriptionsChannelsRouteImport } from './routes/subscriptions_.channels'
 import { Route as AuthOidcCallbackRouteImport } from './routes/auth.oidc.callback'
+import { Route as ChannelProviderChannelIdRouteImport } from './routes/channel_.$provider.$channelId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -209,6 +210,12 @@ const AuthOidcCallbackRoute = AuthOidcCallbackRouteImport.update({
   path: '/auth/oidc/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChannelProviderChannelIdRoute =
+  ChannelProviderChannelIdRouteImport.update({
+    id: '/channel_/$provider/$channelId',
+    path: '/channel/$provider/$channelId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -278,6 +286,7 @@ export interface FileRoutesByTo {
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
   '/import': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -314,6 +323,7 @@ export interface FileRoutesById {
   '/subscriptions_/channels': typeof SubscriptionsChannelsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel_/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/subscriptions/channels'
     | '/import/'
     | '/auth/oidc/callback'
+    | '/channel/$provider/$channelId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/subscriptions/channels'
     | '/import'
     | '/auth/oidc/callback'
+    | '/channel/$provider/$channelId'
   id:
     | '__root__'
     | '/'
@@ -420,6 +432,7 @@ export interface FileRouteTypes {
     | '/subscriptions_/channels'
     | '/import/'
     | '/auth/oidc/callback'
+    | '/channel_/$provider/$channelId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -453,6 +466,7 @@ export interface RootRouteChildren {
   ShortsVideoIdRoute: typeof ShortsVideoIdRoute
   SubscriptionsChannelsRoute: typeof SubscriptionsChannelsRoute
   AuthOidcCallbackRoute: typeof AuthOidcCallbackRoute
+  ChannelProviderChannelIdRoute: typeof ChannelProviderChannelIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -688,6 +702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOidcCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/channel_/$provider/$channelId': {
+      id: '/channel_/$provider/$channelId'
+      path: '/channel/$provider/$channelId'
+      fullPath: '/channel/$provider/$channelId'
+      preLoaderRoute: typeof ChannelProviderChannelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -737,6 +758,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShortsVideoIdRoute: ShortsVideoIdRoute,
   SubscriptionsChannelsRoute: SubscriptionsChannelsRoute,
   AuthOidcCallbackRoute: AuthOidcCallbackRoute,
+  ChannelProviderChannelIdRoute: ChannelProviderChannelIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
