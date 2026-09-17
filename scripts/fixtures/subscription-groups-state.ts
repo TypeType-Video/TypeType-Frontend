@@ -1,7 +1,7 @@
 import { makeChannels, makeGroups, makeVideos } from "./subscription-groups-data";
 
 type FailureRule = { path: string; method: string; count: number; query?: string };
-type Fixture = {
+export type Fixture = {
   groups: ReturnType<typeof makeGroups>;
   channels: ReturnType<typeof makeChannels>;
   videos: ReturnType<typeof makeVideos>;
