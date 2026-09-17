@@ -1,5 +1,6 @@
 import { MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useGroupActionMenu } from "../../hooks/use-group-action-menu";
 import { m } from "../../paraglide/messages.js";
 import type { SubscriptionGroup } from "../../types/subscription-groups";
 import { GroupNameForm } from "./group-name-form";
@@ -24,13 +25,13 @@ export function GroupSidebarItem({
   onDelete,
 }: Props): React.JSX.Element {
   const [renaming, setRenaming] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const actionButton = useRef<HTMLButtonElement>(null);
+  const menu = useGroupActionMenu(disabled);
+  const actionButton = menu.trigger;
   const wasRenaming = useRef(false);
   useEffect(() => {
     if (wasRenaming.current && !renaming) actionButton.current?.focus();
     wasRenaming.current = renaming;
-  }, [renaming]);
+  }, [renaming, actionButton]);
   if (renaming)
     return (
       <GroupNameForm
@@ -67,30 +68,34 @@ export function GroupSidebarItem({
         ref={actionButton}
         type="button"
         disabled={disabled}
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-expanded={menuOpen}
+        onClick={menu.toggle}
+        onKeyDown={menu.onTriggerKeyDown}
+        aria-haspopup="menu"
+        aria-controls={menu.open ? menu.id : undefined}
+        aria-expanded={menu.open}
         aria-label={m.sg_group_actions({ group: group.name })}
         className="sg-button mr-1 w-7 border-0 px-0"
       >
         <MoreHorizontal size={16} />
       </button>
-      {menuOpen && (
-        <fieldset
+      {menu.open && (
+        <div
+          ref={menu.menu}
+          id={menu.id}
+          role="menu"
+          tabIndex={-1}
           aria-label={m.sg_group_actions({ group: group.name })}
           className="absolute bottom-full right-0 z-30 mb-1 flex min-w-40 flex-col border border-border-strong bg-surface p-1"
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              setMenuOpen(false);
-              actionButton.current?.focus();
-            }
-          }}
+          onKeyDown={menu.onMenuKeyDown}
         >
           <button
             type="button"
+            role="menuitem"
+            tabIndex={-1}
             disabled={disabled}
             className="sg-menu-item"
             onClick={() => {
-              setMenuOpen(false);
+              menu.close();
               setRenaming(true);
             }}
           >
@@ -98,16 +103,18 @@ export function GroupSidebarItem({
           </button>
           <button
             type="button"
+            role="menuitem"
+            tabIndex={-1}
             disabled={disabled}
             className="sg-menu-item text-danger"
             onClick={() => {
-              setMenuOpen(false);
+              menu.close(true);
               onDelete();
             }}
           >
             {m.sg_delete_group()}
           </button>
-        </fieldset>
+        </div>
       )}
     </div>
   );
