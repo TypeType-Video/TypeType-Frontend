@@ -24,7 +24,7 @@ function CanonicalChannelPage() {
   const searchQuery = q ?? "";
   const tab = channelTabOrDefault(Route.useSearch().tab);
   const sourceUrl =
-    provider === "bilibili" || provider === "niconico"
+    provider === "youtube" || provider === "bilibili" || provider === "niconico"
       ? canonicalChannelSourceUrl({ provider, id: channelId })
       : null;
   const navigate = useNavigate({ from: "/channel/$provider/$channelId" });

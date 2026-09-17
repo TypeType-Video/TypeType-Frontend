@@ -48,6 +48,9 @@ describe("channel route URLs", () => {
   });
 
   test("rejects invalid provider route values", () => {
+    expect(canonicalChannelSourceUrl({ provider: "youtube", id: "UCRC6cNamj9tYAO6h_RXd5xA" })).toBe(
+      "https://www.youtube.com/channel/UCRC6cNamj9tYAO6h_RXd5xA",
+    );
     expect(toCanonicalChannelRoute("https://space.bilibili.com/not-a-number")).toBeNull();
     expect(toCanonicalChannelRoute("https://www.nicovideo.jp/video/3343223")).toBeNull();
     expect(canonicalChannelSourceUrl({ provider: "bilibili", id: "not-a-number" })).toBeNull();
