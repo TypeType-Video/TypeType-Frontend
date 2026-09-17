@@ -6,8 +6,10 @@ import type {
 import { apiErrorFromResponse } from "./api";
 import { authed, authedJson } from "./authed";
 import { API_BASE } from "./env";
+import { membershipBatches } from "./membership-batches";
 
 const GROUPS_URL = `${API_BASE}/subscriptions/groups`;
+const MAX_CONCURRENT_MEMBERSHIP_REQUESTS = 3;
 
 export function fetchSubscriptionGroups(signal?: AbortSignal): Promise<SubscriptionGroup[]> {
   return authedJson(GROUPS_URL, { signal });
@@ -54,18 +56,24 @@ export class MembershipUpdateError extends Error {
 export async function updateGroupMemberships(changes: MembershipChange[]): Promise<void> {
   const failed = new Set<string>();
   for (const change of changes) {
-    const urls = [...new Set(change.channelUrls)];
-    for (let offset = 0; offset < urls.length; offset += 500) {
-      const channelUrls = urls.slice(offset, offset + 500);
-      try {
-        await groupRequest(
-          `/${encodeURIComponent(change.groupId)}/channels`,
-          change.action === "add" ? "PUT" : "DELETE",
-          { channelUrls },
-        );
-      } catch {
-        for (const url of channelUrls) failed.add(url);
-      }
+    const { batches, invalid } = membershipBatches(change.channelUrls);
+    for (const url of invalid) failed.add(url);
+    for (let offset = 0; offset < batches.length; offset += MAX_CONCURRENT_MEMBERSHIP_REQUESTS) {
+      await Promise.all(
+        batches
+          .slice(offset, offset + MAX_CONCURRENT_MEMBERSHIP_REQUESTS)
+          .map(async (channelUrls) => {
+            try {
+              await groupRequest(
+                `/${encodeURIComponent(change.groupId)}/channels`,
+                change.action === "add" ? "PUT" : "DELETE",
+                { channelUrls },
+              );
+            } catch {
+              for (const url of channelUrls) failed.add(url);
+            }
+          }),
+      );
     }
   }
   if (failed.size > 0) throw new MembershipUpdateError([...failed]);

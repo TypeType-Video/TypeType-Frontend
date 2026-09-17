@@ -44,13 +44,30 @@ export function subscriptionFeedQueryOptions(
   });
 }
 
-export async function invalidateSubscriptionQueries(client: QueryClient): Promise<void> {
+export async function invalidateSubscriptionQueries(
+  client: QueryClient,
+  change: "subscriptions" | "groups" | "memberships" = "subscriptions",
+): Promise<void> {
+  const keys =
+    change === "groups"
+      ? [SUBSCRIPTION_GROUPS_KEY]
+      : [
+          SUBSCRIPTIONS_KEY,
+          SUBSCRIPTION_FEED_KEY,
+          SUBSCRIPTION_GROUPS_KEY,
+          SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY,
+        ];
   await Promise.all(
-    [
-      SUBSCRIPTIONS_KEY,
-      SUBSCRIPTION_FEED_KEY,
-      SUBSCRIPTION_GROUPS_KEY,
-      SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY,
-    ].map((queryKey) => client.invalidateQueries({ queryKey })),
+    keys.map((queryKey) => {
+      const deferred =
+        change === "memberships" &&
+        (queryKey === SUBSCRIPTIONS_KEY || queryKey === SUBSCRIPTION_FEED_KEY);
+      // Membership edits leave global views unchanged; filtered views refresh when opened.
+      return client.invalidateQueries({
+        queryKey,
+        refetchType: deferred ? "none" : "active",
+        predicate: (query) => !deferred || query.queryKey.length > 1,
+      });
+    }),
   );
 }
