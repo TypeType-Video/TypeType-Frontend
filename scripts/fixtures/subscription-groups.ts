@@ -5,6 +5,7 @@ import {
   groupCounts,
   writeGroup,
 } from "./subscription-groups-state";
+import { fixtureMembershipLookup, fixtureMembershipPage } from "./subscription-membership-pages";
 
 let state = createFixture();
 const me = {
@@ -107,6 +108,9 @@ Bun.serve({
         activeProfileId: me.id,
         defaultProfileId: me.id,
       });
+    if (path === "/subscriptions/group-memberships/page") return fixtureMembershipPage(state, url);
+    if (path === "/subscriptions/group-memberships/lookup" && method === "POST")
+      return fixtureMembershipLookup(state, request);
     if (path === "/subscriptions/group-memberships") return Response.json(state.channels);
     if (path === "/subscriptions/groups" && method === "GET")
       return Response.json(groupCounts(state));
