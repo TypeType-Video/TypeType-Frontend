@@ -49,7 +49,10 @@ export function useGroupManager(groups: SubscriptionGroup[], groupsReady: boolea
   const activeGroup = groups.find((group) => group.id === filter);
   const activeFilter = activeGroup || filter === "ungrouped" ? filter : "all";
   const page = useGroupChannelPage(activeFilter, excluded, query, onlySelected ? chosen : null);
-  const visible = page.channels;
+  const selectedChannels = new Map(chosen.map((channel) => [channel.channelUrl, channel]));
+  const visible = page.channels.map(
+    (channel) => selectedChannels.get(channel.channelUrl) ?? channel,
+  );
   const canEdit =
     groupsReady &&
     selection.query.isSuccess &&
