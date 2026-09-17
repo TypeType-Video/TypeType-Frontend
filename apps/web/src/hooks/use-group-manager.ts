@@ -89,6 +89,7 @@ export function useGroupManager(
     const channelUrls = chosen
       .filter((channel) => channel.groupIds.includes(groupId) === (action === "remove"))
       .map((channel) => channel.channelUrl);
+    if (channelUrls.length === 0) return;
     const name = groups.find((group) => group.id === groupId)?.name ?? "";
     const message =
       action === "add"
@@ -107,12 +108,9 @@ export function useGroupManager(
     const pending = confirmation;
     setConfirmation(null);
     if (pending === "clear") {
-      if (
-        await actions.run(
-          () => updateGroupMemberships(clearMembershipChanges(chosen)),
-          m.sg_memberships_cleared(),
-        )
-      )
+      const changes = clearMembershipChanges(chosen);
+      if (changes.length === 0) return;
+      if (await actions.run(() => updateGroupMemberships(changes), m.sg_memberships_cleared()))
         clearSelection();
     } else if (pending) {
       if (

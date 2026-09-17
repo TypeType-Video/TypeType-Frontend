@@ -40,7 +40,11 @@ type GroupActions = {
   error: string | null;
   notice: string | null;
   clearError: () => void;
-  run: (action: () => Promise<unknown>, success: string) => Promise<boolean>;
+  run: (
+    action: () => Promise<unknown>,
+    success: string,
+    change?: "groups" | "memberships",
+  ) => Promise<boolean>;
 };
 
 export function useGroupActions(enabled: boolean): GroupActions {
@@ -50,7 +54,11 @@ export function useGroupActions(enabled: boolean): GroupActions {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  async function run(action: () => Promise<unknown>, success: string): Promise<boolean> {
+  async function run(
+    action: () => Promise<unknown>,
+    success: string,
+    change: "groups" | "memberships" = "memberships",
+  ): Promise<boolean> {
     if (!enabled || lock.current) return false;
     lock.current = true;
     setBusy(true);
@@ -74,7 +82,7 @@ export function useGroupActions(enabled: boolean): GroupActions {
               : m.sg_save_error(),
       );
     } finally {
-      await invalidateSubscriptionQueries(client);
+      await invalidateSubscriptionQueries(client, change);
       lock.current = false;
       setBusy(false);
     }

@@ -70,10 +70,14 @@ export function GroupManager(): React.JSX.Element {
           disabled={disabled}
           onFilter={changeFilter}
           onCreate={(name) =>
-            actions.run(() => createSubscriptionGroup(name), m.sg_group_created({ group: name }))
+            actions.run(
+              () => createSubscriptionGroup(name),
+              m.sg_group_created({ group: name }),
+              "groups",
+            )
           }
           onRename={(id, name) =>
-            actions.run(() => renameSubscriptionGroup(id, name), m.sg_group_renamed())
+            actions.run(() => renameSubscriptionGroup(id, name), m.sg_group_renamed(), "groups")
           }
           onDelete={setConfirmation}
           onCancelRename={actions.clearError}
