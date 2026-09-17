@@ -60,8 +60,9 @@ export async function clearHistory(): Promise<void> {
   if (!res.ok) throw new ApiError("Failed to clear history", res.status);
 }
 
-export function fetchSubscriptions(): Promise<SubscriptionItem[]> {
-  return authedJson(`${BASE}/subscriptions`);
+export function fetchSubscriptions(filter = "all"): Promise<SubscriptionItem[]> {
+  const search = subscriptionFilterParams(filter).toString();
+  return authedJson(`${BASE}/subscriptions${search ? `?${search}` : ""}`);
 }
 
 export async function subscribe(item: Omit<SubscriptionItem, "subscribedAt">): Promise<void> {

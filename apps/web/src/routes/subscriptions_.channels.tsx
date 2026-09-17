@@ -5,17 +5,12 @@ import { SubscriptionGroupFilter } from "../components/subscription-group-filter
 import { SubscriptionsHeader } from "../components/subscriptions-header";
 import { VideoGridSkeleton } from "../components/video-grid-skeleton";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
-import { SUBSCRIPTION_FEED_KEY } from "../hooks/use-subscription-feed";
-import { SUBSCRIPTIONS_KEY, useSubscriptions } from "../hooks/use-subscriptions";
-import { fetchFilteredSubscriptions } from "../lib/api-subscription-groups";
-import { fetchSubscriptionFeed, fetchSubscriptions } from "../lib/api-user";
+import { useSubscriptions } from "../hooks/use-subscriptions";
+import {
+  subscriptionFeedQueryOptions,
+  subscriptionsQueryOptions,
+} from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
-
-const SUBSCRIPTION_STALE_MS = 5 * 60 * 1000;
-
-function nextSubscriptionPage(last: Awaited<ReturnType<typeof fetchSubscriptionFeed>>) {
-  return last.nextpage ?? undefined;
-}
 
 function SubscriptionChannelsPage() {
   const queryClient = useQueryClient();
@@ -28,22 +23,11 @@ function SubscriptionChannelsPage() {
   );
 
   function prefetchChannels() {
-    void queryClient.prefetchQuery({
-      queryKey: group === "all" ? SUBSCRIPTIONS_KEY : [...SUBSCRIPTIONS_KEY, group],
-      queryFn: () => (group === "all" ? fetchSubscriptions() : fetchFilteredSubscriptions(group)),
-      staleTime: SUBSCRIPTION_STALE_MS,
-    });
+    void queryClient.prefetchQuery(subscriptionsQueryOptions(group));
   }
 
   function prefetchVideos() {
-    void queryClient.prefetchInfiniteQuery({
-      queryKey: group === "all" ? SUBSCRIPTION_FEED_KEY : [...SUBSCRIPTION_FEED_KEY, group],
-      queryFn: ({ pageParam, signal }) =>
-        fetchSubscriptionFeed(pageParam as string | null, signal, group),
-      initialPageParam: null as string | null,
-      getNextPageParam: nextSubscriptionPage,
-      staleTime: SUBSCRIPTION_STALE_MS,
-    });
+    void queryClient.prefetchInfiniteQuery(subscriptionFeedQueryOptions(group));
   }
 
   return (

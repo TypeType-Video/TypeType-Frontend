@@ -12,6 +12,7 @@ import {
   type PortabilityJob,
   startPortabilityImport,
 } from "../lib/api-portability";
+import { invalidateSubscriptionQueries } from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
 import { PortabilityFormatPicker } from "./portability-format-picker";
 import { PortabilityImportGuide } from "./portability-import-guide";
@@ -64,14 +65,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   useEffect(() => {
     const state = job.data?.state ?? null;
     if (state === "completed" && previousState.current !== "completed") {
-      for (const key of [
-        "subscription-groups",
-        "subscription-group-memberships",
-        "subscriptions",
-        "subscription-feed",
-      ]) {
-        void queryClient.invalidateQueries({ queryKey: [key] });
-      }
+      void invalidateSubscriptionQueries(queryClient);
       const count = Object.values(job.data?.result ?? {}).reduce((sum, value) => sum + value, 0);
       setToast(
         `${m.portability_import_completed()}: ${count.toLocaleString()} ${m.portability_items()}`,
