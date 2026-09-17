@@ -27,6 +27,7 @@ function SubscriptionChannelsPage() {
   }
 
   function prefetchVideos() {
+    if (!query.data?.length) return;
     void queryClient.prefetchInfiniteQuery(subscriptionFeedQueryOptions(group));
   }
 
@@ -42,7 +43,8 @@ function SubscriptionChannelsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <SubscriptionGroupFilter
           value={group}
-          onChange={(value) => void navigate({ search: { group: value } })}
+          error={query.error}
+          onChange={(value, replace) => void navigate({ search: { group: value }, replace })}
         />
         <Link
           to="/subscriptions/groups"
@@ -54,11 +56,21 @@ function SubscriptionChannelsPage() {
       {query.isLoading ? (
         <VideoGridSkeleton idPrefix="subscription-channels" />
       ) : query.isError ? (
-        <p role="alert" className="py-10 text-center text-sm text-fg-muted">
-          {m.sg_load_error()}
-        </p>
+        <div role="alert" className="flex flex-col items-center gap-3 py-10 text-sm text-fg-muted">
+          <p>{m.sg_channels_load_error()}</p>
+          <button
+            type="button"
+            disabled={query.isFetching}
+            onClick={() => void query.refetch()}
+            className="min-h-9 border border-border-strong px-3 text-fg hover:bg-surface disabled:opacity-40"
+          >
+            {m.ui_retry()}
+          </button>
+        </div>
       ) : subscriptions.length === 0 ? (
-        <p className="py-10 text-center text-sm text-fg-muted">{m.sg_no_channel_match()}</p>
+        <p className="py-10 text-center text-sm text-fg-muted">
+          {group === "all" ? m.ui_no_subscriptions_yet_2() : m.sg_no_channel_match()}
+        </p>
       ) : (
         <SubscriptionChannelList subscriptions={subscriptions} />
       )}

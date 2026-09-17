@@ -1331,6 +1331,8 @@
   "sg_added": "{count} chaînes ajoutées à {group}.",
   "sg_all_channels": "Toutes les chaînes",
   "sg_all_subscriptions": "Tous les abonnements",
+  "sg_ungrouped": "Non groupées",
+  "sg_channels_load_error": "Impossible de charger vos chaînes. Vérifiez votre connexion et réessayez.",
   "sg_back_channels": "Retour aux chaînes",
   "sg_back_to_results": "Retour aux résultats",
   "sg_change_filters": "Essayez un autre groupe ou modifiez votre recherche.",

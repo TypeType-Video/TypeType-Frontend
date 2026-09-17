@@ -17,11 +17,13 @@ type Result = {
   hasNextPage: boolean;
   fetchNextPage: () => void;
   refetch: () => void;
+  error: Error | null;
 };
 
 export function useSubscriptionFeed(filter = "all"): Result {
   const { authReady, isAuthed } = useAuth();
-  const { query: subsQuery } = useSubscriptions();
+  const { query: subsQuery } = useSubscriptions(filter);
+  const empty = subsQuery.isSuccess && subsQuery.data.length === 0;
   const queryClient = useQueryClient();
   const avatarMap = useMemo(
     () => new Map((subsQuery.data ?? []).map((s) => [s.channelUrl, proxyImage(s.avatarUrl)])),
@@ -30,7 +32,7 @@ export function useSubscriptionFeed(filter = "all"): Result {
 
   const query = useInfiniteQuery({
     ...subscriptionFeedQueryOptions(filter),
-    enabled: authReady && isAuthed,
+    enabled: authReady && isAuthed && subsQuery.isSuccess && !empty,
   });
 
   useEffect(() => {
@@ -63,13 +65,14 @@ export function useSubscriptionFeed(filter = "all"): Result {
   );
 
   return {
-    streams,
-    isLoading: query.isLoading,
-    isLoadingError: query.isLoadingError,
-    isFetchNextPageError: query.isFetchNextPageError,
+    streams: empty ? [] : streams,
+    isLoading: !empty && query.isLoading,
+    isLoadingError: !empty && query.isLoadingError,
+    isFetchNextPageError: !empty && query.isFetchNextPageError,
     isFetchingNextPage: query.isFetchingNextPage,
-    hasNextPage: query.hasNextPage,
+    hasNextPage: !empty && query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
     refetch: query.refetch,
+    error: empty ? null : query.error,
   };
 }

@@ -1331,6 +1331,8 @@
   "sg_added": "{count} Kanäle zu {group} hinzugefügt.",
   "sg_all_channels": "Alle Kanäle",
   "sg_all_subscriptions": "Alle Abonnements",
+  "sg_ungrouped": "Nicht gruppiert",
+  "sg_channels_load_error": "Deine Kanäle konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
   "sg_back_channels": "Zurück zu den Kanälen",
   "sg_back_to_results": "Zurück zu den Ergebnissen",
   "sg_change_filters": "Wähle eine andere Gruppe oder ändere deine Suche.",
