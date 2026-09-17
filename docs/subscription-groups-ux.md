@@ -1,6 +1,23 @@
 # Subscription group manager
 
-Desktop implementation of [TypeType #172](https://github.com/TypeType-Video/TypeType/issues/172), based on the contributor's two prototypes and the maintainer's feedback. Compact mobile composition is deferred by request.
+Desktop management increment toward [TypeType #172](https://github.com/TypeType-Video/TypeType/issues/172), based on the contributor's two prototypes and the maintainer's feedback. This PR only partially addresses the issue.
+
+## Scope and acceptance
+
+The contributor explicitly chose a dedicated desktop manager and, after review, confirmed narrowing this PR to that scope. Acceptance covers:
+
+- Desktop group creation, rename and deletion; searchable group filters; inline and bulk membership editing; selection and drafts retained across filters and pages.
+- Existing Videos and Channels group filters, independent feed pagination, empty states, retry and recovery from deleted-group links.
+- Bounded membership writes that respect the current API limits, cancellation of unused reads, structured error details and recovery after partial writes or failed refreshes.
+- Existing TypeType styling, keyboard menu behavior and the existing document-flow fallback at smaller sizes.
+
+Explicit follow-up work, outside this PR's acceptance criteria:
+
+- **Large-library optimization:** the manager still loads the complete membership projection, which the server assembles in memory. Client search and pagination reduce rendered rows, not transferred data or server work. Server-side pagination/search, their OpenAPI contract and scale/performance testing are deferred; this PR makes no large-library performance claim.
+- **Compact mobile workflow:** the stacked document-flow fallback is not the mobile composition requested in #172. The user chose to finalize desktop first; dedicated mobile organization remains deferred.
+- **Post-import organization:** the optional import-completion link opens the full manager. It does not identify or select newly imported channels; a workflow scoped to that import cohort remains deferred.
+
+No server or player change is required for this desktop increment. Completing the deferred scale and import workflows may require API changes.
 
 ## Direction contract
 
@@ -24,7 +41,8 @@ Desktop implementation of [TypeType #172](https://github.com/TypeType-Video/Type
 
 - `/subscriptions/groups` is the dedicated manager. Videos and Channels expose ordinary group filters.
 - Read group definitions and the complete channel membership projection separately. Existing shared subscription payloads remain compatible.
-- Batch membership changes in chunks of at most 500 channels per group. Multi-group operations can partially succeed; refetch actual state and retain failed work for retry.
+- Deduplicate and validate channel URLs (nonblank, at most 2048 characters), then batch membership changes by both 500-channel and 1 MiB serialized UTF-8 body limits. Run at most three chunks concurrently within each group change, preserving change order. Multi-group operations can partially succeed; refetch actual state and retain failed work for retry. Skip bulk actions with no effective changes.
+- Create/rename refresh only group definitions. Membership changes refresh definitions and the membership projection, and mark filtered Channels/Feeds stale for their next visit; unfiltered views remain valid. Subscription changes and imports retain the broader refresh. Query cancellation reaches the underlying requests, and API errors retain their code and request ID.
 - Treat write completion and data refresh separately. If either group definitions or memberships fail to refresh, retain the displayed data with a warning and pause editing. Retry reloads both reads without replaying writes; editing resumes only after both succeed. Partial-write drafts remain available for retry against the refreshed state.
 - Preserve current filters after mutations. Selection survives search and group changes; selecting results adds to the selection.
 - Selecting a named sidebar group defaults the bulk Add/Remove target to that group. Users can override it; searching, changing row selection and toggling In group/Not in group preserve that override. Changing sidebar groups resets the target to the new group; All channels and Ungrouped start without a target.
@@ -50,6 +68,7 @@ At widths of at least 1024 px and heights of at least 600 px, the manager and a 
 
 ## Verification scope
 
+- Author-review follow-up: 376 tests passed, including exact 1 MiB batching, multibyte/escaped URLs, the 2048-character URL limit, a 5001-channel edit with at most three concurrent writes, targeted query refreshes, request cancellation/error metadata, and independent All/named/Ungrouped feed pages, cursors and avatar lookups. Chromium confirmed old group URLs recover to All on both pages, the Channels Retry action restores results, empty Channels has distinct default/filtered messages, direct empty Videos loads make no feed request, and a no-op bulk Add preserves selection without requests or a success notice. Menu checks covered arrow/Home/End keys, Escape focus restoration, Tab/Shift-Tab exit, outside dismissal and switching between menus. Checked the menu in light/dark themes at 1280 × 720 and the existing 390 × 844 fallback without horizontal overflow. These are fixture checks, not a large-library benchmark; Firefox, WebKit and live-backend integration remain unverified.
 - Refresh recovery: 358 tests passed, including new coverage for a successful write followed by a failed membership refresh, failed group-definition refreshes, partial writes, background refreshes, and initial loading. Chromium confirmed all workspace controls pause after refresh failure, a failed retry stays paused, successful retry restores the saved membership without replaying the write, and a subsequent edit uses the recovered membership state. Checked the warning in both themes and at 1280 × 720 / 1024 × 600 without document overflow after layout settles. Fixture memberships were restored. All required automated checks passed; Firefox/WebKit remain unverified.
 - Clean-main style audit: inspected Channels, Settings and the committed group prototype independently of this feature. Removed manager corner rounding and aligned borders, secondary text, selected filters and primary actions with those references. Added the extracted [design guide](../DESIGN.md) and Impeccable component sidecar.
 - Style verification: Chromium confirmed square controls and panels, visible keyboard focus, both inversion states, target defaults, inline drafts and Cancel in light/dark themes. Document dimensions stayed within 1280 × 720 and 1024 × 600 desktop viewports; group lists had no scroll container. The existing 390 × 844 document-flow fallback had no horizontal overflow in either theme. `check`, `test`, `knip`, `sherif`, the production build and `git diff --check` passed. Firefox and WebKit remain unverified; the existing build-size warning and two stale Knip ignore hints remain.
