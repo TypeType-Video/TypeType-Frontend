@@ -31,13 +31,14 @@ export function GroupToolbar(props: Props): React.JSX.Element {
   return (
     <div className="shrink-0 border border-border bg-surface">
       <fieldset
-        disabled={props.disabled}
+        disabled={props.busy}
         className="flex flex-wrap items-center gap-2 border-b border-border p-2"
       >
         <label className="flex h-8 min-w-40 flex-1 items-center gap-2 border border-border bg-app px-2">
           <Search size={14} className="text-fg-muted" />
           <input
             type="search"
+            maxLength={200}
             value={props.query}
             onChange={(event) => props.onQuery(event.target.value)}
             disabled={props.onlySelected}
@@ -48,13 +49,11 @@ export function GroupToolbar(props: Props): React.JSX.Element {
         </label>
         <button
           type="button"
-          disabled={props.resultCount === 0 || props.allSelected}
+          disabled={props.disabled || props.resultCount === 0 || props.allSelected}
           onClick={props.onSelectResults}
           className="sg-button"
         >
-          {props.resultCount === 1
-            ? m.sg_select_one_result()
-            : m.sg_select_results({ count: props.resultCount })}
+          {m.sg_select_page({ count: props.resultCount })}
         </button>
         <button
           type="button"

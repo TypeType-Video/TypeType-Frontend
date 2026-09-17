@@ -8,6 +8,7 @@ type Props = {
   desired: ReadonlySet<string>;
   onChange: (ids: Set<string>) => void;
   busy: boolean;
+  disabled: boolean;
   onSave: (ids: Set<string>) => void;
   onCancel: () => void;
 };
@@ -18,6 +19,7 @@ export function ChannelGroupEditor({
   desired,
   onChange,
   busy,
+  disabled,
   onSave,
   onCancel,
 }: Props): React.JSX.Element {
@@ -36,17 +38,17 @@ export function ChannelGroupEditor({
       aria-label={m.sg_edit_named({ channel: channel.name })}
       onSubmit={(event) => {
         event.preventDefault();
-        if (changed && !busy) onSave(valid);
+        if (changed && !disabled) onSave(valid);
       }}
       onKeyDown={(event) => {
-        if (event.key === "Escape" && !busy) {
+        if (event.key === "Escape" && !disabled) {
           event.preventDefault();
           onCancel();
         }
       }}
     >
-      <fieldset disabled={busy} className="flex min-w-0 items-start gap-2">
-        <GroupCombobox groups={groups} selected={valid} disabled={busy} onToggle={toggle} />
+      <fieldset disabled={disabled} className="flex min-w-0 items-start gap-2">
+        <GroupCombobox groups={groups} selected={valid} disabled={disabled} onToggle={toggle} />
         <button type="button" onClick={onCancel} className="sg-button shrink-0">
           {m.portability_cancel()}
         </button>

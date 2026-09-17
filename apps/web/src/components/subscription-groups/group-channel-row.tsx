@@ -75,6 +75,7 @@ export function GroupChannelRow(props: Props): React.JSX.Element {
             desired={props.draft ?? new Set(channel.groupIds)}
             onChange={props.onDraft}
             busy={props.busy}
+            disabled={props.disabled}
             onCancel={cancel}
             onSave={async (ids) => {
               if (await props.onSave(ids)) cancel();

@@ -1,18 +1,13 @@
 import { type UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { ApiError } from "../lib/api";
-import {
-  fetchGroupMemberships,
-  fetchSubscriptionGroups,
-  MembershipUpdateError,
-} from "../lib/api-subscription-groups";
+import { fetchSubscriptionGroups, MembershipUpdateError } from "../lib/api-subscription-groups";
 import {
   invalidateSubscriptionQueries,
-  SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY,
   SUBSCRIPTION_GROUPS_KEY,
 } from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
-import type { GroupedSubscription, SubscriptionGroup } from "../types/subscription-groups";
+import type { SubscriptionGroup } from "../types/subscription-groups";
 import { useAuth } from "./use-auth";
 
 export function useSubscriptionGroups(): UseQueryResult<SubscriptionGroup[]> {
@@ -20,16 +15,6 @@ export function useSubscriptionGroups(): UseQueryResult<SubscriptionGroup[]> {
   return useQuery({
     queryKey: [...SUBSCRIPTION_GROUPS_KEY, me?.id],
     queryFn: ({ signal }) => fetchSubscriptionGroups(signal),
-    enabled: authReady && isAuthed,
-    staleTime: 60_000,
-  });
-}
-
-export function useGroupMemberships(): UseQueryResult<GroupedSubscription[]> {
-  const { authReady, isAuthed, me } = useAuth();
-  return useQuery({
-    queryKey: [...SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY, me?.id],
-    queryFn: ({ signal }) => fetchGroupMemberships(signal),
     enabled: authReady && isAuthed,
     staleTime: 60_000,
   });

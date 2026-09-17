@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useGroupPagination } from "../../hooks/use-group-pagination";
+import type { useGroupChannelPage } from "../../hooks/use-group-channel-page";
 import { m } from "../../paraglide/messages.js";
 import type { GroupedSubscription, SubscriptionGroup } from "../../types/subscription-groups";
 import { GroupChannelRow } from "./group-channel-row";
@@ -7,12 +6,14 @@ import { GroupPagination } from "./group-pagination";
 
 type Props = {
   channels: GroupedSubscription[];
+  pagination: ReturnType<typeof useGroupChannelPage>["pagination"];
   label: string;
   groups: SubscriptionGroup[];
   selected: ReadonlySet<string>;
   editing: string | null;
   drafts: ReadonlyMap<string, ReadonlySet<string>>;
   busy: boolean;
+  disabled: boolean;
   onToggle: (url: string) => void;
   onDraft: (url: string, ids: Set<string>) => void;
   onCancel: () => void;
@@ -20,14 +21,7 @@ type Props = {
 };
 
 export function GroupChannelList(props: Props): React.JSX.Element {
-  const [anchor, setAnchor] = useState<string | null>(null);
-  const pagination = useGroupPagination({
-    total: props.channels.length,
-    rowRem: 3.5,
-    fallbackSize: 10,
-    reservedRem: props.editing ? 4.5 : 0,
-    anchor: props.channels.findIndex((channel) => channel.channelUrl === (anchor ?? props.editing)),
-  });
+  const { pagination } = props;
   return (
     <div className="flex min-h-0 flex-1 flex-col border border-border bg-surface">
       <div ref={pagination.viewport} className="min-h-0 flex-1">
@@ -38,7 +32,7 @@ export function GroupChannelList(props: Props): React.JSX.Element {
           </div>
         ) : (
           <ul aria-label={m.sg_channels()}>
-            {props.channels.slice(pagination.start, pagination.end).map((channel) => (
+            {props.channels.map((channel) => (
               <GroupChannelRow
                 key={channel.channelUrl}
                 channel={channel}
@@ -47,9 +41,8 @@ export function GroupChannelList(props: Props): React.JSX.Element {
                 editing={props.editing === channel.channelUrl}
                 draft={props.drafts.get(channel.channelUrl)}
                 busy={props.busy}
-                disabled={props.busy}
+                disabled={props.disabled}
                 onSelect={() => {
-                  setAnchor(channel.channelUrl);
                   props.onToggle(channel.channelUrl);
                 }}
                 onDraft={(ids) => props.onDraft(channel.channelUrl, ids)}
@@ -63,8 +56,8 @@ export function GroupChannelList(props: Props): React.JSX.Element {
       <GroupPagination
         {...pagination}
         label={props.label}
-        total={props.channels.length}
-        disabled={props.busy}
+        total={pagination.total}
+        disabled={props.disabled}
       />
     </div>
   );

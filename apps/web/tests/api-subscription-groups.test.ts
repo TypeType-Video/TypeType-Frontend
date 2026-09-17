@@ -3,7 +3,6 @@ import { ApiError } from "../src/lib/api";
 import {
   createSubscriptionGroup,
   deleteSubscriptionGroup,
-  fetchGroupMemberships,
   MembershipUpdateError,
   renameSubscriptionGroup,
   updateGroupMemberships,
@@ -38,11 +37,6 @@ beforeEach(() => {
 afterEach(() => {
   globalThis.fetch = originalFetch;
   useAuthStore.getState().setSignedOut();
-});
-
-test("membership projection uses the dedicated endpoint", async () => {
-  expect(await fetchGroupMemberships()).toEqual([]);
-  expect(calls[0].url).toBe("/api/subscriptions/group-memberships");
 });
 
 test("batch writes deduplicate and split at the 500-channel API limit", async () => {

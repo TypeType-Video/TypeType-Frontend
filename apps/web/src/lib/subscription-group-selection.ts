@@ -1,32 +1,5 @@
 import type { GroupedSubscription, MembershipChange } from "../types/subscription-groups";
 
-export function filterGroupChannels(
-  channels: GroupedSubscription[],
-  filter: string,
-  excluded: boolean,
-  query: string,
-  selected: ReadonlySet<string>,
-  onlySelected: boolean,
-): GroupedSubscription[] {
-  const search = query.trim().toLocaleLowerCase();
-  return channels.filter((channel) => {
-    if (onlySelected) return selected.has(channel.channelUrl);
-    const inScope =
-      filter === "all" ||
-      (filter === "ungrouped"
-        ? channel.groupIds.length === 0
-        : channel.groupIds.includes(filter) !== excluded);
-    return (
-      inScope &&
-      (!search || `${channel.name} ${channel.channelUrl}`.toLocaleLowerCase().includes(search))
-    );
-  });
-}
-
-export function selectGroupResults(selected: ReadonlySet<string>, urls: string[]): Set<string> {
-  return new Set([...selected, ...urls]);
-}
-
 export function channelMembershipChanges(
   channel: GroupedSubscription,
   desired: ReadonlySet<string>,
