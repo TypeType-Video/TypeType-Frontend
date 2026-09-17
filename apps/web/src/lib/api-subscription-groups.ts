@@ -3,18 +3,18 @@ import type {
   MembershipChange,
   SubscriptionGroup,
 } from "../types/subscription-groups";
-import { ApiError } from "./api";
+import { apiErrorFromResponse } from "./api";
 import { authed, authedJson } from "./authed";
 import { API_BASE } from "./env";
 
 const GROUPS_URL = `${API_BASE}/subscriptions/groups`;
 
-export function fetchSubscriptionGroups(): Promise<SubscriptionGroup[]> {
-  return authedJson(GROUPS_URL);
+export function fetchSubscriptionGroups(signal?: AbortSignal): Promise<SubscriptionGroup[]> {
+  return authedJson(GROUPS_URL, { signal });
 }
 
-export function fetchGroupMemberships(): Promise<GroupedSubscription[]> {
-  return authedJson(`${API_BASE}/subscriptions/group-memberships`);
+export function fetchGroupMemberships(signal?: AbortSignal): Promise<GroupedSubscription[]> {
+  return authedJson(`${API_BASE}/subscriptions/group-memberships`, { signal });
 }
 
 async function groupRequest(path: string, method: string, body?: unknown): Promise<Response> {
@@ -25,12 +25,7 @@ async function groupRequest(path: string, method: string, body?: unknown): Promi
       : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
   });
   if (!response.ok) {
-    const error: unknown = await response.json().catch(() => null);
-    const code =
-      error && typeof error === "object" && "code" in error && typeof error.code === "string"
-        ? error.code
-        : null;
-    throw new ApiError("Subscription group request failed", response.status, code);
+    throw apiErrorFromResponse(response, await response.json().catch(() => null));
   }
   return response;
 }

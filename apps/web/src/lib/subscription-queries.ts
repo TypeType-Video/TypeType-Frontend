@@ -19,7 +19,7 @@ export function subscriptionsQueryOptions(
 ): ReturnType<typeof queryOptions<SubscriptionItem[]>> {
   return queryOptions<SubscriptionItem[]>({
     queryKey: filter === "all" ? SUBSCRIPTIONS_KEY : [...SUBSCRIPTIONS_KEY, filter],
-    queryFn: () => fetchSubscriptions(filter),
+    queryFn: ({ signal }) => fetchSubscriptions(filter, signal),
     staleTime: SUBSCRIPTION_STALE_MS,
   });
 }

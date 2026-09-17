@@ -19,7 +19,7 @@ export function useSubscriptionGroups(): UseQueryResult<SubscriptionGroup[]> {
   const { authReady, isAuthed, me } = useAuth();
   return useQuery({
     queryKey: [...SUBSCRIPTION_GROUPS_KEY, me?.id],
-    queryFn: fetchSubscriptionGroups,
+    queryFn: ({ signal }) => fetchSubscriptionGroups(signal),
     enabled: authReady && isAuthed,
     staleTime: 60_000,
   });
@@ -29,7 +29,7 @@ export function useGroupMemberships(): UseQueryResult<GroupedSubscription[]> {
   const { authReady, isAuthed, me } = useAuth();
   return useQuery({
     queryKey: [...SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY, me?.id],
-    queryFn: fetchGroupMemberships,
+    queryFn: ({ signal }) => fetchGroupMemberships(signal),
     enabled: authReady && isAuthed,
     staleTime: 60_000,
   });
