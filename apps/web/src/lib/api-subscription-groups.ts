@@ -1,8 +1,4 @@
-import type {
-  GroupedSubscription,
-  MembershipChange,
-  SubscriptionGroup,
-} from "../types/subscription-groups";
+import type { MembershipChange, SubscriptionGroup } from "../types/subscription-groups";
 import { apiErrorFromResponse } from "./api";
 import { authed, authedJson } from "./authed";
 import { API_BASE } from "./env";
@@ -13,10 +9,6 @@ const MAX_CONCURRENT_MEMBERSHIP_REQUESTS = 3;
 
 export function fetchSubscriptionGroups(signal?: AbortSignal): Promise<SubscriptionGroup[]> {
   return authedJson(GROUPS_URL, { signal });
-}
-
-export function fetchGroupMemberships(signal?: AbortSignal): Promise<GroupedSubscription[]> {
-  return authedJson(`${API_BASE}/subscriptions/group-memberships`, { signal });
 }
 
 async function groupRequest(path: string, method: string, body?: unknown): Promise<Response> {

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useGroupManager } from "../../hooks/use-group-manager";
 import { useInterfaceLocale } from "../../hooks/use-interface-locale";
-import { useGroupMemberships, useSubscriptionGroups } from "../../hooks/use-subscription-groups";
+import { useSubscriptionGroups } from "../../hooks/use-subscription-groups";
 import {
   createSubscriptionGroup,
   renameSubscriptionGroup,
@@ -20,18 +20,14 @@ import "../../styles/subscription-groups.css";
 export function GroupManager(): React.JSX.Element {
   useInterfaceLocale();
   const groupsQuery = useSubscriptionGroups();
-  const channelsQuery = useGroupMemberships();
-  const canEdit = groupsQuery.isSuccess && channelsQuery.isSuccess;
   const groups = useMemo(
     () => [...(groupsQuery.data ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
     [groupsQuery.data],
   );
-  const channels = useMemo(
-    () => [...(channelsQuery.data ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
-    [channelsQuery.data],
-  );
   const {
     actions,
+    page,
+    selectionQuery,
     activeFilter,
     activeGroup,
     excluded,
@@ -57,15 +53,17 @@ export function GroupManager(): React.JSX.Element {
     clearSelection,
     bulk,
     confirm,
-  } = useGroupManager(groups, channels, canEdit);
+  } = useGroupManager(groups, groupsQuery.isSuccess);
+  const channelsQuery = onlySelected ? selectionQuery : page.query;
+  const total = page.query.data?.totalSubscriptions ?? 0;
   return (
     <div className="sg-manager mx-auto flex w-full max-w-[1440px] flex-col gap-3 pt-3">
       <GroupManagerHeader />
-      <GroupManagerData groups={groupsQuery} channels={channelsQuery}>
+      <GroupManagerData groups={groupsQuery} channels={channelsQuery} selection={selectionQuery}>
         <GroupSidebar
           groups={groups}
-          total={channels.length}
-          ungrouped={channels.filter((channel) => channel.groupIds.length === 0).length}
+          total={total}
+          ungrouped={page.query.data?.ungroupedCount ?? 0}
           filter={activeFilter}
           disabled={disabled}
           onFilter={changeFilter}
@@ -124,14 +122,13 @@ export function GroupManager(): React.JSX.Element {
               {actions.notice}
             </p>
           )}
-          {channels.length === 0 ? (
+          {total === 0 && page.query.isSuccess ? (
             <div className="border border-border bg-surface p-10 text-center">
               <p className="text-sm">{m.ui_no_subscriptions_yet_2()}</p>
               <p className="mt-2 text-xs text-fg-muted">{m.sg_empty_subscriptions()}</p>
             </div>
           ) : (
             <GroupChannelList
-              key={`${activeFilter}:${excluded}:${query}:${onlySelected}`}
               label={
                 onlySelected
                   ? m.sg_show_selected()
@@ -140,11 +137,13 @@ export function GroupManager(): React.JSX.Element {
                     : filterName
               }
               channels={visible}
+              pagination={page.pagination}
               groups={groups}
               selected={validSelected}
               editing={editing}
               drafts={drafts}
               busy={actions.busy}
+              disabled={disabled}
               onToggle={toggle}
               onDraft={setDraft}
               onCancel={clearSelection}
@@ -158,7 +157,7 @@ export function GroupManager(): React.JSX.Element {
           )}
         </div>
       </GroupManagerData>
-      {confirmationProps && canEdit && (
+      {confirmationProps && !disabled && (
         <GroupConfirmDialog
           {...confirmationProps}
           onCancel={() => setConfirmation(null)}

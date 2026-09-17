@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { ApiError } from "../src/lib/api";
-import { fetchGroupMemberships, fetchSubscriptionGroups } from "../src/lib/api-subscription-groups";
+import { fetchSubscriptionGroups } from "../src/lib/api-subscription-groups";
 import { fetchSubscriptions } from "../src/lib/api-user";
 import { subscriptionsQueryOptions } from "../src/lib/subscription-queries";
 import { useAuthStore } from "../src/stores/auth-store";
@@ -50,7 +50,6 @@ test("request IDs fall back to the body; non-JSON failures keep their status", a
 test("every subscription list read forwards cancellation to fetch", async () => {
   for (const read of [
     fetchSubscriptionGroups,
-    fetchGroupMemberships,
     (signal: AbortSignal) => fetchSubscriptions("tech", signal),
   ]) {
     const controller = new AbortController();

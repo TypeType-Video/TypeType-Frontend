@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { deleteSubscriptionGroup, updateGroupMemberships } from "../lib/api-subscription-groups";
-import {
-  clearMembershipChanges,
-  filterGroupChannels,
-  selectGroupResults,
-} from "../lib/subscription-group-selection";
+import { clearMembershipChanges } from "../lib/subscription-group-selection";
 import { m } from "../paraglide/messages.js";
 import type { GroupedSubscription, SubscriptionGroup } from "../types/subscription-groups";
+import { useGroupChannelPage } from "./use-group-channel-page";
 import { useGroupSelection } from "./use-group-selection";
 import { useGroupActions } from "./use-subscription-groups";
 
 type State = {
   actions: ReturnType<typeof useGroupActions>;
+  page: ReturnType<typeof useGroupChannelPage>;
+  selectionQuery: ReturnType<typeof useGroupSelection>["query"];
   activeFilter: string;
   activeGroup: SubscriptionGroup | undefined;
   excluded: boolean;
@@ -39,29 +38,24 @@ type State = {
   confirm: () => Promise<void>;
 };
 
-export function useGroupManager(
-  groups: SubscriptionGroup[],
-  channels: GroupedSubscription[],
-  canEdit: boolean,
-): State {
-  const actions = useGroupActions(canEdit);
+export function useGroupManager(groups: SubscriptionGroup[], groupsReady: boolean): State {
   const [filter, setFilter] = useState("all");
   const [excluded, setExcluded] = useState(false);
   const [query, setQuery] = useState("");
-  const selection = useGroupSelection(channels);
+  const selection = useGroupSelection();
   const [onlySelected, setOnlySelected] = useState(false);
   const [confirmation, setConfirmation] = useState<SubscriptionGroup | "clear" | null>(null);
   const { chosen, selected: validSelected, drafts, setDraft } = selection;
   const activeGroup = groups.find((group) => group.id === filter);
   const activeFilter = activeGroup || filter === "ungrouped" ? filter : "all";
-  const visible = filterGroupChannels(
-    channels,
-    activeFilter,
-    excluded,
-    query,
-    validSelected,
-    onlySelected,
-  );
+  const page = useGroupChannelPage(activeFilter, excluded, query, onlySelected ? chosen : null);
+  const visible = page.channels;
+  const canEdit =
+    groupsReady &&
+    selection.query.isSuccess &&
+    !selection.query.isFetching &&
+    (onlySelected || (page.query.isSuccess && !page.query.isPlaceholderData));
+  const actions = useGroupActions(canEdit);
   const hiddenCount =
     chosen.length - visible.filter((channel) => validSelected.has(channel.channelUrl)).length;
   const filterName =
@@ -71,7 +65,8 @@ export function useGroupManager(
 
   function toggle(url: string): void {
     actions.clearError();
-    selection.toggle(url);
+    const channel = visible.find((item) => item.channelUrl === url);
+    if (channel) selection.toggle(channel);
   }
   function changeFilter(value: string): void {
     actions.clearError();
@@ -81,7 +76,7 @@ export function useGroupManager(
   }
   function clearSelection(): void {
     actions.clearError();
-    selection.select(new Set());
+    selection.clear();
     setOnlySelected(false);
   }
   async function bulk(groupId: string, action: "add" | "remove"): Promise<void> {
@@ -142,6 +137,8 @@ export function useGroupManager(
     : null;
   return {
     actions,
+    page,
+    selectionQuery: selection.query,
     activeFilter,
     activeGroup,
     excluded,
@@ -158,13 +155,7 @@ export function useGroupManager(
     confirmationProps,
     setExcluded,
     setQuery,
-    selectResults: () =>
-      selection.select(
-        selectGroupResults(
-          validSelected,
-          visible.map((channel) => channel.channelUrl),
-        ),
-      ),
+    selectResults: () => selection.select(visible),
     setOnlySelected,
     setDraft,
     setConfirmation,

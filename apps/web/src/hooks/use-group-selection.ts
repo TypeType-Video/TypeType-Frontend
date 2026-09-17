@@ -1,47 +1,59 @@
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { selectedMembershipOptions } from "../lib/group-membership-queries";
 import type { GroupedSubscription } from "../types/subscription-groups";
+import { useAuth } from "./use-auth";
 
 type Selection = {
-  urls: ReadonlySet<string>;
+  channels: Map<string, GroupedSubscription>;
   drafts: ReadonlyMap<string, ReadonlySet<string>>;
 };
 
-function selectUrls(current: Selection, urls: ReadonlySet<string>): Selection {
-  return {
-    urls,
-    drafts: new Map([...current.drafts].filter(([url]) => urls.has(url))),
-  };
-}
-
-export function useGroupSelection(channels: GroupedSubscription[]): {
+export function useGroupSelection(): {
   chosen: GroupedSubscription[];
   selected: Set<string>;
   drafts: Selection["drafts"];
-  select: (urls: Set<string>) => void;
-  toggle: (url: string) => void;
+  query: UseQueryResult<GroupedSubscription[]>;
+  select: (channels: GroupedSubscription[]) => void;
+  clear: () => void;
+  toggle: (channel: GroupedSubscription) => void;
   setDraft: (url: string, ids: Set<string>) => void;
 } {
-  const [state, setState] = useState<Selection>({ urls: new Set(), drafts: new Map() });
-  const chosen = channels.filter((channel) => state.urls.has(channel.channelUrl));
+  const { me, authReady, isAuthed } = useAuth();
+  const [state, setState] = useState<Selection>({ channels: new Map(), drafts: new Map() });
+  const query = useQuery({
+    ...selectedMembershipOptions(me?.id, [...state.channels.keys()]),
+    enabled: authReady && isAuthed && state.channels.size > 0,
+    initialData: () => [...state.channels.values()],
+    initialDataUpdatedAt: 0,
+  });
+  const chosen = query.data ?? [...state.channels.values()];
   return {
     chosen,
     selected: new Set(chosen.map((channel) => channel.channelUrl)),
     drafts: state.drafts,
-    select: (urls) => setState((current) => selectUrls(current, urls)),
-    toggle: (url) => {
+    query,
+    select: (channels) =>
+      setState((current) => ({
+        ...current,
+        channels: new Map([...chosen, ...channels].map((channel) => [channel.channelUrl, channel])),
+      })),
+    clear: () => setState({ channels: new Map(), drafts: new Map() }),
+    toggle: (channel) =>
       setState((current) => {
-        const urls = new Set(current.urls);
-        if (urls.has(url)) urls.delete(url);
-        else urls.add(url);
-        return selectUrls(current, urls);
-      });
-    },
-    setDraft: (url, ids) => {
+        const channels = new Map(chosen.map((item) => [item.channelUrl, item]));
+        if (channels.has(channel.channelUrl)) channels.delete(channel.channelUrl);
+        else channels.set(channel.channelUrl, channel);
+        return {
+          channels,
+          drafts: new Map([...current.drafts].filter(([url]) => channels.has(url))),
+        };
+      }),
+    setDraft: (url, ids) =>
       setState((current) =>
-        current.urls.has(url)
+        current.channels.has(url)
           ? { ...current, drafts: new Map(current.drafts).set(url, ids) }
           : current,
-      );
-    },
+      ),
   };
 }

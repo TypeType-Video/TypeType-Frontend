@@ -6,10 +6,20 @@ type ManagedQuery = Pick<
   UseQueryResult,
   "data" | "isPending" | "isError" | "isFetching" | "refetch"
 >;
-type Props = { groups: ManagedQuery; channels: ManagedQuery; children: ReactNode };
+type Props = {
+  groups: ManagedQuery;
+  channels: ManagedQuery;
+  selection?: ManagedQuery;
+  children: ReactNode;
+};
 
-export function GroupManagerData({ groups, channels, children }: Props): React.JSX.Element {
-  const queries = [groups, channels];
+export function GroupManagerData({
+  groups,
+  channels,
+  selection,
+  children,
+}: Props): React.JSX.Element {
+  const queries = selection ? [groups, channels, selection] : [groups, channels];
   const loaded = queries.every((query) => query.data !== undefined);
   const failed = queries.some((query) => query.isError);
   const refreshing = queries.some((query) => query.isFetching);
@@ -34,8 +44,7 @@ export function GroupManagerData({ groups, channels, children }: Props): React.J
             disabled={refreshing}
             className="sg-button"
             onClick={() => {
-              void groups.refetch();
-              void channels.refetch();
+              for (const query of queries) void query.refetch();
             }}
           >
             {refreshing ? m.sg_refreshing() : m.sg_retry()}
