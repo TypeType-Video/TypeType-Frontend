@@ -35,7 +35,7 @@ export function GroupSidebar(props: Props): React.JSX.Element {
           { id: "all", name: m.sg_all_channels(), count: props.total, icon: Users },
           {
             id: "ungrouped",
-            name: m.groups_preview_ungrouped(),
+            name: m.sg_ungrouped(),
             count: props.ungrouped,
             icon: Inbox,
           },

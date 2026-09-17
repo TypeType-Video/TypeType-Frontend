@@ -65,8 +65,7 @@ export function useGroupManager(
   const hiddenCount =
     chosen.length - visible.filter((channel) => validSelected.has(channel.channelUrl)).length;
   const filterName =
-    activeGroup?.name ??
-    (activeFilter === "ungrouped" ? m.groups_preview_ungrouped() : m.sg_all_channels());
+    activeGroup?.name ?? (activeFilter === "ungrouped" ? m.sg_ungrouped() : m.sg_all_channels());
   const editing = chosen.length === 1 ? chosen[0].channelUrl : null;
   const disabled = actions.busy || !canEdit;
 

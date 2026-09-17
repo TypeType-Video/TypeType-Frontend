@@ -33,6 +33,7 @@ function SubscriptionsPage() {
     hasNextPage,
     fetchNextPage,
     refetch,
+    error: feedError,
   } = useSubscriptionFeed(group);
   const { filter } = useBlockedFilter();
   const visible = useMemo(() => filter(streams), [filter, streams]);
@@ -42,6 +43,7 @@ function SubscriptionsPage() {
   }
 
   function prefetchVideos() {
+    if (!query.data?.length) return;
     void queryClient.prefetchInfiniteQuery(subscriptionFeedQueryOptions(group));
   }
 
@@ -69,7 +71,8 @@ function SubscriptionsPage() {
       />
       <SubscriptionGroupFilter
         value={group}
-        onChange={(value) => void navigate({ search: { group: value } })}
+        error={query.error ?? feedError}
+        onChange={(value, replace) => void navigate({ search: { group: value }, replace })}
       />
       {query.isLoading || isLoading ? (
         <VideoGridSkeleton idPrefix="subscriptions" />

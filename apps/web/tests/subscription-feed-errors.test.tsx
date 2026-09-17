@@ -1,13 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
-import { InfiniteQueryObserver, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderToStaticMarkup } from "react-dom/server";
-import { useSubscriptionFeed } from "../src/hooks/use-subscription-feed";
+import { InfiniteQueryObserver, QueryClient } from "@tanstack/react-query";
 import {
   subscriptionFeedQueryOptions,
   subscriptionsQueryOptions,
 } from "../src/lib/subscription-queries";
 import { useAuthStore } from "../src/stores/auth-store";
-import type { VideoItem } from "../src/types/api";
+import { readFeed, video } from "./helpers/subscription-feed";
 
 const originalFetch = globalThis.fetch;
 const clients: QueryClient[] = [];
@@ -17,52 +15,20 @@ afterEach(() => {
   for (const client of clients.splice(0)) client.clear();
 });
 
-function readFeed(client: QueryClient, filter = "all"): ReturnType<typeof useSubscriptionFeed> {
-  let state: ReturnType<typeof useSubscriptionFeed> | undefined;
-  function ReadFeed(): null {
-    state = useSubscriptionFeed(filter);
-    return null;
-  }
-  renderToStaticMarkup(
-    <QueryClientProvider client={client}>
-      <ReadFeed />
-    </QueryClientProvider>,
-  );
-  if (!state) throw new Error("Feed hook did not render");
-  return state;
-}
-
 function setup(filter = "all") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  client.setQueryData(subscriptionsQueryOptions().queryKey, []);
+  client.setQueryData(subscriptionsQueryOptions(filter).queryKey, [
+    {
+      channelUrl: "https://example.org/channel",
+      name: "Test channel",
+      avatarUrl: "",
+      subscribedAt: 0,
+    },
+  ]);
   useAuthStore.getState().setToken("feed-error-test");
   const observer = new InfiniteQueryObserver(client, subscriptionFeedQueryOptions(filter));
   return { client, observer };
-}
-
-function video(id: string): VideoItem {
-  return {
-    id,
-    url: `https://www.youtube.com/watch?v=${id}`,
-    title: id,
-    thumbnailUrl: "",
-    uploaderName: "Test channel",
-    uploaderUrl: "",
-    uploaderAvatarUrl: "",
-    uploaderVerified: false,
-    duration: 100,
-    viewCount: 1,
-    uploadDate: "",
-    uploaded: 0,
-    streamType: "VIDEO_STREAM",
-    isLive: false,
-    isPostLive: false,
-    isLiveContent: false,
-    requiresMembership: false,
-    isShortFormContent: false,
-    shortDescription: null,
-  };
 }
 
 test("a failed next page preserves videos and retries the same cursor", async () => {
