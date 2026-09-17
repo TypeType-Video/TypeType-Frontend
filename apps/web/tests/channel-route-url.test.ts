@@ -7,11 +7,26 @@ import {
 } from "../src/lib/channel-route-url";
 
 describe("channel route URLs", () => {
-  test("keeps YouTube channel paths", () => {
+  test("canonicalizes YouTube channel ids", () => {
     const sourceUrl = "https://www.youtube.com/channel/UC1234567890123456789012";
     expect(toChannelPathParam(sourceUrl)).toBe("UC1234567890123456789012");
-    expect(channelRoutePath(sourceUrl)).toBe("/channel/UC1234567890123456789012");
-    expect(toCanonicalChannelRoute(sourceUrl)).toBeNull();
+    expect(toCanonicalChannelRoute(sourceUrl)).toEqual({
+      provider: "youtube",
+      id: "UC1234567890123456789012",
+    });
+    expect(channelRoutePath(sourceUrl)).toBe("/channel/youtube/UC1234567890123456789012");
+    expect(canonicalChannelSourceUrl({ provider: "youtube", id: "UC1234567890123456789012" })).toBe(
+      "https://www.youtube.com/channel/UC1234567890123456789012",
+    );
+  });
+
+  test("canonicalizes YouTube handles", () => {
+    const sourceUrl = "https://www.youtube.com/@test";
+    expect(toCanonicalChannelRoute(sourceUrl)).toEqual({ provider: "youtube", id: "@test" });
+    expect(channelRoutePath(sourceUrl)).toBe("/channel/youtube/@test");
+    expect(canonicalChannelSourceUrl({ provider: "youtube", id: "@test" })).toBe(
+      "https://www.youtube.com/@test",
+    );
   });
 
   test("canonicalizes BiliBili space URLs", () => {

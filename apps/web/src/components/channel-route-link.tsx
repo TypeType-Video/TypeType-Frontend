@@ -5,7 +5,6 @@ import {
   channelLegacySearch,
   channelPathSearch,
   toCanonicalChannelRoute,
-  toChannelPathParam,
 } from "../lib/channel-route-url";
 
 type Props = {
@@ -17,21 +16,7 @@ type Props = {
 };
 
 export function ChannelRouteLink({ url, children, className, sort = "latest", query = "" }: Props) {
-  const channelId = toChannelPathParam(url);
   const canonicalRoute = toCanonicalChannelRoute(url);
-
-  if (channelId) {
-    return (
-      <Link
-        to="/channel/$channelId"
-        params={{ channelId }}
-        search={channelPathSearch(sort, query)}
-        className={className}
-      >
-        {children}
-      </Link>
-    );
-  }
 
   if (canonicalRoute) {
     return (

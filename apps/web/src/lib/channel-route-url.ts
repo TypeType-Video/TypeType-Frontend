@@ -22,7 +22,7 @@ export type ChannelLegacySearch = ChannelPathSearch & {
 };
 
 export type CanonicalChannelRoute = {
-  provider: "bilibili" | "niconico";
+  provider: "youtube" | "bilibili" | "niconico";
   id: string;
 };
 
@@ -44,6 +44,11 @@ function youtubeChannelParamFromUrl(value: string): string | null {
   } catch {
     return null;
   }
+}
+
+function youtubeChannelRouteFromUrl(value: string): CanonicalChannelRoute | null {
+  const id = youtubeChannelParamFromUrl(value);
+  return id ? { provider: "youtube", id } : null;
 }
 
 function bilibiliChannelRouteFromUrl(value: string): CanonicalChannelRoute | null {
@@ -71,10 +76,22 @@ function niconicoChannelRouteFromUrl(value: string): CanonicalChannelRoute | nul
 }
 
 export function toCanonicalChannelRoute(sourceUrl: string): CanonicalChannelRoute | null {
-  return bilibiliChannelRouteFromUrl(sourceUrl) ?? niconicoChannelRouteFromUrl(sourceUrl);
+  return (
+    youtubeChannelRouteFromUrl(sourceUrl) ??
+    bilibiliChannelRouteFromUrl(sourceUrl) ??
+    niconicoChannelRouteFromUrl(sourceUrl)
+  );
 }
 
 export function canonicalChannelSourceUrl(route: CanonicalChannelRoute): string | null {
+  if (route.provider === "youtube") {
+    const validId =
+      YOUTUBE_CHANNEL_ID_PATTERN.test(route.id) || YOUTUBE_HANDLE_PATTERN.test(route.id);
+    if (!validId) return null;
+    return YOUTUBE_CHANNEL_ID_PATTERN.test(route.id)
+      ? `https://www.youtube.com/channel/${route.id}`
+      : `https://www.youtube.com/${route.id}`;
+  }
   const validId =
     route.provider === "bilibili"
       ? BILIBILI_CHANNEL_ID_PATTERN.test(route.id)
@@ -126,8 +143,6 @@ export function channelLegacySearch(
 }
 
 export function channelRoutePath(sourceUrl: string): string {
-  const pathParam = toChannelPathParam(sourceUrl);
-  if (pathParam) return `/channel/${encodeURIComponent(pathParam)}`;
   const canonicalRoute = toCanonicalChannelRoute(sourceUrl);
   if (canonicalRoute) return `/channel/${canonicalRoute.provider}/${canonicalRoute.id}`;
   const params = new URLSearchParams({ url: toPublicChannelParam(sourceUrl) });
