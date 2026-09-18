@@ -1,10 +1,10 @@
-U want to know the current position of TypeType about AI ? Go check [this](https://github.com/TypeType-Video/TypeType/blob/dev/AI_TRANSPARENCY.md).
-
 <div align="center">
   <img src="https://raw.githubusercontent.com/TypeType-Video/TypeType/main/assets/banner.svg" alt="TypeType" width="100%">
   <h1>TypeType Frontend</h1>
   <p>The React web client for TypeType.</p>
 </div>
+
+You want to know the current position of TypeType about AI ? Go check [this](https://github.com/TypeType-Video/TypeType/blob/dev/AI_TRANSPARENCY.md).
 
 [![Translation status](https://translate.typetype.video/widgets/typetype/-/svg-badge.svg)](https://translate.typetype.video/engage/typetype/)
 
