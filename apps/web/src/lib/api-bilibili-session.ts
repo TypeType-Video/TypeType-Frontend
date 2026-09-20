@@ -2,7 +2,7 @@ import { ApiError } from "./api";
 import { authed, authedJson } from "./authed";
 import { API_BASE as BASE } from "./env";
 
-export type BiliBiliSessionStatus = "disconnected" | "connected" | "needs_reconnect";
+type BiliBiliSessionStatus = "disconnected" | "connected" | "needs_reconnect";
 
 export type BiliBiliSessionState = {
   status: BiliBiliSessionStatus;
