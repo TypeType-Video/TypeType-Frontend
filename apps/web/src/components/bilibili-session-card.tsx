@@ -37,7 +37,10 @@ export function BiliBiliSessionCard({ session }: { session: SessionHook }) {
           )}
           {isConnected && daysLeft > 0 && daysLeft <= 7 && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              {m.ui_bilibili_session_connected()} · {daysLeft}d · <a href="/bilibili-session" className="underline">{m.ui_bilibili_session_reconnect()}</a>
+              {m.ui_bilibili_session_connected()} · {daysLeft}d ·{" "}
+              <a href="/bilibili-session" className="underline">
+                {m.ui_bilibili_session_reconnect()}
+              </a>
             </p>
           )}
           {isReconnect && (
