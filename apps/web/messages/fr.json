@@ -1366,5 +1366,6 @@
   "ui_bilibili_session_qr_expired": "Code QR expiré",
   "ui_bilibili_session_try_again": "Réessayer",
   "ui_bilibili_session_retry": "Réessayer",
-  "ui_bilibili_session_expires_in": "expires in {days} {plural}"
+  "ui_bilibili_session_expires_in": "expires in {days} {plural}",
+  "ui_services": "Services"
 }

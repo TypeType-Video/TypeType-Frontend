@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { BiliBiliSessionCard } from "../components/bilibili-session-card";
 import { Toast } from "../components/toast";
 import { YoutubeSessionBrowserPanel } from "../components/youtube-session-browser-panel";
 import { YoutubeSessionInfoSection } from "../components/youtube-session-info-section";
 import { YoutubeSessionStatusPanel } from "../components/youtube-session-status-panel";
 import { useAuth } from "../hooks/use-auth";
+import { useBiliBiliSession } from "../hooks/use-bilibili-session";
 import { useInstance } from "../hooks/use-instance";
 import { useYoutubeRemoteBrowser } from "../hooks/use-youtube-remote-browser";
 import { useYoutubeSession } from "../hooks/use-youtube-session";
@@ -23,6 +25,7 @@ function YoutubeSessionPage() {
   const { authReady, isAuthed } = useAuth();
   const instance = useInstance();
   const session = useYoutubeSession();
+  const bilibiliSession = useBiliBiliSession();
   const [browserSession, setBrowserSession] = useState<YoutubeRemoteBrowserSession | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const state = session.status.data;
@@ -124,6 +127,13 @@ function YoutubeSessionPage() {
       </section>
 
       <YoutubeSessionInfoSection labelClassName={SIDE_LABEL} />
+
+      <section className="border-border border-t pt-8">
+        <p className={SIDE_LABEL}>{m.ui_services()}</p>
+        <div className="mt-4 max-w-md">
+          <BiliBiliSessionCard session={bilibiliSession} />
+        </div>
+      </section>
 
       <Toast message={toast} />
     </div>
