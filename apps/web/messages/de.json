@@ -1350,5 +1350,21 @@
   "ui_remote_diagnostics": "Diagnose",
   "ui_copy_diagnostics": "Diagnose kopieren",
   "ui_diagnostics_copied": "Kopiert",
-  "ui_remote_diagnostics_hint": "Teile diese Zeilen in einem Fehlerbericht. Sie enthalten keine Passwörter und keine Cookie-Werte."
+  "ui_remote_diagnostics_hint": "Teile diese Zeilen in einem Fehlerbericht. Sie enthalten keine Passwörter und keine Cookie-Werte.",
+  "ui_bilibili_session": "BiliBili-Sitzung",
+  "ui_bilibili_session_connected": "Verbunden",
+  "ui_bilibili_session_not_connected": "Nicht verbunden",
+  "ui_bilibili_session_needs_reconnect": "Sitzung abgelaufen, neu verbinden",
+  "ui_bilibili_session_disconnect": "Trennen",
+  "ui_bilibili_session_connect": "Verbinden",
+  "ui_bilibili_session_reconnect": "Neu verbinden",
+  "ui_bilibili_session_loading": "Wird geladen...",
+  "ui_bilibili_session_scan_qr": "Mit der BiliBili-App scannen",
+  "ui_bilibili_session_scanned": "Gescannt! Auf dem Telefon bestätigen.",
+  "ui_bilibili_session_cancel": "Abbrechen",
+  "ui_bilibili_session_connected_toast": "Verbunden!",
+  "ui_bilibili_session_qr_expired": "QR-Code abgelaufen",
+  "ui_bilibili_session_try_again": "Erneut versuchen",
+  "ui_bilibili_session_retry": "Wiederholen",
+  "ui_bilibili_session_expires_in": "expires in {days} {plural}"
 }

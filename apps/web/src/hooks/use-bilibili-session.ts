@@ -1,0 +1,114 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  disconnectBiliBiliSession,
+  fetchBiliBiliSessionStatus,
+  pollBiliBiliQrLogin,
+  startBiliBiliQrLogin,
+} from "../lib/api-bilibili-session";
+import { useAuth } from "./use-auth";
+
+const BILIBILI_SESSION_KEY = ["bilibili-session"];
+
+export type BiliBiliQrPhase =
+  | "idle"
+  | "generating"
+  | "waiting"
+  | "scanned"
+  | "confirmed"
+  | "expired"
+  | "error";
+
+export function useBiliBiliSession() {
+  const qc = useQueryClient();
+  const { authReady, isAuthed } = useAuth();
+  const [qrPhase, setQrPhase] = useState<BiliBiliQrPhase>("idle");
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
+  const qrcodeKeyRef = useRef<string | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const status = useQuery({
+    queryKey: BILIBILI_SESSION_KEY,
+    queryFn: fetchBiliBiliSessionStatus,
+    enabled: authReady && isAuthed,
+  });
+
+  const disconnect = useMutation({
+    mutationFn: disconnectBiliBiliSession,
+    onSuccess: () => qc.invalidateQueries({ queryKey: BILIBILI_SESSION_KEY }),
+  });
+
+  const stopPolling = useCallback(() => {
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+  }, []);
+
+  const startQr = useCallback(async () => {
+    setQrPhase("generating");
+    setQrError(null);
+    stopPolling();
+    try {
+      const result = await startBiliBiliQrLogin();
+      qrcodeKeyRef.current = result.qrcodeKey;
+      setQrUrl(result.qrUrl);
+      setQrPhase("waiting");
+      const expiresAt = result.expiresAt;
+      pollTimerRef.current = setInterval(async () => {
+        if (Date.now() > expiresAt) {
+          stopPolling();
+          setQrPhase("expired");
+          return;
+        }
+        const key = qrcodeKeyRef.current;
+        if (!key) return;
+        try {
+          const poll = await pollBiliBiliQrLogin(key);
+          if (poll.status === "scanned") setQrPhase("scanned");
+          if (poll.status === "confirmed") {
+            stopPolling();
+            setQrPhase("confirmed");
+            qc.invalidateQueries({ queryKey: BILIBILI_SESSION_KEY });
+            setTimeout(() => setQrPhase("idle"), 2000);
+          }
+          if (poll.status === "expired") {
+            stopPolling();
+            setQrPhase("expired");
+          }
+          if (poll.status === "error") {
+            stopPolling();
+            setQrError(poll.message ?? "Unexpected error");
+            setQrPhase("error");
+          }
+        } catch {
+          // transient network failure, keep polling
+        }
+      }, 2000);
+    } catch {
+      setQrError("Failed to generate QR code");
+      setQrPhase("error");
+    }
+  }, [qc, stopPolling]);
+
+  const cancelQr = useCallback(() => {
+    stopPolling();
+    qrcodeKeyRef.current = null;
+    setQrUrl(null);
+    setQrPhase("idle");
+    setQrError(null);
+  }, [stopPolling]);
+
+  useEffect(() => stopPolling, [stopPolling]);
+
+  return {
+    status,
+    disconnect,
+    qrPhase,
+    qrUrl,
+    qrError,
+    startQr,
+    cancelQr,
+  };
+}

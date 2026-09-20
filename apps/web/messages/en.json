@@ -1350,5 +1350,21 @@
   "ui_remote_diagnostics": "Diagnostics",
   "ui_copy_diagnostics": "Copy diagnostics",
   "ui_diagnostics_copied": "Copied",
-  "ui_remote_diagnostics_hint": "Share these lines in a bug report. They contain no passwords and no cookie values."
+  "ui_remote_diagnostics_hint": "Share these lines in a bug report. They contain no passwords and no cookie values.",
+  "ui_bilibili_session": "BiliBili Session",
+  "ui_bilibili_session_connected": "Connected",
+  "ui_bilibili_session_not_connected": "Not connected",
+  "ui_bilibili_session_needs_reconnect": "Session expired, reconnect",
+  "ui_bilibili_session_disconnect": "Disconnect",
+  "ui_bilibili_session_connect": "Connect",
+  "ui_bilibili_session_reconnect": "Reconnect",
+  "ui_bilibili_session_loading": "Loading...",
+  "ui_bilibili_session_scan_qr": "Scan with the BiliBili app",
+  "ui_bilibili_session_scanned": "Scanned! Confirm on your phone.",
+  "ui_bilibili_session_cancel": "Cancel",
+  "ui_bilibili_session_connected_toast": "Connected!",
+  "ui_bilibili_session_qr_expired": "QR code expired",
+  "ui_bilibili_session_try_again": "Try again",
+  "ui_bilibili_session_retry": "Retry",
+  "ui_bilibili_session_expires_in": "expires in {days} {plural}"
 }

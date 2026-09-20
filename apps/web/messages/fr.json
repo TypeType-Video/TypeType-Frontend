@@ -1350,5 +1350,21 @@
   "ui_remote_diagnostics": "Diagnostics",
   "ui_copy_diagnostics": "Copier les diagnostics",
   "ui_diagnostics_copied": "Copié",
-  "ui_remote_diagnostics_hint": "Partage ces lignes dans un rapport de bug. Elles ne contiennent ni mot de passe ni valeur de cookie."
+  "ui_remote_diagnostics_hint": "Partage ces lignes dans un rapport de bug. Elles ne contiennent ni mot de passe ni valeur de cookie.",
+  "ui_bilibili_session": "Session BiliBili",
+  "ui_bilibili_session_connected": "Connecté",
+  "ui_bilibili_session_not_connected": "Non connecté",
+  "ui_bilibili_session_needs_reconnect": "Session expirée, reconnecter",
+  "ui_bilibili_session_disconnect": "Déconnecter",
+  "ui_bilibili_session_connect": "Connecter",
+  "ui_bilibili_session_reconnect": "Reconnecter",
+  "ui_bilibili_session_loading": "Chargement...",
+  "ui_bilibili_session_scan_qr": "Scannez avec l\"app BiliBili",
+  "ui_bilibili_session_scanned": "Scanné ! Confirmez sur votre téléphone.",
+  "ui_bilibili_session_cancel": "Annuler",
+  "ui_bilibili_session_connected_toast": "Connecté !",
+  "ui_bilibili_session_qr_expired": "Code QR expiré",
+  "ui_bilibili_session_try_again": "Réessayer",
+  "ui_bilibili_session_retry": "Réessayer",
+  "ui_bilibili_session_expires_in": "expires in {days} {plural}"
 }
