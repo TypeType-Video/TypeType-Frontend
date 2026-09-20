@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef } from "react";
+import { BiliBiliSessionBanner } from "../components/bilibili-session-banner";
 import { StreamError } from "../components/stream-error";
 import { WatchPageSkeleton } from "../components/watch-page-skeleton";
 import { WatchStreamError } from "../components/watch-stream-error";
@@ -156,26 +157,29 @@ function WatchPage() {
   const navigating = toPublicWatchParam(activeStream.id) !== publicParam;
 
   return (
-    <Suspense
-      fallback={
-        <WatchPageSkeleton
+    <>
+      <BiliBiliSessionBanner sourceUrl={sourceUrl} />
+      <Suspense
+        fallback={
+          <WatchPageSkeleton
+            stream={activeStream}
+            relatedStreams={activeStream.related}
+            videoUrl={sourceUrl}
+            showComments={!settings.hideComments}
+          />
+        }
+      >
+        <WatchLayout
+          key={activeStream.id}
           stream={activeStream}
-          relatedStreams={activeStream.related}
-          videoUrl={sourceUrl}
-          showComments={!settings.hideComments}
+          startTime={startTime}
+          currentParam={publicParam}
+          navigating={navigating}
+          list={list}
+          shuffle={shuffle}
         />
-      }
-    >
-      <WatchLayout
-        key={activeStream.id}
-        stream={activeStream}
-        startTime={startTime}
-        currentParam={publicParam}
-        navigating={navigating}
-        list={list}
-        shuffle={shuffle}
-      />
-    </Suspense>
+      </Suspense>
+    </>
   );
 }
 
