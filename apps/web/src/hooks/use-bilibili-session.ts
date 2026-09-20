@@ -63,6 +63,7 @@ export function useBiliBiliSession() {
   const startQr = useCallback(async () => {
     setQrPhase("generating");
     setQrError(null);
+    setQrUrl(null);
     stopPolling();
     try {
       const result = await startBiliBiliQrLogin();

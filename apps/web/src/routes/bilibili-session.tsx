@@ -34,6 +34,8 @@ function BiliBiliSessionPage() {
       ? m.ui_bilibili_session_needs_reconnect()
       : m.ui_bilibili_session_not_connected();
   const statusDescription = connected ? m.ui_bilibili_session_description() : "";
+  const qrActive = session.qrPhase === "waiting" || session.qrPhase === "scanned";
+  const canStartQr = !connected && !qrActive && session.qrPhase !== "confirmed";
 
   return (
     <div className="flex w-full max-w-none flex-col gap-8 pt-2 [animation:page-fade-in_0.2s_ease-out]">
@@ -55,7 +57,7 @@ function BiliBiliSessionPage() {
             </p>
           </div>
           <div className="flex flex-col gap-4">
-            {!connected && (
+            {canStartQr && (
               <button
                 type="button"
                 onClick={session.startQr}
@@ -82,6 +84,13 @@ function BiliBiliSessionPage() {
                   />
                 </div>
                 <p className="text-fg-muted text-sm">{m.ui_bilibili_session_scan_qr()}</p>
+                <button
+                  type="button"
+                  onClick={session.cancelQr}
+                  className="mt-2 h-10 border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
+                >
+                  {m.ui_bilibili_session_cancel()}
+                </button>
                 {session.qrPhase === "scanned" && (
                   <p className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
                     {m.ui_bilibili_session_scanned()}
