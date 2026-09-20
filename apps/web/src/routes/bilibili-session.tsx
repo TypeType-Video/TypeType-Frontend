@@ -62,7 +62,7 @@ function BiliBiliSessionPage() {
                 type="button"
                 onClick={session.startQr}
                 disabled={!authReady || !isAuthed || session.qrPhase === "generating"}
-                className="inline-flex h-11 w-full items-center justify-center gap-2 border border-white bg-white px-5 font-medium text-black text-sm transition-colors hover:bg-fg disabled:opacity-50 sm:w-auto"
+                className="inline-flex h-11 w-full self-start items-center justify-center gap-2 border border-white bg-white px-5 font-medium text-black text-sm transition-colors hover:bg-fg disabled:opacity-50 sm:w-auto"
               >
                 <BiliBiliIcon className="h-4 w-4 text-[#00a1d6]" />
                 <span>
