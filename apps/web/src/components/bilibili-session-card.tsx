@@ -30,10 +30,14 @@ export function BiliBiliSessionCard({ session }: { session: SessionHook }) {
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">BiliBili</p>
-          {isConnected && (
+          {isConnected && daysLeft > 7 && (
             <p className="text-xs text-emerald-600 dark:text-emerald-400">
-              {m.ui_bilibili_session_connected()}
-              {daysLeft > 0 ? ` · ${daysLeft}d` : ""}
+              {m.ui_bilibili_session_connected()} · {daysLeft}d
+            </p>
+          )}
+          {isConnected && daysLeft > 0 && daysLeft <= 7 && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {m.ui_bilibili_session_connected()} · {daysLeft}d · <a href="/bilibili-session" className="underline">{m.ui_bilibili_session_reconnect()}</a>
             </p>
           )}
           {isReconnect && (
