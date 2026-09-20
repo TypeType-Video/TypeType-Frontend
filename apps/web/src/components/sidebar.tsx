@@ -70,6 +70,16 @@ export function Sidebar({ overlay = false }: Props) {
   function handleServiceClick(id: ServiceId) {
     update.mutate({ defaultService: id });
     if (isMobile) closeMobileSidebar();
+
+    if (loc.pathname === "/youtube-session" && id === 5) {
+      navigate({ to: "/bilibili-session" });
+      return;
+    }
+    if (loc.pathname === "/bilibili-session" && id === 0) {
+      navigate({ to: "/youtube-session", search: { returnTo: undefined } });
+      return;
+    }
+
     if (loc.pathname !== "/search") return;
     const q = new URLSearchParams(loc.searchStr).get("q") ?? "";
     navigate({ to: "/search", search: { q, service: id } });

@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { BiliBiliIcon } from "../components/bilibili-icon";
 import { Toast } from "../components/toast";
-import { YoutubeIcon } from "../components/youtube-icon";
 import { useAuth } from "../hooks/use-auth";
 import { useBiliBiliSession } from "../hooks/use-bilibili-session";
 import { m } from "../paraglide/messages.js";
@@ -171,24 +170,6 @@ function BiliBiliSessionPage() {
           <li>{m.ui_bilibili_info_temporary()}</li>
           <li>{m.ui_bilibili_info_after()}</li>
         </ul>
-      </section>
-
-      <section className="border-border border-t pt-8">
-        <p className={SIDE_LABEL}>{m.ui_services()}</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Link
-            to="/youtube-session"
-            search={{ returnTo: undefined }}
-            className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-fg text-sm transition-colors hover:border-fg-soft/40"
-          >
-            <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
-            <span>{m.ui_connect_with_youtube()}</span>
-          </Link>
-          <span className="flex items-center gap-3 rounded-lg border border-fg-soft/40 bg-surface px-4 py-3 text-fg text-sm">
-            <BiliBiliIcon className="h-4 w-4 text-[#00a1d6]" />
-            <span>{m.ui_connect_with_bilibili()}</span>
-          </span>
-        </div>
       </section>
 
       <Toast
