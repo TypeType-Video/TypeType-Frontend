@@ -71,8 +71,9 @@ function BiliBiliSessionPage() {
               </button>
             )}
             {session.qrUrl && (session.qrPhase === "waiting" || session.qrPhase === "scanned") && (
-              <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-4">
-                <div className="rounded-md bg-white p-3">
+              <div className="flex w-full max-w-[18rem] flex-col gap-3 border-border border-l-2 pl-5">
+                <p className="font-medium text-fg text-sm">{m.ui_bilibili_session_scan_qr()}</p>
+                <div className="w-fit bg-white p-3">
                   <QRCodeSVG
                     value={session.qrUrl}
                     size={200}
@@ -83,19 +84,20 @@ function BiliBiliSessionPage() {
                     aria-label={m.ui_bilibili_session_scan_qr()}
                   />
                 </div>
-                <p className="text-fg-muted text-sm">{m.ui_bilibili_session_scan_qr()}</p>
-                <button
-                  type="button"
-                  onClick={session.cancelQr}
-                  className="mt-2 h-10 border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
-                >
-                  {m.ui_bilibili_session_cancel()}
-                </button>
-                {session.qrPhase === "scanned" && (
-                  <p className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
-                    {m.ui_bilibili_session_scanned()}
-                  </p>
-                )}
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={session.cancelQr}
+                    className="h-10 w-fit border border-border-strong px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger"
+                  >
+                    {m.ui_bilibili_session_cancel()}
+                  </button>
+                  {session.qrPhase === "scanned" && (
+                    <p className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
+                      {m.ui_bilibili_session_scanned()}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
             {session.qrPhase === ("confirmed" as const) && (
