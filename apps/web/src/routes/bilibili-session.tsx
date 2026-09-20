@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { QRCodeSVG } from "qrcode.react";
 import { BiliBiliIcon } from "../components/bilibili-icon";
 import { Toast } from "../components/toast";
 import { YoutubeIcon } from "../components/youtube-icon";
@@ -70,13 +71,17 @@ function BiliBiliSessionPage() {
             )}
             {session.qrUrl && (session.qrPhase === "waiting" || session.qrPhase === "scanned") && (
               <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-4">
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(session.qrUrl)}`}
-                  alt=""
-                  width={200}
-                  height={200}
-                  className="rounded-md bg-white p-2"
-                />
+                <div className="rounded-md bg-white p-3">
+                  <QRCodeSVG
+                    value={session.qrUrl}
+                    size={200}
+                    level="M"
+                    bgColor="#ffffff"
+                    fgColor="#111111"
+                    includeMargin
+                    aria-label={m.ui_bilibili_session_scan_qr()}
+                  />
+                </div>
                 <p className="text-fg-muted text-sm">{m.ui_bilibili_session_scan_qr()}</p>
                 {session.qrPhase === "scanned" && (
                   <p className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
@@ -173,6 +178,7 @@ function BiliBiliSessionPage() {
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <Link
             to="/youtube-session"
+            search={{ returnTo: undefined }}
             className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-fg text-sm transition-colors hover:border-fg-soft/40"
           >
             <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />

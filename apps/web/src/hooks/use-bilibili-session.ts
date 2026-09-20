@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ApiError } from "../lib/api";
 import {
   disconnectBiliBiliSession,
   fetchBiliBiliSessionStatus,
   pollBiliBiliQrLogin,
   startBiliBiliQrLogin,
 } from "../lib/api-bilibili-session";
+import { m } from "../paraglide/messages.js";
 import { useAuth } from "./use-auth";
 
 const BILIBILI_SESSION_KEY = ["bilibili-session"];
@@ -18,6 +20,18 @@ export type BiliBiliQrPhase =
   | "confirmed"
   | "expired"
   | "error";
+
+function getQrErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.status === 503 || error.code === "bilibili_session_unavailable") {
+      return m.ui_bilibili_session_not_configured();
+    }
+    if (error.status === 429 || error.code === "bilibili_rate_limited") {
+      return m.ui_bilibili_session_rate_limited();
+    }
+  }
+  return m.ui_bilibili_session_qr_unavailable();
+}
 
 export function useBiliBiliSession() {
   const qc = useQueryClient();
@@ -79,15 +93,15 @@ export function useBiliBiliSession() {
           }
           if (poll.status === "error") {
             stopPolling();
-            setQrError(poll.message ?? "Unexpected error");
+            setQrError(poll.message ?? m.ui_bilibili_session_qr_poll_error());
             setQrPhase("error");
           }
         } catch {
           // transient network failure, keep polling
         }
       }, 2000);
-    } catch {
-      setQrError("Failed to generate QR code");
+    } catch (error) {
+      setQrError(getQrErrorMessage(error));
       setQrPhase("error");
     }
   }, [qc, stopPolling]);
