@@ -1367,5 +1367,18 @@
   "ui_bilibili_session_try_again": "Réessayer",
   "ui_bilibili_session_retry": "Réessayer",
   "ui_bilibili_session_expires_in": "expires in {days} {plural}",
-  "ui_services": "Services"
+  "ui_services": "Services",
+  "ui_bilibili_remote_sign_in": "Connexion BiliBili à distance",
+  "ui_connect_bilibili_inside_typetype": "Connecter BiliBili inside TypeType",
+  "ui_typetype_generates_a_qr_code": "TypeType génère un code QR pour la connexion BiliBili. Les cookies sont capturés côté serveur, chiffrés, et jamais envoyés à la web UI.",
+  "ui_use_secondary_bilibili_account": "Utilisez un compte BiliBili secondaire. Le code QR est temporaire et expire après 3 minutes.",
+  "ui_connect_with_bilibili": "Connecter avec BiliBili",
+  "ui_bilibili_session_description": "TypeType peut utiliser cette session lorsque lextraction en a besoin.",
+  "ui_bilibili_expires_at": "Expire le",
+  "ui_bilibili_what_happens": "Ce qui se passe",
+  "ui_bilibili_info_intro": "Le code QR est généré par TypeType et scanné avec la BiliBili app.",
+  "ui_bilibili_info_scan": "Vous scannez le code QR avec la BiliBili app sur votre téléphone.",
+  "ui_bilibili_info_cookies": "Les cookies sont capturés côté serveur, chiffrés, et jamais envoyés à la web UI.",
+  "ui_bilibili_info_temporary": "Le code QR est temporaire et expire après 3 minutes.",
+  "ui_bilibili_info_after": "Après la connexion, les vidéos BiliBili utilisent votre session."
 }

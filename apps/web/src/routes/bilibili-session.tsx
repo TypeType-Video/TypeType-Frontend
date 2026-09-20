@@ -1,20 +1,201 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { BiliBiliSessionCard } from "../components/bilibili-session-card";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { BiliBiliIcon } from "../components/bilibili-icon";
+import { Toast } from "../components/toast";
+import { YoutubeIcon } from "../components/youtube-icon";
+import { useAuth } from "../hooks/use-auth";
 import { useBiliBiliSession } from "../hooks/use-bilibili-session";
 import { m } from "../paraglide/messages.js";
+
+const SIDE_LABEL = "font-mono text-fg-soft text-[11px] uppercase tracking-[0.22em]";
+
+function formatSessionTime(timestamp?: number): string {
+  if (!timestamp || timestamp === 0) return "—";
+  return new Date(timestamp * 1000).toLocaleString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function BiliBiliSessionPage() {
+  const { authReady, isAuthed } = useAuth();
+  const session = useBiliBiliSession();
+  const state = session.status.data;
+  const connected = state?.status === "connected";
+  const daysLeft =
+    state?.expiresAt && state.expiresAt > 0
+      ? Math.ceil((state.expiresAt - Date.now()) / 86400000)
+      : 0;
+  const statusLabel = connected
+    ? m.ui_bilibili_session_connected()
+    : state?.status === "needs_reconnect"
+      ? m.ui_bilibili_session_needs_reconnect()
+      : m.ui_bilibili_session_not_connected();
+  const statusDescription = connected ? m.ui_bilibili_session_description() : "";
+
+  return (
+    <div className="flex w-full max-w-none flex-col gap-8 pt-2 [animation:page-fade-in_0.2s_ease-out]">
+      <div className="px-1">
+        <Link to="/" className="w-fit text-fg-soft text-xs transition-colors hover:text-fg">
+          {m.ui_back_home()}
+        </Link>
+      </div>
+
+      <section className="grid min-h-[28rem] gap-10 border-border border-y py-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="flex min-w-0 flex-col justify-center gap-8">
+          <p className={SIDE_LABEL}>{m.ui_bilibili_remote_sign_in()}</p>
+          <div className="flex flex-col gap-3">
+            <h1 className="max-w-4xl font-semibold text-3xl text-fg tracking-tight sm:text-5xl sm:leading-tight">
+              {m.ui_connect_bilibili_inside_typetype()}
+            </h1>
+            <p className="max-w-3xl text-base text-fg-muted leading-7 sm:text-lg">
+              {m.ui_typetype_generates_a_qr_code()}
+            </p>
+          </div>
+          <div className="flex flex-col gap-4">
+            {!connected && (
+              <button
+                type="button"
+                onClick={session.startQr}
+                disabled={!authReady || !isAuthed || session.qrPhase === "generating"}
+                className="inline-flex h-11 items-center gap-2 bg-fg px-5 text-sm text-bg transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                <BiliBiliIcon className="h-4 w-4 text-[#00a1d6]" />
+                <span>
+                  {session.qrPhase === "generating" ? m.ui_loading() : m.ui_connect_with_bilibili()}
+                </span>
+              </button>
+            )}
+            {session.qrUrl && (session.qrPhase === "waiting" || session.qrPhase === "scanned") && (
+              <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-4">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(session.qrUrl)}`}
+                  alt=""
+                  width={200}
+                  height={200}
+                  className="rounded-md bg-white p-2"
+                />
+                <p className="text-fg-muted text-sm">{m.ui_bilibili_session_scan_qr()}</p>
+                {session.qrPhase === "scanned" && (
+                  <p className="font-medium text-emerald-600 text-xs dark:text-emerald-400">
+                    {m.ui_bilibili_session_scanned()}
+                  </p>
+                )}
+              </div>
+            )}
+            {session.qrPhase === ("confirmed" as const) && (
+              <p className="font-medium text-emerald-600 text-sm dark:text-emerald-400">
+                {m.ui_bilibili_session_connected_toast()}
+              </p>
+            )}
+            {session.qrPhase === "expired" && (
+              <div className="flex flex-col gap-2">
+                <p className="text-amber-600 text-sm dark:text-amber-400">
+                  {m.ui_bilibili_session_qr_expired()}
+                </p>
+                <button
+                  type="button"
+                  onClick={session.startQr}
+                  className="w-fit text-fg text-sm underline"
+                >
+                  {m.ui_bilibili_session_try_again()}
+                </button>
+              </div>
+            )}
+            {session.qrPhase === "error" && (
+              <div className="flex flex-col gap-2">
+                <p className="text-danger text-sm">{session.qrError}</p>
+                <button
+                  type="button"
+                  onClick={session.startQr}
+                  className="w-fit text-fg text-sm underline"
+                >
+                  {m.ui_bilibili_session_retry()}
+                </button>
+              </div>
+            )}
+            <p className="max-w-2xl text-fg-muted text-sm leading-6">
+              {m.ui_use_secondary_bilibili_account()}
+            </p>
+          </div>
+        </div>
+
+        <aside className="flex flex-col justify-center gap-5 border-border lg:border-l lg:pl-8">
+          <div>
+            <p className={SIDE_LABEL}>{m.admin_users_column_status()}</p>
+            <p className="mt-2 font-semibold text-fg text-lg">
+              {session.status.isPending ? m.ui_loading() : statusLabel}
+            </p>
+            {statusDescription && (
+              <p className="mt-2 text-fg-muted text-sm leading-6">{statusDescription}</p>
+            )}
+          </div>
+          <dl className="flex flex-col gap-4 border-border border-t pt-5">
+            {daysLeft > 0 && (
+              <div>
+                <dt className="text-fg-soft text-xs">{m.ui_bilibili_expires_at()}</dt>
+                <dd className="mt-1 text-fg text-sm">{formatSessionTime(state?.expiresAt)}</dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-fg-soft text-xs">{m.ui_updated()}</dt>
+              <dd className="mt-1 text-fg text-sm">{formatSessionTime(state?.updatedAt)}</dd>
+            </div>
+          </dl>
+          <button
+            type="button"
+            disabled={!authReady || !isAuthed || !connected || session.disconnect.isPending}
+            onClick={() => session.disconnect.mutate()}
+            className="h-10 w-full border border-border-strong bg-transparent px-4 text-fg-muted text-sm transition-colors hover:border-danger hover:text-danger disabled:opacity-50"
+          >
+            {m.ui_disconnect()}
+          </button>
+        </aside>
+      </section>
+
+      <section className="grid gap-10 border-border border-b pb-10 lg:grid-cols-[18rem_1fr] xl:grid-cols-[22rem_1fr]">
+        <div>
+          <p className={SIDE_LABEL}>{m.ui_bilibili_what_happens()}</p>
+          <p className="mt-2 text-fg-muted text-sm leading-6">{m.ui_bilibili_info_intro()}</p>
+        </div>
+        <ul className="flex flex-col gap-4 border-border border-l pl-5 text-fg-muted text-sm leading-6">
+          <li>{m.ui_bilibili_info_scan()}</li>
+          <li>{m.ui_bilibili_info_cookies()}</li>
+          <li>{m.ui_bilibili_info_temporary()}</li>
+          <li>{m.ui_bilibili_info_after()}</li>
+        </ul>
+      </section>
+
+      <section className="border-border border-t pt-8">
+        <p className={SIDE_LABEL}>{m.ui_services()}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Link
+            to="/youtube-session"
+            className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-fg text-sm transition-colors hover:border-fg-soft/40"
+          >
+            <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
+            <span>{m.ui_connect_with_youtube()}</span>
+          </Link>
+          <span className="flex items-center gap-3 rounded-lg border border-fg-soft/40 bg-surface px-4 py-3 text-fg text-sm">
+            <BiliBiliIcon className="h-4 w-4 text-[#00a1d6]" />
+            <span>{m.ui_connect_with_bilibili()}</span>
+          </span>
+        </div>
+      </section>
+
+      <Toast
+        message={
+          session.qrPhase === ("confirmed" as const)
+            ? m.ui_bilibili_session_connected_toast()
+            : null
+        }
+      />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/bilibili-session")({
   component: BiliBiliSessionPage,
 });
-
-function BiliBiliSessionPage() {
-  const session = useBiliBiliSession();
-  return (
-    <div className="mx-auto max-w-md px-4 py-8">
-      <h1 className="mb-6 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-        {m.ui_bilibili_session()}
-      </h1>
-      <BiliBiliSessionCard session={session} />
-    </div>
-  );
-}

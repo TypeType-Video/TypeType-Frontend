@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { BiliBiliIcon } from "../components/bilibili-icon";
 import { BiliBiliSessionCard } from "../components/bilibili-session-card";
 import { Toast } from "../components/toast";
+import { YoutubeIcon } from "../components/youtube-icon";
 import { YoutubeSessionBrowserPanel } from "../components/youtube-session-browser-panel";
 import { YoutubeSessionInfoSection } from "../components/youtube-session-info-section";
 import { YoutubeSessionStatusPanel } from "../components/youtube-session-status-panel";
@@ -25,7 +27,6 @@ function YoutubeSessionPage() {
   const { authReady, isAuthed } = useAuth();
   const instance = useInstance();
   const session = useYoutubeSession();
-  const bilibiliSession = useBiliBiliSession();
   const [browserSession, setBrowserSession] = useState<YoutubeRemoteBrowserSession | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const state = session.status.data;
@@ -130,8 +131,18 @@ function YoutubeSessionPage() {
 
       <section className="border-border border-t pt-8">
         <p className={SIDE_LABEL}>{m.ui_services()}</p>
-        <div className="mt-4 max-w-md">
-          <BiliBiliSessionCard session={bilibiliSession} />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <span className="flex items-center gap-3 rounded-lg border border-fg-soft/40 bg-surface px-4 py-3 text-fg text-sm">
+            <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
+            <span>{m.ui_connect_with_youtube()}</span>
+          </span>
+          <Link
+            to="/bilibili-session"
+            className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-fg text-sm transition-colors hover:border-fg-soft/40"
+          >
+            <BiliBiliIcon className="h-4 w-4 text-[#00a1d6]" />
+            <span>{m.ui_connect_with_bilibili()}</span>
+          </Link>
         </div>
       </section>
 

@@ -1367,5 +1367,18 @@
   "ui_bilibili_session_try_again": "Erneut versuchen",
   "ui_bilibili_session_retry": "Wiederholen",
   "ui_bilibili_session_expires_in": "expires in {days} {plural}",
-  "ui_services": "Dienste"
+  "ui_services": "Dienste",
+  "ui_bilibili_remote_sign_in": "BiliBili-Fernanmeldung",
+  "ui_connect_bilibili_inside_typetype": "BiliBili in TypeType verbinden",
+  "ui_typetype_generates_a_qr_code": "TypeType generiert einen QR-Code für die BiliBili-Anmeldung.",
+  "ui_use_secondary_bilibili_account": "Verwenden Sie ein zweites BiliBili-Konto.",
+  "ui_connect_with_bilibili": "Mit BiliBili verbinden",
+  "ui_bilibili_session_description": "TypeType kann diese Sitzung verwenden.",
+  "ui_bilibili_expires_at": "Läuft ab am",
+  "ui_bilibili_what_happens": "Was passiert",
+  "ui_bilibili_info_intro": "Der QR-Code wird von TypeType generiert.",
+  "ui_bilibili_info_scan": "Sie scannen den QR-Code mit der BiliBili-App.",
+  "ui_bilibili_info_cookies": "Cookies werden serverseitig erfasst.",
+  "ui_bilibili_info_temporary": "Der QR-Code ist temporär.",
+  "ui_bilibili_info_after": "Nach der Verbindung verwenden BiliBili-Videos Ihre Sitzung."
 }
