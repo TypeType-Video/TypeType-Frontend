@@ -80,7 +80,7 @@ export function BiliBiliSessionCard({ session }: { session: SessionHook }) {
       </div>
       {showQr && (
         <div className="mt-4 rounded-md border border-zinc-200 bg-zinc-50 p-4 text-center dark:border-zinc-600 dark:bg-zinc-800">
-          {session.qrPhase === "waiting" && session.qrUrl && (
+          {(session.qrPhase === "waiting" || session.qrPhase === "scanned") && session.qrUrl && (
             <>
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(session.qrUrl)}`}

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminConsoleRouteImport } from './routes/admin-console'
+import { Route as BilibiliSessionRouteImport } from './routes/bilibili-session'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as FavoritesRouteImport } from './routes/favorites'
@@ -52,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminConsoleRoute = AdminConsoleRouteImport.update({
   id: '/admin-console',
   path: '/admin-console',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BilibiliSessionRoute = BilibiliSessionRouteImport.update({
+  id: '/bilibili-session',
+  path: '/bilibili-session',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelRoute = ChannelRouteImport.update({
@@ -220,6 +226,7 @@ const ChannelProviderChannelIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -438,6 +450,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
+  BilibiliSessionRoute: typeof BilibiliSessionRoute
   ChannelRoute: typeof ChannelRoute
   ExportRoute: typeof ExportRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -483,6 +496,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-console'
       fullPath: '/admin-console'
       preLoaderRoute: typeof AdminConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bilibili-session': {
+      id: '/bilibili-session'
+      path: '/bilibili-session'
+      fullPath: '/bilibili-session'
+      preLoaderRoute: typeof BilibiliSessionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channel': {
@@ -730,6 +750,7 @@ const ImportRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminConsoleRoute: AdminConsoleRoute,
+  BilibiliSessionRoute: BilibiliSessionRoute,
   ChannelRoute: ChannelRoute,
   ExportRoute: ExportRoute,
   FavoritesRoute: FavoritesRoute,
