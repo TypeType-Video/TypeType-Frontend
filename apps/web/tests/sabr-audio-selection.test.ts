@@ -107,11 +107,31 @@ test("marks live playback sessions for the MSE engine", () => {
   expect(config?.key).toContain(":live:");
 });
 
-function withManagedMediaSource<T>(work: () => T): T {
+test("selects Opus when the browser does not support AAC MSE", () => {
+  const opus = {
+    ...audio("en-US.4", "English (US) original", "en", true),
+    itag: 249,
+    codec: "opus",
+    mimeType: "audio/webm",
+    format: "webm",
+  } as AudioStreamItem;
+  const withOpus = { ...stream, audioStreams: [audio("en-US.4", "English", "en", true), opus] };
+  const config = withManagedMediaSource(
+    () => resolveSabrPlaybackConfig(withOpus, 137, "en-US.4"),
+    (mime) => mime.startsWith("audio/webm") || mime.startsWith("video/mp4"),
+  );
+
+  expect(config?.audioItag).toBe(249);
+});
+
+function withManagedMediaSource<T>(
+  work: () => T,
+  supports: (mime: string) => boolean = () => true,
+): T {
   const scope = globalThis as typeof globalThis & { ManagedMediaSource?: unknown };
   const original = Object.getOwnPropertyDescriptor(scope, "ManagedMediaSource");
   const FakeManagedMediaSource = Object.assign(function FakeManagedMediaSource() {}, {
-    isTypeSupported: () => true,
+    isTypeSupported: supports,
   });
   Object.defineProperty(scope, "ManagedMediaSource", {
     configurable: true,
