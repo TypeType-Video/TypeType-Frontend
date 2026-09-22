@@ -46,22 +46,20 @@ export function registerSabrNativePause(
   onHandled: () => void,
 ): () => void {
   const nativePause = () => {
-    queueMicrotask(() => {
-      if (
-        !shouldHandleSabrNativePause({
-          paused: video.paused,
-          state: engine.snapshot().state,
-          seeking: seeking.current,
-          applyingTransientMediaState: engine.isApplyingTransientMediaState(),
-        })
-      )
-        return;
-      onHandled();
-      engine.pause();
-    });
+    if (
+      !shouldHandleSabrNativePause({
+        paused: video.paused,
+        state: engine.snapshot().state,
+        seeking: seeking.current,
+        applyingTransientMediaState: engine.isApplyingTransientMediaState(),
+      })
+    )
+      return;
+    onHandled();
+    engine.pause();
   };
-  video.addEventListener("pause", nativePause);
-  return () => video.removeEventListener("pause", nativePause);
+  video.addEventListener("pause", nativePause, true);
+  return () => video.removeEventListener("pause", nativePause, true);
 }
 
 type SabrPlaybackEngine = { isApplyingTransientMediaState: () => boolean };
