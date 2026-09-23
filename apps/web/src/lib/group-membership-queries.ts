@@ -54,6 +54,7 @@ export function selectedMembershipOptions(
       }
       return result;
     },
-    staleTime: 60_000,
+    // Revisited selections must refresh before membership actions are enabled.
+    staleTime: 0,
   });
 }
