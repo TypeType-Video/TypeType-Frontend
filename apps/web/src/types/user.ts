@@ -107,6 +107,7 @@ export type SettingsItem = {
   defaultQuality: string;
   defaultPlaybackSpeed: number;
   autoplay: boolean;
+  autoplayOnOpen: boolean;
   autoplayCountdownSeconds: number;
   skipPlaylistAutoplayScreen: boolean;
   audioOnlyPlayback: boolean;

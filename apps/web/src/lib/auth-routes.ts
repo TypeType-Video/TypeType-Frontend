@@ -2,6 +2,7 @@ export type RedirectTarget =
   | "/"
   | "/import"
   | "/history"
+  | "/bilibili-session"
   | "/playlists"
   | "/privacy"
   | "/profile"
@@ -23,6 +24,7 @@ const PROTECTED_PREFIXES = [
   "/settings",
   "/subscriptions",
   "/youtube-session",
+  "/bilibili-session",
 ];
 const AUTH_PAGES = ["/login", "/register", "/reset-password", "/auth/oidc/callback"];
 const OIDC_CALLBACK_PAGE = "/auth/oidc/callback";

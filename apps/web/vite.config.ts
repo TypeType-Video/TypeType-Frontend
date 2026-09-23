@@ -20,6 +20,16 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("/src/paraglide/messages/")) return "paraglide-messages";
+            if (id.includes("/node_modules/lucide-react/")) return "lucide-icons";
+          },
+        },
+      },
+    },
     server: {
       allowedHosts: true,
       proxy: {
