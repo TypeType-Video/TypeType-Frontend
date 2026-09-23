@@ -1,6 +1,7 @@
 import { bufferSeconds, resolvePlaybackPolicy } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
+import { recordClientEvent } from "../lib/client-debug-log";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
 import { createHlsConfig } from "../lib/hls-buffer-config";
 import type { MediaProviderAdapter } from "../lib/vidstack";
@@ -83,6 +84,20 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
       hlsProviderLibraries.set(provider, providerLibrary);
     }
     provider.library = () => providerLibrary;
+    provider.onInstance((hls) => {
+      const events = (hls.constructor as typeof Hls).Events;
+      hls.on(events.ERROR, (_, data) => {
+        recordClientEvent("player.hls_transport_error", {
+          fatal: data.fatal,
+          type: data.type,
+          details: data.details,
+          reason: data.reason,
+          responseCode: data.response?.code,
+          responseUrl: data.response?.url,
+          contextUrl: data.frag?.url ?? data.url,
+        });
+      });
+    });
     return;
   }
   const dashProvider = isDASHProvider(provider);
