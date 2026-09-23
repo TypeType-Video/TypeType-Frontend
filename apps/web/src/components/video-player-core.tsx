@@ -1,3 +1,4 @@
+import { bufferSeconds, resolvePlaybackPolicy } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
@@ -8,8 +9,6 @@ import { useAuthStore } from "../stores/auth-store";
 
 type DashRequestInterceptor = Parameters<dashjs.MediaPlayerClass["addRequestInterceptor"]>[0];
 
-const DASH_TOP_QUALITY_BUFFER_SECONDS = 24;
-const DASH_BACK_BUFFER_SECONDS = 30;
 type DashLibraryModule = { default: typeof dashjs };
 type DashRuntimeModule = typeof dashjs & { default?: typeof dashjs };
 type HlsLibraryModule = { default: typeof Hls; FetchLoader: typeof import("hls.js").FetchLoader };
@@ -38,28 +37,29 @@ const loadHlsLibrary = (): Promise<HlsLibraryModule> => {
 
 function configureDashPlayer(player: dashjs.MediaPlayerClass, library: typeof dashjs): void {
   const onDashUpdate = () => notifyDashPlayer();
+  const policy = resolvePlaybackPolicy();
   player.on(library.MediaPlayer.events.STREAM_INITIALIZED, onDashUpdate);
   player.on(library.MediaPlayer.events.TRACK_CHANGE_RENDERED, onDashUpdate);
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
   player.updateSettings({
     streaming: {
       buffer: {
-        bufferTimeAtTopQuality: DASH_TOP_QUALITY_BUFFER_SECONDS,
-        bufferTimeAtTopQualityLongForm: DASH_TOP_QUALITY_BUFFER_SECONDS,
-        bufferToKeep: DASH_BACK_BUFFER_SECONDS,
+        bufferTimeAtTopQuality: bufferSeconds(policy.steadyBufferMs),
+        bufferTimeAtTopQualityLongForm: bufferSeconds(policy.steadyBufferMs),
+        bufferToKeep: bufferSeconds(policy.backBufferMs),
       },
       cmcd: { enabled: false },
       retryAttempts: {
-        MPD: 5,
-        MediaSegment: 3,
-        InitializationSegment: 3,
-        IndexSegment: 3,
+        MPD: policy.manifestAttempts,
+        MediaSegment: policy.mediaAttempts,
+        InitializationSegment: policy.mediaAttempts,
+        IndexSegment: policy.mediaAttempts,
       },
       retryIntervals: {
-        MPD: 500,
-        MediaSegment: 500,
-        InitializationSegment: 500,
-        IndexSegment: 500,
+        MPD: policy.retryIntervalMs,
+        MediaSegment: policy.retryIntervalMs,
+        InitializationSegment: policy.retryIntervalMs,
+        IndexSegment: policy.retryIntervalMs,
       },
     },
   });

@@ -5,8 +5,11 @@ describe("HLS buffer policy", () => {
   it("matches the TypeType MSE VOD policy", () => {
     expect(createHlsConfig(class {} as never, "generation-1")).toMatchObject({
       backBufferLength: 30,
-      maxBufferLength: 10,
-      maxMaxBufferLength: 10,
+      liveMaxLatencyDuration: 15,
+      liveSyncDuration: 2,
+      maxBufferLength: 24,
+      maxLiveSyncPlaybackRate: 1.25,
+      maxMaxBufferLength: 50,
     });
   });
 

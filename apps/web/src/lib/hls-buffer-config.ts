@@ -1,3 +1,4 @@
+import { bufferSeconds, resolvePlaybackPolicy } from "@typetype/mse";
 import type { HlsConfig } from "hls.js";
 import { isMediaHandleUrl } from "./proxy";
 
@@ -15,14 +16,18 @@ export function createHlsConfig(
   FetchLoader: HlsLoader,
   playbackKey = createHlsPlaybackKey(),
 ): Partial<HlsConfig> {
+  const policy = resolvePlaybackPolicy();
   let requestSequence = 0;
   return {
-    backBufferLength: 30,
+    backBufferLength: bufferSeconds(policy.backBufferMs),
     fetchSetup: (context, initParams) =>
       new Request(hlsRequestUrl(context.url, `${playbackKey}-${requestSequence++}`), initParams),
+    liveMaxLatencyDuration: bufferSeconds(policy.liveMaxLatencyMs),
+    liveSyncDuration: bufferSeconds(policy.liveTargetLatencyMs),
     loader: FetchLoader,
-    maxBufferLength: 10,
-    maxMaxBufferLength: 10,
+    maxBufferLength: bufferSeconds(policy.steadyBufferMs),
+    maxLiveSyncPlaybackRate: policy.liveCatchupMaxRate,
+    maxMaxBufferLength: bufferSeconds(policy.maxBufferMs),
   };
 }
 
