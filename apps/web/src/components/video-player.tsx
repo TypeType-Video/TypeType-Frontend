@@ -74,7 +74,13 @@ export function VideoPlayer({
   const sabrSrc = useMemo(() => (sabrVideoId ? sabrMediaSrc(sabrVideoId) : null), [sabrVideoId]);
   const activeSrc = sabrSrc ?? src;
   const viewType = mediaSourceViewType(audioOnly, Boolean(sabrConfig), activeSrc);
-  const canSeek = streamType !== "live" || Boolean(sabrConfig);
+  const hlsLiveSource =
+    typeof activeSrc === "object" &&
+    activeSrc !== null &&
+    !Array.isArray(activeSrc) &&
+    "type" in activeSrc &&
+    activeSrc.type === "application/x-mpegurl";
+  const canSeek = streamType !== "live" || Boolean(sabrConfig) || hlsLiveSource;
   const { handleProviderChange, handleError, handleEnded } = useVideoPlayerEvents({
     src: activeSrc,
     onError,

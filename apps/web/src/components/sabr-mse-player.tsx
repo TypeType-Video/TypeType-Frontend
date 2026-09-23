@@ -60,7 +60,7 @@ export function SabrMsePlayer({
     onPositionReaderChange,
     onVolumeChange,
   });
-  const reportError = useSabrErrorReporter(errorReportedRef, onError);
+  const reportError = useSabrErrorReporter(errorReportedRef, onError, video, config);
   const { latestEngineHandlers, setQualityTransitioning } = useSabrEngineHandlers(
     latestHandlers,
     reportError,

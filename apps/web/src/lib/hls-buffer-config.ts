@@ -13,7 +13,7 @@ type HlsLoader = HlsConfig["loader"];
 
 export function createHlsConfig(
   FetchLoader: HlsLoader,
-  playbackKey = crypto.randomUUID(),
+  playbackKey = createHlsPlaybackKey(),
 ): Partial<HlsConfig> {
   let requestSequence = 0;
   return {
@@ -24,4 +24,14 @@ export function createHlsConfig(
     maxBufferLength: 10,
     maxMaxBufferLength: 10,
   };
+}
+
+export function createHlsPlaybackKey(cryptoApi: Crypto | undefined = globalThis.crypto): string {
+  if (typeof cryptoApi?.randomUUID === "function") return cryptoApi.randomUUID();
+  if (typeof cryptoApi?.getRandomValues === "function") {
+    return Array.from(cryptoApi.getRandomValues(new Uint32Array(4)), (value) =>
+      value.toString(16).padStart(8, "0"),
+    ).join("-");
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
