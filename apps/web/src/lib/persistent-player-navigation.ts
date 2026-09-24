@@ -10,7 +10,5 @@ export function shouldKeepPersistentPlayerForRoute(
   const requestedVideo = location.searchParams.get("v")?.trim();
   if (!requestedVideo) return false;
 
-  return (
-    toPublicWatchParam(streamId) === toPublicWatchParam(toWatchSourceUrl(requestedVideo))
-  );
+  return toPublicWatchParam(streamId) === toPublicWatchParam(toWatchSourceUrl(requestedVideo));
 }
