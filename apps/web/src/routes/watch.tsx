@@ -45,17 +45,23 @@ function WatchPage() {
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
   const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
-  const bootstrap = useSabrBootstrap(
-    sourceUrl,
-    useAuthenticatedStream,
-    shouldLoadSabrBootstrap(streamEnabled, knownPublicLive),
-  );
   const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
   const streamQuery = useStream(
     sourceUrl,
     useAuthenticatedStream,
     fullStreamEnabled,
     knownPublicLive,
+  );
+  const deferBootstrap =
+    knownPublicLive ||
+    streamQuery.isPending ||
+    streamQuery.isFetching ||
+    streamQuery.isPlaceholderData ||
+    streamQuery.data?.isLive === true;
+  const bootstrap = useSabrBootstrap(
+    sourceUrl,
+    useAuthenticatedStream,
+    shouldLoadSabrBootstrap(streamEnabled, deferBootstrap),
   );
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
