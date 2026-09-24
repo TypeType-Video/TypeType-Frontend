@@ -12,6 +12,7 @@ import { useProgress } from "../hooks/use-progress";
 import { useSettings } from "../hooks/use-settings";
 import { useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { preloadPlaybackRuntime } from "../lib/playback-runtime-preload";
+import { beginPlaybackTrace, playbackTraceEvent } from "../lib/playback-trace";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { hasSabrPlayback } from "../lib/stream-delivery";
@@ -53,13 +54,11 @@ function WatchPage() {
     fullStreamEnabled,
     knownPublicLive,
   );
+  const fullStream = streamQuery.isPlaceholderData ? undefined : streamQuery.data;
   const deferBootstrap =
     knownPublicLive ||
-    streamQuery.isPending ||
-    streamQuery.isFetching ||
-    streamQuery.isPlaceholderData ||
-    streamQuery.data?.isLive === true ||
-    (streamQuery.data !== undefined && hasSabrPlayback(streamQuery.data));
+    fullStream?.isLive === true ||
+    (fullStream !== undefined && hasSabrPlayback(fullStream));
   const bootstrap = useSabrBootstrap(
     sourceUrl,
     useAuthenticatedStream,
@@ -77,7 +76,6 @@ function WatchPage() {
     publicParam,
     previewRelated,
   );
-  const fullStream = streamQuery.isPlaceholderData ? undefined : streamQuery.data;
   useDocumentTitle(activeStream?.title ?? previewStream?.title);
   const loadingPage = (
     <WatchPageSkeleton
@@ -99,6 +97,8 @@ function WatchPage() {
   );
 
   useEffect(() => {
+    beginPlaybackTrace(sourceUrl, "watch_route");
+    playbackTraceEvent("route_enter", { path: "/watch" });
     void preloadPlaybackRuntime(sourceUrl);
   }, [sourceUrl]);
 

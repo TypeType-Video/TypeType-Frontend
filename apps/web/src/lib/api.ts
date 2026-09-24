@@ -7,6 +7,7 @@ import { recordApiError } from "./api-error-log";
 import { extractRequestId, recordClientEvent } from "./client-debug-log";
 import { sanitizeDebugText, sanitizeRequestPath } from "./debug-sanitize";
 import { API_BASE as BASE } from "./env";
+import { finishPlaybackApiRequest, preparePlaybackApiRequest } from "./playback-trace";
 import { optionalBearer } from "./optional-bearer";
 import { normalizeApiPayload } from "./text-normalize";
 
@@ -66,9 +67,11 @@ function toErrorCode(body: unknown): string | null {
 export async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const method = init?.method ?? "GET";
   let res: Response;
+  const trace = preparePlaybackApiRequest(url, init);
   try {
-    res = await fetch(url, init);
+    res = await fetch(url, trace.init);
   } catch (error) {
+    finishPlaybackApiRequest(trace, 0, "network_error");
     const message = error instanceof Error ? error.message : "network_error";
     recordApiError({
       endpoint: url,
@@ -84,6 +87,7 @@ export async function request<T>(url: string, init?: RequestInit): Promise<T> {
     throw error;
   }
   const body = await readBody(res);
+  finishPlaybackApiRequest(trace, res.status, res.ok ? "ok" : "http_error");
   if (!res.ok) {
     const requestId = extractRequestId(res.headers);
     const errorMessage = toErrorMessage(res.status, res.statusText, body);
