@@ -11,6 +11,7 @@ import { useInstance } from "../hooks/use-instance";
 import { useProgress } from "../hooks/use-progress";
 import { useSettings } from "../hooks/use-settings";
 import { useSabrBootstrap, useStream } from "../hooks/use-stream";
+import { preloadPlaybackRuntime } from "../lib/playback-runtime-preload";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { videoAvailabilityCopy } from "../lib/video-availability";
@@ -41,7 +42,7 @@ function WatchPage() {
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
   const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, streamEnabled);
-  const fullStreamEnabled = shouldLoadFullWatchStream(sourceUrl, streamEnabled, bootstrap);
+  const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
   const streamQuery = useStream(sourceUrl, useAuthenticatedStream, fullStreamEnabled);
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
@@ -78,6 +79,10 @@ function WatchPage() {
     progressFetch.isFetching,
     progressFetch.data !== undefined,
   );
+
+  useEffect(() => {
+    void preloadPlaybackRuntime(sourceUrl);
+  }, [sourceUrl]);
 
   useEffect(() => {
     if (v.trim() && publicParam !== v.trim() && (!shortShareUrl || list || shuffle)) {

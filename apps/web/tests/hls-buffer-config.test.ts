@@ -3,14 +3,22 @@ import { createHlsConfig, hlsRequestUrl } from "../src/lib/hls-buffer-config";
 
 describe("HLS buffer policy", () => {
   it("matches the TypeType MSE VOD policy", () => {
-    expect(createHlsConfig(class {} as never, "generation-1")).toMatchObject({
+    const config = createHlsConfig(class {} as never, "generation-1");
+    expect(config).toMatchObject({
+      abrEwmaDefaultEstimate: 1_000_000,
       backBufferLength: 30,
+      capLevelToPlayerSize: true,
       liveMaxLatencyDuration: 20,
       liveSyncDuration: 10,
+      progressive: true,
+      startFragPrefetch: true,
+      startLevel: 0,
       maxBufferLength: 24,
       maxLiveSyncPlaybackRate: 1.25,
       maxMaxBufferLength: 50,
+      testBandwidth: false,
     });
+    expect(config).not.toHaveProperty("liveBackBufferLength");
   });
 
   it("isolates opaque media handles by playback generation", () => {

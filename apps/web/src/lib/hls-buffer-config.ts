@@ -19,7 +19,9 @@ export function createHlsConfig(
   const policy = resolvePlaybackPolicy();
   let requestSequence = 0;
   return {
+    abrEwmaDefaultEstimate: 1_000_000,
     backBufferLength: bufferSeconds(policy.backBufferMs),
+    capLevelToPlayerSize: true,
     fetchSetup: (context, initParams) =>
       new Request(hlsRequestUrl(context.url, `${playbackKey}-${requestSequence++}`), initParams),
     liveMaxLatencyDuration: bufferSeconds(policy.liveMaxLatencyMs),
@@ -28,6 +30,10 @@ export function createHlsConfig(
     maxBufferLength: bufferSeconds(policy.steadyBufferMs),
     maxLiveSyncPlaybackRate: policy.liveCatchupMaxRate,
     maxMaxBufferLength: bufferSeconds(policy.maxBufferMs),
+    progressive: true,
+    startFragPrefetch: true,
+    startLevel: 0,
+    testBandwidth: false,
   };
 }
 
