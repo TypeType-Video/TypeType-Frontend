@@ -2,14 +2,14 @@ import { describe, expect, it } from "bun:test";
 import { createHlsConfig, hlsRequestUrl } from "../src/lib/hls-buffer-config";
 
 describe("HLS buffer policy", () => {
-  it("matches the TypeType MSE VOD policy", () => {
+  it("matches the shared TypeType HLS transport policy", () => {
     const config = createHlsConfig({ FetchLoader: class {} as never, playbackKey: "generation-1" });
     expect(config).toMatchObject({
       abrEwmaDefaultEstimate: 1_000_000,
       backBufferLength: 30,
       capLevelToPlayerSize: true,
-      liveMaxLatencyDuration: 20,
-      liveSyncDuration: 10,
+      liveMaxLatencyDuration: 15,
+      liveSyncDuration: 5,
       progressive: true,
       startFragPrefetch: true,
       startLevel: 0,
