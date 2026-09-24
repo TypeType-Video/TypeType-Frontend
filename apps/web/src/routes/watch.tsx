@@ -45,6 +45,7 @@ function WatchPage() {
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
   const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
+  const knownPublicVod = previewStream?.isLive === false && !previewStream.requiresMembership;
   const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
   const streamQuery = useStream(
     sourceUrl,
@@ -54,10 +55,11 @@ function WatchPage() {
   );
   const deferBootstrap =
     knownPublicLive ||
-    streamQuery.isPending ||
-    streamQuery.isFetching ||
-    streamQuery.isPlaceholderData ||
-    streamQuery.data?.isLive === true;
+    (!knownPublicVod &&
+      (streamQuery.isPending ||
+        streamQuery.isFetching ||
+        streamQuery.isPlaceholderData ||
+        streamQuery.data?.isLive === true));
   const bootstrap = useSabrBootstrap(
     sourceUrl,
     useAuthenticatedStream,
