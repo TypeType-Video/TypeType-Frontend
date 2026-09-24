@@ -3,7 +3,7 @@ import { createHlsConfig, hlsRequestUrl } from "../src/lib/hls-buffer-config";
 
 describe("HLS buffer policy", () => {
   it("matches the TypeType MSE VOD policy", () => {
-    const config = createHlsConfig(class {} as never, "generation-1");
+    const config = createHlsConfig({ FetchLoader: class {} as never, playbackKey: "generation-1" });
     expect(config).toMatchObject({
       abrEwmaDefaultEstimate: 1_000_000,
       backBufferLength: 30,
@@ -32,7 +32,10 @@ describe("HLS buffer policy", () => {
   });
 
   it("versions the network request without changing the logical context", () => {
-    const setup = createHlsConfig(class {} as never, "generation-1").fetchSetup;
+    const setup = createHlsConfig({
+      FetchLoader: class {} as never,
+      playbackKey: "generation-1",
+    }).fetchSetup;
     if (!setup) throw new Error("HLS fetch setup is missing");
     const first = setup(
       { url: "https://example.test/api/media/m1_0123456789abcdefghijklmn" } as never,

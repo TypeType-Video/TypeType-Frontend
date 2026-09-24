@@ -1,9 +1,8 @@
-import { bufferSeconds, resolvePlaybackPolicy } from "@typetype/mse";
+import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
-import { createHlsConfig } from "../lib/hls-buffer-config";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
@@ -38,30 +37,13 @@ const loadHlsLibrary = (): Promise<HlsLibraryModule> => {
 
 function configureDashPlayer(player: dashjs.MediaPlayerClass, library: typeof dashjs): void {
   const onDashUpdate = () => notifyDashPlayer();
-  const policy = resolvePlaybackPolicy();
   player.on(library.MediaPlayer.events.STREAM_INITIALIZED, onDashUpdate);
   player.on(library.MediaPlayer.events.TRACK_CHANGE_RENDERED, onDashUpdate);
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
   player.updateSettings({
     streaming: {
-      buffer: {
-        bufferTimeAtTopQuality: bufferSeconds(policy.steadyBufferMs),
-        bufferTimeAtTopQualityLongForm: bufferSeconds(policy.steadyBufferMs),
-        bufferToKeep: bufferSeconds(policy.backBufferMs),
-      },
+      ...createDashSettings(),
       cmcd: { enabled: false },
-      retryAttempts: {
-        MPD: policy.manifestAttempts,
-        MediaSegment: policy.mediaAttempts,
-        InitializationSegment: policy.mediaAttempts,
-        IndexSegment: policy.mediaAttempts,
-      },
-      retryIntervals: {
-        MPD: policy.retryIntervalMs,
-        MediaSegment: policy.retryIntervalMs,
-        InitializationSegment: policy.retryIntervalMs,
-        IndexSegment: policy.retryIntervalMs,
-      },
     },
   });
   notifyDashPlayer();
@@ -78,7 +60,7 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
     let providerLibrary = hlsProviderLibraries.get(provider);
     if (!providerLibrary) {
       providerLibrary = loadHlsLibrary().then((library) => {
-        provider.config = createHlsConfig(library.FetchLoader);
+        provider.config = createHlsConfig({ FetchLoader: library.FetchLoader });
         return library;
       });
       hlsProviderLibraries.set(provider, providerLibrary);
