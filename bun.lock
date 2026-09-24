@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "typetype",
+      "dependencies": {
+        "@typetype/mse": "0.1.67",
+      },
       "devDependencies": {
         "@biomejs/biome": "^2.5.12",
         "knip": "^6.35.1",
@@ -16,7 +19,7 @@
       "dependencies": {
         "@tanstack/react-query": "^5.102.8",
         "@tanstack/react-router": "^1.170.33",
-        "@typetype/mse": "0.1.66",
+        "@typetype/mse": "0.1.67",
         "@vidstack/react": "1.12.13",
         "@zip.js/zip.js": "^2.13.1",
         "dashjs": "^5.2.1",
@@ -371,7 +374,7 @@
 
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
 
-    "@typetype/mse": ["@typetype/mse@0.1.66", "", {}, "sha512-c4DSZgNotvQafUS5kZCOejwtt9xWYMMjoeVqNJ3F3XpBgacom+KAb6ezikXPNuKV6orYoYZJ/LnigtMhGOK9iA=="],
+    "@typetype/mse": ["@typetype/mse@0.1.67", "", {}, "sha512-ZTvseEIOSepFfebssw6p6qxhrEgXwDkYn0FHTKfcxeBwoZgEMptq+fRmrxSA2Bw10I0wWXGMd/C6i2sB76UczQ=="],
 
     "@typetype/web": ["@typetype/web@workspace:apps/web"],
 
