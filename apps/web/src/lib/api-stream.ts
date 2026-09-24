@@ -20,8 +20,9 @@ export async function fetchStream(
   url: string,
   mode: StreamFetchMode = "anonymous_first",
   signal?: AbortSignal,
+  knownLive = false,
 ): Promise<StreamResponse> {
-  const endpoint = streamEndpoint(url);
+  const endpoint = streamEndpoint(url, knownLive);
   return fetchStreamEndpoint(url, endpoint, mode, signal);
 }
 

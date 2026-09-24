@@ -44,13 +44,19 @@ function WatchPage() {
   const previewStream = previewMatches ? navigationSnapshot.stream : undefined;
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
+  const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
   const bootstrap = useSabrBootstrap(
     sourceUrl,
     useAuthenticatedStream,
-    shouldLoadSabrBootstrap(streamEnabled, previewStream?.isLive === true),
+    shouldLoadSabrBootstrap(streamEnabled, knownPublicLive),
   );
   const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
-  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, fullStreamEnabled);
+  const streamQuery = useStream(
+    sourceUrl,
+    useAuthenticatedStream,
+    fullStreamEnabled,
+    knownPublicLive,
+  );
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
   const previewRelated = previewMatches ? navigationSnapshot.relatedStreams : [];
