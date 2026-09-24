@@ -1,15 +1,12 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useRef } from "react";
 import { useClientLocale } from "../hooks/use-client-locale";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
-import { streamQueryOptions } from "../hooks/use-stream";
 import { useVideoCardPreview } from "../hooks/use-video-card-preview";
+import { useVideoCardPreflight } from "../hooks/use-video-card-sabr-preflight";
 import { formatDuration, formatPublishedDate, formatViews } from "../lib/format";
-import { detectProvider } from "../lib/provider";
 import { isVideoWatched } from "../lib/watch-progress";
 import { watchListSearch } from "../lib/watch-url";
-import { useAuthStore } from "../stores/auth-store";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
 import type { VideoStream } from "../types/stream";
 import { ChannelAvatar } from "./channel-avatar";
@@ -21,8 +18,6 @@ import { VideoProgressBar } from "./video-progress-bar";
 import { VideoStatusBadge } from "./video-status-badge";
 import { VerifiedBadgeIcon } from "./watch-icons";
 import { WatchedBadge } from "./watched-badge";
-
-const LIVE_STREAM_PREFETCH_DELAY_MS = 200;
 
 type Props = {
   stream: VideoStream;
@@ -43,8 +38,6 @@ function VideoCardComponent({
 }: Props) {
   const locale = useClientLocale();
   const rootRef = useRef<HTMLElement | null>(null);
-  const queryClient = useQueryClient();
-  const livePrefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const setNavigation = useWatchNavigationStore((state) => state.setNavigation);
   const preview = useVideoCardPreview(stream);
   const { title, thumbnail } = useDeArrowBranding(
@@ -57,36 +50,12 @@ function VideoCardComponent({
   const progressSeconds = Math.max(0, progressMs / 1_000);
   const watched = !stream.isLive && isVideoWatched(progressSeconds, stream.duration);
   const watchSearch = watchListSearch(stream.id, listId);
-  const prefetchableLive =
-    stream.isLive === true &&
-    stream.requiresMembership !== true &&
-    detectProvider(stream.id) === "youtube";
-  const prefetchLiveStream = useCallback(() => {
-    if (!prefetchableLive) return;
-    void queryClient.prefetchQuery(
-      streamQueryOptions(stream.id, Boolean(useAuthStore.getState().token), true, true),
-    );
-  }, [prefetchableLive, queryClient, stream.id]);
-  const scheduleLivePrefetch = useCallback(() => {
-    if (!prefetchableLive || livePrefetchTimer.current !== null) return;
-    livePrefetchTimer.current = setTimeout(() => {
-      livePrefetchTimer.current = null;
-      prefetchLiveStream();
-    }, LIVE_STREAM_PREFETCH_DELAY_MS);
-  }, [prefetchLiveStream, prefetchableLive]);
-  const clearLivePrefetch = useCallback(() => {
-    if (livePrefetchTimer.current === null) return;
-    clearTimeout(livePrefetchTimer.current);
-    livePrefetchTimer.current = null;
-  }, []);
-
-  useEffect(() => clearLivePrefetch, [clearLivePrefetch]);
+  const { schedule, cancel, focus, commit } = useVideoCardPreflight(stream, progressMs);
   const handleOpen = useCallback(() => {
-    clearLivePrefetch();
-    prefetchLiveStream();
+    commit();
     setNavigation(stream, relatedStreams);
     onOpen?.();
-  }, [clearLivePrefetch, onOpen, prefetchLiveStream, relatedStreams, setNavigation, stream]);
+  }, [commit, onOpen, relatedStreams, setNavigation, stream]);
 
   useEffect(() => {
     if (!onImpression || typeof IntersectionObserver === "undefined") return;
@@ -120,9 +89,10 @@ function VideoCardComponent({
         search={watchSearch}
         preload="intent"
         className="block"
-        onPointerEnter={scheduleLivePrefetch}
-        onPointerLeave={clearLivePrefetch}
-        onFocus={prefetchLiveStream}
+        onPointerEnter={schedule}
+        onPointerLeave={cancel}
+        onFocus={focus}
+        onBlur={cancel}
         onMouseDown={handleOpen}
         onTouchStart={handleOpen}
         onClick={handleOpen}
@@ -183,9 +153,10 @@ function VideoCardComponent({
             search={watchSearch}
             preload="intent"
             className="text-sm font-medium text-fg line-clamp-2 leading-snug hover:text-fg-strong"
-            onPointerEnter={scheduleLivePrefetch}
-            onPointerLeave={clearLivePrefetch}
-            onFocus={prefetchLiveStream}
+            onPointerEnter={schedule}
+            onPointerLeave={cancel}
+            onFocus={focus}
+            onBlur={cancel}
             onMouseDown={handleOpen}
             onTouchStart={handleOpen}
             onClick={handleOpen}

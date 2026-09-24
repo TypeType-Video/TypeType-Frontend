@@ -14,6 +14,7 @@ import { useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { preloadPlaybackRuntime } from "../lib/playback-runtime-preload";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
+import { hasSabrPlayback } from "../lib/stream-delivery";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
 import { shouldLoadFullWatchStream, shouldLoadSabrBootstrap } from "../lib/watch-stream-loading";
@@ -45,7 +46,6 @@ function WatchPage() {
   const useAuthenticatedStream = isAuthed;
   const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
   const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
-  const knownPublicVod = previewStream?.isLive === false && !previewStream.requiresMembership;
   const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
   const streamQuery = useStream(
     sourceUrl,
@@ -55,11 +55,11 @@ function WatchPage() {
   );
   const deferBootstrap =
     knownPublicLive ||
-    (!knownPublicVod &&
-      (streamQuery.isPending ||
-        streamQuery.isFetching ||
-        streamQuery.isPlaceholderData ||
-        streamQuery.data?.isLive === true));
+    streamQuery.isPending ||
+    streamQuery.isFetching ||
+    streamQuery.isPlaceholderData ||
+    streamQuery.data?.isLive === true ||
+    (streamQuery.data !== undefined && hasSabrPlayback(streamQuery.data));
   const bootstrap = useSabrBootstrap(
     sourceUrl,
     useAuthenticatedStream,
