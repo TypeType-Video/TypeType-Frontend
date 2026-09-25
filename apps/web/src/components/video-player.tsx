@@ -98,7 +98,6 @@ export function VideoPlayer({
       logLevel="warn"
       crossOrigin
       playsInline
-      hideControlsOnMouseLeave
       {...(ios ? { "webkit-playsinline": "true" } : {})}
       autoPlay={sabrConfig ? false : autoplay}
       storage={null}
