@@ -1,6 +1,7 @@
 import { useSettings } from "../hooks/use-settings";
 import { m } from "../paraglide/messages.js";
 import { SettingsDiscoveryToggles } from "./settings-content-toggles";
+import { SettingsLayoutPreferences } from "./settings-layout";
 import { ROW, ToggleSwitch } from "./settings-toggle-switch";
 
 function landingOptions() {
@@ -42,6 +43,7 @@ export function SettingsLandingPage() {
           ))}
         </select>
       </div>
+      <SettingsLayoutPreferences />
       <p className="px-1 pt-2 text-xs font-medium text-fg-soft uppercase tracking-wider">
         {m.ui_notifications()}
       </p>
