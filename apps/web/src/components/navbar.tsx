@@ -18,6 +18,7 @@ import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
 import { NavbarSearch } from "./navbar-search";
+import { NavbarServicePicker } from "./navbar-service-picker";
 import { ServiceIcon } from "./service-icon";
 import { Toast } from "./toast";
 
@@ -109,6 +110,7 @@ export function Navbar() {
         )}
 
         {canOpenSearch && !isMobile && <NavbarSearch />}
+        {canOpenSearch && !isMobile && <NavbarServicePicker />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <InterfaceLanguagePicker />
