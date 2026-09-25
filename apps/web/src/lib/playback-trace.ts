@@ -90,7 +90,7 @@ export function beginPlaybackTrace(
   return activeTraceId;
 }
 
-export function currentPlaybackTraceId(): string | null {
+function currentPlaybackTraceId(): string | null {
   return enabled() ? activeTraceId : null;
 }
 
