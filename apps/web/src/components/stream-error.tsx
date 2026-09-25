@@ -35,11 +35,23 @@ export function StreamError({
   const countryCode = parseGeoRestriction(displayedMessage);
   const isMemberOnly = availability === "members_only" || isMemberOnlyMessage(displayedMessage);
   const familyListBlocked = familyListBlockedOverride ?? message === familyListBlockedMessage();
-  const imageSrc = familyListBlocked
-    ? "/family-list-blocked.gif"
-    : isMemberOnly
-      ? "/member-only-source.gif"
-      : "/error-cat.gif";
+  const youtubeSessionReconnect = youtubeSessionAction === "reconnect";
+  const imageSrc = youtubeSessionReconnect
+    ? "/youtube-session-reconnect.gif"
+    : familyListBlocked
+      ? "/family-list-blocked.gif"
+      : isMemberOnly
+        ? "/member-only-source.gif"
+        : "/error-cat.gif";
+  const errorImage = (
+    <img
+      src={imageSrc}
+      width="220"
+      height={youtubeSessionReconnect ? "180" : familyListBlocked ? "181" : "220"}
+      alt=""
+      className="rounded-2xl"
+    />
+  );
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center gap-5 bg-app px-4">
@@ -47,13 +59,18 @@ export function StreamError({
         <VideoAvailabilityPoster availability={availability} message={message} poster={poster} />
       ) : (
         <>
-          <img
-            src={imageSrc}
-            width="220"
-            height={familyListBlocked ? "181" : "220"}
-            alt=""
-            className="rounded-2xl"
-          />
+          {youtubeSessionReconnect && youtubeSessionReturnTo ? (
+            <Link
+              to="/youtube-session"
+              search={{ returnTo: youtubeSessionReturnTo }}
+              aria-label={m.ui_reconnect_with_youtube()}
+              className="cursor-pointer"
+            >
+              {errorImage}
+            </Link>
+          ) : (
+            errorImage
+          )}
           <div className="flex flex-col items-center gap-1.5">
             <p className="text-base font-semibold tracking-tight text-white">
               {m.ui_couldn_t_load_this_video()}

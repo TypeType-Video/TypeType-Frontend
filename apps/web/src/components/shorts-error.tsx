@@ -20,6 +20,22 @@ export function ShortsError({
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 p-5">
       <div className="flex max-w-sm flex-col items-center gap-3 text-center">
+        {youtubeSessionAction === "reconnect" && youtubeSessionReturnTo ? (
+          <Link
+            to="/youtube-session"
+            search={{ returnTo: youtubeSessionReturnTo }}
+            aria-label={m.ui_reconnect_with_youtube()}
+            className="cursor-pointer"
+          >
+            <img
+              src="/youtube-session-reconnect.gif"
+              width="112"
+              height="92"
+              alt=""
+              className="rounded-xl"
+            />
+          </Link>
+        ) : null}
         <p className="text-sm text-fg">{message}</p>
         <div className="flex items-center gap-2">
           {youtubeSessionReturnTo ? (
