@@ -14,12 +14,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Temporarily bypass automatic test/CI validation for Beta image builds.
-  # verify:
-  #   uses: ./.github/workflows/ci.yml
+  verify:
+    uses: ./.github/workflows/ci.yml
 
   prepare:
-    # needs: verify
+    needs: verify
     runs-on: [self-hosted, Linux, X64, ci-stack]
     permissions:
       contents: read
