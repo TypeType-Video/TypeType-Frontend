@@ -11,9 +11,12 @@ export async function prewarmSabrPlayback(
   const params = new URLSearchParams({
     videoItag: String(config.videoItag),
     audioItag: String(config.audioItag),
-    startTimeMs: String(Math.max(0, Math.floor(startTimeMs))),
+    startTimeMs: String(Math.max(0, Math.round(startTimeMs))),
   });
   if (config.audioTrackId) params.set("audioTrackId", config.audioTrackId);
+  if (config.audioOnly) params.set("audioOnly", "true");
+  if (config.isLive) params.set("isLive", "true");
+  params.set("prewarm", "true");
   const url = toAbsoluteApiUrl(`/sabr/playback/${encodeURIComponent(config.videoId)}?${params}`);
   const headers = new Headers();
   if (token) headers.set("Authorization", `Bearer ${token}`);
