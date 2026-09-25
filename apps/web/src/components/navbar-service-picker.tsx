@@ -7,7 +7,11 @@ import { m } from "../paraglide/messages.js";
 import type { ServiceId } from "../types/user";
 import { ServiceIcon } from "./service-icon";
 
-export function NavbarServicePicker() {
+type Props = {
+  compact?: boolean;
+};
+
+export function NavbarServicePicker({ compact = false }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -47,20 +51,24 @@ export function NavbarServicePicker() {
         aria-expanded={open}
         aria-label={m.nav_services()}
         onClick={() => setOpen((current) => !current)}
-        className="flex h-9 items-center gap-2 rounded-sm border border-transparent px-2 text-fg transition-colors hover:border-border hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong"
+        className={`flex h-9 items-center rounded-sm border border-transparent text-fg transition-colors hover:border-border hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-strong ${
+          compact ? "w-9 justify-center px-0" : "gap-2 px-2"
+        }`}
       >
         <ServiceIcon path={active.path} color={active.color} label={active.label} />
-        <span className="hidden text-xs font-medium xl:inline">{active.label}</span>
+        {!compact && <span className="hidden text-xs font-medium xl:inline">{active.label}</span>}
         <ChevronDown
           size={12}
-          className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+          className={`transition-transform duration-150 ${compact ? "hidden" : ""} ${
+            open ? "rotate-180" : ""
+          }`}
           aria-hidden="true"
         />
       </button>
       <div
         role="listbox"
         aria-label={m.nav_services()}
-        className={`absolute right-0 top-full z-30 mt-1 w-44 origin-top-right rounded-sm border border-border-strong bg-app p-1 shadow-xl transition-[opacity,transform] duration-150 ${
+        className={`absolute right-0 top-full z-30 mt-1 w-44 max-w-[calc(100vw-1rem)] origin-top-right rounded-sm border border-border-strong bg-app p-1 shadow-xl transition-[opacity,transform] duration-150 ${
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-1 opacity-0"

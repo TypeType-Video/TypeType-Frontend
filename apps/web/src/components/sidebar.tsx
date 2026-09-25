@@ -1,16 +1,13 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "../hooks/use-auth";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useMobile } from "../hooks/use-mobile";
 import { useSettings } from "../hooks/use-settings";
 import { getStoredAdminSection } from "../lib/admin-console-section";
 import { logoutSession } from "../lib/auth-session";
-import { nextServiceRoute, SERVICE_OPTIONS } from "../lib/service-options";
 import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
-import type { ServiceId } from "../types/user";
 import { NAV_ITEMS } from "./nav-items";
-import { ServiceIcon } from "./service-icon";
 
 const BTN_BASE = "flex h-10 w-full items-center border-l-2 transition-colors";
 const BTN_ACTIVE = "border-accent text-fg";
@@ -49,17 +46,8 @@ export function Sidebar({ overlay = false }: Props) {
   const closeMobileSidebar = useUiStore((s) => s.closeMobileSidebar);
   const visualCollapsed = overlay ? false : collapsed;
   const { isAdmin, isAuthed, signOut } = useAuth();
-  const { settings, update } = useSettings();
-  const service = settings.defaultService;
-  const navigate = useNavigate();
+  const { settings } = useSettings();
   const loc = useRouterState({ select: (s) => s.location });
-
-  function handleServiceClick(id: ServiceId) {
-    update.mutate({ defaultService: id });
-    if (isMobile) closeMobileSidebar();
-    const target = nextServiceRoute(loc.pathname, loc.searchStr, id);
-    if (target) navigate(target);
-  }
 
   const adminSearch = { section: getStoredAdminSection() };
   const navItems = NAV_ITEMS.filter((item) => {
@@ -129,28 +117,6 @@ export function Sidebar({ overlay = false }: Props) {
           })}
         </div>
 
-        {isMobile && (
-          <div className={`mt-4 ${sectionPadding} border-t border-border pt-4 flex flex-col gap-1`}>
-            <p className="text-xs text-fg-soft px-2 mb-1 uppercase tracking-wider">
-              {m.nav_services()}
-            </p>
-            {SERVICE_OPTIONS.map((svc) => (
-              <button
-                key={svc.label}
-                type="button"
-                onClick={() => handleServiceClick(svc.id)}
-                className={`${BTN_BASE} justify-start gap-3 px-2 text-left ${
-                  service === svc.id ? BTN_ACTIVE : BTN_INACTIVE
-                }`}
-              >
-                <ServiceIcon path={svc.path} color={svc.color} label={svc.label} />
-                <span className="typetype-adaptive-label flex-1 text-sm leading-tight">
-                  {svc.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
         {isMobile && isAuthed && (
           <div className="mt-auto px-3 pt-4">
             <button
