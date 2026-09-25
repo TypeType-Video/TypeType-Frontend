@@ -7,8 +7,8 @@ import { recordApiError } from "./api-error-log";
 import { extractRequestId, recordClientEvent } from "./client-debug-log";
 import { sanitizeDebugText, sanitizeRequestPath } from "./debug-sanitize";
 import { API_BASE as BASE } from "./env";
-import { finishPlaybackApiRequest, preparePlaybackApiRequest } from "./playback-trace";
 import { optionalBearer } from "./optional-bearer";
+import { finishPlaybackApiRequest, preparePlaybackApiRequest } from "./playback-trace";
 import { normalizeApiPayload } from "./text-normalize";
 
 export class ApiError extends Error {

@@ -20,7 +20,12 @@ export async function prewarmSabrPlayback(
   const url = toAbsoluteApiUrl(`/sabr/playback/${encodeURIComponent(config.videoId)}?${params}`);
   const headers = new Headers();
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  const trace = preparePlaybackApiRequest(url, { method: "POST", headers, signal, cache: "no-store" });
+  const trace = preparePlaybackApiRequest(url, {
+    method: "POST",
+    headers,
+    signal,
+    cache: "no-store",
+  });
   let response: Response;
   try {
     response = await fetch(url, trace.init);
