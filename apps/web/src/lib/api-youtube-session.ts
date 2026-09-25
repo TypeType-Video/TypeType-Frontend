@@ -3,6 +3,7 @@ import { authed, authedJson } from "./authed";
 import { API_BASE as BASE } from "./env";
 
 export type YoutubeSessionStatus = "disconnected" | "connected" | "needs_reconnect";
+export type YoutubeSessionAction = "connect" | "reconnect";
 
 export type YoutubeSessionState = {
   status: YoutubeSessionStatus;
@@ -16,11 +17,15 @@ export type YoutubeRemoteBrowserSession = {
   expiresAt: number;
 };
 
+export function youtubeSessionActionForError(error: unknown): YoutubeSessionAction | null {
+  if (!(error instanceof ApiError)) return null;
+  if (error.code === "youtube_session_needs_reconnect") return "reconnect";
+  if (error.code === "youtube_session_required") return "connect";
+  return null;
+}
+
 export function isYoutubeSessionActionError(error: unknown): boolean {
-  return (
-    error instanceof ApiError &&
-    (error.code === "youtube_session_required" || error.code === "youtube_session_needs_reconnect")
-  );
+  return youtubeSessionActionForError(error) !== null;
 }
 
 export function fetchYoutubeSessionStatus(): Promise<YoutubeSessionState> {

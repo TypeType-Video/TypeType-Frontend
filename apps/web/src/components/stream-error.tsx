@@ -13,6 +13,7 @@ type Props = {
   message: string;
   onRetry?: () => void;
   youtubeSessionReturnTo?: string;
+  youtubeSessionAction?: "connect" | "reconnect";
   familyListBlocked?: boolean;
   availability?: VideoAvailability;
   poster?: string;
@@ -22,6 +23,7 @@ export function StreamError({
   message,
   onRetry,
   youtubeSessionReturnTo,
+  youtubeSessionAction,
   familyListBlocked: familyListBlockedOverride,
   availability,
   poster,
@@ -82,7 +84,11 @@ export function StreamError({
             className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white px-5 py-2 text-sm font-medium text-app transition-colors hover:bg-fg"
           >
             <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
-            <span>{m.ui_connect_with_youtube()}</span>
+            <span>
+              {youtubeSessionAction === "reconnect"
+                ? m.ui_reconnect_with_youtube()
+                : m.ui_connect_with_youtube()}
+            </span>
           </Link>
         )}
         {familyListBlocked && canGlobalBlock && (
