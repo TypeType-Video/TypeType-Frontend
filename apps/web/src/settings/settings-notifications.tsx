@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useChannelNotificationPreferences } from "../hooks/use-channel-notification-preferences";
 import { useSettings } from "../hooks/use-settings";
 import { useSubscriptions } from "../hooks/use-subscriptions";
+import { normalizeChannelUrl } from "../lib/channel-url";
 import { proxyImage } from "../lib/proxy";
 import { m } from "../paraglide/messages.js";
 import { ROW, ToggleSwitch } from "./settings-toggle-switch";
@@ -14,7 +15,13 @@ export function SettingsNotifications() {
   const [search, setSearch] = useState("");
   const subscriptions = subscriptionsQuery.data ?? [];
   const preferenceByUrl = useMemo(
-    () => new Map((preferences.query.data ?? []).map((item) => [item.channelUrl, item.enabled])),
+    () =>
+      new Map(
+        (preferences.query.data ?? []).map((item) => [
+          normalizeChannelUrl(item.channelUrl),
+          item.enabled,
+        ]),
+      ),
     [preferences.query.data],
   );
   const filtered = useMemo(() => {
@@ -82,12 +89,14 @@ export function SettingsNotifications() {
                 <span className="truncate text-sm text-fg">{subscription.name}</span>
               </div>
               <ToggleSwitch
-                checked={preferenceByUrl.get(subscription.channelUrl) ?? false}
+                checked={preferenceByUrl.get(normalizeChannelUrl(subscription.channelUrl)) ?? false}
                 disabled={preferences.query.isLoading || preferences.update.isPending}
                 onClick={() =>
                   preferences.update.mutate({
                     channelUrl: subscription.channelUrl,
-                    enabled: !(preferenceByUrl.get(subscription.channelUrl) ?? false),
+                    enabled: !(
+                      preferenceByUrl.get(normalizeChannelUrl(subscription.channelUrl)) ?? false
+                    ),
                   })
                 }
               />
