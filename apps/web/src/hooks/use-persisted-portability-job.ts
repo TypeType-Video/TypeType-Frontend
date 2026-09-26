@@ -25,7 +25,7 @@ export function usePersistedPortabilityJob(
       setJobId(next);
       window.dispatchEvent(new CustomEvent(eventName, { detail: next }));
     },
-    [eventName],
+    [eventName, storageKey],
   );
 
   useEffect(() => {

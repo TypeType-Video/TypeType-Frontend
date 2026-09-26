@@ -1,4 +1,4 @@
-import { ZipWriter, type FileEntry } from "@zip.js/zip.js";
+import type { FileEntry, ZipWriter } from "@zip.js/zip.js";
 
 export type ArchiveEntry = FileEntry;
 
@@ -18,7 +18,7 @@ export function uniqueTakeoutEntryName(name: string, part: number, used: Set<str
   let duplicate = 1;
   let candidate = "";
   do {
-    candidate = "takeout-part-" + part + "-" + duplicate + "/" + name;
+    candidate = `takeout-part-${part}-${duplicate}/${name}`;
     duplicate++;
   } while (used.has(candidate));
   used.add(candidate);
@@ -53,8 +53,5 @@ export async function streamTakeoutPart(
       controller.enqueue(chunk);
     },
   });
-  await Promise.all([
-    entry.getData<void>(transfer.writable),
-    transfer.readable.pipeTo(output),
-  ]);
+  await Promise.all([entry.getData<void>(transfer.writable), transfer.readable.pipeTo(output)]);
 }

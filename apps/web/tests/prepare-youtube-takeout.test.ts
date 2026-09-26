@@ -18,10 +18,9 @@ test("preserves account metadata and excludes uploaded videos and other Google p
   await writer.add("Takeout/YouTube/videos/upload.mp4", new TextReader("not account data"));
   await writer.add("Takeout/Mail/mail.html", new TextReader("private unrelated data"));
   const phases: string[] = [];
-  const result = await prepareYoutubeTakeout(
-    new File([await writer.close()], "takeout.zip"),
-    { onProgress: (progress) => phases.push(progress.phase) },
-  );
+  const result = await prepareYoutubeTakeout(new File([await writer.close()], "takeout.zip"), {
+    onProgress: (progress) => phases.push(progress.phase),
+  });
   expect(phases).toContain("scanning");
   expect(phases).toContain("packing");
   const reader = new ZipReader(new BlobReader(result));

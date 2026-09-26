@@ -1,5 +1,6 @@
-import { BlobReader, BlobWriter, ZipReader, ZipWriter, type FileEntry } from "@zip.js/zip.js";
+import { BlobReader, BlobWriter, type FileEntry, ZipReader, ZipWriter } from "@zip.js/zip.js";
 import { m } from "../paraglide/messages.js";
+import type { PortabilityPreparationProgress } from "./portability-preparation-progress";
 import {
   appendTakeoutMetadata,
   isRootZipPart,
@@ -12,7 +13,6 @@ import {
   persistPreparedTakeout,
   type TakeoutFileHandle,
 } from "./youtube-takeout-prepared-store";
-import type { PortabilityPreparationProgress } from "./portability-preparation-progress";
 
 const MAX_METADATA_BYTES = 512 * 1024 * 1024;
 const MAX_EXPANDED_BYTES = 2 * 1024 * 1024 * 1024;
@@ -38,13 +38,14 @@ function isQuotaError(error: unknown): boolean {
   );
 }
 
-export async function prepareYoutubeTakeout(file: File, options: PrepareOptions = {}): Promise<File> {
+export async function prepareYoutubeTakeout(
+  file: File,
+  options: PrepareOptions = {},
+): Promise<File> {
   const reader = new ZipReader(new BlobReader(file));
   const directory = options.ownerId ? await getTakeoutDirectory() : null;
   const outputName =
-    directory && options.ownerId
-      ? "tt-takeout-prepared-" + crypto.randomUUID() + ".zip"
-      : null;
+    directory && options.ownerId ? `tt-takeout-prepared-${crypto.randomUUID()}.zip` : null;
   let outputHandle: TakeoutFileHandle | null = null;
   let outputStream: WritableStream<Uint8Array> | null = null;
   let completed = false;
@@ -152,7 +153,7 @@ export async function prepareYoutubeTakeout(file: File, options: PrepareOptions 
           continue;
         }
 
-        const tempName = "tt-takeout-part-" + crypto.randomUUID() + ".zip";
+        const tempName = `tt-takeout-part-${crypto.randomUUID()}.zip`;
         try {
           const tempHandle = await directory.getFileHandle(tempName, { create: true });
           options.onProgress?.({

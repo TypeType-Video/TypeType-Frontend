@@ -56,8 +56,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           queryClient.setQueryData(["portability-job", started.id], started);
         },
       }),
-    onSuccess: (started) =>
-      queryClient.setQueryData(["portability-job", started.id], started),
+    onSuccess: (started) => queryClient.setQueryData(["portability-job", started.id], started),
   });
   const apply = useMutation({
     mutationFn: () => applyPortabilityImport(jobId as string, [...selected], duplicatePolicy),
@@ -142,7 +141,9 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
           <PortabilityImportDropzone
             busy={upload.isPending}
             extension={format.defaultExtension}
-            label={upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()}
+            label={
+              upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()
+            }
             hint={
               m.portability_drop_original_prefix() +
               " ." +

@@ -2,17 +2,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, LoaderCircle, X } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useAuth } from "../hooks/use-auth";
+import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
+import { usePortabilityJob } from "../hooks/use-portability-job";
+import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import {
   getPortabilityPreparationProgress,
   subscribePortabilityPreparationProgress,
 } from "../lib/portability-preparation-progress";
-import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
-import { usePortabilityJob } from "../hooks/use-portability-job";
-import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import { m } from "../paraglide/messages.js";
-import { PortabilityPreparationToast } from "./portability-preparation-toast";
 import { getLocale } from "../paraglide/runtime.js";
 import { portabilityImportStageLabel } from "./portability-job-status";
+import { PortabilityPreparationToast } from "./portability-preparation-toast";
 import "../styles/notification-toast.css";
 
 const REFRESH_INTERVAL_MS = 2_000;
@@ -40,8 +40,7 @@ export function PortabilityProgressHost() {
     getPortabilityPreparationProgress,
     getPortabilityPreparationProgress,
   );
-  const localPreparation =
-    isAuthed && preparation?.ownerId === me?.id ? preparation : null;
+  const localPreparation = isAuthed && preparation?.ownerId === me?.id ? preparation : null;
   const job = usePortabilityJob(isAuthed ? jobId : null);
   const [finished, setFinished] = useState(false);
   const wasRunning = useRef(false);

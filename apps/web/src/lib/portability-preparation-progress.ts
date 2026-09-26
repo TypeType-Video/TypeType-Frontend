@@ -18,15 +18,13 @@ export function subscribePortabilityPreparationProgress(listener: () => void): (
   return () => listeners.delete(listener);
 }
 
-export function setPortabilityPreparationProgress(
-  progress: PortabilityPreparationProgress,
-): void {
+export function setPortabilityPreparationProgress(progress: PortabilityPreparationProgress): void {
   current = progress;
-  listeners.forEach((listener) => listener());
+  for (const listener of listeners) listener();
 }
 
 export function clearPortabilityPreparationProgress(ownerId: string): void {
   if (current?.ownerId !== ownerId) return;
   current = null;
-  listeners.forEach((listener) => listener());
+  for (const listener of listeners) listener();
 }

@@ -75,7 +75,7 @@ export function PortabilityPreparationToast({
             "h-full bg-accent transition-[width] duration-300 " +
             (percent === null ? "w-1/3 animate-pulse" : "")
           }
-          style={percent === null ? undefined : { width: percent + "%" }}
+          style={percent === null ? undefined : { width: `${percent}%` }}
         />
       </div>
     </aside>

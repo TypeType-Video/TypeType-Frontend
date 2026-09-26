@@ -1,3 +1,5 @@
+import type { PortabilityJob } from "./api-portability";
+import { portabilityResponse } from "./api-portability-response";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
 import {
@@ -6,8 +8,6 @@ import {
 } from "./portability-preparation-progress";
 import { prepareYoutubeTakeout } from "./prepare-youtube-takeout";
 import { clearPreparedTakeout } from "./youtube-takeout-prepared-store";
-import { portabilityResponse } from "./api-portability-response";
-import type { PortabilityJob } from "./api-portability";
 
 export type PortabilityImportOptions = {
   ownerId?: string;
@@ -45,10 +45,10 @@ export async function startPortabilityImport(
     const body = new FormData();
     body.append("file", file);
     const job = await portabilityResponse<PortabilityJob>(
-      await authed(
-        API_BASE + "/portability/imports?format=" + encodeURIComponent(format),
-        { method: "POST", body },
-      ),
+      await authed(`${API_BASE}/portability/imports?format=${encodeURIComponent(format)}`, {
+        method: "POST",
+        body,
+      }),
     );
     options.onAccepted?.(job);
     if (ownerId && format === "youtube-takeout") await clearPreparedTakeout(ownerId);

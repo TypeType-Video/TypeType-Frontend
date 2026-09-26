@@ -1,8 +1,8 @@
 import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
+import { portabilityResponse } from "./api-portability-response";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
-import { portabilityResponse } from "./api-portability-response";
 
 export { startPortabilityImport } from "./api-portability-import";
 
