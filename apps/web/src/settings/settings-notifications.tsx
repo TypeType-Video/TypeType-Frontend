@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ChannelAvatar } from "../components/channel-avatar";
 import { useChannelNotificationPreferences } from "../hooks/use-channel-notification-preferences";
 import { useSettings } from "../hooks/use-settings";
 import { useSubscriptions } from "../hooks/use-subscriptions";
@@ -77,15 +78,11 @@ export function SettingsNotifications() {
           {filtered.map((subscription) => (
             <div key={subscription.channelUrl} className={ROW}>
               <div className="flex min-w-0 items-center gap-3">
-                {subscription.avatarUrl ? (
-                  <img
-                    src={proxyImage(subscription.avatarUrl)}
-                    alt=""
-                    className="h-8 w-8 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="h-8 w-8 shrink-0 rounded-full bg-surface-strong" />
-                )}
+                <ChannelAvatar
+                  src={proxyImage(subscription.avatarUrl)}
+                  name={subscription.name}
+                  className="h-8 w-8"
+                />
                 <span className="truncate text-sm text-fg">{subscription.name}</span>
               </div>
               <ToggleSwitch
