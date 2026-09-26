@@ -8,7 +8,11 @@ import {
   useMediaState,
   useVideoQualityOptions,
 } from "../lib/vidstack";
-import { includesOriginal, normalizeLanguageTag } from "./player-language";
+import {
+  hasMultipleLanguageTracks,
+  includesOriginal,
+  normalizeLanguageTag,
+} from "./player-language";
 
 const QUALITY_OPTIONS = { sort: "descending" } as const;
 
@@ -108,11 +112,14 @@ export function PlayerDefaults({
       : (audioOptions.find((option) => option.track.id === preferredDefaultAudioTrackId) ??
         audioOptions.find((option) => option.track.id === originalAudioTrackId));
 
+    const hasMultipleLanguages = hasMultipleLanguageTracks(audioOptions);
+
     const missingOriginalByContract = forceOriginal && originalAudioTrackId === null;
     const missingOriginalByHeuristic =
-      forceOriginal && originalAudioTrackId === undefined && !match;
+      forceOriginal && originalAudioTrackId === undefined && hasMultipleLanguages && !match;
     if (
       (missingOriginalByContract || missingOriginalByHeuristic) &&
+      hasMultipleLanguages &&
       !originalMissingNotified.current
     ) {
       originalMissingNotified.current = true;
