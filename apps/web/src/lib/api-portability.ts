@@ -14,6 +14,13 @@ type PortabilityJobState =
   | "completed"
   | "failed"
   | "cancelled";
+export type PortabilityImportStage =
+  | "subscriptions"
+  | "recentHistory"
+  | "playlists"
+  | "history"
+  | "remaining";
+
 export type PortabilityCategory =
   | "subscriptions"
   | "subscriptionGroups"
@@ -73,6 +80,11 @@ export type PortabilityJob = {
     unit: "records" | "categories" | "bytes";
     processed: number;
     total: number | null;
+    category?: PortabilityCategory | null;
+    stage?: PortabilityImportStage | null;
+    stageProcessed?: number;
+    stageTotal?: number | null;
+    checkpoint?: number;
   } | null;
   errorCode: string | null;
   errorMessage: string | null;

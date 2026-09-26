@@ -1,6 +1,6 @@
 import { AlertTriangle, Check, CheckCircle2, Copy, LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
-import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
+import type { PortabilityCategory, PortabilityImportStage, PortabilityJob } from "../lib/api-portability";
 import { categoryLabel } from "../lib/portability-catalog";
 import { m } from "../paraglide/messages.js";
 import { getLocale, type Locale } from "../paraglide/runtime.js";
@@ -42,10 +42,31 @@ function progressUnit(unit: PortabilityProgressUnit, locale: Locale): string {
   return m.portability_progress_bytes({}, { locale });
 }
 
+export function portabilityImportStageLabel(
+  stage: PortabilityImportStage,
+  category: PortabilityCategory | null | undefined,
+  locale: Locale = getLocale(),
+): string {
+  if (stage === "subscriptions") return m.portability_stage_subscriptions({}, { locale });
+  if (stage === "recentHistory") return m.portability_stage_recent_history({}, { locale });
+  if (stage === "playlists") return m.portability_stage_playlists({}, { locale });
+  if (stage === "history") return m.portability_stage_history({}, { locale });
+  const remaining = m.portability_stage_remaining({}, { locale });
+  return category ? `${remaining} - ${categoryLabel(category, locale)}` : remaining;
+}
+
+function stagePercent(job: PortabilityJob): number | null {
+  const progress = job.progress;
+  if (!progress?.stageTotal || progress.stageTotal <= 0) return null;
+  return Math.min(100, Math.round(((progress.stageProcessed ?? 0) / progress.stageTotal) * 100));
+}
+
 export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLocale() }: Props) {
   const [copied, setCopied] = useState(false);
   const percent = progressPercent(job);
   const active = ACTIVE.has(job.state);
+  const currentStage = job.progress?.stage;
+  const currentStagePercent = stagePercent(job);
   const Icon = active ? LoaderCircle : job.state === "failed" ? AlertTriangle : CheckCircle2;
   const reference = [
     `${m.portability_job_label({}, { locale })}: ${job.id}`,
@@ -126,6 +147,39 @@ export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLo
             className={`h-full bg-fg transition-[width] duration-300 ${percent === null ? "w-1/3 animate-pulse" : ""}`}
             style={percent === null ? undefined : { width: `${percent}%` }}
           />
+        </div>
+      )}
+      {active && currentStage && (
+        <div className="mt-3 border-t border-border pt-3">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="min-w-0 truncate font-medium text-fg">
+              {portabilityImportStageLabel(currentStage, job.progress?.category, locale)}
+            </span>
+            <span className="shrink-0 text-fg-soft">
+              {job.progress?.stageTotal != null
+                ? m.portability_progress_of(
+                    {
+                      processed: (job.progress.stageProcessed ?? 0).toLocaleString(),
+                      total: job.progress.stageTotal.toLocaleString(),
+                    },
+                    { locale },
+                  )
+                : (job.progress?.stageProcessed ?? 0).toLocaleString()}
+            </span>
+          </div>
+          <div
+            className="mt-2 h-1 overflow-hidden bg-surface-strong"
+            role="progressbar"
+            aria-label={portabilityImportStageLabel(currentStage, job.progress?.category, locale)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={currentStagePercent ?? undefined}
+          >
+            <div
+              className={`h-full bg-accent transition-[width] duration-300 ${currentStagePercent === null ? "w-1/3 animate-pulse" : ""}`}
+              style={currentStagePercent === null ? undefined : { width: `${currentStagePercent}%` }}
+            />
+          </div>
         </div>
       )}
       {job.result && Object.keys(job.result).length > 0 && (
