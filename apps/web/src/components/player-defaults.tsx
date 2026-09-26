@@ -74,7 +74,11 @@ export function PlayerDefaults({
     const defaultHeight = qualityLabelHeight(defaultQuality);
     const exactMatch = qualityOptions.find((o) => o.label === defaultQuality);
     const heightMatch = qualityOptions.find(
-      (o) => defaultHeight !== null && o.quality?.height === defaultHeight,
+      (o) =>
+        defaultHeight !== null &&
+        ((o.quality?.height && o.quality.height > 0
+          ? o.quality.height
+          : qualityLabelHeight(o.label)) === defaultHeight),
     );
     const match = exactMatch ?? heightMatch;
     if (!match) return;
