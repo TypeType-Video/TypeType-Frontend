@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArchiveRestore, FileUp } from "lucide-react";
-import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ArchiveRestore } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAuth } from "../hooks/use-auth";
+import { usePendingYoutubeTakeout } from "../hooks/use-pending-youtube-takeout";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import {
@@ -13,13 +15,16 @@ import {
 } from "../lib/api-portability";
 import { m } from "../paraglide/messages.js";
 import { PortabilityFormatPicker } from "./portability-format-picker";
+import { PortabilityImportDropzone } from "./portability-import-dropzone";
 import { PortabilityImportGuide } from "./portability-import-guide";
 import { PortabilityImportPreview } from "./portability-import-preview";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
 
 export function PortabilityImportPanel({ formats }: { formats: PortabilityFormatDescriptor[] }) {
-  const input = useRef<HTMLInputElement>(null);
+  const { me } = useAuth();
+  const ownerId = me?.id;
+  const [pendingTakeout, setPendingTakeout] = usePendingYoutubeTakeout(ownerId);
   const queryClient = useQueryClient();
   const importFormats = useMemo(
     () =>
@@ -36,17 +41,23 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   const [jobId, setJobId] = usePersistedPortabilityJob("typetype-portability-import-job");
   const [selected, setSelected] = useState<Set<PortabilityCategory>>(new Set());
   const [duplicatePolicy, setDuplicatePolicy] = useState<"skip" | "replace">("skip");
-  const [dragging, setDragging] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const previousState = useRef<string | null>(null);
   const job = usePortabilityJob(jobId);
   const format = importFormats.find((item) => item.format === formatName) ?? importFormats[0];
   const upload = useMutation({
-    mutationFn: (file: File) => startPortabilityImport(file, format.format),
-    onSuccess: (started) => {
-      setJobId(started.id);
-      queryClient.setQueryData(["portability-job", started.id], started);
-    },
+    mutationFn: ({ file, prepared }: { file: File; prepared: boolean }) =>
+      startPortabilityImport(file, format.format, {
+        ownerId,
+        preparedFile: prepared ? file : undefined,
+        onPrepared: setPendingTakeout,
+        onAccepted: (started) => {
+          setJobId(started.id);
+          queryClient.setQueryData(["portability-job", started.id], started);
+        },
+      }),
+    onSuccess: (started) =>
+      queryClient.setQueryData(["portability-job", started.id], started),
   });
   const apply = useMutation({
     mutationFn: () => applyPortabilityImport(jobId as string, [...selected], duplicatePolicy),
@@ -84,14 +95,8 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  function choose(file: File | undefined) {
-    if (file && !upload.isPending) upload.mutate(file);
-  }
-
-  function drop(event: DragEvent<HTMLButtonElement>) {
-    event.preventDefault();
-    setDragging(false);
-    choose(event.dataTransfer.files[0]);
+  function choose(file: File | undefined, prepared = false) {
+    if (file && !upload.isPending) upload.mutate({ file, prepared });
   }
 
   function reset() {
@@ -124,37 +129,28 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             onChange={setFormatName}
           />
           <PortabilityImportGuide format={format.format} />
-          <button
-            type="button"
-            disabled={upload.isPending}
-            aria-busy={upload.isPending}
-            onClick={() => input.current?.click()}
-            onDragEnter={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragOver={(event) => event.preventDefault()}
-            onDragLeave={() => setDragging(false)}
-            onDrop={drop}
-            className={`flex min-h-44 w-full flex-col items-center justify-center border border-dashed px-5 text-center transition-colors ${dragging ? "border-fg bg-surface-strong" : "border-border-strong bg-surface hover:border-fg-soft"}`}
-          >
-            <FileUp size={24} className="text-fg" />
-            <span className="mt-3 text-sm font-medium text-fg">
-              {upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()}
-            </span>
-            <span className="mt-1 max-w-md text-xs text-fg-soft">
-              {m.portability_drop_original_prefix()} .{format.defaultExtension}{" "}
-              {m.portability_drop_original_suffix()}
-            </span>
-          </button>
-          <input
-            ref={input}
-            type="file"
-            className="hidden"
-            onChange={(event) => {
-              choose(event.target.files?.[0]);
-              event.target.value = "";
-            }}
+          {format.format === "youtube-takeout" && pendingTakeout && (
+            <button
+              type="button"
+              disabled={upload.isPending}
+              onClick={() => choose(pendingTakeout, true)}
+              className="h-9 self-start border border-border px-3 text-xs text-fg-muted hover:text-fg disabled:opacity-40"
+            >
+              {m.portability_resume_prepared_upload()}
+            </button>
+          )}
+          <PortabilityImportDropzone
+            busy={upload.isPending}
+            extension={format.defaultExtension}
+            label={upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()}
+            hint={
+              m.portability_drop_original_prefix() +
+              " ." +
+              format.defaultExtension +
+              " " +
+              m.portability_drop_original_suffix()
+            }
+            onFile={(file) => choose(file)}
           />
         </>
       )}

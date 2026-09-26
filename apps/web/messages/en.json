@@ -310,7 +310,8 @@
   "portability_no_import_format": "No import format is available.",
   "portability_preparing_upload": "Preparing and uploading account data...",
   "portability_takeout_metadata_limit": "The account data in this archive exceeds the import limits or is encrypted. Export YouTube separately with smaller ZIP parts.",
-  "portability_takeout_no_metadata": "No YouTube account data was found. Select an original Takeout ZIP containing your history, subscriptions or playlists, rather than a video-only part or a ZIP containing other ZIPs.",
+  "portability_takeout_no_metadata": "No YouTube account data was found. Select the original Takeout ZIP containing your history, subscriptions or playlists, not a video-only ZIP part.",
+  "portability_takeout_storage_required": "The browser does not have enough temporary storage to process this Takeout archive. Free space or use a browser profile with more available storage.",
   "portability_import_title": "Import data",
   "portability_import_description": "Preview and choose what to restore.",
   "portability_import_from": "Import from",
@@ -1398,5 +1399,10 @@
   "ui_bilibili_info_scan": "You scan the QR code with the BiliBili app on your phone.",
   "ui_bilibili_info_cookies": "Cookies are captured server-side, encrypted, and never sent to the web UI.",
   "ui_bilibili_info_temporary": "The QR code is temporary and expires after 3 minutes.",
-  "ui_bilibili_info_after": "After connection, BiliBili videos and streams use your BiliBili session."
+  "ui_bilibili_info_after": "After connection, BiliBili videos and streams use your BiliBili session.",
+  "portability_prepare_scanning": "Scanning archive",
+  "portability_prepare_extracting": "Extracting Takeout parts",
+  "portability_prepare_packing": "Preparing YouTube account data",
+  "portability_prepare_uploading": "Uploading prepared data",
+  "portability_resume_prepared_upload": "Retry prepared upload"
 }

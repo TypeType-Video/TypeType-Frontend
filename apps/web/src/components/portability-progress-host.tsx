@@ -1,11 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, LoaderCircle, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useAuth } from "../hooks/use-auth";
+import {
+  getPortabilityPreparationProgress,
+  subscribePortabilityPreparationProgress,
+} from "../lib/portability-preparation-progress";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
 import { usePortabilityJob } from "../hooks/use-portability-job";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import { m } from "../paraglide/messages.js";
+import { PortabilityPreparationToast } from "./portability-preparation-toast";
 import { getLocale } from "../paraglide/runtime.js";
 import { portabilityImportStageLabel } from "./portability-job-status";
 import "../styles/notification-toast.css";
@@ -27,37 +32,47 @@ function percent(job: PortabilityJob): number | null {
 }
 
 export function PortabilityProgressHost() {
-  const { isAuthed } = useAuth();
+  const { isAuthed, me } = useAuth();
   const queryClient = useQueryClient();
   const [jobId] = usePersistedPortabilityJob("typetype-portability-import-job");
+  const preparation = useSyncExternalStore(
+    subscribePortabilityPreparationProgress,
+    getPortabilityPreparationProgress,
+    getPortabilityPreparationProgress,
+  );
+  const localPreparation =
+    isAuthed && preparation?.ownerId === me?.id ? preparation : null;
   const job = usePortabilityJob(isAuthed ? jobId : null);
   const [finished, setFinished] = useState(false);
-  const wasApplying = useRef(false);
+  const wasRunning = useRef(false);
   const observedJobId = useRef(jobId);
   const seenCheckpoint = useRef(0);
   const refreshTimes = useRef(new Map<PortabilityCategory, number>());
   const refreshedOnTerminal = useRef<string | null>(null);
   const state = job.data?.state;
-  const active = isAuthed && job.data?.kind === "import" && state === "applying";
-  const visible = isAuthed && (active || finished);
+  const active =
+    isAuthed &&
+    job.data?.kind === "import" &&
+    (state === "queued" || state === "analyzing" || state === "applying");
+  const visible = isAuthed && (localPreparation !== null || active || finished);
 
   useEffect(() => {
     if (observedJobId.current !== jobId) {
       observedJobId.current = jobId;
-      wasApplying.current = false;
+      wasRunning.current = false;
       seenCheckpoint.current = 0;
       refreshTimes.current.clear();
       refreshedOnTerminal.current = null;
       setFinished(false);
     }
     if (active) {
-      wasApplying.current = true;
+      wasRunning.current = true;
       setFinished(false);
       return;
     }
-    if (!wasApplying.current || !state || !["completed", "failed", "cancelled"].includes(state))
+    if (!wasRunning.current || !state || !["completed", "failed", "cancelled"].includes(state))
       return;
-    wasApplying.current = false;
+    wasRunning.current = false;
     setFinished(true);
     const timer = window.setTimeout(() => setFinished(false), 6_000);
     return () => window.clearTimeout(timer);
@@ -111,16 +126,21 @@ export function PortabilityProgressHost() {
   const progressPercent = value ? percent(value) : null;
   const locale = getLocale();
 
+  if (localPreparation) return <PortabilityPreparationToast progress={localPreparation} />;
   if (!value || !visible) return null;
-  const activeJob = value.state === "applying";
+  const activeJob = ["queued", "analyzing", "applying"].includes(value.state);
   const title =
-    value.state === "failed"
-      ? m.portability_job_failed({}, { locale })
-      : value.state === "cancelled"
-        ? m.portability_job_cancelled({}, { locale })
-        : value.state === "completed"
-          ? m.portability_job_import_completed({}, { locale })
-          : m.portability_job_importing({}, { locale });
+    value.state === "queued"
+      ? m.portability_job_waiting({}, { locale })
+      : value.state === "analyzing"
+        ? m.portability_job_analyzing({}, { locale })
+        : value.state === "failed"
+          ? m.portability_job_failed({}, { locale })
+          : value.state === "cancelled"
+            ? m.portability_job_cancelled({}, { locale })
+            : value.state === "completed"
+              ? m.portability_job_import_completed({}, { locale })
+              : m.portability_job_importing({}, { locale });
   const detail = stage ? portabilityImportStageLabel(stage, progress?.category, locale) : title;
   const progressText = progress
     ? progress.total != null

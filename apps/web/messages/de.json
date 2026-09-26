@@ -1360,7 +1360,8 @@
   "community_lemmy_acknowledge": "ICH HABE ES VERSTANDEN! Alles klar",
   "portability_preparing_upload": "Kontodaten werden vorbereitet und hochgeladen...",
   "portability_takeout_metadata_limit": "Die Kontodaten in diesem Archiv überschreiten die Importgrenzen oder sind verschlüsselt. Exportiere YouTube separat in kleineren ZIP-Dateien.",
-  "portability_takeout_no_metadata": "Keine YouTube-Kontodaten gefunden. Wähle eine originale Takeout-ZIP mit deinem Verlauf, deinen Abonnements oder deinen Wiedergabelisten statt eines reinen Video-Teils oder einer ZIP-Datei, die weitere ZIP-Dateien enthält.",
+  "portability_takeout_no_metadata": "Keine YouTube-Kontodaten in diesem Archiv gefunden.",
+  "portability_takeout_storage_required": "Der Browser hat nicht genügend temporären Speicherplatz, um dieses Takeout-Archiv zu verarbeiten. Schaffe Speicherplatz oder verwende ein Browserprofil mit mehr verfügbarem Speicherplatz.",
   "ui_remote_diagnostics": "Diagnose",
   "ui_copy_diagnostics": "Diagnose kopieren",
   "ui_diagnostics_copied": "Kopiert",
@@ -1398,5 +1399,10 @@
   "ui_bilibili_info_scan": "Sie scannen den QR-Code mit der BiliBili-App.",
   "ui_bilibili_info_cookies": "Cookies werden serverseitig erfasst.",
   "ui_bilibili_info_temporary": "Der QR-Code ist temporär.",
-  "ui_bilibili_info_after": "Nach der Verbindung verwenden BiliBili-Videos Ihre Sitzung."
+  "ui_bilibili_info_after": "Nach der Verbindung verwenden BiliBili-Videos Ihre Sitzung.",
+  "portability_prepare_scanning": "Archiv wird untersucht",
+  "portability_prepare_extracting": "Takeout-Teile werden entpackt",
+  "portability_prepare_packing": "YouTube-Kontodaten werden vorbereitet",
+  "portability_prepare_uploading": "Vorbereitete Daten werden hochgeladen",
+  "portability_resume_prepared_upload": "Vorbereiteten Upload fortsetzen"
 }

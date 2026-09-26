@@ -310,7 +310,8 @@
   "portability_no_import_format": "Aucun format d'import n'est disponible.",
   "portability_preparing_upload": "Préparation et envoi des données du compte...",
   "portability_takeout_metadata_limit": "Les données de compte de cette archive dépassent les limites d'import ou sont chiffrées. Exportez YouTube séparément avec des parties ZIP plus petites.",
-  "portability_takeout_no_metadata": "Aucune donnée de compte YouTube trouvée. Sélectionnez un ZIP Takeout original contenant votre historique, vos abonnements ou vos playlists, plutôt qu'une partie contenant uniquement des vidéos ou un ZIP contenant d'autres ZIP.",
+  "portability_takeout_no_metadata": "Aucune donnée de compte YouTube trouvée. Sélectionnez le ZIP Takeout original contenant votre historique, vos abonnements ou vos playlists, pas une partie ZIP contenant uniquement des vidéos.",
+  "portability_takeout_storage_required": "Le navigateur ne dispose pas d’assez d’espace temporaire pour traiter cette archive Takeout. Libérez de l’espace ou utilisez un profil de navigateur disposant de plus d’espace.",
   "portability_import_title": "Importer des données",
   "portability_import_description": "Prévisualisez les données et choisissez ce qui doit être restauré.",
   "portability_import_from": "Importer depuis",
@@ -1398,5 +1399,10 @@
   "ui_bilibili_info_scan": "Scannez le code QR avec l’application BiliBili sur votre téléphone.",
   "ui_bilibili_info_cookies": "Les cookies sont capturés et chiffrés côté serveur ; ils ne sont jamais envoyés à l’interface web.",
   "ui_bilibili_info_temporary": "Le code QR est temporaire et expire après 3 minutes.",
-  "ui_bilibili_info_after": "Après la connexion, les vidéos BiliBili utilisent votre session."
+  "ui_bilibili_info_after": "Après la connexion, les vidéos BiliBili utilisent votre session.",
+  "portability_prepare_scanning": "Analyse de l’archive",
+  "portability_prepare_extracting": "Extraction des parties Takeout",
+  "portability_prepare_packing": "Préparation des données YouTube",
+  "portability_prepare_uploading": "Envoi des données préparées",
+  "portability_resume_prepared_upload": "Reprendre l’envoi préparé"
 }
