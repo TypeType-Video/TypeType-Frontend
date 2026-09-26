@@ -11,6 +11,7 @@ describe("channel avatar", () => {
     expect(html).toContain('data-avatar-state="loading"');
     expect(html).toContain("data-avatar-skeleton");
     expect(html).toContain("animate-pulse");
+    expect(html).toContain("bg-fg/15");
     expect(html).toContain('loading="lazy"');
   });
 

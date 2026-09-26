@@ -1,5 +1,6 @@
 import { UserRound } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "./skeleton";
 
 type Props = {
   src: string;
@@ -37,13 +38,7 @@ export function ChannelAvatar({ src, name, className = "w-8 h-8" }: Props) {
       data-avatar-state={state}
       aria-busy={loading}
     >
-      {loading && (
-        <span
-          className="absolute inset-0 animate-pulse rounded-full bg-fg/10"
-          data-avatar-skeleton
-          aria-hidden="true"
-        />
-      )}
+      {loading && <Skeleton className="absolute inset-0 rounded-full" data-avatar-skeleton />}
       {!loading &&
         (name.trim() ? (
           <span className="text-base leading-none">{getInitial(name)}</span>
