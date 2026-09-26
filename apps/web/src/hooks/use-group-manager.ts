@@ -110,14 +110,11 @@ export function useGroupManager(groups: SubscriptionGroup[], groupsReady: boolea
       if (await actions.run(() => updateGroupMemberships(changes), m.sg_memberships_cleared()))
         clearSelection();
     } else if (pending) {
-      if (
-        (await actions.run(
-          () => deleteSubscriptionGroup(pending.id),
-          m.sg_group_deleted({ group: pending.name }),
-        )) &&
-        activeFilter === pending.id
-      )
-        changeFilter("all");
+      if (activeFilter === pending.id) changeFilter("all");
+      await actions.run(
+        () => deleteSubscriptionGroup(pending.id),
+        m.sg_group_deleted({ group: pending.name }),
+      );
     }
   }
 
