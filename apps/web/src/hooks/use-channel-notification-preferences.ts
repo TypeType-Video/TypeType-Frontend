@@ -5,7 +5,7 @@ import {
 } from "../lib/api-notifications";
 import { useAuth } from "./use-auth";
 
-export const CHANNEL_NOTIFICATION_PREFERENCES_KEY = ["channel-notification-preferences"] as const;
+const CHANNEL_NOTIFICATION_PREFERENCES_KEY = ["channel-notification-preferences"] as const;
 
 export function useChannelNotificationPreferences() {
   const queryClient = useQueryClient();
