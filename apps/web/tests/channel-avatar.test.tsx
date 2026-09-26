@@ -23,6 +23,14 @@ describe("channel avatar", () => {
     expect(html).not.toContain("<img");
   });
 
+  test("keeps the skeleton while a missing avatar is being resolved", () => {
+    const html = renderToStaticMarkup(<ChannelAvatar src="" name="OHIOBOSS SATOYU" pending />);
+
+    expect(html).toContain('data-avatar-state="loading"');
+    expect(html).toContain("data-avatar-skeleton");
+    expect(html).not.toContain(">O</span>");
+  });
+
   test("renders a generic fallback when the channel name is missing", () => {
     const html = renderToStaticMarkup(<ChannelAvatar src="" name="" />);
 

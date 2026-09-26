@@ -6,6 +6,7 @@ type Props = {
   src: string;
   name: string;
   className?: string;
+  pending?: boolean;
 };
 
 function getInitial(name: string): string {
@@ -22,13 +23,13 @@ function getInitial(name: string): string {
   return name[0].toUpperCase();
 }
 
-export function ChannelAvatar({ src, name, className = "w-8 h-8" }: Props) {
+export function ChannelAvatar({ src, name, className = "w-8 h-8", pending = false }: Props) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const hasSource = src.trim().length > 0;
   const failed = failedSrc === src;
   const loaded = loadedSrc === src;
-  const loading = hasSource && !failed && !loaded;
+  const loading = pending || (hasSource && !failed && !loaded);
   const state = loading ? "loading" : hasSource && !failed ? "ready" : "fallback";
 
   return (

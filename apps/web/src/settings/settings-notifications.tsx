@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelAvatar } from "../components/channel-avatar";
 import { useChannelNotificationPreferences } from "../hooks/use-channel-notification-preferences";
 import { useSettings } from "../hooks/use-settings";
@@ -14,6 +14,8 @@ export function SettingsNotifications() {
   const { query: subscriptionsQuery } = useSubscriptions();
   const preferences = useChannelNotificationPreferences();
   const [search, setSearch] = useState("");
+  const [avatarWaitExpired, setAvatarWaitExpired] = useState(false);
+  const avatarWaitStartedAt = useRef<number | null>(null);
   const subscriptions = subscriptionsQuery.data ?? [];
   const preferenceByUrl = useMemo(
     () =>
@@ -33,6 +35,39 @@ export function SettingsNotifications() {
         item.name.toLowerCase().includes(term) || item.channelUrl.toLowerCase().includes(term),
     );
   }, [search, subscriptions]);
+  const missingAvatarKey = useMemo(
+    () =>
+      subscriptions
+        .filter((item) => !item.avatarUrl)
+        .map((item) => normalizeChannelUrl(item.channelUrl))
+        .join("\n"),
+    [subscriptions],
+  );
+
+  useEffect(() => {
+    if (!missingAvatarKey) {
+      avatarWaitStartedAt.current = null;
+      setAvatarWaitExpired(false);
+      return;
+    }
+    avatarWaitStartedAt.current ??= Date.now();
+    const elapsed = Date.now() - avatarWaitStartedAt.current;
+    const remaining = Math.max(0, AVATAR_WAIT_TIMEOUT_MS - elapsed);
+    if (remaining === 0) {
+      setAvatarWaitExpired(true);
+      return;
+    }
+    setAvatarWaitExpired(false);
+    const interval = window.setInterval(() => {
+      void subscriptionsQuery.refetch();
+    }, AVATAR_REFRESH_INTERVAL_MS);
+    const timeout = window.setTimeout(() => setAvatarWaitExpired(true), remaining);
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [missingAvatarKey, subscriptionsQuery.refetch]);
+  const showAvatarSkeleton = Boolean(missingAvatarKey) && !avatarWaitExpired;
 
   return (
     <section className="flex flex-col gap-3">
@@ -82,6 +117,7 @@ export function SettingsNotifications() {
                   src={proxyImage(subscription.avatarUrl)}
                   name={subscription.name}
                   className="h-8 w-8"
+                  pending={showAvatarSkeleton && !subscription.avatarUrl}
                 />
                 <span className="truncate text-sm text-fg">{subscription.name}</span>
               </div>
@@ -107,3 +143,6 @@ export function SettingsNotifications() {
     </section>
   );
 }
+
+const AVATAR_REFRESH_INTERVAL_MS = 2_000;
+const AVATAR_WAIT_TIMEOUT_MS = 15_000;
