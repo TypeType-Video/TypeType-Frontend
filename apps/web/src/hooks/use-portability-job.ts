@@ -6,8 +6,7 @@ import {
   getPortabilityJob,
   type PortabilityJob,
 } from "../lib/api-portability";
-
-const TERMINAL_STATES = new Set(["ready", "completed", "failed", "cancelled"]);
+import { shouldPollPortabilityJob } from "../lib/portability-job-polling";
 
 export function usePortabilityJob(id: string | null) {
   const queryClient = useQueryClient();
@@ -18,11 +17,8 @@ export function usePortabilityJob(id: string | null) {
     enabled: id !== null,
     retry: (failureCount, error) =>
       !(error instanceof ApiError && error.status === 404) && failureCount < 2,
-    refetchInterval: (current) => {
-      if (current.state.error instanceof ApiError && current.state.error.status === 404)
-        return false;
-      return current.state.data && TERMINAL_STATES.has(current.state.data.state) ? false : 1_000;
-    },
+    refetchInterval: (current) =>
+      shouldPollPortabilityJob(current.state.error, current.state.data?.state) ? 1_000 : false,
   });
   const cancel = useMutation({
     mutationFn: () => cancelPortabilityJob(id as string),
