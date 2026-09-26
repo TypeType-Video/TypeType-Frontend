@@ -66,6 +66,11 @@ export function resolveManifestSrc(
   const safeMaxHeight = qualityFailed ? 720 : 1080;
   const directDashPair = hasDirectDashPair(stream);
 
+  if (provider === "youtube" && isLive) {
+    if (!stream.hlsUrl || options?.hlsFailed) return "";
+    return { src: resolveHlsManifestUrl(stream), type: "application/x-mpegurl" };
+  }
+
   if (shouldUseHls(stream.hlsUrl, isLive, options?.hlsFailed ?? false, directDashPair)) {
     return {
       src: resolveHlsManifestUrl(stream),

@@ -36,7 +36,7 @@ export function useSabrPlaybackConfig(
     [defaultAudioLanguage, preferOriginalLanguage, stream],
   );
   const effectiveTrackId = selectedTrackId ?? fallbackTrackId;
-  const preferredQuality = resolvePreferredQuality(defaultQuality);
+  const preferredQuality = resolvePreferredSabrQuality(defaultQuality);
   const defaultItag = useMemo(
     () => defaultSabrItag(options, preferredQuality),
     [options, preferredQuality],
@@ -62,7 +62,9 @@ type NetworkInformation = {
   saveData?: boolean;
 };
 
-function resolvePreferredQuality(defaultQuality: string | undefined): string | undefined {
+export function resolvePreferredSabrQuality(
+  defaultQuality: string | undefined,
+): string | undefined {
   if (defaultQuality?.toLowerCase() !== "auto" || typeof window === "undefined") {
     return defaultQuality;
   }

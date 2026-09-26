@@ -40,11 +40,19 @@ const PROFILE_QUERIES = new Set([
   "youtube-session",
 ]);
 
+const isProfileQuery = ({ queryKey }: { queryKey: readonly unknown[] }): boolean =>
+  typeof queryKey[0] === "string" && PROFILE_QUERIES.has(queryKey[0]);
+
 export function resetProfileQueries(client: QueryClient): Promise<void> {
   // Reset cancels old responses and notifies mounted observers; removing queries does not.
   // Media extraction and playback state deliberately stay outside this boundary.
   return client.resetQueries({
-    predicate: ({ queryKey }) =>
-      typeof queryKey[0] === "string" && PROFILE_QUERIES.has(queryKey[0]),
+    predicate: isProfileQuery,
   });
+}
+
+export async function clearProfileQueries(client: QueryClient): Promise<void> {
+  const filters = { predicate: isProfileQuery };
+  await client.cancelQueries(filters);
+  client.removeQueries(filters);
 }

@@ -1,35 +1,29 @@
 import { expect, test } from "bun:test";
-import { shouldLoadFullWatchStream } from "../src/lib/watch-stream-loading";
+import {
+  shouldLoadFullWatchStream,
+  shouldLoadSabrBootstrap,
+} from "../src/lib/watch-stream-loading";
 
-test("waits for YouTube bootstrap before loading the full stream", () => {
-  expect(
-    shouldLoadFullWatchStream("https://www.youtube.com/watch?v=video", true, {
-      isSuccess: false,
-      isError: false,
-    }),
-  ).toBe(false);
-  expect(
-    shouldLoadFullWatchStream("https://www.youtube.com/watch?v=video", true, {
-      isSuccess: true,
-      isError: false,
-    }),
-  ).toBe(true);
+test("loads the full stream in parallel with bootstrap", () => {
+  expect(shouldLoadFullWatchStream(true)).toBe(true);
 });
 
 test("loads non-YouTube streams without waiting for SABR bootstrap", () => {
-  expect(
-    shouldLoadFullWatchStream("https://www.nicovideo.jp/watch/sm9", true, {
-      isSuccess: false,
-      isError: false,
-    }),
-  ).toBe(true);
+  expect(shouldLoadFullWatchStream(true)).toBe(true);
 });
 
 test("keeps all stream requests disabled until watch access is ready", () => {
-  expect(
-    shouldLoadFullWatchStream("https://www.youtube.com/watch?v=video", false, {
-      isSuccess: true,
-      isError: false,
-    }),
-  ).toBe(false);
+  expect(shouldLoadFullWatchStream(false)).toBe(false);
+});
+
+test("skips the SABR bootstrap when the navigation preview is a live stream", () => {
+  expect(shouldLoadSabrBootstrap(true, true)).toBe(false);
+});
+
+test("keeps the SABR bootstrap for videos without a confirmed live preview", () => {
+  expect(shouldLoadSabrBootstrap(true, false)).toBe(true);
+});
+
+test("keeps the SABR bootstrap disabled until watch access is ready", () => {
+  expect(shouldLoadSabrBootstrap(false, false)).toBe(false);
 });

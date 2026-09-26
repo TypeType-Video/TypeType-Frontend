@@ -3,6 +3,7 @@ import type { StreamResponse } from "../types/api";
 import { ApiError, request } from "./api";
 import { recordClientEvent } from "./client-debug-log";
 import { sanitizeVideoContext } from "./debug-sanitize";
+import { beginPlaybackTrace } from "./playback-trace";
 import { sabrBootstrapEndpoint, streamEndpoint } from "./stream-request";
 
 type StreamFetchMode = "anonymous_first" | "authenticated_first";
@@ -20,8 +21,9 @@ export async function fetchStream(
   url: string,
   mode: StreamFetchMode = "anonymous_first",
   signal?: AbortSignal,
+  knownLive = false,
 ): Promise<StreamResponse> {
-  const endpoint = streamEndpoint(url);
+  const endpoint = streamEndpoint(url, knownLive);
   return fetchStreamEndpoint(url, endpoint, mode, signal);
 }
 
@@ -41,6 +43,7 @@ async function fetchStreamEndpoint(
   mode: StreamFetchMode,
   signal?: AbortSignal,
 ): Promise<StreamResponse> {
+  beginPlaybackTrace(url, "stream_resolve");
   const token = useAuthStore.getState().token;
   const video = sanitizeVideoContext(url) ?? "unknown";
   if (token && mode === "authenticated_first") {

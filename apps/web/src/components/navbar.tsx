@@ -18,6 +18,7 @@ import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
 import { NavbarSearch } from "./navbar-search";
+import { NavbarServicePicker } from "./navbar-service-picker";
 import { ServiceIcon } from "./service-icon";
 import { Toast } from "./toast";
 
@@ -79,7 +80,7 @@ export function Navbar() {
             rel="noreferrer"
             aria-label={m.shell_support_typetype()}
             title={m.shell_support_typetype()}
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
+            className="hidden h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg sm:inline-flex"
           >
             <DollarSign size={15} />
             <span className="hidden sm:inline">{m.shell_support()}</span>
@@ -90,7 +91,7 @@ export function Navbar() {
             rel="noreferrer"
             aria-label="Lemmy"
             title="Lemmy"
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
+            className="hidden h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg sm:inline-flex"
           >
             <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
             <span className="hidden sm:inline">Lemmy</span>
@@ -111,6 +112,7 @@ export function Navbar() {
         {canOpenSearch && !isMobile && <NavbarSearch />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {canOpenSearch && <NavbarServicePicker compact={isMobile} />}
           <InterfaceLanguagePicker />
           <NavbarNotifications />
           <NavbarAccountControls

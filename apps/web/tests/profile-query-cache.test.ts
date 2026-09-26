@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
-import { resetProfileQueries } from "../src/lib/profile-query-cache";
+import { clearProfileQueries, resetProfileQueries } from "../src/lib/profile-query-cache";
 
 test("refreshes mounted subscriptions without replacing their observer or media cache", async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -32,6 +32,35 @@ test("refreshes mounted subscriptions without replacing their observer or media 
   await refresh;
   expect(observer.getCurrentResult().data).toEqual(["Test"]);
 
+  unsubscribe();
+  client.clear();
+});
+
+test("removes profile data on logout without refetching it", async () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  let fetchCount = 0;
+  const observer = new QueryObserver(client, {
+    queryKey: ["subscriptions"],
+    queryFn: async () => {
+      fetchCount += 1;
+      return ["private-subscription"];
+    },
+  });
+  const unsubscribe = observer.subscribe(() => {});
+  await observer.refetch();
+  client.setQueryData(["history", ""], ["private-history"]);
+
+  await clearProfileQueries(client);
+
+  expect(client.getQueryData(["subscriptions"])).toBeUndefined();
+  expect(client.getQueryData(["history", ""])).toBeUndefined();
+  expect(fetchCount).toBe(1);
+  const nextObserver = new QueryObserver(client, {
+    queryKey: ["subscriptions"],
+    queryFn: async () => ["next-user-subscription"],
+  });
+  expect(nextObserver.getCurrentResult().data).toBeUndefined();
+  nextObserver.destroy();
   unsubscribe();
   client.clear();
 });

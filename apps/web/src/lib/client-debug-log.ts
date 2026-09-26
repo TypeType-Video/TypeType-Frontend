@@ -5,6 +5,7 @@ import { sanitizeDebugText } from "./debug-sanitize";
 
 const STORAGE_KEY = "typed-client-debug-log";
 const MAX_ENTRIES = 80;
+const MAX_PLAYBACK_TRACE_ENTRIES = 800;
 const TTL_MS = 30 * 60 * 1000;
 const FLUSH_DELAY_MS = 250;
 const REQUEST_ID_HEADERS = ["x-request-id", "x-correlation-id", "x-trace-id", "request-id"];
@@ -81,7 +82,11 @@ function writeStoredLog(entries: CrashLogEntry[], immediate = false): void {
 
 function pushEntry(entry: CrashLogEntry): void {
   const stored = readStoredLog();
-  writeStoredLog([...stored.entries, entry].slice(-MAX_ENTRIES));
+  const keepsPlaybackTrace =
+    entry.message.startsWith("playback.") ||
+    stored.entries.some((storedEntry) => storedEntry.message.startsWith("playback."));
+  const limit = keepsPlaybackTrace ? MAX_PLAYBACK_TRACE_ENTRIES : MAX_ENTRIES;
+  writeStoredLog([...stored.entries, entry].slice(-limit));
 }
 
 function formatDetails(details: DebugDetails | undefined): string {

@@ -1,15 +1,14 @@
+import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
+import { recordClientEvent } from "../lib/client-debug-log";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
-import { createHlsConfig } from "../lib/hls-buffer-config";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
 
 type DashRequestInterceptor = Parameters<dashjs.MediaPlayerClass["addRequestInterceptor"]>[0];
 
-const DASH_TOP_QUALITY_BUFFER_SECONDS = 24;
-const DASH_BACK_BUFFER_SECONDS = 30;
 type DashLibraryModule = { default: typeof dashjs };
 type DashRuntimeModule = typeof dashjs & { default?: typeof dashjs };
 type HlsLibraryModule = { default: typeof Hls; FetchLoader: typeof import("hls.js").FetchLoader };
@@ -43,24 +42,8 @@ function configureDashPlayer(player: dashjs.MediaPlayerClass, library: typeof da
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
   player.updateSettings({
     streaming: {
-      buffer: {
-        bufferTimeAtTopQuality: DASH_TOP_QUALITY_BUFFER_SECONDS,
-        bufferTimeAtTopQualityLongForm: DASH_TOP_QUALITY_BUFFER_SECONDS,
-        bufferToKeep: DASH_BACK_BUFFER_SECONDS,
-      },
+      ...createDashSettings(),
       cmcd: { enabled: false },
-      retryAttempts: {
-        MPD: 5,
-        MediaSegment: 3,
-        InitializationSegment: 3,
-        IndexSegment: 3,
-      },
-      retryIntervals: {
-        MPD: 500,
-        MediaSegment: 500,
-        InitializationSegment: 500,
-        IndexSegment: 500,
-      },
     },
   });
   notifyDashPlayer();
@@ -77,12 +60,26 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
     let providerLibrary = hlsProviderLibraries.get(provider);
     if (!providerLibrary) {
       providerLibrary = loadHlsLibrary().then((library) => {
-        provider.config = createHlsConfig(library.FetchLoader);
+        provider.config = createHlsConfig({ FetchLoader: library.FetchLoader });
         return library;
       });
       hlsProviderLibraries.set(provider, providerLibrary);
     }
     provider.library = () => providerLibrary;
+    provider.onInstance((hls) => {
+      const events = (hls.constructor as typeof Hls).Events;
+      hls.on(events.ERROR, (_, data) => {
+        recordClientEvent("player.hls_transport_error", {
+          fatal: data.fatal,
+          type: data.type,
+          details: data.details,
+          reason: data.reason,
+          responseCode: data.response?.code,
+          responseUrl: data.response?.url,
+          contextUrl: data.frag?.url ?? data.url,
+        });
+      });
+    });
     return;
   }
   const dashProvider = isDASHProvider(provider);

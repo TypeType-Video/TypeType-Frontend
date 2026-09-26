@@ -55,7 +55,7 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
     retry,
     errorMessage,
     isMemberOnlyShort,
-    needsYoutubeSession,
+    youtubeSessionAction,
   } = useShortsActiveStream({
     shorts,
     index,
@@ -140,8 +140,9 @@ export function ShortsPlayerShell({ targetUrl }: Props) {
       streamError={streamError}
       errorMessage={errorMessage}
       isMemberOnlyShort={isMemberOnlyShort}
+      youtubeSessionAction={youtubeSessionAction ?? undefined}
       youtubeSessionReturnTo={
-        needsYoutubeSession
+        youtubeSessionAction
           ? youtubeSessionReturnToForShorts(toPublicWatchParam(activeId))
           : undefined
       }

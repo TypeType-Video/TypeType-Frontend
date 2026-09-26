@@ -58,7 +58,8 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
     provider === "bilibili"
       ? bilibiliVariantCount(stream.videoOnlyStreams ?? [], stream.audioStreams ?? [])
       : 0;
-  const sabrSelected = provider === "youtube";
+  const isYoutubeLive = provider === "youtube" && isLive;
+  const sabrSelected = provider === "youtube" && !isLive;
   const sabrEnabled = sabrSelected && hasSabrPlayback(stream);
 
   const fallbackSrc = resolveManifestSrc(stream, isLive, qualityFailed, {
@@ -70,8 +71,12 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
     bilibiliVariant,
   });
   const manifestSrc: MediaSrc = sabrSelected ? { src: "", type: "video/mp4" } : fallbackSrc;
+  const missingYoutubeLiveHls = isYoutubeLive && !stream.hlsUrl;
   const handleError = useCallback(() => {
-    if (sabrSelected) {
+    if (isYoutubeLive) {
+      recordClientEvent("player.hls_failed", { video: debugVideo });
+      setPlayerFailed(true);
+    } else if (sabrSelected) {
       if (claimAutomaticSabrRecovery(sabrRecoveryRef)) {
         recordClientEvent("player.sabr_recovering", { video: debugVideo });
         setRetryKey((k) => k + 1);
@@ -111,6 +116,7 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
     debugVideo,
     hlsEnabled,
     hlsFailed,
+    isYoutubeLive,
     sabrSelected,
     hasDirectPlaybackFallback,
     provider,
@@ -155,7 +161,7 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
     manifestSrc,
     manifestLoading: false,
     sabrEnabled,
-    playerFailed,
+    playerFailed: playerFailed || missingYoutubeLiveHls,
     qualityFailed,
     clearFailed,
     handleError,

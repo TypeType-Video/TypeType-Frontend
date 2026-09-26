@@ -8,7 +8,7 @@ import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
 import { ApiError } from "./lib/api";
 import { installConsoleWarningFilter } from "./lib/console-warning-filter";
 import { initErrorCapture } from "./lib/error-capture";
-import { resetProfileQueries } from "./lib/profile-query-cache";
+import { clearProfileQueries, resetProfileQueries } from "./lib/profile-query-cache";
 import { getLocale, getTextDirection } from "./paraglide/runtime.js";
 import { routeTree } from "./routeTree.gen";
 import { useAuthStore } from "./stores/auth-store";
@@ -40,8 +40,14 @@ const queryClient = new QueryClient({
 });
 
 useAuthStore.subscribe((session, previous) => {
-  if (session.me && previous.me && session.me.id !== previous.me.id) {
-    void resetProfileQueries(queryClient);
+  const previousProfileId = previous.me?.id;
+  const nextProfileId = session.me?.id;
+  if (previousProfileId && previousProfileId !== nextProfileId) {
+    if (nextProfileId) {
+      void resetProfileQueries(queryClient);
+    } else {
+      void clearProfileQueries(queryClient);
+    }
   }
 });
 

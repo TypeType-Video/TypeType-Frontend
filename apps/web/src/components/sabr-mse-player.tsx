@@ -7,7 +7,9 @@ import { useSabrMediaSettings } from "../hooks/use-sabr-media-settings";
 import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { toAbsoluteApiUrl } from "../lib/env";
+import { addPlaybackTraceHeader } from "../lib/playback-trace";
 import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
+import { observeSabrMsePlayback } from "../lib/sabr-mse-playback-trace";
 import * as sabrNativePause from "../lib/sabr-native-pause";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
@@ -60,7 +62,7 @@ export function SabrMsePlayer({
     onPositionReaderChange,
     onVolumeChange,
   });
-  const reportError = useSabrErrorReporter(errorReportedRef, onError);
+  const reportError = useSabrErrorReporter(errorReportedRef, onError, video, config);
   const { latestEngineHandlers, setQualityTransitioning } = useSabrEngineHandlers(
     latestHandlers,
     reportError,
@@ -94,13 +96,11 @@ export function SabrMsePlayer({
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
       startTimeMs: initialStartTimeMs,
-      headers: headersRef.current,
+      headers: addPlaybackTraceHeader(new Headers(headersRef.current)),
     });
+    const stopPlaybackTrace = observeSabrMsePlayback(video, config.videoId, engine, reportError);
     engineRef.current = engine;
     qualityRef.current = initialConfig;
-    const offError = engine.on("error", (event) => {
-      if (event.type === "error") reportError(event.error, event.recoveryPositionMs);
-    });
     let engineLoaded = false;
     const { unregister: unregisterMediaElementObservers, settle: settlePlaybackRate } =
       sabrNativePause.registerSabrPlaybackRateObservers(
@@ -185,7 +185,7 @@ export function SabrMsePlayer({
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
       captureCleanupPosition(video, videoHandoffRef.current, config.videoId);
-      offError();
+      stopPlaybackTrace();
       unguardAutoplay();
       unregisterControls();
       unregisterMediaElementObservers();

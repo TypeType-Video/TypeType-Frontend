@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { useSettings } from "../hooks/use-settings";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
+import { relatedVideoPanelClassName } from "../lib/layout-preferences";
 import type { VideoStream } from "../types/stream";
 import { RelatedVideos } from "./related-videos";
 import { WatchMeta } from "./watch-meta";
@@ -23,14 +25,16 @@ export function WatchSecondaryContent({
   onSeekTimestamp,
   audioOnly,
 }: Props) {
+  const { settings } = useSettings();
   const hasPlaylistPanel = Boolean(playlistPanel);
   const hasRelatedStreams = relatedStreams.length > 0;
+  const panelClassName = `w-full lg:flex-1 ${relatedVideoPanelClassName(settings.relatedVideoSize)} flex flex-col gap-6`;
 
   if (!cinemaMode) {
     if (!(hasPlaylistPanel || hasRelatedStreams)) return null;
 
     return (
-      <div className="w-full lg:flex-1 lg:min-w-64 flex flex-col gap-6">
+      <div className={panelClassName}>
         {playlistPanel}
         {hasRelatedStreams && <RelatedVideos streams={relatedStreams} />}
       </div>
@@ -48,7 +52,7 @@ export function WatchSecondaryContent({
         />
       </div>
       {(hasPlaylistPanel || hasRelatedStreams) && (
-        <div className="w-full lg:flex-1 lg:min-w-64 flex flex-col gap-6">
+        <div className={panelClassName}>
           {playlistPanel}
           {hasRelatedStreams && <RelatedVideos streams={relatedStreams} />}
         </div>

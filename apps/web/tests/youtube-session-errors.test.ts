@@ -15,7 +15,9 @@ if (!("localStorage" in globalThis)) {
 }
 
 const { ApiError } = await import("../src/lib/api");
-const { isYoutubeSessionActionError } = await import("../src/lib/api-youtube-session");
+const { isYoutubeSessionActionError, youtubeSessionActionForError } = await import(
+  "../src/lib/api-youtube-session"
+);
 
 describe("YouTube session errors", () => {
   test("recognizes missing and expired YouTube sessions", () => {
@@ -27,6 +29,16 @@ describe("YouTube session errors", () => {
         new ApiError("Reconnect YouTube", 400, "youtube_session_needs_reconnect"),
       ),
     ).toBe(true);
+    expect(
+      youtubeSessionActionForError(
+        new ApiError("Reconnect YouTube", 400, "youtube_session_needs_reconnect"),
+      ),
+    ).toBe("reconnect");
+    expect(
+      youtubeSessionActionForError(
+        new ApiError("Connect YouTube", 400, "youtube_session_required"),
+      ),
+    ).toBe("connect");
   });
 
   test("does not turn playback failures into account actions", () => {

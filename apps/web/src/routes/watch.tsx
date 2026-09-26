@@ -11,11 +11,14 @@ import { useInstance } from "../hooks/use-instance";
 import { useProgress } from "../hooks/use-progress";
 import { useSettings } from "../hooks/use-settings";
 import { useSabrBootstrap, useStream } from "../hooks/use-stream";
+import { preloadPlaybackRuntime } from "../lib/playback-runtime-preload";
+import { beginPlaybackTrace, playbackTraceEvent } from "../lib/playback-trace";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
+import { hasSabrPlayback } from "../lib/stream-delivery";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
-import { shouldLoadFullWatchStream } from "../lib/watch-stream-loading";
+import { shouldLoadFullWatchStream, shouldLoadSabrBootstrap } from "../lib/watch-stream-loading";
 import {
   isYoutubeShortShareUrl,
   toPublicWatchParam,
@@ -38,16 +41,31 @@ function WatchPage() {
   const { isPending: instancePending } = useInstance();
   const { settings, settingsReady } = useSettings();
   const navigationSnapshot = useWatchNavigationStore((state) => state.snapshot);
-  const useAuthenticatedStream = isAuthed;
-  const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
-  const bootstrap = useSabrBootstrap(sourceUrl, useAuthenticatedStream, streamEnabled);
-  const fullStreamEnabled = shouldLoadFullWatchStream(sourceUrl, streamEnabled, bootstrap);
-  const streamQuery = useStream(sourceUrl, useAuthenticatedStream, fullStreamEnabled);
-  const { add } = useHistory();
-  const progressFetch = useProgress(sourceUrl);
   const previewMatches =
     navigationSnapshot && toPublicWatchParam(navigationSnapshot.stream.id) === publicParam;
   const previewStream = previewMatches ? navigationSnapshot.stream : undefined;
+  const useAuthenticatedStream = isAuthed;
+  const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
+  const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
+  const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
+  const streamQuery = useStream(
+    sourceUrl,
+    useAuthenticatedStream,
+    fullStreamEnabled,
+    knownPublicLive,
+  );
+  const fullStream = streamQuery.isPlaceholderData ? undefined : streamQuery.data;
+  const deferBootstrap =
+    knownPublicLive ||
+    fullStream?.isLive === true ||
+    (fullStream !== undefined && hasSabrPlayback(fullStream));
+  const bootstrap = useSabrBootstrap(
+    sourceUrl,
+    useAuthenticatedStream,
+    shouldLoadSabrBootstrap(streamEnabled, deferBootstrap),
+  );
+  const { add } = useHistory();
+  const progressFetch = useProgress(sourceUrl);
   const previewRelated = previewMatches ? navigationSnapshot.relatedStreams : [];
   const availabilityPoster = proxyImage(
     previewStream?.rawThumbnail ?? youtubeThumbnailUrl(publicParam) ?? "",
@@ -58,7 +76,6 @@ function WatchPage() {
     publicParam,
     previewRelated,
   );
-  const fullStream = streamQuery.isPlaceholderData ? undefined : streamQuery.data;
   useDocumentTitle(activeStream?.title ?? previewStream?.title);
   const loadingPage = (
     <WatchPageSkeleton
@@ -78,6 +95,12 @@ function WatchPage() {
     progressFetch.isFetching,
     progressFetch.data !== undefined,
   );
+
+  useEffect(() => {
+    beginPlaybackTrace(sourceUrl, "watch_route");
+    playbackTraceEvent("route_enter", { path: "/watch" });
+    void preloadPlaybackRuntime(sourceUrl);
+  }, [sourceUrl]);
 
   useEffect(() => {
     if (v.trim() && publicParam !== v.trim() && (!shortShareUrl || list || shuffle)) {

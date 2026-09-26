@@ -30,6 +30,7 @@ function readActions(client: QueryClient, enabled: boolean): ReturnType<typeof u
 function setup() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const failedReads = new Set<string>();
+  const reads = { groups: 0, memberships: 0 };
   const state: { memberships: string[]; writes: number } = { memberships: [], writes: 0 };
   const group: SubscriptionGroup = {
     id: "tech",
@@ -53,6 +54,7 @@ function setup() {
     queryKey: groupKey,
     staleTime: Infinity,
     queryFn: async () => {
+      reads.groups++;
       if (failedReads.has("groups")) throw new Error("Group refresh unavailable");
       return [{ ...group, channelCount: state.memberships.length ? 1 : 0 }];
     },
@@ -61,6 +63,7 @@ function setup() {
     queryKey: channelKey,
     staleTime: Infinity,
     queryFn: async () => {
+      reads.memberships++;
       if (failedReads.has("memberships")) throw new Error("Membership refresh unavailable");
       return [{ ...channel, groupIds: [...state.memberships] }];
     },
@@ -75,6 +78,7 @@ function setup() {
     groups,
     channels,
     state,
+    reads,
     failedReads,
     write: async () => {
       state.writes++;
@@ -94,6 +98,15 @@ function setup() {
       ),
   };
 }
+
+test("the default mutation path refreshes group definitions after a deletion request", async () => {
+  const fixture = setup();
+  const readsBefore = fixture.reads.groups;
+
+  expect(await fixture.actions().run(async () => undefined, "Deleted")).toBe(true);
+
+  expect(fixture.reads.groups).toBe(readsBefore + 1);
+});
 
 test("saved memberships with a failed refresh pause editing; recovery only repeats reads", async () => {
   const fixture = setup();

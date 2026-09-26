@@ -1,7 +1,10 @@
 import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
+import { portabilityResponse } from "./api-portability-response";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
+
+export { startPortabilityImport } from "./api-portability-import";
 
 type PortabilityDirection = "import" | "export";
 export type PortabilityFidelity = "complete" | "partial";
@@ -14,6 +17,13 @@ type PortabilityJobState =
   | "completed"
   | "failed"
   | "cancelled";
+export type PortabilityImportStage =
+  | "subscriptions"
+  | "recentHistory"
+  | "playlists"
+  | "history"
+  | "remaining";
+
 export type PortabilityCategory =
   | "subscriptions"
   | "subscriptionGroups"
@@ -73,6 +83,11 @@ export type PortabilityJob = {
     unit: "records" | "categories" | "bytes";
     processed: number;
     total: number | null;
+    category?: PortabilityCategory | null;
+    stage?: PortabilityImportStage | null;
+    stageProcessed?: number;
+    stageTotal?: number | null;
+    checkpoint?: number;
   } | null;
   errorCode: string | null;
   errorMessage: string | null;
@@ -83,36 +98,8 @@ type PortabilityJobReport = Pick<
   "id" | "state" | "requestId" | "preview" | "result" | "errorCode" | "errorMessage"
 >;
 
-async function portabilityResponse<T>(response: Response): Promise<T> {
-  const payload = await response.json().catch(() => null);
-  if (!response.ok) {
-    const candidate = payload as { error?: string; code?: string } | null;
-    throw new ApiError(
-      candidate?.error ?? response.statusText ?? "Portability request failed",
-      response.status,
-      candidate?.code ?? null,
-    );
-  }
-  return payload as T;
-}
-
 export async function getPortabilityFormats(): Promise<PortabilityFormatDescriptor[]> {
   return portabilityResponse(await authed(`${API_BASE}/portability/formats`));
-}
-
-export async function startPortabilityImport(file: File, format: string): Promise<PortabilityJob> {
-  if (format === "youtube-takeout") {
-    const { prepareYoutubeTakeout } = await import("./prepare-youtube-takeout");
-    file = await prepareYoutubeTakeout(file);
-  }
-  const body = new FormData();
-  body.append("file", file);
-  return portabilityResponse(
-    await authed(`${API_BASE}/portability/imports?format=${encodeURIComponent(format)}`, {
-      method: "POST",
-      body,
-    }),
-  );
 }
 
 export async function applyPortabilityImport(

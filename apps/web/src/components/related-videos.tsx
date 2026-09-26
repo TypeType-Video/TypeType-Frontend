@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useVideoProgressMap } from "../hooks/use-progress";
+import { useSettings } from "../hooks/use-settings";
 import { videoProgressUrl } from "../lib/video-progress";
 import type { VideoStream } from "../types/stream";
 import { AutoplayToggle } from "./autoplay-toggle";
@@ -26,6 +27,7 @@ function uniqueStreams(streams: VideoStream[]): VideoStream[] {
 }
 
 export function RelatedVideos({ streams, isLoading = false }: Props) {
+  const { settings } = useSettings();
   const { filter } = useBlockedFilter();
   const visible = useMemo(() => uniqueStreams(filter(streams)), [filter, streams]);
   const progressByUrl = useVideoProgressMap(visible);
@@ -33,7 +35,7 @@ export function RelatedVideos({ streams, isLoading = false }: Props) {
     <div className="flex flex-col gap-3">
       <AutoplayToggle />
       {isLoading
-        ? SKELETON_KEYS.map((k) => <RelatedCardSkeleton key={k} />)
+        ? SKELETON_KEYS.map((k) => <RelatedCardSkeleton key={k} size={settings.relatedVideoSize} />)
         : visible.map((stream, index) => (
             <div
               key={stream.id}
@@ -43,6 +45,7 @@ export function RelatedVideos({ streams, isLoading = false }: Props) {
               <RelatedCard
                 stream={stream}
                 relatedStreams={visible}
+                size={settings.relatedVideoSize}
                 progressMs={progressByUrl.get(videoProgressUrl(stream))?.position}
               />
             </div>
