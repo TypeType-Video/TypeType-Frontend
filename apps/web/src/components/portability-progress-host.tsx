@@ -1,5 +1,5 @@
-import { AlertTriangle, CheckCircle2, LoaderCircle, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { AlertTriangle, CheckCircle2, LoaderCircle, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
@@ -11,12 +11,7 @@ import { portabilityImportStageLabel } from "./portability-job-status";
 import "../styles/notification-toast.css";
 
 const REFRESH_INTERVAL_MS = 2_000;
-const IMPORT_QUERY_KEYS = [
-  ["subscriptions"],
-  ["playlists"],
-  ["history"],
-  ["history-all"],
-] as const;
+const IMPORT_QUERY_KEYS = [["subscriptions"], ["playlists"], ["history"], ["history-all"]] as const;
 
 function queryKeysForCategory(category: PortabilityCategory | null | undefined) {
   if (category === "subscriptions") return [["subscriptions"]] as const;
@@ -60,7 +55,8 @@ export function PortabilityProgressHost() {
       setFinished(false);
       return;
     }
-    if (!wasApplying.current || !state || !["completed", "failed", "cancelled"].includes(state)) return;
+    if (!wasApplying.current || !state || !["completed", "failed", "cancelled"].includes(state))
+      return;
     wasApplying.current = false;
     setFinished(true);
     const timer = window.setTimeout(() => setFinished(false), 6_000);
@@ -94,7 +90,9 @@ export function PortabilityProgressHost() {
     }
     refreshedOnTerminal.current = value.id;
     void Promise.all(
-      IMPORT_QUERY_KEYS.map((queryKey) => queryClient.invalidateQueries({ queryKey: [...queryKey] })),
+      IMPORT_QUERY_KEYS.map((queryKey) =>
+        queryClient.invalidateQueries({ queryKey: [...queryKey] }),
+      ),
     );
   }, [job.data, queryClient]);
 
@@ -123,9 +121,7 @@ export function PortabilityProgressHost() {
         : value.state === "completed"
           ? m.portability_job_import_completed({}, { locale })
           : m.portability_job_importing({}, { locale });
-  const detail = stage
-    ? portabilityImportStageLabel(stage, progress?.category, locale)
-    : title;
+  const detail = stage ? portabilityImportStageLabel(stage, progress?.category, locale) : title;
   const progressText = progress
     ? progress.total != null
       ? m.portability_progress_of(
@@ -139,17 +135,27 @@ export function PortabilityProgressHost() {
     : null;
 
   return (
-    <aside role="status" aria-live="polite" className="notification-toast portability-progress-toast">
+    <aside
+      role="status"
+      aria-live="polite"
+      className="notification-toast portability-progress-toast"
+    >
       <div className="flex items-center gap-2.5 p-2">
         {activeJob ? (
-          <LoaderCircle size={17} className="shrink-0 animate-spin text-accent" aria-hidden="true" />
+          <LoaderCircle
+            size={17}
+            className="shrink-0 animate-spin text-accent"
+            aria-hidden="true"
+          />
         ) : value.state === "failed" ? (
           <AlertTriangle size={17} className="shrink-0 text-danger" aria-hidden="true" />
         ) : (
           <CheckCircle2 size={17} className="shrink-0 text-accent" aria-hidden="true" />
         )}
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[10px] font-semibold uppercase text-accent">{title}</span>
+          <span className="block truncate text-[10px] font-semibold uppercase text-accent">
+            {title}
+          </span>
           <span className="mt-0.5 block truncate text-[13px] font-medium leading-tight text-fg">
             {detail}
           </span>

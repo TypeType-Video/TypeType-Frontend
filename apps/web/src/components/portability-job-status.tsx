@@ -1,6 +1,10 @@
 import { AlertTriangle, Check, CheckCircle2, Copy, LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
-import type { PortabilityCategory, PortabilityImportStage, PortabilityJob } from "../lib/api-portability";
+import type {
+  PortabilityCategory,
+  PortabilityImportStage,
+  PortabilityJob,
+} from "../lib/api-portability";
 import { categoryLabel } from "../lib/portability-catalog";
 import { m } from "../paraglide/messages.js";
 import { getLocale, type Locale } from "../paraglide/runtime.js";
@@ -177,7 +181,9 @@ export function PortabilityJobStatus({ job, onCancel, cancelling, locale = getLo
           >
             <div
               className={`h-full bg-accent transition-[width] duration-300 ${currentStagePercent === null ? "w-1/3 animate-pulse" : ""}`}
-              style={currentStagePercent === null ? undefined : { width: `${currentStagePercent}%` }}
+              style={
+                currentStagePercent === null ? undefined : { width: `${currentStagePercent}%` }
+              }
             />
           </div>
         </div>

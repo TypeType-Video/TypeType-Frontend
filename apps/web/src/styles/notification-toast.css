@@ -44,6 +44,7 @@
   top: calc(4.25rem + env(safe-area-inset-top, 0px));
 }
 
-html[data-portability-progress-visible="true"] .notification-toast:not(.portability-progress-toast) {
+html[data-portability-progress-visible="true"]
+  .notification-toast:not(.portability-progress-toast) {
   top: calc(12.25rem + env(safe-area-inset-top, 0px));
 }
