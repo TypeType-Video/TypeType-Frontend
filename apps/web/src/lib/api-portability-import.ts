@@ -7,7 +7,11 @@ import {
   setPortabilityPreparationProgress,
 } from "./portability-preparation-progress";
 import { prepareYoutubeTakeout } from "./prepare-youtube-takeout";
+import { isYoutubeTakeoutArchive } from "./youtube-takeout-archive";
 import { clearPreparedTakeout } from "./youtube-takeout-prepared-store";
+import { m } from "../paraglide/messages.js";
+
+const MAX_UPLOAD_BYTES = 512 * 1024 * 1024;
 
 export type PortabilityImportOptions = {
   ownerId?: string;
@@ -23,7 +27,10 @@ export async function startPortabilityImport(
 ): Promise<PortabilityJob> {
   const ownerId = options.ownerId;
   try {
-    if (format === "youtube-takeout") {
+    const autoFormat = format === "auto";
+    const takeout =
+      format === "youtube-takeout" || (autoFormat && (await isYoutubeTakeoutArchive(file)));
+    if (takeout) {
       file =
         options.preparedFile ??
         (await prepareYoutubeTakeout(file, {
@@ -33,6 +40,9 @@ export async function startPortabilityImport(
           },
         }));
       options.onPrepared?.(file);
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error(m.portability_upload_too_large_client());
     }
     if (ownerId) {
       setPortabilityPreparationProgress({
@@ -44,14 +54,15 @@ export async function startPortabilityImport(
     }
     const body = new FormData();
     body.append("file", file);
+    const query = autoFormat ? "" : `?format=${encodeURIComponent(format)}`;
     const job = await portabilityResponse<PortabilityJob>(
-      await authed(`${API_BASE}/portability/imports?format=${encodeURIComponent(format)}`, {
+      await authed(`${API_BASE}/portability/imports${query}`, {
         method: "POST",
         body,
       }),
     );
     options.onAccepted?.(job);
-    if (ownerId && format === "youtube-takeout") await clearPreparedTakeout(ownerId);
+    if (ownerId && takeout) await clearPreparedTakeout(ownerId);
     return job;
   } finally {
     if (ownerId) clearPortabilityPreparationProgress(ownerId);

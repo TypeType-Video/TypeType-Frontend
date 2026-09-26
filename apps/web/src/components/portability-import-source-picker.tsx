@@ -5,7 +5,7 @@ import { PortabilityImportDropzone } from "./portability-import-dropzone";
 
 type Props = {
   busy: boolean;
-  extension: string;
+  extension?: string;
   label: string;
   hint: string;
   onFile: (file: File | undefined) => void;

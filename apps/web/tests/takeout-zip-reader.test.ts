@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
-import type { FileEntry } from "@zip.js/zip.js";
+import { BlobWriter, type FileEntry, TextReader, ZipWriter } from "@zip.js/zip.js";
 import { TakeoutZipReader } from "../src/lib/takeout-zip-reader";
+import { isYoutubeTakeoutArchive } from "../src/lib/youtube-takeout-archive";
 
 const ZIP32_WRAP = 0x1_0000_0000;
 
@@ -90,4 +91,26 @@ test("normalizes an overflowing logical offset before zip.js validates entry bou
 
   expect(entry.offset).toBe(ZIP32_WRAP + physicalOffset);
   expect(reader.size).toBe(originalSize);
+});
+
+test("detects a direct Google Takeout archive from its YouTube metadata paths", async () => {
+  const writer = new ZipWriter(new BlobWriter());
+  await writer.add(
+    "Takeout/YouTube et YouTube Music/abonnements/abonnements.csv",
+    new TextReader("Channel Id\nUC1"),
+  );
+  const file = new File([await writer.close()], "takeout.zip");
+
+  expect(await isYoutubeTakeoutArchive(file)).toBe(true);
+});
+
+test("detects Google Takeout transfer archives before decompressing their parts", async () => {
+  const writer = new ZipWriter(new BlobWriter());
+  await writer.add(
+    "takeout-20260905T223911Z-2-001.zip",
+    new TextReader("not a real nested archive"),
+  );
+  const file = new File([await writer.close()], "transfer-01a07621.zip");
+
+  expect(await isYoutubeTakeoutArchive(file)).toBe(true);
 });

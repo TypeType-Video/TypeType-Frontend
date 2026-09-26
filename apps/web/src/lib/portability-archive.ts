@@ -8,7 +8,7 @@ export function isZipArchive(file: Blob): Promise<boolean> {
 
 export async function portabilityArchiveIssue(
   file: File,
-  expectedExtension: string,
+  expectedExtension?: string,
 ): Promise<PortabilityArchiveIssue | null> {
   const advertisedZip =
     /\.zip$/i.test(file.name) ||

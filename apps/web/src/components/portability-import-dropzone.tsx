@@ -3,11 +3,14 @@ import { type DragEvent, useRef, useState } from "react";
 
 type Props = {
   busy: boolean;
-  extension: string;
+  extension?: string;
   label: string;
   hint: string;
   onFile: (file: File | undefined) => void;
 };
+
+const ARCHIVE_ACCEPT =
+  ".zip,.json,.xml,.opml,.db,.sqlite,application/zip,application/json,application/xml,text/xml,application/x-sqlite3";
 
 export function PortabilityImportDropzone({ busy, extension, label, hint, onFile }: Props) {
   const input = useRef<HTMLInputElement>(null);
@@ -47,7 +50,7 @@ export function PortabilityImportDropzone({ busy, extension, label, hint, onFile
       <input
         ref={input}
         type="file"
-        accept={`.${extension},.zip,application/zip,application/x-zip-compressed`}
+        accept={extension ? `.${extension},${ARCHIVE_ACCEPT}` : ARCHIVE_ACCEPT}
         disabled={busy}
         className="hidden"
         onChange={(event) => {

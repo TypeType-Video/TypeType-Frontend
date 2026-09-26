@@ -33,21 +33,17 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
       ),
     [formats],
   );
-  const [formatName, setFormatName] = useState(
-    importFormats.find((format) => format.format === "typetype")?.format ??
-      importFormats[0]?.format ??
-      "typetype",
-  );
+  const [formatName, setFormatName] = useState("auto");
   const [jobId, setJobId] = usePersistedPortabilityJob("typetype-portability-import-job");
   const [selected, setSelected] = useState<Set<PortabilityCategory>>(new Set());
   const [duplicatePolicy, setDuplicatePolicy] = useState<"skip" | "replace">("skip");
   const [toast, setToast] = useState<string | null>(null);
   const previousState = useRef<string | null>(null);
   const job = usePortabilityJob(jobId);
-  const format = importFormats.find((item) => item.format === formatName) ?? importFormats[0];
+  const selectedFormat = importFormats.find((item) => item.format === formatName);
   const upload = useMutation({
     mutationFn: ({ file, prepared }: { file: File; prepared: boolean }) =>
-      startPortabilityImport(file, format.format, {
+      startPortabilityImport(file, formatName, {
         ownerId,
         preparedFile: prepared ? file : undefined,
         onPrepared: setPendingTakeout,
@@ -106,7 +102,8 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     apply.reset();
   }
 
-  if (!format) return <p className="text-sm text-fg-muted">{m.portability_no_import_format()}</p>;
+  if (importFormats.length === 0)
+    return <p className="text-sm text-fg-muted">{m.portability_no_import_format()}</p>;
 
   const preview = job.data?.preview;
   const failure = upload.error ?? job.error ?? apply.error ?? report.error;
@@ -123,12 +120,12 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
         <>
           <PortabilityFormatPicker
             label={m.portability_import_from()}
-            formats={importFormats}
-            value={format.format}
+            formats={[{ format: "auto", defaultExtension: "" }, ...importFormats]}
+            value={formatName}
             onChange={setFormatName}
           />
-          <PortabilityImportGuide format={format.format} />
-          {format.format === "youtube-takeout" && pendingTakeout && (
+          <PortabilityImportGuide format={formatName} />
+          {pendingTakeout && (formatName === "auto" || formatName === "youtube-takeout") && (
             <button
               type="button"
               disabled={upload.isPending}
@@ -139,16 +136,15 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
             </button>
           )}
           <PortabilityImportSourcePicker
-            key={format.format}
+            key={formatName}
             busy={upload.isPending}
-            extension={format.defaultExtension}
+            extension={selectedFormat?.defaultExtension}
             label={
               upload.isPending ? m.portability_preparing_upload() : m.portability_choose_or_drop()
             }
             hint={
               m.portability_drop_original_prefix() +
-              " ." +
-              format.defaultExtension +
+              (selectedFormat ? ` .${selectedFormat.defaultExtension}` : "") +
               " " +
               m.portability_drop_original_suffix()
             }
