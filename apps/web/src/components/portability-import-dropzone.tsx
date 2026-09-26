@@ -47,7 +47,7 @@ export function PortabilityImportDropzone({ busy, extension, label, hint, onFile
       <input
         ref={input}
         type="file"
-        accept={`.${extension}`}
+        accept={`.${extension},.zip,application/zip,application/x-zip-compressed`}
         disabled={busy}
         className="hidden"
         onChange={(event) => {

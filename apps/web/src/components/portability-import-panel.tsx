@@ -15,9 +15,9 @@ import {
 } from "../lib/api-portability";
 import { m } from "../paraglide/messages.js";
 import { PortabilityFormatPicker } from "./portability-format-picker";
-import { PortabilityImportDropzone } from "./portability-import-dropzone";
 import { PortabilityImportGuide } from "./portability-import-guide";
 import { PortabilityImportPreview } from "./portability-import-preview";
+import { PortabilityImportSourcePicker } from "./portability-import-source-picker";
 import { PortabilityJobStatus } from "./portability-job-status";
 import { Toast } from "./toast";
 
@@ -138,7 +138,8 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
               {m.portability_resume_prepared_upload()}
             </button>
           )}
-          <PortabilityImportDropzone
+          <PortabilityImportSourcePicker
+            key={format.format}
             busy={upload.isPending}
             extension={format.defaultExtension}
             label={
@@ -151,7 +152,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
               " " +
               m.portability_drop_original_suffix()
             }
-            onFile={(file) => choose(file)}
+            onFile={choose}
           />
         </>
       )}

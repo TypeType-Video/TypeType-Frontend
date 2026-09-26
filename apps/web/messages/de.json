@@ -310,6 +310,8 @@
   "portability_import_description": "Vorschau anzeigen und auswählen, was wiederhergestellt werden soll.",
   "portability_import_from": "Importieren von",
   "portability_choose_or_drop": "Sicherungskopie auswählen oder ablegen",
+  "portability_zip_choose_source": "Dies ist ein ZIP-Archiv, aber das ausgewählte Format erwartet einen anderen Dateityp. Wähle YouTube Takeout für ein Google-Takeout-Archiv oder NewPipe für ein NewPipe-Backup.",
+  "portability_invalid_zip": "Diese Datei ist kein lesbares ZIP-Archiv. Wähle für YouTube Takeout das vollständige Original-ZIP und nicht eine einzelne HTML-, JSON- oder CSV-Datei oder einen Videoteil.",
   "portability_drop_original_prefix": "Lege die originale",
   "portability_drop_original_suffix": "Datei ab. Es wird nichts importiert, bis du die Vorschau überprüft hast.",
   "portability_duplicate_records": "Doppelte Daten gefunden",
