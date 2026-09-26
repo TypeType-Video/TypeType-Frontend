@@ -21,5 +21,5 @@ export async function portabilityArchiveIssue(
     if (advertisedZip) return "invalid-zip";
   }
   if (!isZip && (advertisedZip || expectedExtension === "zip")) return "invalid-zip";
-  return isZip && expectedExtension !== "zip" ? "wrong-format" : null;
+  return isZip && expectedExtension != null && expectedExtension !== "zip" ? "wrong-format" : null;
 }

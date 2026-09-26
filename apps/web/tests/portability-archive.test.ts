@@ -10,6 +10,7 @@ test("recognizes a ZIP by its contents rather than its filename", async () => {
 
   expect(await isZipArchive(namelessZip)).toBe(true);
   expect(await portabilityArchiveIssue(namelessZip, "zip")).toBeNull();
+  expect(await portabilityArchiveIssue(namelessZip)).toBeNull();
   expect(await isZipArchive(new File(["not a zip"], "backup.zip"))).toBe(false);
 });
 
