@@ -18,8 +18,11 @@ export function usePortabilityJob(id: string | null) {
     enabled: id !== null,
     retry: (failureCount, error) =>
       !(error instanceof ApiError && error.status === 404) && failureCount < 2,
-    refetchInterval: (current) =>
-      current.state.data && TERMINAL_STATES.has(current.state.data.state) ? false : 1_000,
+    refetchInterval: (current) => {
+      if (current.state.error instanceof ApiError && current.state.error.status === 404)
+        return false;
+      return current.state.data && TERMINAL_STATES.has(current.state.data.state) ? false : 1_000;
+    },
   });
   const cancel = useMutation({
     mutationFn: () => cancelPortabilityJob(id as string),

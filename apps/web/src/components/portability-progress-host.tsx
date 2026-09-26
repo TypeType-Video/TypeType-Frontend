@@ -46,7 +46,7 @@ function percent(job: PortabilityJob): number | null {
 export function PortabilityProgressHost() {
   const { isAuthed, me } = useAuth();
   const queryClient = useQueryClient();
-  const [jobId] = usePersistedPortabilityJob("typetype-portability-import-job");
+  const [jobId, setJobId] = usePersistedPortabilityJob("typetype-portability-import-job");
   const preparation = useSyncExternalStore(
     subscribePortabilityPreparationProgress,
     getPortabilityPreparationProgress,
@@ -66,6 +66,12 @@ export function PortabilityProgressHost() {
     job.data?.kind === "import" &&
     (state === "queued" || state === "analyzing" || state === "applying");
   const visible = isAuthed && (localPreparation !== null || active || finished);
+
+  useEffect(() => {
+    if (!job.missing || !jobId) return;
+    setJobId(null);
+    setFinished(false);
+  }, [job.missing, jobId, setJobId]);
 
   useEffect(() => {
     if (observedJobId.current !== jobId) {
