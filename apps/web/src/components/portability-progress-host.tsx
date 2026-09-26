@@ -4,12 +4,12 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
 import { usePortabilityJob } from "../hooks/use-portability-job";
-import { SUBSCRIPTION_FEED_KEY } from "../hooks/use-subscription-feed";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import {
   getPortabilityPreparationProgress,
   subscribePortabilityPreparationProgress,
 } from "../lib/portability-preparation-progress";
+import { SUBSCRIPTION_FEED_KEY } from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { portabilityImportStageLabel } from "./portability-job-status";
