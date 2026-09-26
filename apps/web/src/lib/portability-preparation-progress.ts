@@ -1,4 +1,4 @@
-export type PortabilityPreparationPhase = "scanning" | "extracting" | "packing" | "uploading";
+type PortabilityPreparationPhase = "scanning" | "extracting" | "packing" | "uploading";
 export type PortabilityPreparationProgress = {
   ownerId: string;
   phase: PortabilityPreparationPhase;
