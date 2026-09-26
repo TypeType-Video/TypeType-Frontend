@@ -316,6 +316,7 @@
   "portability_import_description": "Prévisualisez les données et choisissez ce qui doit être restauré.",
   "portability_import_from": "Importer depuis",
   "portability_auto_detect": "Détection automatique",
+  "portability_auto_import_starting": "Import automatique des données détectées. Vous pouvez quitter cette page, la progression continue.",
   "portability_choose_or_drop": "Choisissez ou déposez une sauvegarde",
   "portability_zip_choose_source": "Cette archive ZIP est lisible, mais elle ne correspond pas à la source d’import sélectionnée. Choisissez la source qui a produit cette sauvegarde.",
   "portability_invalid_zip": "Le fichier n’est pas une archive ZIP lisible. Sélectionnez l’archive complète d’origine, pas un fichier isolé ni une partie incomplète.",

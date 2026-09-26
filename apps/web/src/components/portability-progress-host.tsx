@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { usePersistedPortabilityJob } from "../hooks/use-persisted-portability-job";
 import { usePortabilityJob } from "../hooks/use-portability-job";
+import { SUBSCRIPTION_FEED_KEY } from "../hooks/use-subscription-feed";
 import type { PortabilityCategory, PortabilityJob } from "../lib/api-portability";
 import {
   getPortabilityPreparationProgress,
@@ -16,12 +17,23 @@ import { PortabilityPreparationToast } from "./portability-preparation-toast";
 import "../styles/notification-toast.css";
 
 const REFRESH_INTERVAL_MS = 2_000;
-const IMPORT_QUERY_KEYS = [["subscriptions"], ["playlists"], ["history"], ["history-all"]] as const;
+const IMPORT_QUERY_KEYS = [
+  ["subscriptions"],
+  SUBSCRIPTION_FEED_KEY,
+  ["playlists"],
+  ["saved-playlists"],
+  ["history"],
+  ["history-all"],
+  ["favorites"],
+  ["watch-later"],
+];
 
 function queryKeysForCategory(category: PortabilityCategory | null | undefined) {
-  if (category === "subscriptions") return [["subscriptions"]] as const;
-  if (category === "playlists") return [["playlists"]] as const;
+  if (category === "subscriptions") return [["subscriptions"], SUBSCRIPTION_FEED_KEY];
+  if (category === "playlists") return [["playlists"], ["saved-playlists"]];
   if (category === "history") return [["history"], ["history-all"]] as const;
+  if (category === "favorites") return [["favorites"]];
+  if (category === "watchLater") return [["watch-later"]];
   return [];
 }
 

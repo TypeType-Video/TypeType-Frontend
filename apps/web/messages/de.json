@@ -310,6 +310,7 @@
   "portability_import_description": "Vorschau anzeigen und auswählen, was wiederhergestellt werden soll.",
   "portability_import_from": "Importieren von",
   "portability_auto_detect": "Automatische Erkennung",
+  "portability_auto_import_starting": "Die erkannten Daten werden automatisch importiert. Du kannst diese Seite verlassen, der Fortschritt läuft weiter.",
   "portability_choose_or_drop": "Sicherungskopie auswählen oder ablegen",
   "portability_zip_choose_source": "Das ZIP-Archiv ist lesbar, passt aber nicht zur ausgewählten Importquelle. Wähle die Quelle, die dieses Backup erstellt hat.",
   "portability_invalid_zip": "Diese Datei ist kein lesbares ZIP-Archiv. Wähle das vollständige Original-Backup, nicht eine einzelne Datei oder einen unvollständigen Teil.",

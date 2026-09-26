@@ -35,10 +35,9 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   );
   const [formatName, setFormatName] = useState("auto");
   const [jobId, setJobId] = usePersistedPortabilityJob("typetype-portability-import-job");
-  const [selected, setSelected] = useState<Set<PortabilityCategory>>(new Set());
-  const [duplicatePolicy, setDuplicatePolicy] = useState<"skip" | "replace">("skip");
   const [toast, setToast] = useState<string | null>(null);
   const previousState = useRef<string | null>(null);
+  const autoAppliedJobId = useRef<string | null>(null);
   const job = usePortabilityJob(jobId);
   const selectedFormat = importFormats.find((item) => item.format === formatName);
   const upload = useMutation({
@@ -55,16 +54,26 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
     onSuccess: (started) => queryClient.setQueryData(["portability-job", started.id], started),
   });
   const apply = useMutation({
-    mutationFn: () => applyPortabilityImport(jobId as string, [...selected], duplicatePolicy),
+    mutationFn: (categories: PortabilityCategory[]) =>
+      applyPortabilityImport(jobId as string, categories, "skip"),
     onSuccess: (updated) =>
       queryClient.setQueryData<PortabilityJob>(["portability-job", jobId], updated),
+    onError: () => {
+      autoAppliedJobId.current = null;
+    },
   });
   const report = useMutation({ mutationFn: () => downloadPortabilityReport(jobId as string) });
 
   useEffect(() => {
-    if (!job.data?.preview || selected.size > 0) return;
-    setSelected(new Set(Object.keys(job.data.preview.counts) as PortabilityCategory[]));
-  }, [job.data?.preview, selected.size]);
+    const data = job.data;
+    if (data?.state !== "ready" || !data.preview || autoAppliedJobId.current === data.id) {
+      return;
+    }
+    const categories = Object.keys(data.preview.counts) as PortabilityCategory[];
+    if (categories.length === 0) return;
+    autoAppliedJobId.current = data.id;
+    apply.mutate(categories);
+  }, [apply.mutate, job.data]);
 
   useEffect(() => {
     const state = job.data?.state ?? null;
@@ -97,7 +106,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
   function reset() {
     if (jobId) void job.remove.mutateAsync().catch(() => undefined);
     setJobId(null);
-    setSelected(new Set());
+    autoAppliedJobId.current = null;
     upload.reset();
     apply.reset();
   }
@@ -156,23 +165,7 @@ export function PortabilityImportPanel({ formats }: { formats: PortabilityFormat
       {job.data && <PortabilityJobStatus job={job.data} onCancel={() => job.cancel.mutate()} />}
 
       {preview && job.data?.state === "ready" && (
-        <PortabilityImportPreview
-          preview={preview}
-          selected={selected}
-          duplicatePolicy={duplicatePolicy}
-          applying={apply.isPending}
-          onReset={reset}
-          onToggle={(category) =>
-            setSelected((current) => {
-              const next = new Set(current);
-              if (next.has(category)) next.delete(category);
-              else next.add(category);
-              return next;
-            })
-          }
-          onDuplicatePolicy={setDuplicatePolicy}
-          onApply={() => apply.mutate()}
-        />
+        <PortabilityImportPreview preview={preview} applying={apply.isPending} onReset={reset} />
       )}
 
       {job.data && ["completed", "failed", "cancelled"].includes(job.data.state) && (
