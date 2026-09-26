@@ -20,7 +20,7 @@ export async function isYoutubeTakeoutArchive(file: Blob): Promise<boolean> {
       if (entry.directory) continue;
       sourceReader.registerEntry(entry);
       const name = entry.filename.replaceAll("\\", "/");
-      if (name.startsWith("Takeout/") && isTakeoutMetadata(name)) return true;
+      if (name.toLowerCase().startsWith("takeout/") && isTakeoutMetadata(name)) return true;
       if (/^takeout-\d{8}t\d{6}z-\d+-\d+\.zip$/i.test(name)) return true;
     }
   } catch {
