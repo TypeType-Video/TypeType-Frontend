@@ -1,3 +1,4 @@
+import { m } from "../paraglide/messages.js";
 import type { PortabilityJob } from "./api-portability";
 import { portabilityResponse } from "./api-portability-response";
 import { authed } from "./authed";
@@ -9,7 +10,6 @@ import {
 import { prepareYoutubeTakeout } from "./prepare-youtube-takeout";
 import { isYoutubeTakeoutArchive } from "./youtube-takeout-archive";
 import { clearPreparedTakeout } from "./youtube-takeout-prepared-store";
-import { m } from "../paraglide/messages.js";
 
 const MAX_UPLOAD_BYTES = 512 * 1024 * 1024;
 

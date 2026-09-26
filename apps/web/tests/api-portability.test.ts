@@ -80,10 +80,7 @@ test("automatic imports let the server detect the source without a format hint",
   const { ZipWriter, BlobWriter, TextReader } = await import("@zip.js/zip.js");
   const archive = new ZipWriter(new BlobWriter());
   await archive.add("Takeout/YouTube/subscriptions.csv", new TextReader("Channel Id\nUC1"));
-  await startPortabilityImport(
-    new File([await archive.close()], "takeout.zip"),
-    "auto",
-  );
+  await startPortabilityImport(new File([await archive.close()], "takeout.zip"), "auto");
 
   const [url] = (globalThis.fetch as ReturnType<typeof mock>).mock.calls[0] as [string];
   expect(url).toBe("/api/portability/imports");

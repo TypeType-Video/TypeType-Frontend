@@ -79,14 +79,14 @@ export function PortabilityFormatPicker({ label, formats, value, onChange }: Pro
                   }`}
                 >
                   <PortabilityFormatIcon format={format.format} className="h-6 w-6 shrink-0" />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">
-                        {formatName(format.format)}
-                      </span>
-                      {format.defaultExtension && (
-                        <span className="block text-xs text-fg-soft">.{format.defaultExtension}</span>
-                      )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">
+                      {formatName(format.format)}
                     </span>
+                    {format.defaultExtension && (
+                      <span className="block text-xs text-fg-soft">.{format.defaultExtension}</span>
+                    )}
+                  </span>
                   {active && <Check size={15} className="shrink-0" aria-hidden="true" />}
                 </button>
               );
