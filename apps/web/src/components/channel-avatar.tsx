@@ -1,3 +1,4 @@
+import { UserRound } from "lucide-react";
 import { useState } from "react";
 
 type Props = {
@@ -22,29 +23,34 @@ function getInitial(name: string): string {
 
 export function ChannelAvatar({ src, name, className = "w-8 h-8" }: Props) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const failed = failedSrc === src;
-
-  if (!src || failed) {
-    return (
-      <div
-        className={`${className} flex flex-shrink-0 select-none items-center justify-center rounded-full border border-border bg-gradient-to-br from-surface-strong to-surface-soft font-semibold text-fg-muted`}
-        title={name}
-      >
-        <span className="text-base leading-none">{getInitial(name)}</span>
-      </div>
-    );
-  }
+  const loaded = loadedSrc === src;
 
   return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`${className} flex-shrink-0 rounded-full object-cover`}
-      loading="lazy"
-      decoding="async"
-      onError={() => setFailedSrc(src)}
+    <div
+      className={`${className} relative flex flex-shrink-0 select-none items-center justify-center overflow-hidden rounded-full border border-border bg-gradient-to-br from-surface-strong to-surface-soft font-semibold text-fg-muted`}
       title={name}
-    />
+    >
+      {name.trim() ? (
+        <span className="text-base leading-none">{getInitial(name)}</span>
+      ) : (
+        <UserRound className="h-1/2 w-1/2" aria-hidden="true" />
+      )}
+      {src && !failed && (
+        <img
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${
+            loaded ? "opacity-100" : "opacity-0"
+          }`}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoadedSrc(src)}
+          onError={() => setFailedSrc(src)}
+        />
+      )}
+    </div>
   );
 }
