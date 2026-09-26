@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useAuth } from "../hooks/use-auth";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { useHistory } from "../hooks/use-history";
 import { isVideoInProgress } from "../lib/watch-progress";
@@ -9,6 +10,7 @@ const MAX_ITEMS = 12;
 
 export function ContinueWatching() {
   const { items } = useHistory();
+  const { isAuthed } = useAuth();
   const { filter } = useBlockedFilter();
   const displayed = useMemo(
     () =>
@@ -18,7 +20,7 @@ export function ContinueWatching() {
         .slice(0, MAX_ITEMS),
     [filter, items],
   );
-  if (displayed.length === 0) return null;
+  if (!isAuthed || displayed.length === 0) return null;
 
   return (
     <section className="mt-2 flex flex-col gap-3 sm:mt-3">
