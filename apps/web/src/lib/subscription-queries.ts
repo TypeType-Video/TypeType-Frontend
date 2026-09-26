@@ -9,7 +9,7 @@ import type { SubscriptionItem } from "../types/user";
 import { fetchSubscriptionFeed, fetchSubscriptions } from "./api-user";
 
 const SUBSCRIPTIONS_KEY = ["subscriptions"];
-const SUBSCRIPTION_FEED_KEY = ["subscription-feed"];
+export const SUBSCRIPTION_FEED_KEY = ["subscription-feed"];
 export const SUBSCRIPTION_GROUPS_KEY = ["subscription-groups"];
 export const SUBSCRIPTION_GROUP_MEMBERSHIPS_KEY = ["subscription-group-memberships"];
 const SUBSCRIPTION_STALE_MS = 5 * 60 * 1000;
