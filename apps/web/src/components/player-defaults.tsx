@@ -114,11 +114,19 @@ export function PlayerDefaults({
       : (audioOptions.find((option) => option.track.id === preferredDefaultAudioTrackId) ??
         audioOptions.find((option) => option.track.id === originalAudioTrackId));
 
+    const hasMultipleLanguages =
+      new Set(
+        audioOptions
+          .map((option) => normalizeLanguageTag(option.track.language))
+          .filter(Boolean),
+      ).size > 1;
+
     const missingOriginalByContract = forceOriginal && originalAudioTrackId === null;
     const missingOriginalByHeuristic =
-      forceOriginal && originalAudioTrackId === undefined && !match;
+      forceOriginal && originalAudioTrackId === undefined && hasMultipleLanguages && !match;
     if (
       (missingOriginalByContract || missingOriginalByHeuristic) &&
+      hasMultipleLanguages &&
       !originalMissingNotified.current
     ) {
       originalMissingNotified.current = true;
