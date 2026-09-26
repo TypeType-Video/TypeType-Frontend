@@ -16,11 +16,19 @@ describe("channel avatar", () => {
   });
 
   test("renders the channel initial when no avatar URL exists", () => {
-    const html = renderToStaticMarkup(<ChannelAvatar src="" name="Channel" />);
+    const html = renderToStaticMarkup(<ChannelAvatar src="" name="Channel" pending={false} />);
 
     expect(html).toContain('data-avatar-state="fallback"');
     expect(html).toContain(">C</span>");
     expect(html).not.toContain("<img");
+  });
+
+  test("shows a short skeleton before deciding a missing avatar is unavailable", () => {
+    const html = renderToStaticMarkup(<ChannelAvatar src="" name="Channel" />);
+
+    expect(html).toContain('data-avatar-state="loading"');
+    expect(html).toContain("data-avatar-skeleton");
+    expect(html).not.toContain(">C</span>");
   });
 
   test("keeps the skeleton while a missing avatar is being resolved", () => {
@@ -32,7 +40,7 @@ describe("channel avatar", () => {
   });
 
   test("renders a generic fallback when the channel name is missing", () => {
-    const html = renderToStaticMarkup(<ChannelAvatar src="" name="" />);
+    const html = renderToStaticMarkup(<ChannelAvatar src="" name="" pending={false} />);
 
     expect(html).toContain("lucide-user-round");
   });

@@ -1,5 +1,5 @@
 import { UserRound } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "./skeleton";
 
 type Props = {
@@ -23,13 +23,26 @@ function getInitial(name: string): string {
   return name[0].toUpperCase();
 }
 
-export function ChannelAvatar({ src, name, className = "w-8 h-8", pending = false }: Props) {
+export function ChannelAvatar({ src, name, className = "w-8 h-8", pending }: Props) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [missingExpired, setMissingExpired] = useState(false);
   const hasSource = src.trim().length > 0;
   const failed = failedSrc === src;
   const loaded = loadedSrc === src;
-  const loading = pending || (hasSource && !failed && !loaded);
+  useEffect(() => {
+    if (hasSource || pending === false) {
+      setMissingExpired(false);
+      return;
+    }
+    if (pending === true) return;
+    setMissingExpired(false);
+    const timer = window.setTimeout(() => setMissingExpired(true), MISSING_AVATAR_GRACE_MS);
+    return () => window.clearTimeout(timer);
+  }, [hasSource, pending]);
+  const missing =
+    !hasSource && !failed && (pending === true || (pending === undefined && !missingExpired));
+  const loading = missing || (hasSource && !failed && !loaded);
   const state = loading ? "loading" : hasSource && !failed ? "ready" : "fallback";
 
   return (
@@ -61,3 +74,5 @@ export function ChannelAvatar({ src, name, className = "w-8 h-8", pending = fals
     </div>
   );
 }
+
+const MISSING_AVATAR_GRACE_MS = 1_500;
