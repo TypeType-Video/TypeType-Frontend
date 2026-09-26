@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { normalizeDefaultPlaybackSpeed } from "../lib/playback-speed";
+import { qualityLabelHeight, qualityOptionHeight } from "../lib/player-quality";
 import type { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import {
   useAudioOptions,
@@ -29,13 +30,6 @@ type PlaybackSpeedDefaultProps = {
   defaultPlaybackSpeed: number;
   preference?: SabrPlaybackRatePreference;
 };
-
-function qualityLabelHeight(label: string): number | null {
-  const match = label.match(/(\d+)/);
-  if (!match) return null;
-  const height = Number(match[1]);
-  return Number.isFinite(height) ? height : null;
-}
 
 export function PlayerDefaults({
   defaultQuality,
@@ -74,11 +68,7 @@ export function PlayerDefaults({
     const defaultHeight = qualityLabelHeight(defaultQuality);
     const exactMatch = qualityOptions.find((o) => o.label === defaultQuality);
     const heightMatch = qualityOptions.find(
-      (o) =>
-        defaultHeight !== null &&
-        ((o.quality?.height && o.quality.height > 0
-          ? o.quality.height
-          : qualityLabelHeight(o.label)) === defaultHeight),
+      (o) => defaultHeight !== null && qualityOptionHeight(o) === defaultHeight,
     );
     const match = exactMatch ?? heightMatch;
     if (!match) return;

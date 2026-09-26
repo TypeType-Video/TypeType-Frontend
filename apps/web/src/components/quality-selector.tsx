@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useDashPlayerSnapshot } from "../lib/dash-player-store";
 import { dashQualityOptions, selectDashTrack, selectedDashHeight } from "../lib/dash-video";
+import { qualityOptionHeight } from "../lib/player-quality";
 import { sabrResolutionOptions } from "../lib/sabr-quality-selection";
 import type { DefaultLayoutIcon, MenuInstance } from "../lib/vidstack";
 import {
@@ -22,23 +23,8 @@ const QUALITY_OPTIONS = { sort: "descending" } as const;
 
 type QualityOption = ReturnType<typeof useVideoQualityOptions>[number];
 
-function qualityLabelHeight(label: string): number | null {
-  const match = label.match(/(\d+)/);
-  if (!match) return null;
-  const height = Number(match[1]);
-  return Number.isFinite(height) ? height : null;
-}
-
-function optionHeight(option: QualityOption): number | null {
-  if (option.quality?.height && option.quality.height > 0) return option.quality.height;
-  if ("height" in option && typeof (option as { height?: unknown }).height === "number") {
-    return (option as { height: number }).height;
-  }
-  return qualityLabelHeight(option.label);
-}
-
 function qualityValue(option: QualityOption): string {
-  const height = optionHeight(option);
+  const height = qualityOptionHeight(option);
   return height !== null ? String(height) : option.label;
 }
 
@@ -147,7 +133,7 @@ export function QualitySelector() {
   const radioOptions = filteredOptions.map((o) => ({ label: o.label, value: qualityValue(o) }));
 
   if (filteredOptions.length <= 1) return null;
-  if (filteredOptions.every((o) => (optionHeight(o) ?? 0) === 0)) return null;
+  if (filteredOptions.every((o) => (qualityOptionHeight(o) ?? 0) === 0)) return null;
 
   if (!selected) return null;
   const current = selected.label;
