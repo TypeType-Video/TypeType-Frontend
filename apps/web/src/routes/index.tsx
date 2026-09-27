@@ -5,26 +5,10 @@ import { HomeFallbackSection } from "../components/home-fallback-section";
 import { HomeRecommendationsSection } from "../components/home-recommendations-section";
 import { useAuth } from "../hooks/use-auth";
 import { useSettings } from "../hooks/use-settings";
+import { defaultLandingPath } from "../lib/default-landing";
 import { m } from "../paraglide/messages.js";
 
 let landingApplied = false;
-
-function landingPath(value: string) {
-  switch (value) {
-    case "subscriptions":
-      return "/subscriptions";
-    case "history":
-      return "/history";
-    case "playlists":
-      return "/playlists";
-    case "watch-later":
-      return "/watch-later";
-    case "favorites":
-      return "/favorites";
-    default:
-      return null;
-  }
-}
 
 function HomePage() {
   const { authReady, isAuthed } = useAuth();
@@ -34,7 +18,7 @@ function HomePage() {
   useEffect(() => {
     if (landingApplied || !settingsReady) return;
     landingApplied = true;
-    const target = landingPath(settings.defaultLandingPage);
+    const target = defaultLandingPath(settings.defaultLandingPage);
     if (target) navigate({ to: target, replace: true });
   }, [settingsReady, settings.defaultLandingPage, navigate]);
 

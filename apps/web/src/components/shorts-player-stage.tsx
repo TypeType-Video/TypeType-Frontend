@@ -24,6 +24,7 @@ export function ShortsPlayerStage({
   streamError,
   errorMessage,
   isMemberOnlyShort,
+  youtubeSessionAction,
   youtubeSessionReturnTo,
   hasPrev,
   hasNext,
@@ -129,6 +130,7 @@ export function ShortsPlayerStage({
                 message={playbackMessage}
                 onRetry={retry}
                 onNext={onNext}
+                youtubeSessionAction={youtubeSessionAction}
                 youtubeSessionReturnTo={youtubeSessionReturnTo}
               />
             )}

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminConsoleRouteImport } from './routes/admin-console'
+import { Route as BilibiliSessionRouteImport } from './routes/bilibili-session'
 import { Route as ChannelRouteImport } from './routes/channel'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as FavoritesRouteImport } from './routes/favorites'
@@ -41,7 +42,9 @@ import { Route as ImportYoutubeRouteImport } from './routes/import/youtube'
 import { Route as PlaylistsIdRouteImport } from './routes/playlists_.$id'
 import { Route as ShortsVideoIdRouteImport } from './routes/shorts_.$videoId'
 import { Route as SubscriptionsChannelsRouteImport } from './routes/subscriptions_.channels'
+import { Route as SubscriptionsGroupsRouteImport } from './routes/subscriptions_.groups'
 import { Route as AuthOidcCallbackRouteImport } from './routes/auth.oidc.callback'
+import { Route as ChannelProviderChannelIdRouteImport } from './routes/channel_.$provider.$channelId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminConsoleRoute = AdminConsoleRouteImport.update({
   id: '/admin-console',
   path: '/admin-console',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BilibiliSessionRoute = BilibiliSessionRouteImport.update({
+  id: '/bilibili-session',
+  path: '/bilibili-session',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelRoute = ChannelRouteImport.update({
@@ -204,15 +212,27 @@ const SubscriptionsChannelsRoute = SubscriptionsChannelsRouteImport.update({
   path: '/subscriptions/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubscriptionsGroupsRoute = SubscriptionsGroupsRouteImport.update({
+  id: '/subscriptions_/groups',
+  path: '/subscriptions/groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthOidcCallbackRoute = AuthOidcCallbackRouteImport.update({
   id: '/auth/oidc/callback',
   path: '/auth/oidc/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChannelProviderChannelIdRoute =
+  ChannelProviderChannelIdRouteImport.update({
+    id: '/channel_/$provider/$channelId',
+    path: '/channel/$provider/$channelId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -242,12 +262,15 @@ export interface FileRoutesByFullPath {
   '/playlists/$id': typeof PlaylistsIdRoute
   '/shorts/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions/groups': typeof SubscriptionsGroupsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -276,13 +299,16 @@ export interface FileRoutesByTo {
   '/playlists/$id': typeof PlaylistsIdRoute
   '/shorts/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions/groups': typeof SubscriptionsGroupsRoute
   '/import': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin-console': typeof AdminConsoleRoute
+  '/bilibili-session': typeof BilibiliSessionRoute
   '/channel': typeof ChannelRoute
   '/export': typeof ExportRoute
   '/favorites': typeof FavoritesRoute
@@ -312,14 +338,17 @@ export interface FileRoutesById {
   '/playlists_/$id': typeof PlaylistsIdRoute
   '/shorts_/$videoId': typeof ShortsVideoIdRoute
   '/subscriptions_/channels': typeof SubscriptionsChannelsRoute
+  '/subscriptions_/groups': typeof SubscriptionsGroupsRoute
   '/import/': typeof ImportIndexRoute
   '/auth/oidc/callback': typeof AuthOidcCallbackRoute
+  '/channel_/$provider/$channelId': typeof ChannelProviderChannelIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -349,12 +378,15 @@ export interface FileRouteTypes {
     | '/playlists/$id'
     | '/shorts/$videoId'
     | '/subscriptions/channels'
+    | '/subscriptions/groups'
     | '/import/'
     | '/auth/oidc/callback'
+    | '/channel/$provider/$channelId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -383,12 +415,15 @@ export interface FileRouteTypes {
     | '/playlists/$id'
     | '/shorts/$videoId'
     | '/subscriptions/channels'
+    | '/subscriptions/groups'
     | '/import'
     | '/auth/oidc/callback'
+    | '/channel/$provider/$channelId'
   id:
     | '__root__'
     | '/'
     | '/admin-console'
+    | '/bilibili-session'
     | '/channel'
     | '/export'
     | '/favorites'
@@ -418,13 +453,16 @@ export interface FileRouteTypes {
     | '/playlists_/$id'
     | '/shorts_/$videoId'
     | '/subscriptions_/channels'
+    | '/subscriptions_/groups'
     | '/import/'
     | '/auth/oidc/callback'
+    | '/channel_/$provider/$channelId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
+  BilibiliSessionRoute: typeof BilibiliSessionRoute
   ChannelRoute: typeof ChannelRoute
   ExportRoute: typeof ExportRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -452,7 +490,9 @@ export interface RootRouteChildren {
   PlaylistsIdRoute: typeof PlaylistsIdRoute
   ShortsVideoIdRoute: typeof ShortsVideoIdRoute
   SubscriptionsChannelsRoute: typeof SubscriptionsChannelsRoute
+  SubscriptionsGroupsRoute: typeof SubscriptionsGroupsRoute
   AuthOidcCallbackRoute: typeof AuthOidcCallbackRoute
+  ChannelProviderChannelIdRoute: typeof ChannelProviderChannelIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -469,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-console'
       fullPath: '/admin-console'
       preLoaderRoute: typeof AdminConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bilibili-session': {
+      id: '/bilibili-session'
+      path: '/bilibili-session'
+      fullPath: '/bilibili-session'
+      preLoaderRoute: typeof BilibiliSessionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channel': {
@@ -681,11 +728,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscriptionsChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/subscriptions_/groups': {
+      id: '/subscriptions_/groups'
+      path: '/subscriptions/groups'
+      fullPath: '/subscriptions/groups'
+      preLoaderRoute: typeof SubscriptionsGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/oidc/callback': {
       id: '/auth/oidc/callback'
       path: '/auth/oidc/callback'
       fullPath: '/auth/oidc/callback'
       preLoaderRoute: typeof AuthOidcCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channel_/$provider/$channelId': {
+      id: '/channel_/$provider/$channelId'
+      path: '/channel/$provider/$channelId'
+      fullPath: '/channel/$provider/$channelId'
+      preLoaderRoute: typeof ChannelProviderChannelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -709,6 +770,7 @@ const ImportRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminConsoleRoute: AdminConsoleRoute,
+  BilibiliSessionRoute: BilibiliSessionRoute,
   ChannelRoute: ChannelRoute,
   ExportRoute: ExportRoute,
   FavoritesRoute: FavoritesRoute,
@@ -736,7 +798,9 @@ const rootRouteChildren: RootRouteChildren = {
   PlaylistsIdRoute: PlaylistsIdRoute,
   ShortsVideoIdRoute: ShortsVideoIdRoute,
   SubscriptionsChannelsRoute: SubscriptionsChannelsRoute,
+  SubscriptionsGroupsRoute: SubscriptionsGroupsRoute,
   AuthOidcCallbackRoute: AuthOidcCallbackRoute,
+  ChannelProviderChannelIdRoute: ChannelProviderChannelIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

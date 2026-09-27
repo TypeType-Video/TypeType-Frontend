@@ -9,11 +9,12 @@ import { useSettings } from "../hooks/use-settings";
 import { isStreamUnavailableError, useSabrBootstrap, useStream } from "../hooks/use-stream";
 import { familyListBlockedMessage, isChannelNotAllowedError } from "../lib/allow-list-error";
 import { ApiError } from "../lib/api";
-import { isYoutubeSessionActionError } from "../lib/api-youtube-session";
+import { youtubeSessionActionForError } from "../lib/api-youtube-session";
 import { isEmbeddedFrame, resolveEmbedAccess } from "../lib/embed-access";
 import { parseStartTime } from "../lib/parse-start-time";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
+import { resolveStreamErrorMessage } from "../lib/stream-error-message";
 import { resolveVideoAvailability, videoAvailabilityCopy } from "../lib/video-availability";
 import { toPublicWatchParam, toWatchSourceUrl, youtubeThumbnailUrl } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
@@ -95,8 +96,12 @@ function EmbedPage() {
     const availability = genericExtractorError
       ? "members_only"
       : resolveVideoAvailability(activeError);
-    const needsYoutubeSession = isYoutubeSessionActionError(activeError);
+    const youtubeSessionAction = youtubeSessionActionForError(activeError);
+    const needsYoutubeSession = youtubeSessionAction !== null;
     const familyListBlocked = isChannelNotAllowedError(activeError);
+    const streamErrorMessage = isStreamUnavailableError(activeError)
+      ? m.ui_this_video_is_currently_unavailable()
+      : resolveStreamErrorMessage(activeError);
     const message = availability
       ? videoAvailabilityCopy(
           availability,
@@ -105,10 +110,10 @@ function EmbedPage() {
       : familyListBlocked
         ? familyListBlockedMessage()
         : needsYoutubeSession
-          ? m.ui_connect_youtube_to_access_this_video()
-          : isStreamUnavailableError(activeError)
-            ? m.ui_this_video_is_currently_unavailable()
-            : m.ui_failed_to_load_stream();
+          ? youtubeSessionAction === "reconnect"
+            ? m.ui_reconnect_youtube_to_access_this_video()
+            : m.ui_connect_youtube_to_access_this_video()
+          : (streamErrorMessage ?? m.ui_failed_to_load_stream());
     return (
       <EmbedError
         message={message}

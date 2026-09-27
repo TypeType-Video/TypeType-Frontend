@@ -1,3 +1,5 @@
+import { useSettings } from "../hooks/use-settings";
+import { videoGridClassName } from "../lib/layout-preferences";
 import { VideoCardSkeleton } from "./video-card-skeleton";
 
 const DEFAULT_COUNT = 12;
@@ -8,9 +10,10 @@ type Props = {
 };
 
 export function VideoGridSkeleton({ count = DEFAULT_COUNT, idPrefix = "video-grid" }: Props) {
+  const { settings } = useSettings();
   const keys = Array.from({ length: count }, (_, index) => `${idPrefix}-${index}`);
   return (
-    <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+    <div className={videoGridClassName(settings.videoGridColumns)}>
       {keys.map((key) => (
         <VideoCardSkeleton key={key} />
       ))}

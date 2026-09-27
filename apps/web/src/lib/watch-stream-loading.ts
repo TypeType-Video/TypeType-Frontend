@@ -1,16 +1,7 @@
-import { detectProvider } from "./provider";
+export function shouldLoadFullWatchStream(streamEnabled: boolean): boolean {
+  return streamEnabled;
+}
 
-type BootstrapState = {
-  isSuccess: boolean;
-  isError: boolean;
-};
-
-export function shouldLoadFullWatchStream(
-  sourceUrl: string,
-  streamEnabled: boolean,
-  bootstrap: BootstrapState,
-): boolean {
-  if (!streamEnabled) return false;
-  if (detectProvider(sourceUrl) !== "youtube") return true;
-  return bootstrap.isSuccess || bootstrap.isError;
+export function shouldLoadSabrBootstrap(streamEnabled: boolean, previewIsLive: boolean): boolean {
+  return streamEnabled && !previewIsLive;
 }

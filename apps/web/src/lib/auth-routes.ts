@@ -2,11 +2,13 @@ export type RedirectTarget =
   | "/"
   | "/import"
   | "/history"
+  | "/bilibili-session"
   | "/playlists"
   | "/privacy"
   | "/profile"
   | "/settings"
   | "/subscriptions"
+  | "/subscriptions/groups"
   | "/youtube-session"
   | `/youtube-session?returnTo=${string}`
   | `/shorts?v=${string}`;
@@ -22,6 +24,7 @@ const PROTECTED_PREFIXES = [
   "/settings",
   "/subscriptions",
   "/youtube-session",
+  "/bilibili-session",
 ];
 const AUTH_PAGES = ["/login", "/register", "/reset-password", "/auth/oidc/callback"];
 const OIDC_CALLBACK_PAGE = "/auth/oidc/callback";
@@ -61,6 +64,7 @@ export function sanitizeRedirect(value: string | undefined): RedirectTarget {
   if (value === "/profile") return "/profile";
   if (value === "/settings") return "/settings";
   if (value === "/subscriptions") return "/subscriptions";
+  if (value === "/subscriptions/groups") return "/subscriptions/groups";
   if (value === "/youtube-session") return "/youtube-session";
   if (value === "/playlists" || value.startsWith("/playlists/")) return "/playlists";
   return "/";

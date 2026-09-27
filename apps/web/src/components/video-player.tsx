@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useSabrPlayerState } from "../hooks/use-sabr-player-state";
+import { BILIBILI_FLV_VIDEO_PROVIDER_LOADERS } from "../lib/bilibili-flv-loader";
 import { isIosDevice } from "../lib/ios-device";
 import { mediaSourceViewType } from "../lib/media-source-view-type";
 import { SABR_VIDEO_PROVIDER_LOADERS, sabrMediaSrc } from "../lib/sabr-vidstack-loader";
@@ -74,7 +75,13 @@ export function VideoPlayer({
   const sabrSrc = useMemo(() => (sabrVideoId ? sabrMediaSrc(sabrVideoId) : null), [sabrVideoId]);
   const activeSrc = sabrSrc ?? src;
   const viewType = mediaSourceViewType(audioOnly, Boolean(sabrConfig), activeSrc);
-  const canSeek = streamType !== "live" || Boolean(sabrConfig);
+  const hlsLiveSource =
+    typeof activeSrc === "object" &&
+    activeSrc !== null &&
+    !Array.isArray(activeSrc) &&
+    "type" in activeSrc &&
+    activeSrc.type === "application/x-mpegurl";
+  const canSeek = streamType !== "live" || Boolean(sabrConfig) || hlsLiveSource;
   const { handleProviderChange, handleError, handleEnded } = useVideoPlayerEvents({
     src: activeSrc,
     onError,
@@ -92,7 +99,6 @@ export function VideoPlayer({
       logLevel="warn"
       crossOrigin
       playsInline
-      hideControlsOnMouseLeave
       {...(ios ? { "webkit-playsinline": "true" } : {})}
       autoPlay={sabrConfig ? false : autoplay}
       storage={null}
@@ -104,7 +110,7 @@ export function VideoPlayer({
       data-sabr-seeking={sabrState.seeking ? "true" : undefined}
     >
       <MediaProvider
-        loaders={sabrConfig ? SABR_VIDEO_PROVIDER_LOADERS : undefined}
+        loaders={sabrConfig ? SABR_VIDEO_PROVIDER_LOADERS : BILIBILI_FLV_VIDEO_PROVIDER_LOADERS}
         className={mediaClassName ?? "h-full w-full"}
         mediaProps={mediaClassName ? { className: mediaClassName } : undefined}
       >

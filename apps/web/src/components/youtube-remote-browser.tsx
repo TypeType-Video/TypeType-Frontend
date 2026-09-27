@@ -10,6 +10,7 @@ type Props = {
   phase: YoutubeRemotePhase;
   error: string | null;
   onInput: (message: YoutubeRemoteInput) => void;
+  onLog: (message: string) => void;
 };
 
 function modifiers(event: KeyboardEvent): string[] {
@@ -29,10 +30,11 @@ function isPasteShortcut(event: KeyboardEvent): boolean {
   return event.key.toLowerCase() === "v" && (event.ctrlKey || event.metaKey) && !event.altKey;
 }
 
-export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props) {
+export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput, onLog }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pointerIdRef = useRef<number | null>(null);
+  const clickCountRef = useRef(0);
   const [frameSize, setFrameSize] = useState<RemotePointerSize | null>(null);
   const [viewportSize, setViewportSize] = useState<RemotePointerSize | null>(null);
 
@@ -46,11 +48,14 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
       setViewportSize((previous) =>
         previous?.width === width && previous.height === height ? previous : { width, height },
       );
+      onLog(
+        `surface ${width}x${height} rect=${Math.round(root.getBoundingClientRect().top)}px from top`,
+      );
       onInput({ type: "resize", width, height });
     });
     observer.observe(root);
     return () => observer.disconnect();
-  }, [onInput]);
+  }, [onInput, onLog]);
 
   useEffect(() => {
     if (!frameUrl) {
@@ -75,6 +80,15 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
     return mapYoutubeRemotePointer(event.clientX, event.clientY, rect, frameSize, viewportSize);
   }
 
+  function logClick(event: PointerEvent, mapped: { x: number; y: number }) {
+    clickCountRef.current += 1;
+    if (clickCountRef.current > 5) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    onLog(
+      `click #${clickCountRef.current} client=${Math.round(event.clientX)},${Math.round(event.clientY)} rect=${Math.round(rect.left)},${Math.round(rect.top)} ${Math.round(rect.width)}x${Math.round(rect.height)} frame=${frameSize?.width ?? "?"}x${frameSize?.height ?? "?"} viewport=${viewportSize?.width ?? "?"}x${viewportSize?.height ?? "?"} mapped=${mapped.x},${mapped.y} pointer=${event.pointerType} focused=${document.activeElement === inputRef.current}`,
+    );
+  }
+
   function releasePointer(event: PointerEvent) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -93,9 +107,15 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
           alt=""
           className="h-full w-full object-contain"
           onLoad={(event) => {
-            setFrameSize({
+            const next = {
               width: event.currentTarget.naturalWidth,
               height: event.currentTarget.naturalHeight,
+            };
+            setFrameSize((previous) => {
+              if (previous?.width === next.width && previous.height === next.height)
+                return previous;
+              onLog(`frame size ${next.width}x${next.height}`);
+              return next;
             });
           }}
         />
@@ -117,13 +137,21 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
         value=""
         onChange={() => undefined}
         className="absolute inset-0 h-full w-full touch-none resize-none cursor-default border-0 bg-transparent p-0 text-base text-transparent caret-transparent outline-none"
+        onFocus={() => onLog("input focused")}
+        onBlur={() => onLog(`input blurred, active=${document.activeElement?.tagName ?? "none"}`)}
+        onLostPointerCapture={() => onLog("pointer capture lost")}
         onPointerDown={(event) => {
-          if (pointerIdRef.current !== null && pointerIdRef.current !== event.pointerId) return;
+          if (pointerIdRef.current !== null && pointerIdRef.current !== event.pointerId) {
+            onLog(`pointer down ignored, another pointer ${pointerIdRef.current} is active`);
+            return;
+          }
           event.preventDefault();
           event.currentTarget.focus();
           event.currentTarget.setPointerCapture(event.pointerId);
           pointerIdRef.current = event.pointerId;
-          onInput({ type: "pointer", event: "down", ...point(event), button: "left" });
+          const mapped = point(event);
+          logClick(event, mapped);
+          onInput({ type: "pointer", event: "down", ...mapped, button: "left" });
         }}
         onPointerMove={(event) => {
           if (pointerIdRef.current !== null && pointerIdRef.current !== event.pointerId) return;
@@ -175,6 +203,7 @@ export function YoutubeRemoteBrowser({ frameUrl, phase, error, onInput }: Props)
         onPaste={(event) => {
           event.preventDefault();
           const value = event.clipboardData.getData("text");
+          onLog(`paste ${value.length} chars`);
           if (value) onInput({ type: "text", value });
         }}
       />

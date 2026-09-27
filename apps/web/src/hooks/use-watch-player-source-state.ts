@@ -20,6 +20,7 @@ type Args = {
   sabrEnabled: boolean;
   settingsReady: boolean;
   autoplayEnabled: boolean;
+  autoplayOnOpen: boolean;
   navigating: boolean;
   playbackIntent: () => boolean | null;
 };
@@ -44,6 +45,7 @@ type AutoplayDecision = {
   retryKey: number;
   settingsReady: boolean;
   autoplayEnabled: boolean;
+  autoplayOnOpen: boolean;
   playbackIntent: boolean | null;
   autoplayIntent: boolean;
 };
@@ -57,7 +59,8 @@ export function decideWatchSourceAutoplay(args: AutoplayDecision): boolean {
     args.previous === null ||
     args.previous.streamId !== args.streamId ||
     !args.previous.settingsReady;
-  return args.previous?.autoplay === true || (initialSource && args.autoplayEnabled);
+  if (initialSource) return args.autoplayOnOpen;
+  return args.previous?.autoplay === true;
 }
 
 export function useWatchPlayerSourceState(args: Args) {
@@ -94,6 +97,7 @@ export function useWatchPlayerSourceState(args: Args) {
         retryKey: args.retryKey,
         settingsReady: args.settingsReady,
         autoplayEnabled: args.autoplayEnabled,
+        autoplayOnOpen: args.autoplayOnOpen,
         playbackIntent: args.playbackIntent(),
         autoplayIntent,
       }),

@@ -13,15 +13,21 @@ import {
 } from "../lib/stream-request";
 import { useAuthStore } from "../stores/auth-store";
 
-export function streamQueryOptions(url: string, useAuthenticatedStream = false, enabled = true) {
+export function streamQueryOptions(
+  url: string,
+  useAuthenticatedStream = false,
+  enabled = true,
+  knownLive = false,
+) {
   const ownerId = useAuthenticatedStream ? useAuthStore.getState().me?.id : null;
   return queryOptions({
-    queryKey: streamQueryKey(url, useAuthenticatedStream, ownerId),
+    queryKey: streamQueryKey(url, useAuthenticatedStream, ownerId, knownLive),
     queryFn: ({ signal }) =>
       fetchStream(
         url,
         useAuthenticatedStream ? "authenticated_first" : "anonymous_first",
         signal,
+        knownLive,
       ).then((r) => mapStreamResponse(r, url)),
     enabled: enabled && url.startsWith("http"),
     staleTime: 3 * 60 * 1000,
@@ -56,9 +62,14 @@ export function isMemberOnlyApiError(error: unknown): boolean {
   return isMemberOnlyApiResponse(error);
 }
 
-export function useStream(url: string, useAuthenticatedStream = false, enabled = true) {
+export function useStream(
+  url: string,
+  useAuthenticatedStream = false,
+  enabled = true,
+  knownLive = false,
+) {
   return useQuery({
-    ...streamQueryOptions(url, useAuthenticatedStream, enabled),
+    ...streamQueryOptions(url, useAuthenticatedStream, enabled, knownLive),
     placeholderData: keepPreviousData,
   });
 }

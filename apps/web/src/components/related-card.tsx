@@ -3,6 +3,7 @@ import { memo } from "react";
 import { useClientLocale } from "../hooks/use-client-locale";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { formatDuration, formatPublishedDate, formatViews } from "../lib/format";
+import { relatedVideoThumbnailClassName } from "../lib/layout-preferences";
 import { isVideoWatched } from "../lib/watch-progress";
 import { watchRouteSearch } from "../lib/watch-url";
 import { useWatchNavigationStore } from "../stores/watch-navigation-store";
@@ -19,11 +20,13 @@ import { WatchedBadge } from "./watched-badge";
 type Props = {
   stream: VideoStream;
   relatedStreams?: VideoStream[];
+  size?: "default" | "large";
   progressMs?: number;
 };
 
-function RelatedCardComponent({ stream, relatedStreams, progressMs = 0 }: Props) {
+function RelatedCardComponent({ stream, relatedStreams, size = "default", progressMs = 0 }: Props) {
   const locale = useClientLocale();
+  const thumbnailClassName = relatedVideoThumbnailClassName(size);
   const setNavigation = useWatchNavigationStore((state) => state.setNavigation);
   const { title, thumbnail } = useDeArrowBranding(
     stream.id,
@@ -42,7 +45,7 @@ function RelatedCardComponent({ stream, relatedStreams, progressMs = 0 }: Props)
         to="/watch"
         search={watchRouteSearch(stream.id)}
         preload="intent"
-        className="relative w-32 aspect-video rounded-md overflow-hidden bg-surface-strong flex-shrink-0 sm:w-40"
+        className={`relative ${thumbnailClassName} aspect-video rounded-md overflow-hidden bg-surface-strong flex-shrink-0`}
         onClick={() => setNavigation(stream, relatedStreams)}
       >
         <img

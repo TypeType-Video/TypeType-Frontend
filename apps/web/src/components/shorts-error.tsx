@@ -6,13 +6,36 @@ type Props = {
   message: string;
   onRetry: () => void;
   onNext: () => void;
+  youtubeSessionAction?: "connect" | "reconnect";
   youtubeSessionReturnTo?: string;
 };
 
-export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }: Props) {
+export function ShortsError({
+  message,
+  onRetry,
+  onNext,
+  youtubeSessionAction,
+  youtubeSessionReturnTo,
+}: Props) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 p-5">
       <div className="flex max-w-sm flex-col items-center gap-3 text-center">
+        {youtubeSessionAction === "reconnect" && youtubeSessionReturnTo ? (
+          <Link
+            to="/youtube-session"
+            search={{ returnTo: youtubeSessionReturnTo }}
+            aria-label={m.ui_reconnect_with_youtube()}
+            className="cursor-pointer"
+          >
+            <img
+              src="/youtube-session-reconnect.gif"
+              width="112"
+              height="92"
+              alt=""
+              className="rounded-xl"
+            />
+          </Link>
+        ) : null}
         <p className="text-sm text-fg">{message}</p>
         <div className="flex items-center gap-2">
           {youtubeSessionReturnTo ? (
@@ -22,7 +45,9 @@ export function ShortsError({ message, onRetry, onNext, youtubeSessionReturnTo }
               className="inline-flex h-9 items-center gap-2 rounded-md bg-fg px-3 text-xs font-medium text-app hover:bg-white"
             >
               <YoutubeIcon className="h-4 w-4 text-[#ff0000]" />
-              {m.ui_connect_with_youtube()}
+              {youtubeSessionAction === "reconnect"
+                ? m.ui_reconnect_with_youtube()
+                : m.ui_connect_with_youtube()}
             </Link>
           ) : (
             <button

@@ -11,6 +11,11 @@ const VIDEO_URL = "https://www.youtube.com/watch?v=test";
 test("uses SABR for YouTube and provider-specific direct endpoints", () => {
   expect(streamEndpoint(VIDEO_URL)).toContain("/streams/youtube/sabr?url=");
   expect(streamQueryKey(VIDEO_URL, false)).toEqual(["stream", VIDEO_URL, "anon"]);
+  expect(streamEndpoint(VIDEO_URL, true)).toContain("/streams/youtube/live?url=");
+  expect(streamQueryKey(VIDEO_URL, false, null, true)).toEqual(["stream", VIDEO_URL, "live:anon"]);
+  expect(streamQueryKey(VIDEO_URL, false, null, true)).not.toEqual(
+    streamQueryKey(VIDEO_URL, false),
+  );
   expect(streamEndpoint("https://www.nicovideo.jp/watch/test")).toContain("/streams/niconico?url=");
   expect(streamEndpoint("https://www.bilibili.com/video/test")).toContain("/streams/bilibili?url=");
   expect(() => streamEndpoint("https://example.com/video")).toThrow("Unsupported video provider");

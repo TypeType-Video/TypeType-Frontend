@@ -1,3 +1,4 @@
+import { isMseTypeSupported } from "@typetype/mse";
 import type { SabrAudioOption } from "../stores/sabr-audio-store";
 import type { AudioStreamItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
@@ -11,8 +12,14 @@ function audioCandidates(stream: VideoStream): AudioStreamItem[] {
     (item) =>
       item.deliveryMethod === "sabr" &&
       Boolean(item.sabrSessionUrl?.trim()) &&
-      item.codec === "mp4a.40.2",
+      Boolean(item.codec?.trim()) &&
+      Boolean(item.mimeType?.trim()),
   );
+}
+
+function isMseAudioSupported(item: AudioStreamItem): boolean {
+  if (!item.mimeType || !item.codec) return false;
+  return isMseTypeSupported(`${item.mimeType}; codecs="${item.codec}"`);
 }
 
 export function sabrAudioOptions(stream: VideoStream): SabrAudioOption[] {
@@ -63,11 +70,13 @@ export function pickSabrAudio(
   selectedTrackId?: string | null,
 ): AudioStreamItem | null {
   const candidates = audioCandidates(stream);
+  const supported = candidates.filter(isMseAudioSupported);
+  const playable = supported.length > 0 ? supported : candidates;
   const fallbackId = defaultSabrAudioTrackId(stream);
   return (
-    candidates.find((item) => item.audioTrackId === selectedTrackId) ??
-    candidates.find((item) => item.audioTrackId === fallbackId) ??
-    candidates[0] ??
+    playable.find((item) => item.audioTrackId === selectedTrackId) ??
+    playable.find((item) => item.audioTrackId === fallbackId) ??
+    playable[0] ??
     null
   );
 }

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { YoutubeRemoteInput, YoutubeRemotePhase } from "../hooks/use-youtube-remote-browser";
+import type { YoutubeRemoteLogLine } from "../lib/youtube-remote-messages";
 import { youtubeRemotePhaseLabel } from "../lib/youtube-remote-phase";
 import { m } from "../paraglide/messages.js";
 import { ReportBugModal } from "./report-bug-modal";
 import { BugIcon } from "./watch-icons";
 import { YoutubeIcon } from "./youtube-icon";
 import { YoutubeRemoteBrowser } from "./youtube-remote-browser";
+import { YoutubeRemoteDiagnostics } from "./youtube-remote-diagnostics";
 
 type Props = {
   browserOpen: boolean;
@@ -19,9 +21,11 @@ type Props = {
   frameUrl: string | null;
   phase: YoutubeRemotePhase;
   error: string | null;
+  logs: YoutubeRemoteLogLine[];
   onStart: () => void;
   onCancel: () => void;
   onInput: (input: YoutubeRemoteInput) => void;
+  onLog: (message: string) => void;
 };
 
 export function YoutubeSessionBrowserPanel({
@@ -36,16 +40,24 @@ export function YoutubeSessionBrowserPanel({
   frameUrl,
   phase,
   error,
+  logs,
   onStart,
   onCancel,
   onInput,
+  onLog,
 }: Props) {
   const [reportOpen, setReportOpen] = useState(false);
 
   if (browserOpen) {
     return (
       <div className="flex flex-col gap-3">
-        <YoutubeRemoteBrowser frameUrl={frameUrl} phase={phase} error={error} onInput={onInput} />
+        <YoutubeRemoteBrowser
+          frameUrl={frameUrl}
+          phase={phase}
+          error={error}
+          onInput={onInput}
+          onLog={onLog}
+        />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-fg-soft text-xs">
             {m.ui_phase()} {youtubeRemotePhaseLabel(phase)}.{" "}
@@ -69,6 +81,7 @@ export function YoutubeSessionBrowserPanel({
             </button>
           </div>
         </div>
+        <YoutubeRemoteDiagnostics logs={logs} />
         {reportOpen && <ReportBugModal onClose={() => setReportOpen(false)} />}
       </div>
     );
@@ -106,6 +119,11 @@ export function YoutubeSessionBrowserPanel({
         >
           {m.ui_retry_video()}
         </a>
+      )}
+      {logs.length > 0 && (
+        <div className="mt-5">
+          <YoutubeRemoteDiagnostics logs={logs} />
+        </div>
       )}
     </div>
   );

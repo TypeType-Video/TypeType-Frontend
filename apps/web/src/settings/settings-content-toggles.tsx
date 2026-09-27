@@ -35,6 +35,7 @@ function useHideEverythingTrigger() {
 type ToggleKey = Extract<
   keyof SettingsItem,
   | "autoplay"
+  | "autoplayOnOpen"
   | "deArrowEnabled"
   | "hideContinueWatching"
   | "hideHomeRecommendations"
@@ -58,6 +59,11 @@ function watchOptions(): ToggleOption[] {
       key: "autoplay",
       label: m.ui_autoplay_next_video(),
       description: m.ui_automatically_continue_with_the_first_item_in_the_suggestions_column(),
+    },
+    {
+      key: "autoplayOnOpen",
+      label: m.ui_autoplay_on_open(),
+      description: m.ui_automatically_start_playback_when_a_video_is_opened(),
     },
   ];
 }

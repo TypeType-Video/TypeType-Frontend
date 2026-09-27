@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { createYoutubeRemoteInputQueue } from "../lib/youtube-remote-input-queue";
+import {
+  appendYoutubeRemoteLog,
+  parseYoutubeRemoteMessage,
+  type YoutubeRemoteLogLine,
+  type YoutubeRemotePhase,
+} from "../lib/youtube-remote-messages";
 import { m } from "../paraglide/messages.js";
 
-export type YoutubeRemotePhase =
-  | "idle"
-  | "connecting"
-  | "opening"
-  | "awaiting_login"
-  | "capturing_session"
-  | "connected"
-  | "closed"
-  | "error";
+export type { YoutubeRemotePhase } from "../lib/youtube-remote-messages";
 
 export type YoutubeRemoteInput =
   | { type: "resize"; width: number; height: number }
@@ -23,49 +21,13 @@ export type YoutubeRemoteInput =
   | { type: "text"; value: string }
   | { type: "cancel" };
 
-type RemoteStatus = {
-  type: "status";
-  phase: YoutubeRemotePhase;
-};
-
-type RemoteError = {
-  type: "error";
-  message: string;
-};
-
-function isYoutubeRemotePhase(value: string): value is YoutubeRemotePhase {
-  return (
-    value === "idle" ||
-    value === "connecting" ||
-    value === "opening" ||
-    value === "awaiting_login" ||
-    value === "capturing_session" ||
-    value === "connected" ||
-    value === "closed" ||
-    value === "error"
-  );
-}
-
-function parseRemoteMessage(value: string): RemoteStatus | RemoteError | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(value);
-  } catch {
-    return null;
-  }
-  if (!parsed || typeof parsed !== "object" || !("type" in parsed)) return null;
-  if (
-    parsed.type === "status" &&
-    "phase" in parsed &&
-    typeof parsed.phase === "string" &&
-    isYoutubeRemotePhase(parsed.phase)
-  ) {
-    return { type: "status", phase: parsed.phase };
-  }
-  if (parsed.type === "error" && "message" in parsed && typeof parsed.message === "string") {
-    return { type: "error", message: parsed.message };
-  }
-  return null;
+function describeInput(message: YoutubeRemoteInput): string {
+  if (message.type === "pointer") return `pointer ${message.event} ${message.x},${message.y}`;
+  if (message.type === "key") return `key ${message.event} ${message.key}`;
+  if (message.type === "text") return `text ${message.value.length} chars`;
+  if (message.type === "resize") return `resize ${message.width}x${message.height}`;
+  if (message.type === "wheel") return `wheel ${message.deltaX},${message.deltaY}`;
+  return message.type;
 }
 
 export function useYoutubeRemoteBrowser(wsUrl: string | null) {
@@ -74,31 +36,47 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
   const inputCountRef = useRef(0);
   const lastResizeRef = useRef<Extract<YoutubeRemoteInput, { type: "resize" }> | null>(null);
   const inputQueueRef = useRef<ReturnType<typeof createYoutubeRemoteInputQueue> | null>(null);
+  const startedAtRef = useRef(Date.now());
   const [phase, setPhase] = useState<YoutubeRemotePhase>(wsUrl ? "connecting" : "idle");
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<YoutubeRemoteLogLine[]>([]);
 
-  const sendImmediate = useCallback((message: YoutubeRemoteInput) => {
-    const ws = wsRef.current;
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      recordClientEvent("youtube_remote.input_dropped", { type: message.type });
-      return false;
-    }
-    ws.send(JSON.stringify(message));
-    inputCountRef.current += 1;
-    if (
-      message.type !== "pointer" ||
-      message.event !== "move" ||
-      inputCountRef.current % 25 === 0
-    ) {
-      recordClientEvent("youtube_remote.input_sent", {
-        type: message.type,
-        event: "event" in message ? message.event : null,
-        length: message.type === "text" ? message.value.length : null,
-      });
-    }
-    return true;
-  }, []);
+  const pushLog = useCallback(
+    (source: YoutubeRemoteLogLine["source"], message: string, at?: number) => {
+      const line = { at: at ?? Date.now() - startedAtRef.current, source, message };
+      setLogs((previous) => appendYoutubeRemoteLog(previous, line));
+    },
+    [],
+  );
+
+  const sendImmediate = useCallback(
+    (message: YoutubeRemoteInput) => {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        recordClientEvent("youtube_remote.input_dropped", { type: message.type });
+        pushLog(
+          "client",
+          `input dropped ${describeInput(message)} readyState=${ws?.readyState ?? "none"}`,
+        );
+        return false;
+      }
+      ws.send(JSON.stringify(message));
+      inputCountRef.current += 1;
+      const isMove = message.type === "pointer" && message.event === "move";
+      if (!isMove || inputCountRef.current % 25 === 0) {
+        recordClientEvent("youtube_remote.input_sent", {
+          type: message.type,
+          event: "event" in message ? message.event : null,
+          length: message.type === "text" ? message.value.length : null,
+        });
+        const buffered = ws.bufferedAmount > 0 ? ` buffered=${ws.bufferedAmount}` : "";
+        pushLog("client", `sent ${describeInput(message)}${buffered}`);
+      }
+      return true;
+    },
+    [pushLog],
+  );
 
   const canSend = useCallback(() => {
     const ws = wsRef.current;
@@ -120,6 +98,9 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     let active = true;
     let finished = false;
     let frameCount = 0;
+    let lastFrameAt = 0;
+    startedAtRef.current = Date.now();
+    setLogs([]);
     setPhase("connecting");
     setError(null);
     const ws = new WebSocket(wsUrl);
@@ -127,27 +108,50 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     wsRef.current = ws;
 
     recordClientEvent("youtube_remote.ws_connecting", { hasUrl: true });
+    pushLog("client", `websocket connecting ${navigator.userAgent}`);
+    pushLog(
+      "client",
+      `window ${window.innerWidth}x${window.innerHeight} dpr=${window.devicePixelRatio} visible=${document.visibilityState} focus=${document.hasFocus()}`,
+    );
+    const onVisibility = () => pushLog("client", `tab ${document.visibilityState}`);
+    const onError = (event: ErrorEvent) => pushLog("client", `page error ${event.message}`);
+    const onRejection = (event: PromiseRejectionEvent) =>
+      pushLog("client", `unhandled rejection ${String(event.reason).slice(0, 160)}`);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
 
     ws.onopen = () => {
       if (!active) return;
       recordClientEvent("youtube_remote.ws_open");
+      pushLog("client", "websocket open");
       if (lastResizeRef.current) sendImmediate(lastResizeRef.current);
     };
 
     ws.onmessage = (event) => {
       if (!active) return;
       if (typeof event.data === "string") {
-        const message = parseRemoteMessage(event.data);
+        const message = parseYoutubeRemoteMessage(event.data);
+        if (message?.type === "log") {
+          pushLog("token", message.message, message.at);
+          recordClientEvent("youtube_remote.token_log", {
+            at: message.at,
+            message: message.message,
+          });
+        }
         if (message?.type === "status") {
           if (message.phase === "connected") finished = true;
           setPhase(message.phase);
           recordClientEvent("youtube_remote.status", { phase: message.phase });
+          pushLog("client", `status ${message.phase}`);
         }
         if (message?.type === "error") {
           setPhase("error");
           setError(m.ui_remote_browser_error());
           recordClientEvent("youtube_remote.backend_error", { message: message.message });
+          pushLog("client", `backend error: ${message.message}`);
         }
+        if (!message) pushLog("client", `unreadable text message ${event.data.slice(0, 80)}`);
         return;
       }
       const blob = event.data instanceof Blob ? event.data : new Blob([event.data]);
@@ -156,8 +160,14 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       frameRef.current = nextUrl;
       setFrameUrl(nextUrl);
       frameCount += 1;
+      const now = Date.now();
+      if (lastFrameAt > 0 && now - lastFrameAt > 2000) {
+        pushLog("client", `frame gap ${now - lastFrameAt}ms before frame #${frameCount}`);
+      }
+      lastFrameAt = now;
       if (frameCount === 1 || frameCount % 50 === 0) {
         recordClientEvent("youtube_remote.frame", { count: frameCount, bytes: blob.size });
+        pushLog("client", `frame #${frameCount} ${blob.size} bytes`);
       }
     };
 
@@ -167,16 +177,24 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       setPhase("error");
       setError(m.ui_remote_browser_connection_failed());
       recordClientEvent("youtube_remote.ws_error");
+      pushLog("client", "websocket error");
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       if (!active) return;
       recordClientEvent("youtube_remote.ws_close", { finished });
+      pushLog(
+        "client",
+        `websocket closed code=${event.code} reason=${event.reason} finished=${finished}`,
+      );
       if (!finished) setPhase("closed");
     };
 
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
       ws.close();
       wsRef.current = null;
       if (frameRef.current) URL.revokeObjectURL(frameRef.current);
@@ -184,7 +202,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
       inputQueueRef.current?.reset();
       setFrameUrl(null);
     };
-  }, [wsUrl, sendImmediate]);
+  }, [wsUrl, sendImmediate, pushLog]);
 
   const send = useCallback(
     (message: YoutubeRemoteInput) => {
@@ -194,5 +212,7 @@ export function useYoutubeRemoteBrowser(wsUrl: string | null) {
     [sendImmediate],
   );
 
-  return { phase, frameUrl, error, send };
+  const log = useCallback((message: string) => pushLog("client", message), [pushLog]);
+
+  return { phase, frameUrl, error, logs, send, log };
 }

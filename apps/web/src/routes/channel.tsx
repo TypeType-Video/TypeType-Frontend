@@ -7,7 +7,7 @@ import {
   channelLegacySearch,
   channelPathSearch,
   channelTabOrDefault,
-  toChannelPathParam,
+  toCanonicalChannelRoute,
   toChannelSourceUrl,
 } from "../lib/channel-route-url";
 import { splitChannelSearchUrl } from "../lib/channel-search-url";
@@ -35,20 +35,20 @@ function LegacyChannelPage() {
   const searchQuery = q ?? "";
   const tab = channelTabOrDefault(Route.useSearch().tab);
   const sourceUrl = toChannelSourceUrl(url);
-  const channelId = toChannelPathParam(sourceUrl);
+  const canonicalRoute = toCanonicalChannelRoute(sourceUrl);
   const navigate = useNavigate({ from: "/channel" });
 
   useEffect(() => {
-    if (!channelId) return;
+    if (!canonicalRoute) return;
     navigate({
-      to: "/channel/$channelId",
-      params: { channelId },
+      to: "/channel/$provider/$channelId",
+      params: { provider: canonicalRoute.provider, channelId: canonicalRoute.id },
       search: channelPathSearch(sort, searchQuery, tab),
       replace: true,
     });
-  }, [channelId, tab, navigate, searchQuery, sort]);
+  }, [canonicalRoute, tab, navigate, searchQuery, sort]);
 
-  if (channelId) return <PageSpinner />;
+  if (canonicalRoute) return <PageSpinner />;
 
   return (
     <ChannelPageContent

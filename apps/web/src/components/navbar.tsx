@@ -7,8 +7,10 @@ import { useAuthToasts } from "../hooks/use-auth-toasts";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { useMobile } from "../hooks/use-mobile";
 import { useSearchShortcut } from "../hooks/use-search-shortcut";
+import { useSettings } from "../hooks/use-settings";
 import { isAuthPage } from "../lib/auth-routes";
 import { LEMMY_COMMUNITY_URL } from "../lib/community-announcement";
+import { defaultLandingPath } from "../lib/default-landing";
 import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import { InterfaceLanguagePicker } from "./interface-language-picker";
@@ -16,6 +18,7 @@ import { NavbarAccountControls } from "./navbar-account-controls";
 import { NavbarLeadingControl } from "./navbar-leading-control";
 import { NavbarNotifications } from "./navbar-notifications";
 import { NavbarSearch } from "./navbar-search";
+import { NavbarServicePicker } from "./navbar-service-picker";
 import { ServiceIcon } from "./service-icon";
 import { Toast } from "./toast";
 
@@ -35,6 +38,8 @@ export function Navbar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const toggleMobileSidebar = useUiStore((s) => s.toggleMobileSidebar);
   const { status, isAuthed, isGuest, isAdmin, me, signOut } = useAuth();
+  const { settings } = useSettings();
+  const logoTarget = defaultLandingPath(settings.defaultLandingPage) ?? "/";
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const authPage = isAuthPage(pathname);
   const canOpenSearch = !authPage;
@@ -63,7 +68,7 @@ export function Navbar() {
             onBack={handleBack}
             onToggleSidebar={isMobile ? toggleMobileSidebar : toggleSidebar}
           />
-          <Link to="/" className="flex shrink-0 items-center gap-2">
+          <Link to={logoTarget} className="flex shrink-0 items-center gap-2">
             <img src="/logo.svg" alt="TypeType" width={28} height={28} />
             <span className="hidden max-w-28 truncate text-fg text-sm font-semibold tracking-widest min-[430px]:inline sm:max-w-none">
               TYPETYPE
@@ -75,7 +80,7 @@ export function Navbar() {
             rel="noreferrer"
             aria-label={m.shell_support_typetype()}
             title={m.shell_support_typetype()}
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
+            className="hidden h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg sm:inline-flex"
           >
             <DollarSign size={15} />
             <span className="hidden sm:inline">{m.shell_support()}</span>
@@ -86,7 +91,7 @@ export function Navbar() {
             rel="noreferrer"
             aria-label="Lemmy"
             title="Lemmy"
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg"
+            className="hidden h-8 shrink-0 items-center gap-1.5 px-1 text-xs font-medium text-fg-muted hover:text-fg sm:inline-flex"
           >
             <ServiceIcon path={siLemmy.path} color="currentColor" label="Lemmy" />
             <span className="hidden sm:inline">Lemmy</span>
@@ -107,6 +112,7 @@ export function Navbar() {
         {canOpenSearch && !isMobile && <NavbarSearch />}
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {canOpenSearch && <NavbarServicePicker compact={isMobile} />}
           <InterfaceLanguagePicker />
           <NavbarNotifications />
           <NavbarAccountControls

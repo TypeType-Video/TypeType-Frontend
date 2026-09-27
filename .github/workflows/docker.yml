@@ -28,6 +28,7 @@ jobs:
       image: ${{ steps.info.outputs.image }}
       labels: ${{ steps.meta.outputs.labels }}
       metadata-json: ${{ steps.meta.outputs.json }}
+      platform-matrix: ${{ steps.info.outputs.platform-matrix }}
       version: ${{ steps.info.outputs.version }}
     steps:
       - uses: actions/checkout@v7.0.1
@@ -55,6 +56,12 @@ jobs:
             echo "image=$image"
             echo "version=$version"
           } >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF_NAME" == "dev" ]]; then
+            platform_matrix='{"include":[{"platform":"linux/amd64","arch":"amd64"}]}'
+          else
+            platform_matrix='{"include":[{"platform":"linux/amd64","arch":"amd64"},{"platform":"linux/arm64","arch":"arm64"}]}'
+          fi
+          echo "platform-matrix=$platform_matrix" >> "$GITHUB_OUTPUT"
 
       - name: Extract image metadata
         id: meta
@@ -77,12 +84,7 @@ jobs:
       packages: write
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            arch: amd64
-          - platform: linux/arm64
-            arch: arm64
+      matrix: ${{ fromJSON(needs.prepare.outputs.platform-matrix) }}
     steps:
       - uses: actions/checkout@v7.0.1
 
@@ -174,8 +176,10 @@ jobs:
           METADATA_JSON: ${{ needs.prepare.outputs.metadata-json }}
         run: |
           mapfile -t digests < <(find "$DIGEST_DIR" -maxdepth 1 -type f -printf '%f\n' | sort)
-          if [[ "${#digests[@]}" -ne 2 ]]; then
-            echo "Expected two platform digests, found ${#digests[@]}"
+          expected_digests=2
+          if [[ "$GITHUB_REF_NAME" == "dev" ]]; then expected_digests=1; fi
+          if [[ "${#digests[@]}" -ne "$expected_digests" ]]; then
+            echo "Expected $expected_digests platform digests, found ${#digests[@]}"
             exit 1
           fi
           mapfile -t tags < <(jq -r '.tags[]' <<< "$METADATA_JSON")

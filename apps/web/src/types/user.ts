@@ -101,15 +101,20 @@ export type CaptionStyles = {
   displayBgOpacity: string;
 };
 
+export type VideoGridColumns = 0 | 4 | 5 | 6;
+export type RelatedVideoSize = "default" | "large";
 export type SettingsItem = {
   defaultService: ServiceId;
   defaultLandingPage: string;
   defaultQuality: string;
   defaultPlaybackSpeed: number;
   autoplay: boolean;
+  autoplayOnOpen: boolean;
   autoplayCountdownSeconds: number;
   skipPlaylistAutoplayScreen: boolean;
   audioOnlyPlayback: boolean;
+  videoGridColumns: VideoGridColumns;
+  relatedVideoSize: RelatedVideoSize;
   volume: number;
   muted: boolean;
   notificationPopupsEnabled: boolean;

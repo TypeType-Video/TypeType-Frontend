@@ -4,7 +4,9 @@ export type SettingsSection =
   | "home"
   | "language"
   | "service"
+  | "notifications"
   | "import"
+  | "api"
   | "privacy"
   | "blocked"
   | "rss"
@@ -19,7 +21,9 @@ export function isSettingsSection(value: unknown): value is SettingsSection {
     value === "home" ||
     value === "language" ||
     value === "service" ||
+    value === "notifications" ||
     value === "import" ||
+    value === "api" ||
     value === "privacy" ||
     value === "blocked" ||
     value === "rss" ||

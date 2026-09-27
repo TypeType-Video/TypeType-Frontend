@@ -1,7 +1,7 @@
 import { useSettings } from "../hooks/use-settings";
 import { m } from "../paraglide/messages.js";
 import { SettingsDiscoveryToggles } from "./settings-content-toggles";
-import { ROW, ToggleSwitch } from "./settings-toggle-switch";
+import { SettingsLayoutPreferences } from "./settings-layout";
 
 function landingOptions() {
   return [
@@ -42,25 +42,7 @@ export function SettingsLandingPage() {
           ))}
         </select>
       </div>
-      <p className="px-1 pt-2 text-xs font-medium text-fg-soft uppercase tracking-wider">
-        {m.ui_notifications()}
-      </p>
-      <div className="border-y border-border">
-        <div className={ROW}>
-          <div className="flex flex-col gap-1">
-            <span className="text-sm text-fg">{m.ui_notification_popups()}</span>
-            <span className="text-xs text-fg-soft">
-              {m.ui_show_a_popup_when_a_subscribed_channel_publishes_a_video()}
-            </span>
-          </div>
-          <ToggleSwitch
-            checked={settings.notificationPopupsEnabled}
-            onClick={() =>
-              update.mutate({ notificationPopupsEnabled: !settings.notificationPopupsEnabled })
-            }
-          />
-        </div>
-      </div>
+      <SettingsLayoutPreferences />
       <div className="divide-y divide-border border-y border-border">
         <SettingsDiscoveryToggles />
       </div>

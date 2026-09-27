@@ -7,7 +7,10 @@ import { useSabrMediaSettings } from "../hooks/use-sabr-media-settings";
 import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { toAbsoluteApiUrl } from "../lib/env";
+import { addPlaybackTraceHeader } from "../lib/playback-trace";
 import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
+import { observeSabrMsePlayback } from "../lib/sabr-mse-playback-trace";
+import * as sabrNativePause from "../lib/sabr-native-pause";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import { isAbortError } from "../lib/sabr-playback-retry";
 import { cancelPendingSabrSeek, positionMs, runSabrSeek } from "../lib/sabr-player-seek";
@@ -59,7 +62,7 @@ export function SabrMsePlayer({
     onPositionReaderChange,
     onVolumeChange,
   });
-  const reportError = useSabrErrorReporter(errorReportedRef, onError);
+  const reportError = useSabrErrorReporter(errorReportedRef, onError, video, config);
   const { latestEngineHandlers, setQualityTransitioning } = useSabrEngineHandlers(
     latestHandlers,
     reportError,
@@ -93,36 +96,29 @@ export function SabrMsePlayer({
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
       startTimeMs: initialStartTimeMs,
-      headers: headersRef.current,
+      headers: addPlaybackTraceHeader(new Headers(headersRef.current)),
     });
+    const stopPlaybackTrace = observeSabrMsePlayback(video, config.videoId, engine, reportError);
     engineRef.current = engine;
-    qualityRef.current = {
-      videoItag: initialConfig.videoItag,
-      audioItag: initialConfig.audioItag,
-      audioTrackId: initialConfig.audioTrackId,
-    };
-    const offError = engine.on("error", (event) => {
-      if (event.type === "error") reportError(event.error, event.recoveryPositionMs);
-    });
-    const volumeChange = () => {
-      if (!settingsReadyRef.current || engine.isApplyingTransientMediaState()) return;
-      latestHandlers().onVolumeChange?.(video.volume, video.muted);
-    };
+    qualityRef.current = initialConfig;
+    let engineLoaded = false;
+    const { unregister: unregisterMediaElementObservers, settle: settlePlaybackRate } =
+      sabrNativePause.registerSabrPlaybackRateObservers(
+        video,
+        settingsReadyRef,
+        engine,
+        latestHandlers,
+        playbackRate,
+      );
     const offPosition = registerPosition(video, videoHandoffRef.current, config.videoId);
-    let playbackRateSettled = false,
-      engineLoaded = false;
-    const playbackRateChange = () => {
-      playbackRate.capture(video, !playbackRateSettled || engine.isApplyingTransientMediaState());
-    };
-    const settlePlaybackRate = () => {
-      if (engine.isApplyingTransientMediaState()) return;
-      playbackRate.apply(video, false);
-      playbackRateSettled = true;
-    };
     const playEngine = () => engine.play().then(settlePlaybackRate);
     playbackRate.initialize(video);
-    video.addEventListener("volumechange", volumeChange);
-    video.addEventListener("ratechange", playbackRateChange);
+    const unregisterNativePause = sabrNativePause.registerSabrNativePause(
+      video,
+      engine,
+      seekingRef,
+      sabrNativePause.createSabrNativePauseHandler(video, pendingPlayRef, autoplayAttempt),
+    );
     const autoplayDeadline = new SabrAutoplayDeadline(() => {
       if (!autoplayAttempt.expire()) return;
       pendingPlayRef.current = false;
@@ -189,11 +185,11 @@ export function SabrMsePlayer({
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
       captureCleanupPosition(video, videoHandoffRef.current, config.videoId);
-      offError();
+      stopPlaybackTrace();
       unguardAutoplay();
       unregisterControls();
-      video.removeEventListener("volumechange", volumeChange);
-      video.removeEventListener("ratechange", playbackRateChange);
+      unregisterMediaElementObservers();
+      unregisterNativePause();
       offPosition();
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);

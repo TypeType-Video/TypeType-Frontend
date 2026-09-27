@@ -1,7 +1,16 @@
-export function RelatedCardSkeleton() {
+import { relatedVideoThumbnailClassName } from "../lib/layout-preferences";
+import type { RelatedVideoSize } from "../types/user";
+
+type Props = {
+  size?: RelatedVideoSize;
+};
+
+export function RelatedCardSkeleton({ size = "default" }: Props) {
   return (
     <div className="flex gap-2 animate-pulse">
-      <div className="w-40 aspect-video rounded-md bg-fg/10 flex-shrink-0" />
+      <div
+        className={`${relatedVideoThumbnailClassName(size)} aspect-video rounded-md bg-fg/10 flex-shrink-0`}
+      />
       <div className="flex flex-col gap-1.5 flex-1 min-w-0">
         <div className="h-3 bg-fg/10 rounded w-full" />
         <div className="h-3 bg-fg/10 rounded w-3/4" />

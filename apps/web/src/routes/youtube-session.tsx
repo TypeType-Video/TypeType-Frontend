@@ -107,9 +107,11 @@ function YoutubeSessionPage() {
             frameUrl={remote.frameUrl}
             phase={remote.phase}
             error={remote.error}
+            logs={remote.logs}
             onStart={startRemoteBrowser}
             onCancel={cancelRemoteBrowser}
             onInput={remote.send}
+            onLog={remote.log}
           />
         </div>
 

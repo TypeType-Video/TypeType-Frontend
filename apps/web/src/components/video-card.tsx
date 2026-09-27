@@ -3,6 +3,7 @@ import { memo, useCallback, useEffect, useRef } from "react";
 import { useClientLocale } from "../hooks/use-client-locale";
 import { useDeArrowBranding } from "../hooks/use-dearrow";
 import { useVideoCardPreview } from "../hooks/use-video-card-preview";
+import { useVideoCardPreflight } from "../hooks/use-video-card-sabr-preflight";
 import { formatDuration, formatPublishedDate, formatViews } from "../lib/format";
 import { isVideoWatched } from "../lib/watch-progress";
 import { watchListSearch } from "../lib/watch-url";
@@ -49,10 +50,12 @@ function VideoCardComponent({
   const progressSeconds = Math.max(0, progressMs / 1_000);
   const watched = !stream.isLive && isVideoWatched(progressSeconds, stream.duration);
   const watchSearch = watchListSearch(stream.id, listId);
+  const { schedule, cancel, focus, commit } = useVideoCardPreflight(stream, progressMs);
   const handleOpen = useCallback(() => {
+    commit();
     setNavigation(stream, relatedStreams);
     onOpen?.();
-  }, [onOpen, relatedStreams, setNavigation, stream]);
+  }, [commit, onOpen, relatedStreams, setNavigation, stream]);
 
   useEffect(() => {
     if (!onImpression || typeof IntersectionObserver === "undefined") return;
@@ -86,6 +89,10 @@ function VideoCardComponent({
         search={watchSearch}
         preload="intent"
         className="block"
+        onPointerEnter={schedule}
+        onPointerLeave={cancel}
+        onFocus={focus}
+        onBlur={cancel}
         onMouseDown={handleOpen}
         onTouchStart={handleOpen}
         onClick={handleOpen}
@@ -146,6 +153,10 @@ function VideoCardComponent({
             search={watchSearch}
             preload="intent"
             className="text-sm font-medium text-fg line-clamp-2 leading-snug hover:text-fg-strong"
+            onPointerEnter={schedule}
+            onPointerLeave={cancel}
+            onFocus={focus}
+            onBlur={cancel}
             onMouseDown={handleOpen}
             onTouchStart={handleOpen}
             onClick={handleOpen}

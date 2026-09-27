@@ -8,7 +8,7 @@ const previous = {
   autoplay: true,
 };
 
-test("uses autoplay setting only for the initial source", () => {
+test("uses autoplay-on-open only for the initial source", () => {
   expect(
     decideWatchSourceAutoplay({
       previous: null,
@@ -16,13 +16,14 @@ test("uses autoplay setting only for the initial source", () => {
       retryKey: 0,
       settingsReady: true,
       autoplayEnabled: true,
+      autoplayOnOpen: true,
       playbackIntent: null,
       autoplayIntent: false,
     }),
   ).toBe(true);
 });
 
-test("carries initial autoplay through source bootstrap", () => {
+test("carries open autoplay through source bootstrap", () => {
   expect(
     decideWatchSourceAutoplay({
       previous,
@@ -30,6 +31,7 @@ test("carries initial autoplay through source bootstrap", () => {
       retryKey: 0,
       settingsReady: true,
       autoplayEnabled: true,
+      autoplayOnOpen: true,
       playbackIntent: null,
       autoplayIntent: false,
     }),
@@ -44,6 +46,7 @@ test("preserves pause across a source switch", () => {
       retryKey: 0,
       settingsReady: true,
       autoplayEnabled: true,
+      autoplayOnOpen: true,
       playbackIntent: false,
       autoplayIntent: false,
     }),
@@ -58,6 +61,7 @@ test("preserves playback across a source switch", () => {
       retryKey: 0,
       settingsReady: true,
       autoplayEnabled: false,
+      autoplayOnOpen: false,
       playbackIntent: true,
       autoplayIntent: false,
     }),

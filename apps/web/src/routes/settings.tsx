@@ -1,10 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Ban,
+  Bell,
   CircleHelp,
   Download,
   Gauge,
   House,
+  KeyRound,
   Languages,
   Radio,
   Server,
@@ -24,10 +26,12 @@ import {
 } from "../lib/settings-section";
 import { m } from "../paraglide/messages.js";
 import { SettingsAbout } from "../settings/settings-about";
+import { SettingsApi } from "../settings/settings-api";
 import { SettingsBackup } from "../settings/settings-backup";
 import { SettingsBlocked } from "../settings/settings-blocked";
 import { SettingsLandingPage } from "../settings/settings-landing-page";
 import { SettingsLanguage } from "../settings/settings-language";
+import { SettingsNotifications } from "../settings/settings-notifications";
 import { SettingsPlayback } from "../settings/settings-playback";
 import { SettingsPrivacy } from "../settings/settings-privacy";
 import { SettingsRss } from "../settings/settings-rss";
@@ -69,10 +73,22 @@ function baseItems(): Item[] {
       icon: Server,
     },
     {
+      key: "notifications",
+      label: m.ui_notifications(),
+      description: m.settings_notifications_description(),
+      icon: Bell,
+    },
+    {
       key: "import",
       label: m.settings_data_label(),
       description: m.settings_data_description(),
       icon: Download,
+    },
+    {
+      key: "api",
+      label: m.settings_api_label(),
+      description: m.settings_api_description(),
+      icon: KeyRound,
     },
     {
       key: "privacy",
@@ -156,7 +172,9 @@ function SettingsPage() {
       {activeSection === "home" && <SettingsLandingPage />}
       {activeSection === "language" && <SettingsLanguage />}
       {activeSection === "service" && <SettingsService />}
+      {activeSection === "notifications" && <SettingsNotifications />}
       {activeSection === "import" && <SettingsBackup />}
+      {activeSection === "api" && <SettingsApi />}
       {activeSection === "privacy" && <SettingsPrivacy />}
       {activeSection === "blocked" && <SettingsBlocked />}
       {activeSection === "rss" && showRss && (

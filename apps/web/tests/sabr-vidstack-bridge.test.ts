@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { registerSabrNativePause, shouldHandleSabrNativePause } from "../src/lib/sabr-native-pause";
 import {
   consumeSabrSeekTarget,
   isSabrPlaybackEventTransient,
@@ -7,6 +8,68 @@ import {
   requestSabrVidstackPlayback,
 } from "../src/lib/sabr-vidstack-bridge";
 import { seekSponsorBlockSegment } from "../src/lib/sponsorblock-seek";
+
+test("handles a native pause while SABR is actively playing", () => {
+  expect(
+    shouldHandleSabrNativePause({
+      paused: true,
+      state: "playing",
+      seeking: false,
+      applyingTransientMediaState: false,
+    }),
+  ).toBe(true);
+});
+
+test("ignores native pauses caused by SABR transitions", () => {
+  expect(
+    shouldHandleSabrNativePause({
+      paused: true,
+      state: "playing",
+      seeking: true,
+      applyingTransientMediaState: false,
+    }),
+  ).toBe(false);
+  expect(
+    shouldHandleSabrNativePause({
+      paused: true,
+      state: "buffering",
+      seeking: false,
+      applyingTransientMediaState: true,
+    }),
+  ).toBe(false);
+});
+
+test("turns an external pause event into a persistent engine pause", async () => {
+  let onPause: (() => void) | undefined;
+  const video = {
+    paused: true,
+    addEventListener: (type: string, listener: EventListener) => {
+      if (type === "pause") onPause = listener as unknown as () => void;
+    },
+    removeEventListener: () => {},
+  } as unknown as HTMLVideoElement;
+  let state: "playing" | "ready" = "playing";
+  let pauses = 0;
+  const unregister = registerSabrNativePause(
+    video,
+    {
+      snapshot: () => ({ state }),
+      isApplyingTransientMediaState: () => false,
+      pause: () => {
+        pauses += 1;
+        state = "ready";
+      },
+    },
+    { current: false },
+    () => {},
+  );
+
+  onPause?.();
+  await Promise.resolve();
+
+  expect(pauses).toBe(1);
+  unregister();
+});
 
 test("replays a pending SABR play request when MSE controls register", async () => {
   let plays = 0;
