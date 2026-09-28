@@ -2,8 +2,8 @@ import { type ReactNode, useState } from "react";
 import {
   parseRichTextMarkup,
   parseTextSegments,
-  sameVideoTimestampSeconds,
   type RichTextNode,
+  sameVideoTimestampSeconds,
 } from "../lib/rich-text";
 import { ExternalLinkModal } from "./external-link-modal";
 
@@ -37,9 +37,7 @@ export function RichText({ text, videoUrl, onSeekTimestamp }: RichTextProps) {
             href={segment.value}
             onClick={(event) => {
               event.preventDefault();
-              const seconds = videoUrl
-                ? sameVideoTimestampSeconds(segment.value, videoUrl)
-                : null;
+              const seconds = videoUrl ? sameVideoTimestampSeconds(segment.value, videoUrl) : null;
               if (seconds !== null && onSeekTimestamp) {
                 onSeekTimestamp(seconds);
                 return;

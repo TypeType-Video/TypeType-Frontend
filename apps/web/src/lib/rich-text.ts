@@ -149,9 +149,8 @@ function parseTimestampParameter(value: string | null): number | null {
   if (clockSeconds !== null) return clockSeconds;
 
   const match = value.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
-  if (!match || !match.slice(1).some(Boolean)) return null;
-  const seconds =
-    Number(match[1] ?? 0) * 3600 + Number(match[2] ?? 0) * 60 + Number(match[3] ?? 0);
+  if (!match?.slice(1).some(Boolean)) return null;
+  const seconds = Number(match[1] ?? 0) * 3600 + Number(match[2] ?? 0) * 60 + Number(match[3] ?? 0);
   return Number.isSafeInteger(seconds) ? seconds : null;
 }
 
