@@ -1,10 +1,19 @@
 import { expect, test } from "bun:test";
-import { keyboardSeekOffset, nextKeyboardSeekTarget } from "../src/components/player-hotkeys-utils";
+import {
+  isPlaybackToggleShortcut,
+  keyboardSeekOffset,
+  nextKeyboardSeekTarget,
+} from "../src/components/player-hotkeys-utils";
 
 test("maps horizontal arrow keys to ten second seeks", () => {
   expect(keyboardSeekOffset("ArrowLeft")).toBe(-10);
   expect(keyboardSeekOffset("ArrowRight")).toBe(10);
   expect(keyboardSeekOffset("ArrowUp")).toBeNull();
+});
+
+test("maps K to playback toggle", () => {
+  expect(isPlaybackToggleShortcut("KeyK")).toBe(true);
+  expect(isPlaybackToggleShortcut("Space")).toBe(false);
 });
 
 test("accumulates rapid arrow seeks from the last requested target", () => {

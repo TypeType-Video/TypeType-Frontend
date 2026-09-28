@@ -3,6 +3,7 @@ import {
   clampTime,
   consumeEvent,
   isInteractiveTarget,
+  isPlaybackToggleShortcut,
   isPlayerSeekShortcutTarget,
   type KeyboardSeekTarget,
   keyboardSeekOffset,
@@ -14,7 +15,11 @@ import { useHoldFastForward } from "./use-hold-fast-forward";
 
 const FRAME_STEP_SECONDS = 1 / 30;
 
-export function usePlayerKeyboard(canSeek: boolean, sabrVideo: HTMLVideoElement | null = null) {
+export function usePlayerKeyboard(
+  canSeek: boolean,
+  sabrVideo: HTMLVideoElement | null = null,
+  playbackOnly = false,
+) {
   const player = useMediaPlayer();
   const remote = useMediaRemote();
   const currentTime = useMediaState("currentTime");
@@ -67,6 +72,7 @@ export function usePlayerKeyboard(canSeek: boolean, sabrVideo: HTMLVideoElement 
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (playbackOnly && !isPlaybackToggleShortcut(event.code)) return;
       const seekOffset = keyboardSeekOffset(event.code);
       if (seekOffset !== null && isPlayerSeekShortcutTarget(event.target, player?.el ?? null)) {
         consumeEvent(event);
@@ -74,6 +80,11 @@ export function usePlayerKeyboard(canSeek: boolean, sabrVideo: HTMLVideoElement 
         return;
       }
       if (isInteractiveTarget(event.target)) return;
+      if (isPlaybackToggleShortcut(event.code)) {
+        consumeEvent(event);
+        if (!event.repeat) togglePaused();
+        return;
+      }
       if (event.code === "Space") {
         consumeEvent(event);
         if (!event.repeat) {
@@ -118,7 +129,7 @@ export function usePlayerKeyboard(canSeek: boolean, sabrVideo: HTMLVideoElement 
       window.removeEventListener("blur", onBlur);
       restore(false);
     };
-  }, [canSeek, player, remote, sabrVideo, start, restore, isActive]);
+  }, [canSeek, player, remote, sabrVideo, start, restore, isActive, playbackOnly]);
 
   return holding;
 }
