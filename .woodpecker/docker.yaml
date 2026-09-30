@@ -63,10 +63,10 @@ steps:
         fi
 
         {
-          printf 'VERSION=%s\n' "$${version}"
-          printf 'LOCAL_REPO=%s\n' "$${local_repo}"
-          printf 'GHCR_REPO=%s\n' "$${ghcr_repo}"
-          printf 'TAGS=%s\n' "$${tags}"
+          printf "VERSION='%s'\n" "$${version}"
+          printf "LOCAL_REPO='%s'\n" "$${local_repo}"
+          printf "GHCR_REPO='%s'\n" "$${ghcr_repo}"
+          printf "TAGS='%s'\n" "$${tags}"
         } > .woodpecker-publish.env
 
   - name: publish-amd64
