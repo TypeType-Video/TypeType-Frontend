@@ -89,6 +89,7 @@ steps:
           docker login ghcr.io -u "$${GHCR_USER}" --password-stdin
 
         docker build --pull --platform linux/amd64 \
+          --provenance=false --sbom=false \
           --build-arg "BUILD_VERSION=$${VERSION}" \
           --build-arg "BUILD_REVISION=$${CI_COMMIT_SHA}" \
           --build-arg "BUILD_TIME=$${build_time}" \
@@ -136,6 +137,7 @@ steps:
           docker login ghcr.io -u "$${GHCR_USER}" --password-stdin
 
         docker build --pull --platform linux/arm64 \
+          --provenance=false --sbom=false \
           --build-arg "BUILD_VERSION=$${VERSION}" \
           --build-arg "BUILD_REVISION=$${CI_COMMIT_SHA}" \
           --build-arg "BUILD_TIME=$${build_time}" \
