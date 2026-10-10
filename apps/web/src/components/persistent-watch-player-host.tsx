@@ -9,6 +9,7 @@ import {
 } from "../hooks/use-persistent-watch-player";
 import { isPlayerOutsideViewport } from "../lib/compact-player-position";
 import { m } from "../paraglide/messages.js";
+import { useUiStore } from "../stores/ui-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import { WatchStagePlayer } from "./watch-stage-player";
 
@@ -38,6 +39,7 @@ export function PersistentWatchPlayerHost() {
   const close = usePersistentWatchPlayerStore((state) => state.close);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
+  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const isMobile = useMobile();
   const frameRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -79,21 +81,118 @@ export function PersistentWatchPlayerHost() {
     );
   }, [entry?.anchor, watchPage]);
 
+  const syncFrame = useCallback(
+    (commitState = true) => {
+      const anchor = entry?.anchor;
+      const frame = frameRef.current;
+      if (!anchor) {
+        if (commitState) updateAnchorRect();
+        return;
+      }
+      const rect = anchor.getBoundingClientRect();
+      if (frame && !outsideViewport && watchPage) {
+        frame.style.top = `${rect.top}px`;
+        frame.style.left = `${rect.left}px`;
+        frame.style.width = `${rect.width}px`;
+        frame.style.height = `${rect.height}px`;
+      }
+      // Check if viewport threshold changed
+      setOutsideViewport((previous) => {
+        const next = isPlayerOutsideViewport(rect.bottom, previous);
+        return next;
+      });
+      if (commitState) {
+        setAnchorRect((previous) =>
+          previous &&
+          previous.left === rect.left &&
+          previous.top === rect.top &&
+          previous.width === rect.width &&
+          previous.height === rect.height
+            ? previous
+            : { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+        );
+      }
+    },
+    [entry?.anchor, outsideViewport, watchPage, updateAnchorRect],
+  );
+
   useLayoutEffect(() => {
-    updateAnchorRect();
-  }, [updateAnchorRect]);
+    syncFrame(true);
+  }, [syncFrame]);
 
   useEffect(() => {
-    const observer = new ResizeObserver(updateAnchorRect);
+    const handleSync = () => syncFrame(true);
+    const observer = new ResizeObserver(handleSync);
     if (entry?.anchor) observer.observe(entry.anchor);
-    window.addEventListener("scroll", updateAnchorRect, true);
-    window.addEventListener("resize", updateAnchorRect);
+
+    const handleScroll = () => {
+      syncFrame(true);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    window.addEventListener("resize", handleSync);
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", updateAnchorRect, true);
-      window.removeEventListener("resize", updateAnchorRect);
+      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("resize", handleSync);
     };
-  }, [updateAnchorRect, entry?.anchor]);
+  }, [syncFrame, entry?.anchor]);
+
+  // Consolidated transition animation tracking loop without per-frame React state churn
+  const animRafRef = useRef<number | null>(null);
+  const startTransitionLoop = useCallback(() => {
+    if (!watchPage || outsideViewport) return;
+    if (animRafRef.current !== null) {
+      cancelAnimationFrame(animRafRef.current);
+    }
+    const start = performance.now();
+    const duration = 280;
+    const tick = (now: number) => {
+      if (now - start < duration) {
+        syncFrame(false); // Direct DOM style sync, no React state re-renders
+        animRafRef.current = requestAnimationFrame(tick);
+      } else {
+        syncFrame(true); // Final resting position: commit state
+        animRafRef.current = null;
+      }
+    };
+    animRafRef.current = requestAnimationFrame(tick);
+  }, [watchPage, outsideViewport, syncFrame]);
+
+  useEffect(() => {
+    startTransitionLoop();
+    return () => {
+      if (animRafRef.current !== null) {
+        cancelAnimationFrame(animRafRef.current);
+        animRafRef.current = null;
+      }
+    };
+  }, [sidebarCollapsed, startTransitionLoop]);
+
+  useEffect(() => {
+    if (!watchPage || outsideViewport) return;
+    const handleTransition = () => {
+      startTransitionLoop();
+    };
+    const handleEnd = () => {
+      if (animRafRef.current !== null) {
+        cancelAnimationFrame(animRafRef.current);
+        animRafRef.current = null;
+      }
+      syncFrame(true);
+    };
+
+    window.addEventListener("transitionrun", handleTransition);
+    window.addEventListener("transitionend", handleEnd);
+    return () => {
+      if (animRafRef.current !== null) {
+        cancelAnimationFrame(animRafRef.current);
+        animRafRef.current = null;
+      }
+      window.removeEventListener("transitionrun", handleTransition);
+      window.removeEventListener("transitionend", handleEnd);
+    };
+  }, [watchPage, outsideViewport, startTransitionLoop, syncFrame]);
 
   const floating = !watchPage || (!landscapeWatch && outsideViewport);
   const handlePointerMove = useCallback(
@@ -147,7 +246,7 @@ export function PersistentWatchPlayerHost() {
 
   if (!entry?.enabled || hiddenPage) return null;
 
-  const style =
+  const style: React.CSSProperties =
     !floating && anchorRect
       ? {
           left: anchorRect.left,
@@ -155,12 +254,17 @@ export function PersistentWatchPlayerHost() {
           width: anchorRect.width,
           height: anchorRect.height,
         }
-      : position
-        ? { left: position.left, top: position.top }
-        : {
-            right: "1rem",
-            bottom: `calc(${isMobile ? "4.5rem" : "1rem"} + env(safe-area-inset-bottom, 0px))`,
-          };
+      : !floating
+        ? {
+            opacity: 0,
+            pointerEvents: "none",
+          }
+        : position
+          ? { left: position.left, top: position.top }
+          : {
+              right: "1rem",
+              bottom: `calc(${isMobile ? "4.5rem" : "1rem"} + env(safe-area-inset-bottom, 0px))`,
+            };
 
   const beginDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (!floating || !frameRef.current || !event.isPrimary || event.button !== 0) return;
@@ -180,7 +284,11 @@ export function PersistentWatchPlayerHost() {
   return (
     <div
       ref={frameRef}
-      className="typetype-persistent-player-frame fixed z-30 overflow-hidden rounded-lg bg-black shadow-2xl ring-1 ring-black/30"
+      className={`typetype-persistent-player-frame fixed overflow-hidden bg-black transition-[box-shadow,ring-width] duration-200 ${
+        floating
+          ? "z-30 rounded-lg shadow-2xl ring-1 ring-black/30"
+          : "z-10 rounded-lg shadow-none ring-0"
+      }`}
       data-floating={floating ? "" : undefined}
       data-dragging={dragging ? "" : undefined}
       style={style}
