@@ -2,6 +2,9 @@ import { beforeEach, expect, test } from "bun:test";
 import {
   clearStoredLandingSettings,
   defaultLandingPath,
+  initializeDefaultLandingRedirect,
+  isDefaultLandingRedirectPending,
+  markDefaultLandingRedirectApplied,
   readStoredDefaultLandingPath,
   readStoredLandingSettings,
   shouldHideHomeNavigation,
@@ -13,6 +16,7 @@ import type { SettingsItem } from "../src/types/user";
 const store: Record<string, string> = {};
 
 beforeEach(() => {
+  initializeDefaultLandingRedirect("/subscriptions");
   for (const k of Object.keys(store)) {
     delete store[k];
   }
@@ -90,4 +94,14 @@ test("clears stored landing settings for a user", () => {
   syncStoredLandingSettings("subscriptions", true, "user-a");
   clearStoredLandingSettings("user-a");
   expect(readStoredLandingSettings("user-a")).toEqual({});
+});
+
+test("only applies the configured landing page on an initial home visit", () => {
+  initializeDefaultLandingRedirect("/subscriptions");
+  expect(isDefaultLandingRedirectPending()).toBe(false);
+
+  initializeDefaultLandingRedirect("/");
+  expect(isDefaultLandingRedirectPending()).toBe(true);
+  markDefaultLandingRedirectApplied();
+  expect(isDefaultLandingRedirectPending()).toBe(false);
 });

@@ -7,11 +7,14 @@ import { HomeRecommenderWelcome } from "../components/home-recommender-welcome";
 import { useAuth } from "../hooks/use-auth";
 import { readCachedSettings, useSettings, writeCachedSettings } from "../hooks/use-settings";
 import { fetchSettings } from "../lib/api-user";
-import { defaultLandingPath, readStoredDefaultLandingPath } from "../lib/default-landing";
+import {
+  defaultLandingPath,
+  isDefaultLandingRedirectPending,
+  markDefaultLandingRedirectApplied,
+  readStoredDefaultLandingPath,
+} from "../lib/default-landing";
 import { m } from "../paraglide/messages.js";
 import { useAuthStore } from "../stores/auth-store";
-
-let landingApplied = false;
 
 function HomePage() {
   const { authReady, isAuthed } = useAuth();
@@ -20,15 +23,13 @@ function HomePage() {
   const target = defaultLandingPath(settings.defaultLandingPage);
 
   useEffect(() => {
-    if (landingApplied || !settingsReady) return;
-    if (target) {
-      landingApplied = true;
-      navigate({ to: target, replace: true });
-    }
+    if (!isDefaultLandingRedirectPending() || !settingsReady) return;
+    markDefaultLandingRedirectApplied();
+    if (target) navigate({ to: target, replace: true });
   }, [settingsReady, target, navigate]);
 
   // If a non-home landing page is active, do not render homepage contents to avoid flash
-  if (target) {
+  if (isDefaultLandingRedirectPending() && target) {
     return null;
   }
 
@@ -58,6 +59,7 @@ function HomePage() {
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
+    if (!isDefaultLandingRedirectPending()) return;
     const { token, me } = useAuthStore.getState();
     const userId = me?.id ?? null;
     let target = readStoredDefaultLandingPath(userId);
@@ -70,8 +72,12 @@ export const Route = createFileRoute("/")({
         const settings = await fetchSettings();
         writeCachedSettings(settings, userId);
         target = defaultLandingPath(settings.defaultLandingPage);
-      } catch {}
+      } catch {
+        return;
+      }
     }
+    if (!target && token && !userId) return;
+    markDefaultLandingRedirectApplied();
     if (target) {
       throw redirect({ to: target, replace: true });
     }

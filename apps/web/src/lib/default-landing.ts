@@ -1,6 +1,20 @@
 const DEFAULT_LANDING_STORAGE_KEY = "typetype-default-landing-page";
 const HIDE_HOME_STORAGE_KEY = "typetype-hide-home-recommendations";
 
+let initialLandingRedirectPending = false;
+
+export function initializeDefaultLandingRedirect(pathname: string): void {
+  initialLandingRedirectPending = pathname === "/";
+}
+
+export function isDefaultLandingRedirectPending(): boolean {
+  return initialLandingRedirectPending;
+}
+
+export function markDefaultLandingRedirectApplied(): void {
+  initialLandingRedirectPending = false;
+}
+
 function scopedStorageKey(key: string, userId?: string | null): string {
   const normalized = userId?.trim();
   return `${key}:${normalized ? encodeURIComponent(normalized) : "anonymous"}`;

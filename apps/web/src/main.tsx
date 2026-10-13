@@ -7,6 +7,7 @@ import { PageSpinner } from "./components/page-spinner";
 import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
 import { apiRetryDelay, shouldRetryApiError } from "./lib/api-retry";
 import { installConsoleWarningFilter } from "./lib/console-warning-filter";
+import { initializeDefaultLandingRedirect } from "./lib/default-landing";
 import { initErrorCapture } from "./lib/error-capture";
 import { clearProfileQueries, resetProfileQueries } from "./lib/profile-query-cache";
 import { getLocale, getTextDirection } from "./paraglide/runtime.js";
@@ -17,6 +18,7 @@ installConsoleWarningFilter();
 initErrorCapture();
 document.documentElement.lang = getLocale();
 document.documentElement.dir = getTextDirection();
+initializeDefaultLandingRedirect(window.location.pathname);
 
 const router = createRouter({
   routeTree,
