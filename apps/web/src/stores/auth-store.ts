@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { clearLegacyUserCaches, clearUserCaches } from "../lib/settings-cache";
 import type { AuthMe, AuthStatus } from "../types/auth";
 
 type StoredAuth = {
@@ -56,26 +57,35 @@ function writeStoredAuth(data: StoredAuth): void {
 
 const stored = readStoredAuth();
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
   token: stored?.token ?? null,
   me: stored?.me ?? null,
-  status: stored?.token == null ? "signed_out" : "loading",
+  status: stored?.token == null ? "signed_out" : stored?.me ? toStatus(stored.me) : "loading",
   setBootstrapping: () =>
     set((state) => ({
       ...state,
-      status: state.token === null ? "signed_out" : "loading",
+      status: state.token === null ? "signed_out" : state.me ? toStatus(state.me) : "loading",
     })),
   setToken: (token) => {
+    clearUserCaches(get().me?.id);
+    clearLegacyUserCaches();
     writeStoredAuth({ token, me: null });
     set({ token, me: null, status: "loading" });
   },
   setSession: (token, me) => {
     const normalized = normalizeAuthMe(me);
     if (!normalized) return;
+    const previousUserId = get().me?.id;
+    if (previousUserId && previousUserId !== normalized.id) {
+      clearUserCaches(previousUserId);
+    }
+    clearLegacyUserCaches();
     writeStoredAuth({ token, me: normalized });
     set({ token, me: normalized, status: toStatus(normalized) });
   },
   setSignedOut: () => {
+    clearUserCaches(get().me?.id);
+    clearLegacyUserCaches();
     localStorage.removeItem(STORAGE_KEY);
     set({ token: null, me: null, status: "signed_out" });
   },

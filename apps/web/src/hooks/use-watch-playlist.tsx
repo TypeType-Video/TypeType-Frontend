@@ -1,14 +1,25 @@
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useCallback, useEffect } from "react";
 import { WatchPlaylistPanel } from "../components/watch-playlist-panel";
-import { applyCustomOrder, randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
+import { playlistShuffleSeed } from "../lib/continuous-playlist";
+import { applyCustomOrder } from "../lib/playlist-shuffle";
 import { isManagedPlaylistId } from "../lib/playlist-url";
+import {
+  activeStreamCollection,
+  streamCollectionPlaylistItems,
+  streamCollectionSectionGroups,
+} from "../lib/stream-collections";
+import { streamPartPlaylistItems } from "../lib/stream-parts";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
+import { m } from "../paraglide/messages.js";
 import { usePlaylistOrderStore } from "../stores/playlist-order-store";
 import type { WatchPlaylistItem } from "../types/playlist";
+import type { StreamCollectionItem } from "../types/stream-collection";
+import type { StreamPartItem } from "../types/stream-parts";
 import { useBlockedFilter } from "./use-blocked-filter";
 import { usePlaylist } from "./use-playlist";
+import { usePlaylistShuffle } from "./use-playlist-shuffle";
 import { usePlaylists } from "./use-playlists";
 import { usePublicPlaylist } from "./use-public-playlist";
 
@@ -27,6 +38,8 @@ export function useWatchPlaylist(
   list: string | undefined,
   shuffle: string | undefined,
   currentParam: string,
+  collections?: StreamCollectionItem[],
+  parts?: StreamPartItem[],
 ): WatchPlaylist {
   const navigate = useNavigate();
   const { filter } = useBlockedFilter();
@@ -39,9 +52,18 @@ export function useWatchPlaylist(
   const setOrder = usePlaylistOrderStore((state) => state.setOrder);
   const customOrder = usePlaylistOrderStore((state) => (list ? state.orders[list] : undefined));
   const isManaged = managedList.length > 0;
+  const collection = activeStreamCollection(collections, currentParam);
+  const collectionVideos = streamCollectionPlaylistItems(collection);
+  const collectionSections = streamCollectionSectionGroups(collection).map((sec) => ({
+    ...sec,
+    videos: filter(sec.videos),
+  }));
+  const partVideos = streamPartPlaylistItems(parts);
   const name = isManaged
     ? (managedPlaylist.data?.name ?? "")
-    : (publicPlaylist.data?.pages[0]?.playlist.title ?? "");
+    : (publicPlaylist.data?.pages[0]?.playlist.title ??
+      collection?.title ??
+      (partVideos.length > 0 ? m.ui_video_parts() : ""));
   const base: WatchPlaylistItem[] = isManaged
     ? (managedPlaylist.data?.videos ?? []).map((item) => ({
         key: item.id,
@@ -51,19 +73,24 @@ export function useWatchPlaylist(
         channelName: item.channelName,
         channelUrl: item.channelUrl,
       }))
-    : (publicPlaylist.data?.pages.flatMap((page) => page.streams) ?? []).map((item, index) => ({
-        key: `${index}-${item.id}`,
-        url: item.id,
-        title: item.title,
-        thumbnail: item.thumbnail,
-        channelName: item.channelName,
-        channelUrl: item.channelUrl,
-      }));
+    : (publicPlaylist.data?.pages.flatMap((page) => page.streams) ?? []).length > 0
+      ? (publicPlaylist.data?.pages.flatMap((page) => page.streams) ?? []).map((item, index) => ({
+          key: `${index}-${item.id}`,
+          url: item.id,
+          title: item.title,
+          thumbnail: item.thumbnail,
+          channelName: item.channelName,
+          channelUrl: item.channelUrl,
+        }))
+      : collectionVideos.length > 0
+        ? collectionVideos
+        : partVideos;
   const visibleBase = filter(base);
   const arranged =
     !isManaged && customOrder ? applyCustomOrder(visibleBase, customOrder) : visibleBase;
-  const videos = shuffle ? shuffleByKey(arranged, shuffle) : arranged;
-  const inPlaylist = Boolean(list) && videos.length > 0;
+  const { plan, videos } = usePlaylistShuffle(arranged, list, shuffle, currentParam);
+  const inPlaylist =
+    (Boolean(list) || Boolean(collection) || partVideos.length > 0) && videos.length > 0;
   const currentIdx = inPlaylist
     ? videos.findIndex((video) => toPublicWatchParam(video.url) === currentParam)
     : -1;
@@ -73,8 +100,8 @@ export function useWatchPlaylist(
   const loadMorePublic = useCallback(() => {
     if (canLoadPublicPage) void publicPlaylist.fetchNextPage();
   }, [canLoadPublicPage, publicPlaylist.fetchNextPage]);
-  const previousVideo = currentIdx > 0 ? videos[currentIdx - 1] : undefined;
-  const nextVideo = currentIdx >= 0 ? videos[currentIdx + 1] : undefined;
+  const previousVideo = plan ? plan.previous : currentIdx > 0 ? videos[currentIdx - 1] : undefined;
+  const nextVideo = plan ? plan.next : currentIdx >= 0 ? videos[currentIdx + 1] : undefined;
   const previousParam = previousVideo ? toPublicWatchParam(previousVideo.url) : null;
   const nextParam = nextVideo ? toPublicWatchParam(nextVideo.url) : null;
   const playPrevious = useCallback(() => {
@@ -110,21 +137,30 @@ export function useWatchPlaylist(
   ]);
 
   const panel =
-    inPlaylist && list ? (
+    inPlaylist && (list || collection || partVideos.length > 0) ? (
       <WatchPlaylistPanel
         name={name}
         videos={videos}
+        sections={collectionSections.length > 1 && !shuffle ? collectionSections : undefined}
         listId={list}
         currentParam={currentParam}
         shuffle={shuffle}
         isLoadingMore={publicPlaylist.isFetchingNextPage}
         onLoadMore={canLoadPublicPage ? loadMorePublic : undefined}
-        onToggleShuffle={() =>
-          navigate({
-            to: "/watch",
-            search: { v: currentParam, list, ...(shuffle ? {} : { shuffle: randomShuffleSeed() }) },
-            resetScroll: false,
-          })
+        allowContinuous={isManaged}
+        onShuffleChange={
+          list || collection
+            ? (mode) =>
+                navigate({
+                  to: "/watch",
+                  search: {
+                    v: currentParam,
+                    list,
+                    shuffle: playlistShuffleSeed(mode, currentParam),
+                  },
+                  resetScroll: false,
+                })
+            : undefined
         }
         onReorder={(items) => {
           if (isManaged && list) {

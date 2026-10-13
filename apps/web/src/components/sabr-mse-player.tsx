@@ -6,9 +6,15 @@ import { useSabrErrorReporter } from "../hooks/use-sabr-error-reporter";
 import { useSabrMediaSettings } from "../hooks/use-sabr-media-settings";
 import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
+import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
 import { addPlaybackTraceHeader } from "../lib/playback-trace";
-import { guardAutoplay, SabrAutoplayAttempt, SabrAutoplayDeadline } from "../lib/sabr-autoplay";
+import {
+  confirmAutoplayOnPlaying,
+  guardAutoplay,
+  SabrAutoplayAttempt,
+  SabrAutoplayDeadline,
+} from "../lib/sabr-autoplay";
 import { observeSabrMsePlayback } from "../lib/sabr-mse-playback-trace";
 import * as sabrNativePause from "../lib/sabr-native-pause";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
@@ -24,6 +30,7 @@ import { useAuthStore } from "../stores/auth-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
 export function SabrMsePlayer({
   config,
+  retryKey,
   playbackRatePreference,
   video,
   startTime,
@@ -79,6 +86,9 @@ export function SabrMsePlayer({
   useSabrMediaSettings(video, settingsReady, initialVolume, initialMuted);
   useEffect(() => {
     if (!video) return;
+    if (retryKey > 0) {
+      recordClientEvent("player.sabr_engine_retry", { attempt: retryKey });
+    }
     errorReportedRef.current = false;
     const { startTimeMs: initialStartTimeMs, replacingVideo } = videoHandoffRef.current.attach(
       video,
@@ -125,6 +135,7 @@ export function SabrMsePlayer({
       video.autoplay = false;
       engine.pause();
     });
+    const unconfirmAutoplay = confirmAutoplayOnPlaying(video, autoplayAttempt, autoplayDeadline);
     const unguardAutoplay = guardAutoplay(video, autoplayAttempt, () => engine.pause());
     const startAutoplay = () => {
       if (!engineLoaded || video.readyState < 3) return;
@@ -134,7 +145,8 @@ export function SabrMsePlayer({
       void playEngine()
         .then(() => {
           autoplayDeadline.clear();
-          if (!autoplayAttempt.resolve()) engine.pause();
+          if (autoplayAttempt.isExpired) engine.pause();
+          else autoplayAttempt.resolve();
         })
         .catch((error: unknown) => {
           autoplayDeadline.clear();
@@ -190,6 +202,7 @@ export function SabrMsePlayer({
       unregisterControls();
       unregisterMediaElementObservers();
       unregisterNativePause();
+      unconfirmAutoplay();
       offPosition();
       video.removeEventListener("canplay", startAutoplay);
       window.clearInterval(autoplayTimer);
@@ -212,6 +225,7 @@ export function SabrMsePlayer({
     latestStartTime,
     playbackRate,
     reportError,
+    retryKey,
     video,
   ]);
   return null;

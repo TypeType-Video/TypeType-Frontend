@@ -19,7 +19,11 @@ import { proxyImage } from "../lib/proxy";
 import { hasSabrPlayback } from "../lib/stream-delivery";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
-import { shouldLoadFullWatchStream, shouldLoadSabrBootstrap } from "../lib/watch-stream-loading";
+import {
+  isWatchStreamPending,
+  shouldLoadFullWatchStream,
+  shouldLoadSabrBootstrap,
+} from "../lib/watch-stream-loading";
 import {
   isYoutubeShortShareUrl,
   toPublicWatchParam,
@@ -67,7 +71,10 @@ function WatchPage() {
   );
   const { add } = useHistory();
   const progressFetch = useProgress(sourceUrl);
-  const previewRelated = previewMatches ? navigationSnapshot.relatedStreams : [];
+  const showRelated = !settings.hideRelatedVideos;
+  const hasSecondaryContent = Boolean(list || showRelated);
+  const previewRelated =
+    hasSecondaryContent && previewMatches && showRelated ? navigationSnapshot.relatedStreams : [];
   const availabilityPoster = proxyImage(
     previewStream?.rawThumbnail ?? youtubeThumbnailUrl(publicParam) ?? "",
   );
@@ -84,6 +91,9 @@ function WatchPage() {
       relatedStreams={previewRelated}
       videoUrl={sourceUrl}
       showComments={!settings.hideComments}
+      showRelated={showRelated}
+      list={list}
+      currentParam={publicParam}
     />
   );
 
@@ -139,7 +149,11 @@ function WatchPage() {
     });
   }, [activeStream, progressFetch.data?.position, resumePending]);
 
-  const pending = streamQuery.isLoading || bootstrap.isLoading;
+  const pending = isWatchStreamPending(
+    streamQuery.isLoading,
+    bootstrap.isLoading,
+    streamQuery.isPlaceholderData,
+  );
   if (resumePending) return loadingPage;
   if (!activeStream && (!streamEnabled || pending)) return loadingPage;
 
@@ -187,9 +201,12 @@ function WatchPage() {
         fallback={
           <WatchPageSkeleton
             stream={activeStream}
-            relatedStreams={activeStream.related}
+            relatedStreams={showRelated ? activeStream.related : []}
             videoUrl={sourceUrl}
             showComments={!settings.hideComments}
+            showRelated={showRelated}
+            list={list}
+            currentParam={publicParam}
           />
         }
       >

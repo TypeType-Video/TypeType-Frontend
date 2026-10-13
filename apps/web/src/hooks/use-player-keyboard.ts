@@ -11,6 +11,8 @@ import {
 } from "../components/player-hotkeys-utils";
 import { requestSabrSeek, requestSabrVidstackPlayback } from "../lib/sabr-vidstack-bridge";
 import { useMediaPlayer, useMediaRemote, useMediaState } from "../lib/vidstack";
+import { useDanmakuStore } from "../stores/danmaku-store";
+import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import { useHoldFastForward } from "./use-hold-fast-forward";
 
 const FRAME_STEP_SECONDS = 1 / 30;
@@ -72,6 +74,13 @@ export function usePlayerKeyboard(
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.key === "Escape" || event.code === "Escape") {
+        if (useWatchLayoutStore.getState().webFullscreen) {
+          consumeEvent(event);
+          useWatchLayoutStore.getState().setWebFullscreen(false);
+          return;
+        }
+      }
       if (playbackOnly && !isPlaybackToggleShortcut(event.code)) return;
       const seekOffset = keyboardSeekOffset(event.code);
       if (seekOffset !== null && isPlayerSeekShortcutTarget(event.target, player?.el ?? null)) {
@@ -80,6 +89,25 @@ export function usePlayerKeyboard(
         return;
       }
       if (isInteractiveTarget(event.target)) return;
+      if (event.key === "w" || event.key === "W" || event.code === "KeyW") {
+        consumeEvent(event);
+        useWatchLayoutStore.getState().toggleWebFullscreen();
+        return;
+      }
+      if (event.key === "t" || event.key === "T" || event.code === "KeyT") {
+        consumeEvent(event);
+        useWatchLayoutStore.getState().toggleCinemaMode();
+        return;
+      }
+      if (event.key === "d" || event.key === "D" || event.code === "KeyD") {
+        const el = event.target instanceof Element ? event.target : null;
+        if (el?.closest("input, textarea, select, [contenteditable='true'], [role='menu']")) {
+          return;
+        }
+        consumeEvent(event);
+        useDanmakuStore.getState().toggle();
+        return;
+      }
       if (isPlaybackToggleShortcut(event.code)) {
         consumeEvent(event);
         if (!event.repeat) togglePaused();

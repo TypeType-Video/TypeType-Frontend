@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { AppFooter } from "../components/app-footer";
 import { AuthBackdrop } from "../components/auth-backdrop";
 import { GuestDisabledScreen } from "../components/guest-disabled-screen";
@@ -43,7 +43,8 @@ function RootLayoutContent() {
   const closeMobileSidebar = useUiStore((s) => s.closeMobileSidebar);
   const theme = useThemeStore((s) => s.theme);
   const cinemaMode = useWatchLayoutStore((s) => s.cinemaMode);
-  const { isAuthed, isAdmin, isGuest, status } = useAuth();
+  const webFullscreen = useWatchLayoutStore((s) => s.webFullscreen);
+  const { isAuthed, isAdmin, isGuest, status, authReady } = useAuth();
   const setSignedOut = useAuthStore((s) => s.setSignedOut);
   const { data: instance } = useInstance();
   const location = useRouterState({ select: (state) => state.location });
@@ -59,7 +60,7 @@ function RootLayoutContent() {
   const registerStatus = useRegisterStatus(status !== "loading" && !framedEmbedPage);
   const watchPage = pathname === "/watch";
   const watchCinemaPage = pathname === "/watch" && cinemaMode;
-  const wasWatchCinemaPage = useRef(watchCinemaPage);
+  const watchWebFullscreenPage = pathname === "/watch" && webFullscreen;
   useSessionActivityReporting(!framedEmbedPage);
 
   useEffect(() => {
@@ -71,6 +72,22 @@ function RootLayoutContent() {
 
   useEffect(() => {
     applyTheme(theme);
+
+    if (theme !== "system" || typeof window === "undefined" || !window.matchMedia) {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      applyTheme("system");
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
   }, [theme]);
 
   useEffect(() => {
@@ -84,11 +101,8 @@ function RootLayoutContent() {
   }, [isMobile, closeMobileSidebar]);
 
   useLayoutEffect(() => {
-    if (watchCinemaPage && !wasWatchCinemaPage.current && !isMobile) {
-      setSidebarCollapsed(true);
-    }
-    wasWatchCinemaPage.current = watchCinemaPage;
-  }, [watchCinemaPage, isMobile, setSidebarCollapsed]);
+    if (watchPage && !isMobile) setSidebarCollapsed(true);
+  }, [watchPage, isMobile, setSidebarCollapsed]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -140,7 +154,13 @@ function RootLayoutContent() {
     return <NotFoundPage />;
   }
 
-  if (instance?.guestAllowed === false && (!isAuthed || isGuest) && !authPage && !embedPage) {
+  if (
+    instance?.guestAllowed === false &&
+    authReady &&
+    (!isAuthed || isGuest) &&
+    !authPage &&
+    !embedPage
+  ) {
     return <GuestDisabledScreen />;
   }
 
@@ -185,29 +205,39 @@ function RootLayoutContent() {
   const topPadding = watchPage
     ? undefined
     : { paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))" };
-  const showTabBar = isMobile && !shortsPage && !watchCinemaPage && !embedPage;
+  const showTabBar =
+    isMobile && !shortsPage && !watchCinemaPage && !watchWebFullscreenPage && !embedPage;
   const mainBottomPad = showTabBar
     ? "pb-[calc(env(safe-area-inset-bottom)+4.5rem)]"
     : "pb-5 sm:pb-6";
-  const mainClasses = watchCinemaPage
-    ? "watch-page-main transition-all duration-200 ml-0"
-    : `watch-page-main px-3 sm:px-4 ${mainBottomPad} transition-all duration-200 ${
-        isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
-      }`;
+  const mainClasses = watchWebFullscreenPage
+    ? "watch-page-main p-0 m-0 w-full h-full"
+    : watchCinemaPage
+      ? "watch-page-main transition-all duration-200 ml-0"
+      : `watch-page-main px-2 sm:px-3 ${mainBottomPad} transition-all duration-200 ${
+          isMobile ? "ml-0" : collapsed ? "ml-14" : "typetype-sidebar-offset"
+        }`;
 
   return (
-    <div className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell" : ""}`}>
+    <div
+      className={`min-h-screen bg-app text-fg ${watchPage ? "watch-page-shell watch-page-shell-dark" : ""} ${
+        watchWebFullscreenPage ? "watch-web-fullscreen" : ""
+      }`}
+    >
       <PersistentWatchPlayer />
-      <div className="watch-page-chrome">
-        <Navbar />
-      </div>
-      {watchCinemaPage ? !isMobile && <Sidebar overlay /> : <Sidebar />}
+      {!watchWebFullscreenPage && (
+        <div className="watch-page-chrome">
+          <Navbar />
+        </div>
+      )}
+      {!watchWebFullscreenPage &&
+        (watchCinemaPage ? !isMobile && <Sidebar overlay /> : <Sidebar />)}
       <main
         className={`${mainClasses} ${pathname === "/subscriptions/groups" ? "sg-page" : ""}`}
         style={topPadding}
       >
         <Outlet />
-        <AppFooter />
+        {!watchWebFullscreenPage && <AppFooter />}
       </main>
       {showTabBar && (
         <div className="watch-page-chrome">

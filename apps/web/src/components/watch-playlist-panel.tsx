@@ -1,43 +1,82 @@
-import { ChevronDown, Shuffle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { type DragEvent, type UIEvent, useEffect, useRef, useState } from "react";
 import { useFlipList } from "../hooks/use-flip-list";
 import { useMobile } from "../hooks/use-mobile";
+import { usePlaylistVisibility } from "../hooks/use-playlist-visibility";
 import { toPublicWatchParam } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
 import type { WatchPlaylistItem } from "../types/playlist";
+import {
+  type PlaylistShuffleMode,
+  WatchPlaylistShuffleControl,
+  WatchPlaylistVisibilityToggle,
+} from "./watch-playlist-controls";
 import { WatchPlaylistRow } from "./watch-playlist-row";
+
+type WatchPlaylistSection = {
+  id: string;
+  title: string;
+  videos: WatchPlaylistItem[];
+};
 
 type Props = {
   name: string;
   videos: WatchPlaylistItem[];
-  listId: string;
+  sections?: WatchPlaylistSection[];
+  listId?: string;
   currentParam: string;
   shuffle: string | undefined;
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
-  onToggleShuffle: () => void;
+  onShuffleChange?: (mode: PlaylistShuffleMode) => void;
+  allowContinuous?: boolean;
   onReorder?: (videos: WatchPlaylistItem[]) => void;
 };
 
 export function WatchPlaylistPanel({
   name,
   videos,
+  sections,
   listId,
   currentParam,
   shuffle,
   isLoadingMore = false,
   onLoadMore,
-  onToggleShuffle,
+  onShuffleChange,
+  allowContinuous = false,
   onReorder,
 }: Props) {
   const isMobile = useMobile();
+  const visibility = usePlaylistVisibility(listId);
   const [collapsed, setCollapsed] = useState(isMobile);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const currentElement = useRef<HTMLLIElement | null>(null);
-  const currentIndex = videos.findIndex((video) => toPublicWatchParam(video.url) === currentParam);
-  const reorderable = Boolean(onReorder);
-  const register = useFlipList(videos.map((video) => video.key).join("|"));
+
+  const sectionWithCurrent = sections?.find((sec) =>
+    sec.videos.some((video) => toPublicWatchParam(video.url) === currentParam),
+  );
+  const sectionWithCurrentId = sectionWithCurrent?.id;
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(
+    sectionWithCurrentId ?? sections?.[0]?.id ?? null,
+  );
+
+  useEffect(() => {
+    if (sectionWithCurrentId) {
+      setSelectedSectionId(sectionWithCurrentId);
+    }
+  }, [sectionWithCurrentId]);
+
+  const activeSection =
+    sections && sections.length > 1
+      ? (sections.find((sec) => sec.id === selectedSectionId) ?? sections[0])
+      : null;
+  const displayVideos = activeSection ? activeSection.videos : videos;
+  const currentIndex = displayVideos.findIndex(
+    (video) => toPublicWatchParam(video.url) === currentParam,
+  );
+  const reorderable = Boolean(onReorder) && !activeSection && !visibility.hidden && !shuffle;
+  const register = useFlipList(displayVideos.map((video) => video.key).join("|"));
 
   useEffect(() => {
     if (!collapsed && currentIndex >= 0) {
@@ -45,9 +84,6 @@ export function WatchPlaylistPanel({
     }
   }, [collapsed, currentIndex]);
 
-  function commit(next: WatchPlaylistItem[]) {
-    onReorder?.(next);
-  }
   function handleDragStart(event: DragEvent, index: number) {
     setDragIndex(index);
     event.dataTransfer.effectAllowed = "move";
@@ -59,7 +95,7 @@ export function WatchPlaylistPanel({
       const next = [...videos];
       const [moved] = next.splice(dragIndex, 1);
       next.splice(targetIndex, 0, moved);
-      commit(next);
+      onReorder(next);
     }
     setDragIndex(null);
     setOverIndex(null);
@@ -70,7 +106,7 @@ export function WatchPlaylistPanel({
     const next = [...videos];
     const [moved] = next.splice(index, 1);
     next.splice(target, 0, moved);
-    commit(next);
+    onReorder(next);
   }
   function handleScroll(event: UIEvent<HTMLUListElement>) {
     if (!onLoadMore || isLoadingMore) return;
@@ -89,19 +125,8 @@ export function WatchPlaylistPanel({
         >
           <span className="truncate font-medium text-fg text-sm">{name}</span>
           <span className="text-fg-soft text-xs">
-            {currentIndex >= 0 ? currentIndex + 1 : "-"} / {videos.length}
+            {currentIndex >= 0 ? currentIndex + 1 : "-"} / {displayVideos.length}
           </span>
-        </button>
-        <button
-          type="button"
-          onClick={onToggleShuffle}
-          aria-label={m.ui_shuffle_playlist()}
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center gap-1.5 rounded-full font-medium text-xs transition-colors sm:w-auto sm:rounded-lg sm:px-2.5 sm:py-1.5 ${
-            shuffle ? "bg-fg text-app" : "text-fg-muted hover:bg-surface-strong hover:text-fg"
-          }`}
-        >
-          <Shuffle className="h-3.5 w-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">{m.ui_shuffle()}</span>
         </button>
         <button
           type="button"
@@ -116,8 +141,48 @@ export function WatchPlaylistPanel({
         </button>
       </div>
       {!collapsed && (
+        <div className="flex items-center gap-3 border-border border-b px-3 py-2">
+          <WatchPlaylistShuffleControl
+            shuffle={shuffle}
+            allowContinuous={allowContinuous}
+            onShuffleChange={onShuffleChange}
+          />
+          <div className="ml-auto">
+            <WatchPlaylistVisibilityToggle
+              hidden={visibility.hidden}
+              onToggleHidden={visibility.toggle}
+            />
+          </div>
+        </div>
+      )}
+      {!collapsed && sections && sections.length > 1 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto border-border border-b px-3 py-2 no-scrollbar">
+          {sections.map((section) => {
+            const isSelected = (activeSection?.id ?? sections[0].id) === section.id;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => setSelectedSectionId(section.id)}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                  isSelected
+                    ? "bg-fg text-app"
+                    : "bg-surface-strong/70 text-fg-muted hover:bg-surface-strong hover:text-fg"
+                }`}
+              >
+                <span>{section.title}</span>
+                <span className={`text-[10px] ${isSelected ? "opacity-80" : "text-fg-soft"}`}>
+                  ({section.videos.length})
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+      {!collapsed && (
         <ul className="max-h-[24rem] list-none overflow-y-auto py-1" onScroll={handleScroll}>
-          {videos.map((video, index) => {
+          {displayVideos.map((video, index) => {
+            if (visibility.hidden && currentIndex >= 0 && index > currentIndex) return null;
             const isCurrent = index === currentIndex;
 
             return (
@@ -146,7 +211,7 @@ export function WatchPlaylistPanel({
                 <WatchPlaylistRow
                   video={video}
                   index={index}
-                  total={videos.length}
+                  total={displayVideos.length}
                   isCurrent={isCurrent}
                   reorderable={reorderable}
                   isMobile={isMobile}

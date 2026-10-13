@@ -1,4 +1,6 @@
 import type { PublicPlaylistInfo } from "./playlist";
+import type { HomeRecommendationRow } from "./recommender";
+import type { StreamCollectionItem } from "./stream-collection";
 import type {
   AudioStreamItem,
   PreviewFrameItem,
@@ -7,6 +9,7 @@ import type {
   SubtitleItem,
   VideoStreamItem,
 } from "./stream-items";
+import type { StreamPartItem } from "./stream-parts";
 
 export type {
   AudioStreamItem,
@@ -81,6 +84,8 @@ export type StreamResponse = {
   subtitles: SubtitleItem[];
   previewFrames: PreviewFrameItem[];
   relatedStreams: VideoItem[];
+  collections?: StreamCollectionItem[];
+  parts?: StreamPartItem[];
 };
 
 export type ChannelResultItem = {
@@ -126,6 +131,9 @@ export type HomeRecommendationsResponse = {
   items: VideoItem[];
   nextCursor: string | null;
   hasMore: boolean;
+  algorithm?: string | null;
+  rows?: HomeRecommendationRow[] | null;
+  preparing?: boolean | null;
 };
 
 export type SubscriptionFeedPage = {

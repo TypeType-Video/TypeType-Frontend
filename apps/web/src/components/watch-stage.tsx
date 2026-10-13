@@ -1,10 +1,9 @@
-import { type MutableRefObject, type ReactNode, useLayoutEffect, useRef } from "react";
+import type { MutableRefObject, ReactNode } from "react";
 import { usePersistentWatchPlayer } from "../hooks/use-persistent-watch-player";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import type { AutoplayState } from "../hooks/use-watch-ended-navigation";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
-import { resolveWatchPlayerStartTime } from "../lib/watch-player-position";
 import type { SponsorBlockSegmentItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
 import type { CaptionStyles, SettingsItem } from "../types/user";
@@ -13,7 +12,7 @@ import { PageSpinner } from "./page-spinner";
 import { PlayerError } from "./player-error";
 import type { WatchLayoutClasses } from "./watch-layout-classes";
 import { WatchMeta } from "./watch-meta";
-import { WatchStagePlayer } from "./watch-stage-player";
+import type { WatchStagePlayerProps } from "./watch-stage-player";
 
 type Props = {
   classes: WatchLayoutClasses;
@@ -23,6 +22,7 @@ type Props = {
   sabrConfig: SabrPlaybackConfig | null;
   audioOnly: boolean;
   playerKey: string;
+  sabrRetryKey: number;
   startTime: number;
   seekIntervalSeconds?: number;
   isLive: boolean;
@@ -39,6 +39,7 @@ type Props = {
   chaptersVtt?: string;
   playerFailed: boolean;
   cinemaMode: boolean;
+  webFullscreen?: boolean;
   hideComments: boolean;
   mobilePanel: ReactNode;
   mobileSecondaryContent: ReactNode | null;
@@ -70,6 +71,7 @@ export function WatchStage({
   sabrConfig,
   audioOnly,
   playerKey,
+  sabrRetryKey,
   startTime,
   seekIntervalSeconds,
   isLive,
@@ -86,6 +88,7 @@ export function WatchStage({
   chaptersVtt,
   playerFailed,
   cinemaMode,
+  webFullscreen = false,
   hideComments,
   mobilePanel,
   mobileSecondaryContent,
@@ -108,40 +111,6 @@ export function WatchStage({
   onError,
   onReset,
 }: Props) {
-  const playerPositionRef = useRef(startTime);
-  const playerStartTimeRef = useRef(startTime);
-  const playerKeyRef = useRef(playerKey);
-  const cinemaModeRef = useRef(cinemaMode);
-  const sourceChanged = playerKeyRef.current !== playerKey;
-  const cinemaModeChanged = cinemaModeRef.current !== cinemaMode;
-
-  if (sourceChanged) {
-    playerKeyRef.current = playerKey;
-    playerPositionRef.current = startTime;
-    playerStartTimeRef.current = startTime;
-  }
-
-  const playerStartTime = resolveWatchPlayerStartTime(
-    playerStartTimeRef.current,
-    playerPositionRef.current,
-    cinemaModeChanged && !sourceChanged,
-  );
-
-  useLayoutEffect(() => {
-    cinemaModeRef.current = cinemaMode;
-    if (cinemaModeChanged && !sourceChanged) {
-      playerStartTimeRef.current = playerPositionRef.current;
-    }
-  }, [cinemaMode, cinemaModeChanged, sourceChanged]);
-
-  const handleTimeUpdate = (positionMs: number) => {
-    playerPositionRef.current = Math.max(0, positionMs);
-    onTimeUpdate(positionMs);
-  };
-  const handleSeeking = (positionMs: number) => {
-    playerPositionRef.current = Math.max(0, positionMs);
-    onSeeking(positionMs);
-  };
   const playerOverlay = (
     <>
       {overlay}
@@ -157,15 +126,16 @@ export function WatchStage({
       )}
     </>
   );
-  const playerProps = {
+  const playerProps: WatchStagePlayerProps = {
     audioOnly,
     streamTitle: stream.title,
     poster: stream.thumbnail,
     playerKey,
+    sabrRetryKey,
     manifestSrc,
     sabrConfig,
     isLive,
-    startTime: playerStartTime,
+    startTime,
     seekIntervalSeconds,
     subtitles: stream.subtitles,
     sponsorBlockSegments,
@@ -183,10 +153,10 @@ export function WatchStage({
     mediaClassName: classes.mediaClassName,
     onCaptionStylesChange,
     onVolumeChange,
-    onTimeUpdate: handleTimeUpdate,
+    onTimeUpdate,
     onPlay,
     onPause,
-    onSeeking: handleSeeking,
+    onSeeking,
     onSeeked,
     onError,
     onPositionReaderChange,
@@ -194,11 +164,7 @@ export function WatchStage({
     onPreviousVideo,
     onNextVideo,
   };
-  const persistent = usePersistentWatchPlayer(
-    stream.id,
-    playerProps,
-    !cinemaMode && !navigating && !playerFailed,
-  );
+  const persistent = usePersistentWatchPlayer(stream.id, playerProps, !navigating && !playerFailed);
   const localPlayer = navigating ? (
     <div className="flex aspect-video w-full items-center justify-center bg-black">
       <PageSpinner fullScreen={false} />
@@ -208,20 +174,16 @@ export function WatchStage({
       <PlayerError onRetry={onReset} />
     </div>
   ) : (
-    <WatchStagePlayer {...playerProps} />
+    <div aria-hidden="true" className="aspect-video h-full w-full bg-black" />
   );
 
   return (
     <div className={classes.playerWrapClass}>
       <div ref={persistent.anchorRef} className={classes.playerBoxClass}>
-        {cinemaMode || navigating || playerFailed ? (
-          localPlayer
-        ) : (
-          <div aria-hidden="true" className="aspect-video w-full bg-black" />
-        )}
+        {localPlayer}
       </div>
-      {mobilePanel ? <div className="mt-4">{mobilePanel}</div> : null}
-      {!cinemaMode && (
+      {mobilePanel && !webFullscreen ? <div className="mt-4">{mobilePanel}</div> : null}
+      {!cinemaMode && !webFullscreen && (
         <WatchMeta
           stream={stream}
           showComments={!hideComments}
@@ -229,7 +191,9 @@ export function WatchStage({
           audioOnly={audioOnlyControls}
         />
       )}
-      {mobileSecondaryContent ? <div className="mt-6">{mobileSecondaryContent}</div> : null}
+      {mobileSecondaryContent && !webFullscreen ? (
+        <div className="mt-6">{mobileSecondaryContent}</div>
+      ) : null}
     </div>
   );
 }

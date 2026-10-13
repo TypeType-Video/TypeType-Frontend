@@ -15,6 +15,7 @@ import { AudioTimeSlider } from "./audio-time-slider";
 import { AudioTrackSelector } from "./audio-track-selector";
 import { CinemaModeControl } from "./cinema-mode-control";
 import { CompactPlayerControls } from "./compact-player-controls";
+import { DanmakuSelector } from "./danmaku-selector";
 import { FormatSelector } from "./format-selector";
 import { PlayerTrackButton } from "./player-track-button";
 import { PlayerVolumeControl, PlayerVolumeSlider } from "./player-volume-control";
@@ -22,6 +23,7 @@ import { QualitySelector } from "./quality-selector";
 import { SabrCurrentTime } from "./sabr-current-time";
 import { SabrTimeSlider } from "./sabr-time-slider";
 import { ShortsPlayerLayout } from "./shorts-player-layout";
+import { WebFullscreenControl } from "./web-fullscreen-control";
 
 type Props = {
   audioOnly?: boolean;
@@ -159,6 +161,7 @@ export function VideoPlayerLayout({
             <AudioTrackSelector originalLocale={originalAudioLocale} sabr={sabr} />
             <QualitySelector />
             <FormatSelector />
+            <DanmakuSelector />
           </>
         ),
         beforePlayButton: <PlayerTrackButton direction="previous" onClick={onPreviousVideo} />,
@@ -167,6 +170,7 @@ export function VideoPlayerLayout({
           <>
             <PlayerVolumeControl />
             {!hideCinemaMode && <CinemaModeControl />}
+            {!hideCinemaMode && <WebFullscreenControl />}
           </>
         ),
         volumeSlider: <PlayerVolumeSlider />,
