@@ -1,5 +1,3 @@
-import { API_BASE } from "./env";
-
 export function youtubeSessionReturnToForWatch(
   v: string,
   list: string | undefined,
@@ -35,15 +33,4 @@ export function sanitizeYoutubeSessionReturnTo(value: unknown): string | undefin
     url.searchParams.get("list") ?? undefined,
     url.searchParams.get("shuffle") ?? undefined,
   );
-}
-
-export function toYoutubeSessionWebSocketUrl(wsUrl: string): string {
-  if (wsUrl.startsWith("ws://") || wsUrl.startsWith("wss://")) return wsUrl;
-  const apiUrl = new URL(API_BASE, window.location.origin);
-  const url =
-    wsUrl.startsWith("http://") || wsUrl.startsWith("https://")
-      ? new URL(wsUrl)
-      : new URL(`${apiUrl.pathname.replace(/\/$/, "")}/${wsUrl.replace(/^\//, "")}`, apiUrl.origin);
-  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-  return url.toString();
 }

@@ -85,7 +85,7 @@ export function YoutubeDeviceLoginPanel({
         message:
           startError instanceof Error ? startError.message.slice(0, 200) : String(startError),
       });
-      setError(m.ui_remote_browser_connection_failed());
+      setError(m.ui_failed());
     }
   }
 
@@ -100,9 +100,6 @@ export function YoutubeDeviceLoginPanel({
   if (!device) {
     return (
       <div className="max-w-3xl border-border border-l-2 pl-5">
-        <p className="text-fg text-sm leading-6">
-          {m.ui_use_a_secondary_youtube_account_the_remote_browser_is_temporary_and_c()}
-        </p>
         <button
           type="button"
           disabled={pending}
