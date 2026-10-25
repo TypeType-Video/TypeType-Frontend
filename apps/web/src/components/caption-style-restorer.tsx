@@ -20,6 +20,8 @@ export function CaptionStyleRestorer({ captionStyles, settingsReady, onChange }:
   onChangeRef.current = onChange;
   const applyingRef = useRef(false);
   const restoredRef = useRef(false);
+  const savedRef = useRef(JSON.stringify(captionStyles));
+  savedRef.current = JSON.stringify(captionStyles);
 
   useEffect(() => {
     const el = player?.el;
@@ -41,7 +43,11 @@ export function CaptionStyleRestorer({ captionStyles, settingsReady, onChange }:
       if (applyingRef.current) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        onChangeRef.current(readCaptionStylesFromStorage());
+        const styles = readCaptionStylesFromStorage();
+        const serialized = JSON.stringify(styles);
+        if (serialized === savedRef.current) return;
+        savedRef.current = serialized;
+        onChangeRef.current(styles);
       }, 600);
     });
     observer.observe(el, { attributes: true, attributeFilter: ["style"] });
