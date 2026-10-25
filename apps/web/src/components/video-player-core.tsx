@@ -87,6 +87,7 @@ export function ChaptersTrack({ src }: { src: string }) {
 export function onProviderChange(
   provider: MediaProviderAdapter | null,
   sourceProvider?: Provider,
+  onDashFragmentLoaded?: () => void,
 ): void {
   if (isHLSProvider(provider)) {
     let providerLibrary = hlsProviderLibraries.get(provider);
@@ -135,6 +136,9 @@ export function onProviderChange(
     };
     setDashPlayer(player);
     player.addRequestInterceptor(addAuthHeader);
+    player.on("fragmentLoadingCompleted", (event: dashjs.FragmentLoadingCompletedEvent) => {
+      if (event.response) onDashFragmentLoaded?.();
+    });
     if (dashLibrary) configureDashPlayer(player, dashLibrary, sourceProvider);
     else
       void loadDashLibrary().then(({ default: library }) =>

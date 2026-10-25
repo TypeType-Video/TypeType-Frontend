@@ -1,5 +1,6 @@
 export type {
   MediaContext,
+  MediaErrorDetail,
   MediaProviderAdapter,
   MediaProviderLoader,
   MediaSrc,
