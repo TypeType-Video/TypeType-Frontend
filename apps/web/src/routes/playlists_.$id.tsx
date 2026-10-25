@@ -1,16 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ConfirmModal } from "../components/confirm-modal";
 import { PlaylistActions } from "../components/playlist-actions";
 import { PlaylistGrid } from "../components/playlist-grid";
 import { PlaylistRenameModal } from "../components/playlist-rename-modal";
+import { PlaylistSectionTabs } from "../components/playlist-section-tabs";
 import { PlaylistSortMenu } from "../components/playlist-sort-menu";
 import { useBlockedFilter } from "../hooks/use-blocked-filter";
 import { usePlaylist } from "../hooks/use-playlist";
+import { usePlaylistCollectionMeta } from "../hooks/use-playlist-collection-meta";
 import { usePlaylists } from "../hooks/use-playlists";
+import { useScopedValue } from "../hooks/use-scoped-value";
 import { randomShuffleSeed, shuffleByKey } from "../lib/playlist-shuffle";
 import { type PlaylistSortMode, sortPlaylistVideos } from "../lib/playlist-sort";
+import { isCollectionPlaylist } from "../lib/stream-collections";
 import { markWatchAutoplayIntent } from "../lib/watch-autoplay-intent";
 import { toPublicWatchParam } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
@@ -26,6 +30,35 @@ function PlaylistDetailPage() {
   const [pendingRemove, setPendingRemove] = useState<PlaylistVideoItem | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [sortMode, setSortMode] = useState<PlaylistSortMode>("manual");
+  const [activeSectionId, setActiveSectionId] = useScopedValue<string | null>(id, null);
+
+  const isCollection = Boolean(playlist && isCollectionPlaylist(playlist));
+  const collectionMeta = usePlaylistCollectionMeta(
+    id,
+    isCollection,
+    playlist?.name ?? "",
+    playlist?.videos ?? [],
+  );
+
+  const allVideos = playlist?.videos ?? [];
+  const sections =
+    collectionMeta?.sections && collectionMeta.sections.length > 1
+      ? collectionMeta.sections
+      : undefined;
+  const activeSection = sections?.find((sec) => sec.id === activeSectionId);
+  const sectionFilteredVideos = useMemo(() => {
+    if (!activeSection) return allVideos;
+    const urlSet = new Set(activeSection.videoUrls.map((u) => toPublicWatchParam(u)));
+    return allVideos.filter(
+      (v: PlaylistVideoItem) =>
+        activeSection.videoUrls.includes(v.url.trim()) || urlSet.has(toPublicWatchParam(v.url)),
+    );
+  }, [allVideos, activeSection]);
+
+  const videos = filter(sectionFilteredVideos) as PlaylistVideoItem[];
+  const count = videos.length;
+  const sortedVideos = sortPlaylistVideos(videos, sortMode);
+  const reorderable = !activeSection && sortMode === "manual";
 
   if (isPending) {
     return (
@@ -48,12 +81,6 @@ function PlaylistDetailPage() {
     );
   }
 
-  const allVideos = playlist.videos ?? [];
-  const videos = filter(allVideos);
-  const count = videos.length;
-  const sortedVideos = sortPlaylistVideos(videos, sortMode);
-  const reorderable = sortMode === "manual";
-
   function handleDelete() {
     remove.mutate(id);
     navigate({ to: "/playlists" });
@@ -65,10 +92,6 @@ function PlaylistDetailPage() {
       to: "/watch",
       search: { v: toPublicWatchParam(video.url), list: id, ...(shuffle ? { shuffle } : {}) },
     });
-  }
-  function handleShuffle() {
-    const seed = randomShuffleSeed();
-    playFrom(shuffleByKey(sortedVideos, seed)[0], seed);
   }
 
   return (
@@ -104,7 +127,10 @@ function PlaylistDetailPage() {
             <>
               <PlaylistActions
                 onPlayAll={() => playFrom(sortedVideos[0])}
-                onShuffle={handleShuffle}
+                onShuffle={() => {
+                  const s = randomShuffleSeed();
+                  playFrom(shuffleByKey(sortedVideos, s)[0], s);
+                }}
               />
               <PlaylistSortMenu value={sortMode} onChange={setSortMode} />
             </>
@@ -118,6 +144,17 @@ function PlaylistDetailPage() {
           </button>
         </div>
       </div>
+
+      {sections && (
+        <PlaylistSectionTabs
+          sections={sections}
+          activeSectionId={activeSectionId}
+          onSelectSection={setActiveSectionId}
+          totalCount={allVideos.length}
+          videoUrls={allVideos.map((v) => v.url)}
+        />
+      )}
+
       {count === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
           <p className="text-fg-muted text-sm">

@@ -85,7 +85,7 @@ export function YoutubeDeviceLoginPanel({
         message:
           startError instanceof Error ? startError.message.slice(0, 200) : String(startError),
       });
-      setError(m.ui_failed());
+      setError(m.ui_youtube_device_sign_in_failed());
     }
   }
 
@@ -100,6 +100,7 @@ export function YoutubeDeviceLoginPanel({
   if (!device) {
     return (
       <div className="max-w-3xl border-border border-l-2 pl-5">
+        <p className="text-fg text-sm leading-6">{m.ui_youtube_device_sign_in_hint()}</p>
         <button
           type="button"
           disabled={pending}

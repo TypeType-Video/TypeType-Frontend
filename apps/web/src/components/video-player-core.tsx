@@ -2,8 +2,10 @@ import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { attachDashPlaybackDiagnostics } from "../lib/dash-playback-diagnostics";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
 import { installDashQualityCompat } from "../lib/dash-quality-compat";
+import type { Provider } from "../lib/provider";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
@@ -36,17 +38,42 @@ const loadHlsLibrary = (): Promise<HlsLibraryModule> => {
   return hlsLibraryPromise;
 };
 
-function configureDashPlayer(player: dashjs.MediaPlayerClass, library: typeof dashjs): void {
+const STREAMING_BUFFER_POLICY = {
+  steadyBufferMs: 36_000,
+  maxBufferMs: 60_000,
+  backBufferMs: 20_000,
+} as const;
+
+export function buildDashStreamingSettings() {
+  const dashSettings = createDashSettings(STREAMING_BUFFER_POLICY);
+  return {
+    ...dashSettings,
+    buffer: {
+      ...dashSettings.buffer,
+      bufferTimeDefault: 24,
+      bufferTimeAtTopQuality: 36,
+      bufferTimeAtTopQualityLongForm: 60,
+    },
+    gaps: {
+      enableStallFix: true,
+    },
+    cmcd: { enabled: false },
+  };
+}
+
+function configureDashPlayer(
+  player: dashjs.MediaPlayerClass,
+  library: typeof dashjs,
+  sourceProvider?: Provider,
+): void {
   installDashQualityCompat(player);
   const onDashUpdate = () => notifyDashPlayer();
   player.on(library.MediaPlayer.events.STREAM_INITIALIZED, onDashUpdate);
   player.on(library.MediaPlayer.events.TRACK_CHANGE_RENDERED, onDashUpdate);
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
+  if (sourceProvider === "bilibili") attachDashPlaybackDiagnostics(player, library);
   player.updateSettings({
-    streaming: {
-      ...createDashSettings(),
-      cmcd: { enabled: false },
-    },
+    streaming: buildDashStreamingSettings(),
   });
   notifyDashPlayer();
 }
@@ -57,12 +84,19 @@ export function ChaptersTrack({ src }: { src: string }) {
   return <Track kind="chapters" src={src} default />;
 }
 
-export function onProviderChange(provider: MediaProviderAdapter | null) {
+export function onProviderChange(
+  provider: MediaProviderAdapter | null,
+  sourceProvider?: Provider,
+  onDashFragmentLoaded?: () => void,
+): void {
   if (isHLSProvider(provider)) {
     let providerLibrary = hlsProviderLibraries.get(provider);
     if (!providerLibrary) {
       providerLibrary = loadHlsLibrary().then((library) => {
-        provider.config = createHlsConfig({ FetchLoader: library.FetchLoader });
+        provider.config = createHlsConfig({
+          FetchLoader: library.FetchLoader,
+          policy: STREAMING_BUFFER_POLICY,
+        });
         return library;
       });
       hlsProviderLibraries.set(provider, providerLibrary);
@@ -91,7 +125,7 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
   }
   provider.library = loadDashLibrary;
   provider.onInstance((player) => {
-    const addAuthHeader: DashRequestInterceptor = (request) => {
+    const addAuthHeader: DashRequestInterceptor = async (request) => {
       const token = useAuthStore.getState().token;
       if (!token) return request;
       request.headers = {
@@ -102,8 +136,13 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
     };
     setDashPlayer(player);
     player.addRequestInterceptor(addAuthHeader);
-    if (dashLibrary) configureDashPlayer(player, dashLibrary);
+    player.on("fragmentLoadingCompleted", (event: dashjs.FragmentLoadingCompletedEvent) => {
+      if (event.response) onDashFragmentLoaded?.();
+    });
+    if (dashLibrary) configureDashPlayer(player, dashLibrary, sourceProvider);
     else
-      void loadDashLibrary().then(({ default: library }) => configureDashPlayer(player, library));
+      void loadDashLibrary().then(({ default: library }) =>
+        configureDashPlayer(player, library, sourceProvider),
+      );
   });
 }

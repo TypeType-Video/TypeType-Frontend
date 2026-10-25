@@ -20,16 +20,6 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
     ],
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("/src/paraglide/messages/")) return "paraglide-messages";
-            if (id.includes("/node_modules/lucide-react/")) return "lucide-icons";
-          },
-        },
-      },
-    },
     server: {
       allowedHosts: true,
       proxy: {
@@ -48,10 +38,6 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: apiTarget,
           rewrite: (path) => path.replace(/^\/api/, ""),
-          ws: true,
-        },
-        "/youtube-session/browser": {
-          target: apiTarget,
           ws: true,
         },
         "/proxy": {

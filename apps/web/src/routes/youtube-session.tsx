@@ -19,7 +19,6 @@ function YoutubeSessionPage() {
   const canDisconnect =
     authReady && isAuthed && state?.status !== "disconnected" && !session.disconnect.isPending;
   const connected = state?.status === "connected";
-
   const refetchStatus = session.status.refetch;
 
   function disconnect() {
@@ -40,12 +39,15 @@ function YoutubeSessionPage() {
 
       <section className="grid min-h-[28rem] gap-10 border-border border-y py-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="flex min-w-0 flex-col justify-center gap-8">
-          <p className={SIDE_LABEL}>{m.ui_connect_with_youtube()}</p>
+          <p className={SIDE_LABEL}>{m.ui_youtube_device_sign_in()}</p>
 
           <div className="flex flex-col gap-3">
             <h1 className="max-w-4xl font-semibold text-3xl text-fg tracking-tight sm:text-5xl sm:leading-tight">
               {m.ui_connect_youtube_inside_typetype()}
             </h1>
+            <p className="max-w-3xl text-base text-fg-muted leading-7 sm:text-lg">
+              {m.ui_youtube_device_sign_in_description()}
+            </p>
           </div>
 
           <YoutubeDeviceLoginPanel

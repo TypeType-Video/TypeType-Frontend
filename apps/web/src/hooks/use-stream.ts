@@ -1,5 +1,6 @@
 import { keepPreviousData, queryOptions, useQuery } from "@tanstack/react-query";
 import { ApiError } from "../lib/api";
+import { apiRetryDelay, shouldRetryApiError } from "../lib/api-retry";
 import { fetchSabrBootstrap, fetchStream } from "../lib/api-stream";
 import { mapStreamResponse } from "../lib/mappers";
 import {
@@ -46,9 +47,9 @@ export function streamQueryOptions(
       ) {
         return false;
       }
-      return count < 2;
+      return count < 2 && shouldRetryApiError(count, error);
     },
-    retryDelay: (attempt) => Math.min(250 * 2 ** attempt, 1500),
+    retryDelay: apiRetryDelay,
     refetchOnWindowFocus: false,
   });
 }
@@ -95,9 +96,9 @@ export function useSabrBootstrap(url: string, useAuthenticatedStream = false, en
     retry: (count, error) => {
       if (error instanceof ApiError && [400, 403, 404, 409, 422].includes(error.status))
         return false;
-      return count < 2;
+      return count < 2 && shouldRetryApiError(count, error);
     },
-    retryDelay: (attempt) => Math.min(250 * 2 ** attempt, 1500),
+    retryDelay: apiRetryDelay,
     refetchOnWindowFocus: false,
   });
 }

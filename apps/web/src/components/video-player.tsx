@@ -27,6 +27,7 @@ patchVidstackProviderLoaders();
 
 export function VideoPlayer({
   src,
+  provider,
   sabrConfig,
   sabrRetryKey = 0,
   sabrPlaybackRatePreference,
@@ -85,6 +86,7 @@ export function VideoPlayer({
   const canSeek = streamType !== "live" || Boolean(sabrConfig) || hlsLiveSource;
   const { handleProviderChange, handleError, handleEnded } = useVideoPlayerEvents({
     src: activeSrc,
+    sourceProvider: provider,
     onError,
     onEnded,
   });
@@ -100,6 +102,7 @@ export function VideoPlayer({
       logLevel="warn"
       crossOrigin
       playsInline
+      preload="auto"
       {...(ios ? { "webkit-playsinline": "true" } : {})}
       autoPlay={sabrConfig ? false : autoplay}
       storage={null}

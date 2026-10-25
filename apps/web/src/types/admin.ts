@@ -12,7 +12,6 @@ export type AdminSettings = {
   activeSessionsEnabled: boolean;
   localLoginEnabled: boolean;
   oidcAutoRedirect: boolean;
-  youtubeRemoteLoginEnabled: boolean;
   accessMode: AccessMode;
   rssEnabled: boolean;
   rssPublicBaseUrl: string | null;

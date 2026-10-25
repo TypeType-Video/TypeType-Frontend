@@ -5,7 +5,7 @@ import "./index.css";
 import { NotFoundPage } from "./components/not-found-page";
 import { PageSpinner } from "./components/page-spinner";
 import { InterfaceLocaleProvider } from "./hooks/use-interface-locale";
-import { ApiError } from "./lib/api";
+import { apiRetryDelay, shouldRetryApiError } from "./lib/api-retry";
 import { installConsoleWarningFilter } from "./lib/console-warning-filter";
 import { initializeDefaultLandingRedirect } from "./lib/default-landing";
 import { initErrorCapture } from "./lib/error-capture";
@@ -29,14 +29,8 @@ const router = createRouter({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (count, error) => {
-        if (error instanceof ApiError) {
-          if (error.status === 429) return count < 2;
-          if (error.status >= 400 && error.status < 500) return false;
-        }
-        return count < 3;
-      },
-      retryDelay: (attempt) => Math.min(300 * 2 ** attempt, 1500),
+      retry: shouldRetryApiError,
+      retryDelay: apiRetryDelay,
     },
   },
 });

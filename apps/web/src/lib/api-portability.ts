@@ -4,8 +4,6 @@ import { portabilityResponse } from "./api-portability-response";
 import { authed } from "./authed";
 import { API_BASE } from "./env";
 
-export { startPortabilityImport } from "./api-portability-import";
-
 type PortabilityDirection = "import" | "export";
 export type PortabilityFidelity = "complete" | "partial";
 type PortabilityJobState =

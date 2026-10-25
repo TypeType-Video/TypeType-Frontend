@@ -5,7 +5,6 @@ import { API_BASE as BASE } from "./env";
 
 export type InstanceCapabilities = {
   guestAllowed: boolean;
-  youtubeRemoteLoginEnabled: boolean;
   parentalControlsEnabled: boolean;
   rss: RssInstanceCapability;
   recommender: RecommenderCapability;
@@ -45,7 +44,6 @@ function isRssCapability(value: unknown): value is RssInstanceCapability {
 
 function isInstanceCapabilities(value: unknown): value is {
   guestAllowed: boolean;
-  youtubeRemoteLoginEnabled: boolean;
   parentalControlsEnabled?: unknown;
   rss?: unknown;
   recommender?: unknown;
@@ -54,9 +52,7 @@ function isInstanceCapabilities(value: unknown): value is {
     !!value &&
     typeof value === "object" &&
     "guestAllowed" in value &&
-    typeof value.guestAllowed === "boolean" &&
-    "youtubeRemoteLoginEnabled" in value &&
-    typeof value.youtubeRemoteLoginEnabled === "boolean"
+    typeof value.guestAllowed === "boolean"
   );
 }
 

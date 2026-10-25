@@ -1,4 +1,5 @@
 import { type MutableRefObject, type ReactNode, useEffect, useRef } from "react";
+import type { Provider } from "../lib/provider";
 import { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
@@ -15,6 +16,7 @@ export type WatchStagePlayerProps = {
   playerKey: string;
   sabrRetryKey: number;
   manifestSrc: MediaSrc;
+  provider: Provider;
   sabrConfig: SabrPlaybackConfig | null;
   isLive: boolean;
   startTime: number;
@@ -64,6 +66,7 @@ export function WatchStagePlayer(props: WatchStagePlayerProps) {
       <VideoPlayer
         key={props.playerKey}
         src={props.manifestSrc}
+        provider={props.provider}
         sabrConfig={props.sabrConfig}
         sabrRetryKey={props.sabrRetryKey}
         sabrPlaybackRatePreference={playbackRatePreference.current}

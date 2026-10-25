@@ -12,8 +12,8 @@ import {
   type PortabilityCategory,
   type PortabilityFormatDescriptor,
   type PortabilityJob,
-  startPortabilityImport,
 } from "../lib/api-portability";
+import { startPortabilityImport } from "../lib/api-portability-import";
 import { invalidateSubscriptionQueries } from "../lib/subscription-queries";
 import { m } from "../paraglide/messages.js";
 import { PortabilityFormatPicker } from "./portability-format-picker";

@@ -27,7 +27,6 @@ function isAdminSettings(value: unknown): value is AdminSettings {
     typeof record.activeSessionsEnabled === "boolean" &&
     typeof record.localLoginEnabled === "boolean" &&
     typeof record.oidcAutoRedirect === "boolean" &&
-    typeof record.youtubeRemoteLoginEnabled === "boolean" &&
     typeof record.rssEnabled === "boolean" &&
     (record.rssPublicBaseUrl === null || typeof record.rssPublicBaseUrl === "string") &&
     typeof record.rssMaxFeedsPerUser === "number" &&

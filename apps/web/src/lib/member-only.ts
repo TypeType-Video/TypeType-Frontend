@@ -13,10 +13,7 @@ export function isMemberOnlyMessage(message: string | null | undefined): boolean
 }
 
 export function isMemberOnlyApiError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    "status" in error &&
-    error.status === 400 &&
-    isMemberOnlyMessage(error.message)
-  );
+  if (!(error instanceof Error) || !("status" in error)) return false;
+  if ("code" in error && error.code === "members_only") return true;
+  return (error.status === 400 || error.status === 422) && isMemberOnlyMessage(error.message);
 }

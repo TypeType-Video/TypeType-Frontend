@@ -13,7 +13,7 @@ import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
 import { VideoCardFeedbackMenu } from "./video-card-feedback-menu";
 import { VideoMembershipBadge } from "./video-membership-badge";
-import { VideoPreview } from "./video-preview";
+import { VideoPreviewSlot } from "./video-preview-slot";
 import { VideoProgressBar } from "./video-progress-bar";
 import { VideoStatusBadge } from "./video-status-badge";
 import { VerifiedBadgeIcon } from "./watch-icons";
@@ -108,7 +108,7 @@ function VideoCardComponent({
               loading="lazy"
               decoding="async"
             />
-            <VideoPreview stream={preview.previewStream} show={preview.showPreview} />
+            <VideoPreviewSlot stream={preview.previewStream} show={preview.showPreview} />
           </div>
           {preview.memberOnly && (
             <span className="absolute left-2 top-2">

@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
 import {
+  canRenderWatchStream,
+  canRequestWatchStream,
   isWatchStreamPending,
   shouldLoadFullWatchStream,
   shouldLoadSabrBootstrap,
@@ -35,4 +37,27 @@ test("keeps the loading screen while React Query holds the previous stream", () 
 
 test("does not keep loading once the current stream is ready", () => {
   expect(isWatchStreamPending(false, false, false)).toBe(false);
+});
+
+const signedInLoading = {
+  authReady: true,
+  isAuthed: true,
+  instancePending: true,
+  settingsReady: false,
+};
+
+test("requests the stream as soon as auth is ready, before instance and settings", () => {
+  expect(canRequestWatchStream(signedInLoading)).toBe(true);
+  expect(canRequestWatchStream({ ...signedInLoading, authReady: false })).toBe(false);
+});
+
+test("renders the player only once instance and account settings are ready", () => {
+  expect(canRenderWatchStream(signedInLoading)).toBe(false);
+  expect(canRenderWatchStream({ ...signedInLoading, instancePending: false })).toBe(false);
+  expect(
+    canRenderWatchStream({ ...signedInLoading, instancePending: false, settingsReady: true }),
+  ).toBe(true);
+  expect(
+    canRenderWatchStream({ ...signedInLoading, isAuthed: false, instancePending: false }),
+  ).toBe(true);
 });

@@ -16,11 +16,8 @@ const recommender = { installed: false, enabled: false, experimental: true };
 
 describe("RSS instance capability", () => {
   test("keeps RSS hidden when an older Server omits the capability", () => {
-    expect(
-      normalizeInstanceCapabilities({ guestAllowed: true, youtubeRemoteLoginEnabled: false }),
-    ).toEqual({
+    expect(normalizeInstanceCapabilities({ guestAllowed: true })).toEqual({
       guestAllowed: true,
-      youtubeRemoteLoginEnabled: false,
       parentalControlsEnabled: false,
       rss: {
         enabled: false,
@@ -44,13 +41,11 @@ describe("RSS instance capability", () => {
     expect(
       normalizeInstanceCapabilities({
         guestAllowed: false,
-        youtubeRemoteLoginEnabled: true,
         parentalControlsEnabled: true,
         rss,
       }),
     ).toEqual({
       guestAllowed: false,
-      youtubeRemoteLoginEnabled: true,
       parentalControlsEnabled: true,
       rss,
       recommender,

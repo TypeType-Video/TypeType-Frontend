@@ -13,7 +13,10 @@ const Root = ({ children, ...props }: { children?: ReactNode } & Record<string, 
 };
 const Slot = ({ children }: { children?: ReactNode }) => <>{children}</>;
 
+const vidstack = await import("../src/lib/vidstack");
+
 mock.module("../src/lib/vidstack", () => ({
+  ...vidstack,
   TimeSlider: {
     Root,
     Preview: Slot,
