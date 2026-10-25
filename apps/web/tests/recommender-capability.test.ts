@@ -13,7 +13,7 @@ if (!("localStorage" in globalThis)) {
 const { normalizeInstanceCapabilities } = await import("../src/lib/api-instance");
 const { isAlgorithmSection } = await import("../src/lib/algorithm-sections");
 
-const base = { guestAllowed: true, youtubeRemoteLoginEnabled: false };
+const base = { guestAllowed: true };
 
 describe("recommender instance capability", () => {
   test("an instance without the service offers nothing", () => {

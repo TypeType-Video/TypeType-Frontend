@@ -40,10 +40,6 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api/, ""),
           ws: true,
         },
-        "/youtube-session/browser": {
-          target: apiTarget,
-          ws: true,
-        },
         "/proxy": {
           target: apiTarget,
         },

@@ -22,12 +22,6 @@ export type YoutubeDeviceStart = {
 
 export type YoutubeDeviceStatus = "pending" | "slow_down" | "connected";
 
-export type YoutubeRemoteBrowserSession = {
-  sessionId: string;
-  wsUrl: string;
-  expiresAt: number;
-};
-
 export function youtubeSessionActionForError(error: unknown): YoutubeSessionAction | null {
   if (!(error instanceof ApiError)) return null;
   if (error.code === "youtube_session_needs_reconnect") return "reconnect";
@@ -41,23 +35,6 @@ export function isYoutubeSessionActionError(error: unknown): boolean {
 
 export function fetchYoutubeSessionStatus(): Promise<YoutubeSessionState> {
   return authedJson(`${BASE}/youtube-session/status`);
-}
-
-export function startYoutubeSessionBrowser(
-  returnTo?: string,
-): Promise<YoutubeRemoteBrowserSession> {
-  return authedJson(`${BASE}/youtube-session/browser/start`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ returnTo: returnTo ?? null }),
-  });
-}
-
-export async function cancelYoutubeSessionBrowser(sessionId: string): Promise<void> {
-  const res = await authed(`${BASE}/youtube-session/browser/${encodeURIComponent(sessionId)}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) throw new ApiError("Failed to close YouTube login", res.status);
 }
 
 export async function disconnectYoutubeSession(): Promise<void> {
