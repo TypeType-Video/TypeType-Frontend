@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM oven/bun:1.4.3-alpine AS builder
+FROM --platform=$BUILDPLATFORM oven/bun:1.4.4-alpine AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN find apps/web/dist -type f \
         \( -name '*.css' -o -name '*.html' -o -name '*.js' -o -name '*.json' -o -name '*.svg' \) \
         -exec gzip -9 -k '{}' \;
 
-FROM nginx:1.31.6-alpine AS runner
+FROM nginx:1.31.8-alpine3.24 AS runner
 ARG BUILD_VERSION=0.1.0
 ARG BUILD_REVISION=development
 ARG BUILD_TIME=unknown
