@@ -10,7 +10,7 @@ if (!("localStorage" in globalThis)) {
   });
 }
 
-const { startPortabilityImport } = await import("../src/lib/api-portability");
+const { startPortabilityImport } = await import("../src/lib/api-portability-import");
 const { useAuthStore } = await import("../src/stores/auth-store");
 
 const originalFetch = globalThis.fetch;
