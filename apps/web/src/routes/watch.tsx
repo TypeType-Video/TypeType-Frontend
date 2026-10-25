@@ -22,6 +22,8 @@ import { videoAvailabilityCopy } from "../lib/video-availability";
 import { isShortFormContentHidden } from "../lib/video-visibility";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
 import {
+  canRenderWatchStream,
+  canRequestWatchStream,
   isWatchStreamPending,
   shouldLoadFullWatchStream,
   shouldLoadSabrBootstrap,
@@ -52,7 +54,9 @@ function WatchPage() {
     navigationSnapshot && toPublicWatchParam(navigationSnapshot.stream.id) === publicParam;
   const previewStream = previewMatches ? navigationSnapshot.stream : undefined;
   const useAuthenticatedStream = isAuthed;
-  const streamEnabled = authReady && !instancePending && (!isAuthed || settingsReady);
+  const access = { authReady, isAuthed, instancePending, settingsReady };
+  const streamEnabled = canRequestWatchStream(access);
+  const renderReady = canRenderWatchStream(access);
   const knownPublicLive = previewStream?.isLive === true && !previewStream.requiresMembership;
   const fullStreamEnabled = shouldLoadFullWatchStream(streamEnabled);
   const streamQuery = useStream(
@@ -133,7 +137,7 @@ function WatchPage() {
   }, [fullStream, list, navigate, publicParam, resumePending, shortShareUrl, shuffle]);
 
   useEffect(() => {
-    if (!activeStream || shortContentHidden || resumePending) return;
+    if (!activeStream || !renderReady || shortContentHidden || resumePending) return;
     if (historyAddedForRef.current === activeStream.id) return;
     const historyPositionMs =
       progressFetch.data?.position ?? (activeStream.startPosition ?? 0) * 1000;
@@ -151,15 +155,15 @@ function WatchPage() {
       viewCount: activeStream.views,
       progress,
     });
-  }, [activeStream, progressFetch.data?.position, resumePending, shortContentHidden]);
+  }, [activeStream, progressFetch.data?.position, renderReady, resumePending, shortContentHidden]);
 
   const pending = isWatchStreamPending(
     streamQuery.isLoading,
     bootstrap.isLoading,
     streamQuery.isPlaceholderData,
   );
-  if (resumePending) return loadingPage;
-  if (!activeStream && (!streamEnabled || pending)) return loadingPage;
+  if (resumePending || !renderReady) return loadingPage;
+  if (!activeStream && pending) return loadingPage;
 
   if (!activeStream) {
     const activeError = streamQuery.error ?? bootstrap.error;
