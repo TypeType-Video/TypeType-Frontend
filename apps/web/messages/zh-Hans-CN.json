@@ -1818,5 +1818,7 @@
   "ui_youtube_device_sign_in": "使用代码登录 YouTube",
   "ui_youtube_device_sign_in_description": "TypeType 会显示一个代码，请在 google.com/device 输入。YouTube 会话保留在服务器上，绝不会发送到网页界面。",
   "ui_youtube_device_sign_in_hint": "请使用备用 YouTube 账号。代码会在几分钟后过期。",
-  "ui_youtube_device_sign_in_failed": "无法开始 YouTube 登录"
+  "ui_youtube_device_sign_in_failed": "无法开始 YouTube 登录",
+  "ui_error_temporarily_unavailable": "视频服务暂时不可用，请稍后再试。",
+  "ui_error_temporarily_unavailable_retrying": "视频服务繁忙，正在重试…"
 }

@@ -1818,5 +1818,7 @@
   "ui_youtube_device_sign_in": "YouTube-Anmeldung per Code",
   "ui_youtube_device_sign_in_description": "TypeType zeigt einen Code an, den du auf google.com/device eingibst. Die YouTube-Sitzung bleibt auf dem Server und wird nie an die Weboberfläche gesendet.",
   "ui_youtube_device_sign_in_hint": "Verwende ein zweites YouTube-Konto. Der Code läuft nach einigen Minuten ab.",
-  "ui_youtube_device_sign_in_failed": "Die YouTube-Anmeldung konnte nicht gestartet werden"
+  "ui_youtube_device_sign_in_failed": "Die YouTube-Anmeldung konnte nicht gestartet werden",
+  "ui_error_temporarily_unavailable": "Der Videodienst ist vorübergehend nicht verfügbar. Versuche es gleich noch einmal.",
+  "ui_error_temporarily_unavailable_retrying": "Der Videodienst ist ausgelastet. Neuer Versuch…"
 }

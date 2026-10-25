@@ -7,13 +7,13 @@ import { toPublicWatchParam } from "../lib/watch-url";
 import { m } from "../paraglide/messages.js";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
 import type { VideoStream } from "../types/stream";
-import { PageSpinner } from "./page-spinner";
 import { RelatedCardSkeleton } from "./related-card-skeleton";
 import { RelatedVideos } from "./related-videos";
 import { WatchCommentSkeleton } from "./watch-comment-skeleton";
 import { WatchComments } from "./watch-comments";
 import { WatchInfo } from "./watch-info";
 import { getWatchLayoutClasses } from "./watch-layout-classes";
+import { WatchLoadingIndicator } from "./watch-loading-indicator";
 import { WatchPlaylistSkeleton } from "./watch-playlist-skeleton";
 
 const RELATED_KEYS = ["related-1", "related-2", "related-3", "related-4", "related-5"];
@@ -27,6 +27,7 @@ type Props = {
   showRelated?: boolean;
   list?: string;
   currentParam?: string;
+  notice?: string;
 };
 
 export function WatchPageSkeleton({
@@ -37,6 +38,7 @@ export function WatchPageSkeleton({
   showRelated = true,
   list,
   currentParam,
+  notice,
 }: Props) {
   const isMobile = useMobile();
   const cinemaMode = useWatchLayoutStore((state) => state.cinemaMode);
@@ -122,7 +124,7 @@ export function WatchPageSkeleton({
         <div className={classes.playerWrapClass}>
           <div className={classes.playerBoxClass}>
             <div className="aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
-              <PageSpinner fullScreen={false} />
+              <WatchLoadingIndicator notice={notice} />
             </div>
           </div>
         </div>
@@ -141,7 +143,7 @@ export function WatchPageSkeleton({
       <div className={classes.playerWrapClass}>
         <div className={classes.playerBoxClass}>
           <div className="aspect-video w-full overflow-hidden rounded-lg bg-black flex items-center justify-center">
-            <PageSpinner fullScreen={false} />
+            <WatchLoadingIndicator notice={notice} />
           </div>
         </div>
         {isMobile && playlistSkeleton && <div className="mt-4">{playlistSkeleton}</div>}

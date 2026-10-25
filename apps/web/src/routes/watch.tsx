@@ -18,6 +18,7 @@ import { beginPlaybackTrace, playbackTraceEvent } from "../lib/playback-trace";
 import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { hasSabrPlayback } from "../lib/stream-delivery";
+import { streamRetryNotice } from "../lib/stream-error-message";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { isShortFormContentHidden } from "../lib/video-visibility";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
@@ -102,6 +103,10 @@ function WatchPage() {
       showRelated={showRelated}
       list={list}
       currentParam={publicParam}
+      notice={streamRetryNotice(
+        streamQuery.failureReason ?? bootstrap.failureReason,
+        streamQuery.isFetching || bootstrap.isFetching,
+      )}
     />
   );
 

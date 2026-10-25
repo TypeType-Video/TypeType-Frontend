@@ -1,5 +1,6 @@
 import { m } from "../paraglide/messages.js";
 import { ApiError } from "./api";
+import { isTemporaryApiError } from "./api-retry";
 
 export function resolveStreamErrorMessage(error: unknown): string | null {
   if (!(error instanceof ApiError)) return null;
@@ -15,13 +16,26 @@ export function resolveStreamErrorMessage(error: unknown): string | null {
       return m.ui_error_private_video();
     case "age_restricted":
       return m.ui_error_age_restricted();
+    case "provider_rate_limited":
+    case "provider_paced":
+    case "upstream_timeout":
+      return m.ui_error_temporarily_unavailable();
+    case "provider_data_missing":
+    case "media_handle_unavailable":
+      return m.ui_error_stream_unavailable();
   }
 
   const message = error.message.toLowerCase();
   if (isProviderAccessBlockedMessage(message)) return m.ui_error_provider_blocked();
   if (isRegionRestrictedMessage(message)) return m.ui_error_region_restricted();
+  if (isTemporaryApiError(error)) return m.ui_error_temporarily_unavailable();
   if (error.status === 422) return m.ui_error_stream_unavailable();
   return null;
+}
+
+export function streamRetryNotice(error: unknown, retrying: boolean): string | undefined {
+  if (!retrying || !isTemporaryApiError(error)) return undefined;
+  return m.ui_error_temporarily_unavailable_retrying();
 }
 
 function isProviderAccessBlockedMessage(message: string): boolean {
