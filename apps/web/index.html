@@ -73,11 +73,14 @@
       #app-loader {
         position: fixed;
         inset: 0;
-        background: #000000;
+        background: #09090b;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 9999;
+      }
+      html[data-theme="light"] #app-loader {
+        background: var(--color-app, #f4f4f5);
       }
     </style>
   </head>
