@@ -3,7 +3,7 @@
   "version": "1.10.1",
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
-    "knip": "^6.41.0",
+    "knip": "^6.43.0",
     "sherif": "^1.13.0"
   },
   "overrides": {
