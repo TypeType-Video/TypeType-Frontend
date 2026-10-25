@@ -1,7 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { addFavorite, fetchFavorite, removeFavorite } from "../lib/api-collections";
-import type { FavoriteItem } from "../types/user";
+import { addFavorite, fetchFavoriteStatus, removeFavorite } from "../lib/api-collections";
 import { useAuth } from "./use-auth";
 
 const FAVORITES_KEY = ["favorites"] as const;
@@ -13,17 +12,17 @@ export function useFavoriteStatus(videoUrl: string) {
   const queryKey = [...FAVORITES_KEY, videoUrl] as const;
   const query = useQuery({
     queryKey,
-    queryFn: () => fetchFavorite(videoUrl),
+    queryFn: () => fetchFavoriteStatus(videoUrl),
     enabled: authReady && isAuthed,
   });
-  const isFavorite = intent ?? (query.data !== null && query.data !== undefined);
+  const isFavorite = intent ?? query.data ?? false;
 
   async function add(): Promise<void> {
     if (isFavorite) return;
     setIntent(true);
     try {
-      const favorite = await addFavorite(videoUrl);
-      queryClient.setQueryData<FavoriteItem | null>(queryKey, favorite);
+      await addFavorite(videoUrl);
+      queryClient.setQueryData<boolean>(queryKey, true);
       await queryClient.invalidateQueries({
         queryKey: FAVORITES_KEY,
         exact: true,
@@ -40,7 +39,7 @@ export function useFavoriteStatus(videoUrl: string) {
     setIntent(false);
     try {
       await removeFavorite(videoUrl);
-      queryClient.setQueryData<FavoriteItem | null>(queryKey, null);
+      queryClient.setQueryData<boolean>(queryKey, false);
       await queryClient.invalidateQueries({
         queryKey: FAVORITES_KEY,
         exact: true,

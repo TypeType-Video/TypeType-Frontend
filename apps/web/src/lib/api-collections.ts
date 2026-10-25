@@ -155,13 +155,11 @@ export function fetchFavorites(): Promise<FavoriteItem[]> {
   return authedJson(`${BASE}/favorites`);
 }
 
-export async function fetchFavorite(videoUrl: string): Promise<FavoriteItem | null> {
-  const res = await authed(`${BASE}/favorites/${encodeURIComponent(videoUrl)}`, undefined, {
-    silentStatuses: [404],
-  });
-  if (res.status === 404) return null;
-  await throwIfFailed(res, "favorite lookup failed");
-  return (await res.json()) as FavoriteItem;
+export async function fetchFavoriteStatus(videoUrl: string): Promise<boolean> {
+  const url = `${BASE}/favorites/status?videoUrl=${encodeURIComponent(videoUrl)}`;
+  const res = await authed(url);
+  await throwIfFailed(res, "favorite status lookup failed");
+  return ((await res.json()) as { isFavorite: boolean }).isFavorite;
 }
 
 export function addFavorite(videoUrl: string): Promise<FavoriteItem> {
