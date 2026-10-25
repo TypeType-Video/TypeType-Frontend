@@ -10,7 +10,7 @@ export function PageSpinner({ fullScreen = true }: Props) {
 
   return (
     <div className={wrapperClass}>
-      <img src="/loader.gif" width={size} height={size} alt="" />
+      <img className="loading-mascot" src="/loader-mascot.png" width={size} height={size} alt="" />
     </div>
   );
 }

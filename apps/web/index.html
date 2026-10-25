@@ -11,7 +11,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="TypeType" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="preload" as="image" href="/loader.gif" />
+    <link rel="preload" as="image" href="/loader-mascot.png" />
     <script>
       (() => {
         const STORAGE_KEY = "typed-theme";
@@ -82,11 +82,23 @@
       html[data-theme="light"] #app-loader {
         background: var(--color-app, #f4f4f5);
       }
+      .loading-mascot {
+        object-fit: contain;
+        animation: mascot-loader-bob 1.4s ease-in-out infinite;
+        transform-origin: center;
+      }
+      @keyframes mascot-loader-bob {
+        0%, 100% { transform: translateY(0) rotate(-1deg); }
+        50% { transform: translateY(-3px) rotate(1deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loading-mascot { animation: none; }
+      }
     </style>
   </head>
   <body>
     <div id="app-loader">
-      <img src="/loader.gif" width="160" height="160" alt="" />
+      <img class="loading-mascot" src="/loader-mascot.png" width="160" height="160" alt="" />
     </div>
     <script>
       if (window.location.pathname === "/hide-everything") {
