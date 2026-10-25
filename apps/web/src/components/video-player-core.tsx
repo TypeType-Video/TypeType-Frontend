@@ -2,8 +2,10 @@ import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { attachDashPlaybackDiagnostics } from "../lib/dash-playback-diagnostics";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
 import { installDashQualityCompat } from "../lib/dash-quality-compat";
+import type { Provider } from "../lib/provider";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
@@ -59,12 +61,17 @@ export function buildDashStreamingSettings() {
   };
 }
 
-function configureDashPlayer(player: dashjs.MediaPlayerClass, library: typeof dashjs): void {
+function configureDashPlayer(
+  player: dashjs.MediaPlayerClass,
+  library: typeof dashjs,
+  sourceProvider?: Provider,
+): void {
   installDashQualityCompat(player);
   const onDashUpdate = () => notifyDashPlayer();
   player.on(library.MediaPlayer.events.STREAM_INITIALIZED, onDashUpdate);
   player.on(library.MediaPlayer.events.TRACK_CHANGE_RENDERED, onDashUpdate);
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
+  if (sourceProvider === "bilibili") attachDashPlaybackDiagnostics(player, library);
   player.updateSettings({
     streaming: buildDashStreamingSettings(),
   });
@@ -77,7 +84,10 @@ export function ChaptersTrack({ src }: { src: string }) {
   return <Track kind="chapters" src={src} default />;
 }
 
-export function onProviderChange(provider: MediaProviderAdapter | null) {
+export function onProviderChange(
+  provider: MediaProviderAdapter | null,
+  sourceProvider?: Provider,
+): void {
   if (isHLSProvider(provider)) {
     let providerLibrary = hlsProviderLibraries.get(provider);
     if (!providerLibrary) {
@@ -114,7 +124,7 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
   }
   provider.library = loadDashLibrary;
   provider.onInstance((player) => {
-    const addAuthHeader: DashRequestInterceptor = (request) => {
+    const addAuthHeader: DashRequestInterceptor = async (request) => {
       const token = useAuthStore.getState().token;
       if (!token) return request;
       request.headers = {
@@ -125,8 +135,10 @@ export function onProviderChange(provider: MediaProviderAdapter | null) {
     };
     setDashPlayer(player);
     player.addRequestInterceptor(addAuthHeader);
-    if (dashLibrary) configureDashPlayer(player, dashLibrary);
+    if (dashLibrary) configureDashPlayer(player, dashLibrary, sourceProvider);
     else
-      void loadDashLibrary().then(({ default: library }) => configureDashPlayer(player, library));
+      void loadDashLibrary().then(({ default: library }) =>
+        configureDashPlayer(player, library, sourceProvider),
+      );
   });
 }

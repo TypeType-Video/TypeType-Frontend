@@ -2,6 +2,7 @@ import type { MutableRefObject, ReactNode } from "react";
 import { usePersistentWatchPlayer } from "../hooks/use-persistent-watch-player";
 import type { WatchAudioOnlyControls } from "../hooks/use-watch-audio-only-playback";
 import type { AutoplayState } from "../hooks/use-watch-ended-navigation";
+import { detectProvider } from "../lib/provider";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
 import type { SponsorBlockSegmentItem } from "../types/api";
@@ -133,6 +134,7 @@ export function WatchStage({
     playerKey,
     sabrRetryKey,
     manifestSrc,
+    provider: detectProvider(stream.id),
     sabrConfig,
     isLive,
     startTime,

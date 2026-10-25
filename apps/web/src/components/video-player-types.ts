@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Provider } from "../lib/provider";
 import type { SabrPlaybackRatePreference } from "../lib/sabr-playback-rate-preference";
 import type { SabrPlaybackConfig } from "../lib/sabr-source";
 import type { MediaSrc } from "../lib/vidstack";
@@ -7,6 +8,7 @@ import type { CaptionStyles } from "../types/user";
 
 export type VideoPlayerProps = {
   src: MediaSrc;
+  provider?: Provider;
   sabrConfig?: SabrPlaybackConfig | null;
   sabrRetryKey?: number;
   sabrPlaybackRatePreference?: SabrPlaybackRatePreference;
