@@ -9,23 +9,27 @@ import { sanitizeDebugText, sanitizeRequestPath } from "./debug-sanitize";
 import { API_BASE as BASE } from "./env";
 import { optionalBearer } from "./optional-bearer";
 import { finishPlaybackApiRequest, preparePlaybackApiRequest } from "./playback-trace";
+import { parseRetryAfterMs } from "./retry-after";
 import { normalizeApiPayload } from "./text-normalize";
 
 export class ApiError extends Error {
   status: number;
   code: string | null;
   requestId: string | null;
+  retryAfterMs: number | null;
   constructor(
     message: string,
     status: number,
     code: string | null = null,
     requestId: string | null = null,
+    retryAfterMs: number | null = null,
   ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.requestId = requestId;
+    this.retryAfterMs = retryAfterMs;
   }
 }
 
@@ -81,6 +85,7 @@ export function apiErrorFromResponse(response: Response, body: unknown): ApiErro
     response.status,
     toErrorCode(body),
     extractRequestId(response.headers) ?? bodyRequestId,
+    parseRetryAfterMs(response.headers.get("Retry-After")),
   );
 }
 
