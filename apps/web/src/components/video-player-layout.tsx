@@ -98,7 +98,6 @@ export function VideoPlayerLayout({
           smallLayoutWhen={false}
           translations={translations}
           slots={{
-            captionButton: null,
             currentTime: null,
             timeDivider: null,
             endTime: timePair,
@@ -127,7 +126,6 @@ export function VideoPlayerLayout({
         smallLayoutWhen={false}
         translations={translations}
         slots={{
-          captionButton: null,
           endTime: timePair,
           timeSlider,
           seekBackwardButton: backwardButton,
