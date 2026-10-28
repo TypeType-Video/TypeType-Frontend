@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
 import { buildSafeSubtitleTracks } from "../src/components/subtitle-track-utils";
+import { setTestOrigin } from "./test-origin";
 
-Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+setTestOrigin("https://typetype.test");
 
 test("uses caption variants instead of numeric duplicate language labels", () => {
   const tracks = buildSafeSubtitleTracks([

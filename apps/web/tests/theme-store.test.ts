@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { afterAll, beforeEach, describe, expect, it } from "bun:test";
 import { applyTheme } from "../src/lib/theme";
 import {
   getNextTheme,
@@ -6,6 +6,16 @@ import {
   resolveEffectiveTheme,
   useThemeStore,
 } from "../src/stores/theme-store";
+
+const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+const originalMatchMedia = Object.getOwnPropertyDescriptor(globalThis, "matchMedia");
+
+afterAll(() => {
+  if (originalDocument) Object.defineProperty(globalThis, "document", originalDocument);
+  else Reflect.deleteProperty(globalThis, "document");
+  if (originalMatchMedia) Object.defineProperty(globalThis, "matchMedia", originalMatchMedia);
+  else Reflect.deleteProperty(globalThis, "matchMedia");
+});
 
 describe("Theme system and system theme following", () => {
   const mockDataset: Record<string, string> = {};
