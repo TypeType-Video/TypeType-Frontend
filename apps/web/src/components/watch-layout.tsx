@@ -36,6 +36,8 @@ export function WatchLayout({
   navigating,
   list,
   shuffle,
+  streamLoadedAt,
+  onStreamExpired,
 }: WatchLayoutProps) {
   const isMobile = useMobile();
   const save = useSaveProgress(stream.id);
@@ -44,7 +46,10 @@ export function WatchLayout({
   const branding = useDeArrowBranding(stream.id, stream.title, stream.thumbnail, stream.duration);
   const displayStream = { ...stream, ...branding };
   const isLive = stream.streamType === "live_stream" || stream.streamType === "audio_live_stream";
-  const player = usePlayerError(stream, isLive);
+  const player = usePlayerError(stream, isLive, {
+    loadedAt: streamLoadedAt,
+    refresh: onStreamExpired,
+  });
   const { on: bulletCommentsOn } = useDanmakuStore();
   const { isNicoNico, canLoadBulletComments, bulletComments } = useWatchBulletComments(
     stream.id,

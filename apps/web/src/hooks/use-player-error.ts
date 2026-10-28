@@ -11,6 +11,7 @@ import {
   hasDirectDashPair,
   hasSabrPlayback,
 } from "../lib/stream-delivery";
+import { claimStreamRefresh, type StreamRefreshClaim } from "../lib/stream-refresh";
 import { resolveManifestSrc, shouldUseHls } from "../lib/stream-src";
 import type { MediaSrc } from "../lib/vidstack";
 import type { VideoStream } from "../types/stream";
@@ -30,7 +31,16 @@ type UsePlayerErrorReturn = {
   seekStartTime: number | null;
 };
 
-export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerErrorReturn {
+type StreamFreshness = {
+  loadedAt: number;
+  refresh: () => void;
+};
+
+export function usePlayerError(
+  stream: VideoStream,
+  isLive: boolean,
+  freshness?: StreamFreshness,
+): UsePlayerErrorReturn {
   const debugVideo = sanitizeVideoContext(stream.id) ?? "unknown";
   const provider = detectProvider(stream.id);
   const iosDevice = isIosDevice();
@@ -55,6 +65,9 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
   const [playerFailed, setPlayerFailed] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const sabrRecoveryRef = useRef(false);
+  const streamRefreshRef = useRef<StreamRefreshClaim>({ refreshedFor: null });
+  const freshnessRef = useRef(freshness);
+  freshnessRef.current = freshness;
   const offlineRecoveryRef = useRef<OfflinePlayerRecovery | null>(null);
   if (!offlineRecoveryRef.current) {
     offlineRecoveryRef.current = new OfflinePlayerRecovery();
@@ -118,6 +131,13 @@ export function usePlayerError(stream: VideoStream, isLive: boolean): UsePlayerE
       }
       setHlsFailed(true);
       setRetryKey((k) => k + 1);
+    } else if (
+      provider === "bilibili" &&
+      freshnessRef.current &&
+      claimStreamRefresh(streamRefreshRef.current, freshnessRef.current.loadedAt, Date.now())
+    ) {
+      recordClientEvent("player.bilibili_stream_refreshed", { video: debugVideo });
+      freshnessRef.current.refresh();
     } else if (provider === "bilibili" && bilibiliVariant < bilibiliVariants - 1) {
       recordClientEvent("player.bilibili_variant_failed", { video: debugVideo });
       setBilibiliVariant((variant) => variant + 1);

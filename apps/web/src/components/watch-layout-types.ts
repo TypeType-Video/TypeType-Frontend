@@ -7,4 +7,6 @@ export type WatchLayoutProps = {
   navigating: boolean;
   list?: string;
   shuffle?: string;
+  streamLoadedAt: number;
+  onStreamExpired: () => void;
 };

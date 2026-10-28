@@ -234,6 +234,8 @@ function WatchPage() {
           navigating={navigating}
           list={list}
           shuffle={shuffle}
+          streamLoadedAt={streamQuery.isPlaceholderData ? 0 : streamQuery.dataUpdatedAt}
+          onStreamExpired={() => void streamQuery.refetch()}
         />
       </Suspense>
     </BiliBiliSessionGateProvider>
