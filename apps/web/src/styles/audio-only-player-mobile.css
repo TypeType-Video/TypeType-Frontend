@@ -82,7 +82,7 @@
   }
 
   .typetype-audio-only-player .typetype-audio-time-slider-fill {
-    background: #ff174d;
+    background: var(--typetype-player-brand, #ff174d);
   }
 
   .typetype-audio-only-player .typetype-audio-time-slider-thumb {

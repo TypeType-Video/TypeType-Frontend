@@ -1,0 +1,4 @@
+html[data-player-color] {
+  --video-brand: var(--typetype-player-brand);
+  --audio-brand: var(--typetype-player-brand);
+}

@@ -21,9 +21,11 @@ import {
 } from "../lib/auth-routes";
 import { bootstrapSession } from "../lib/auth-session";
 import { isEmbeddedFrame } from "../lib/embed-access";
+import { applyPlayerColor } from "../lib/player-color";
 import { applyTheme } from "../lib/theme";
 import { m } from "../paraglide/messages.js";
 import { subscribeAuthStorage, useAuthStore } from "../stores/auth-store";
+import { usePlayerColorStore } from "../stores/player-color-store";
 import { useThemeStore } from "../stores/theme-store";
 import { useUiStore } from "../stores/ui-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
@@ -42,6 +44,7 @@ function RootLayoutContent() {
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
   const closeMobileSidebar = useUiStore((s) => s.closeMobileSidebar);
   const theme = useThemeStore((s) => s.theme);
+  const playerColor = usePlayerColorStore((s) => s.color);
   const cinemaMode = useWatchLayoutStore((s) => s.cinemaMode);
   const webFullscreen = useWatchLayoutStore((s) => s.webFullscreen);
   const { isAuthed, isAdmin, isGuest, status, authReady } = useAuth();
@@ -69,6 +72,8 @@ function RootLayoutContent() {
   }, [framedEmbedPage]);
 
   useEffect(() => subscribeAuthStorage(), []);
+
+  useEffect(() => applyPlayerColor(playerColor), [playerColor]);
 
   useEffect(() => {
     applyTheme(theme);

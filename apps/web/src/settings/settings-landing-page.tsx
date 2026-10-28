@@ -2,6 +2,7 @@ import { useSettings } from "../hooks/use-settings";
 import { m } from "../paraglide/messages.js";
 import { SettingsDiscoveryToggles } from "./settings-content-toggles";
 import { SettingsLayoutPreferences } from "./settings-layout";
+import { SettingsPlayerColor } from "./settings-player-color";
 
 function landingOptions() {
   return [
@@ -43,6 +44,7 @@ export function SettingsLandingPage() {
         </select>
       </div>
       <SettingsLayoutPreferences />
+      <SettingsPlayerColor />
       <div className="divide-y divide-border border-y border-border">
         <SettingsDiscoveryToggles />
       </div>
