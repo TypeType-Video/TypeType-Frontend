@@ -131,7 +131,7 @@ export function buildDownloadOptions(stream: VideoStream): DownloadOption[] {
     const recommendedAudio = audios.findIndex(
       (audio) => (audio.bitrate ?? 0) >= 160 && (audio.bitrate ?? 0) < 256,
     );
-    const index = recommendedAudio >= 0 ? recommendedAudio : 0;
+    const index = Math.max(recommendedAudio, 0);
     audios[index] = { ...audios[index], recommended: true };
   }
 
