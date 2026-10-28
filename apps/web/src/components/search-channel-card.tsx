@@ -6,6 +6,7 @@ import type { ChannelResultItem } from "../types/api";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
 import { ChannelRouteLink } from "./channel-route-link";
+import { ChannelVerificationBadge } from "./channel-verification-badge";
 
 type Props = {
   channel: ChannelResultItem;
@@ -37,9 +38,12 @@ export function SearchChannelCard({ channel }: Props) {
             <span className="truncate text-sm font-semibold text-fg transition-colors group-hover:text-accent sm:text-base">
               {channel.name}
             </span>
-            {channel.isVerified && (
-              <BadgeCheck className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-            )}
+            {channel.isVerified &&
+              (channel.verification ? (
+                <ChannelVerificationBadge verification={channel.verification} />
+              ) : (
+                <BadgeCheck className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              ))}
           </div>
           {metadata && <p className="mt-1 truncate text-xs text-fg-muted">{metadata}</p>}
           {channel.description && (

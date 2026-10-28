@@ -97,6 +97,7 @@ export type ChannelResultItem = {
   subscriberCount: number;
   streamCount: number;
   isVerified: boolean;
+  verification?: ChannelVerification | null;
 };
 
 export type SearchPageResponse = {
@@ -181,6 +182,8 @@ export type BulletCommentsPageResponse = {
   nextpage: string | null;
 };
 
+export type ChannelVerification = "personal" | "organization";
+
 export type ChannelResponse = {
   name: string;
   description: string;
@@ -190,6 +193,7 @@ export type ChannelResponse = {
   isVerified: boolean;
   videos: VideoItem[];
   nextpage: string | null;
+  verification?: ChannelVerification | null;
 };
 
 export type PodcastItem = {

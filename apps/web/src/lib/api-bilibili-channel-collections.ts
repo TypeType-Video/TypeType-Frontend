@@ -1,5 +1,6 @@
-import type { VideoItem } from "../types/api";
+import type { ChannelVerification, VideoItem } from "../types/api";
 import { request } from "./api";
+import { bilibiliVerification } from "./bilibili-verification";
 import { API_BASE as BASE } from "./env";
 import { proxyImage } from "./proxy";
 
@@ -57,6 +58,7 @@ export async function fetchBilibiliChannelMeta(mid: string): Promise<{
   bannerUrl: string;
   subscriberCount: number;
   isVerified: boolean;
+  verification: ChannelVerification | null;
 } | null> {
   if (!mid) return null;
   try {
@@ -70,14 +72,15 @@ export async function fetchBilibiliChannelMeta(mid: string): Promise<{
     const rawBanner = res.data?.space?.l_img || res.data?.space?.s_img || "";
     const bannerUrl = rawBanner ? proxyImage(rawBanner) : "";
     const subscriberCount = typeof card.fans === "number" ? card.fans : 0;
-    const isVerified = Boolean(card.official_verify && card.official_verify.type !== -1);
+    const verification = bilibiliVerification(card.official_verify?.type);
     return {
       name,
       description,
       avatarUrl,
       bannerUrl,
       subscriberCount,
-      isVerified,
+      isVerified: verification !== null,
+      verification,
     };
   } catch {
     return null;

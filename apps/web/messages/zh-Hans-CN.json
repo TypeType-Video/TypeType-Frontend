@@ -1394,6 +1394,8 @@
   "ui_users_with_admin_managed_access_appear_here_search_to_configure_anoth": "Users with admin-managed access appear here. Search to configure another account.",
   "ui_using_cached_file": "Using the cached file.",
   "ui_verified": "Verified",
+  "ui_verified_organization": "机构认证",
+  "ui_verified_personal": "个人认证",
   "ui_versions": "版本",
   "ui_video": "video",
   "ui_video_count": "{count} 个视频",

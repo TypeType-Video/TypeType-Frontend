@@ -10,6 +10,7 @@ import { buildChannelRequestUrl } from "../lib/channel-search-url";
 import { mapVideoItem } from "../lib/mappers";
 import { detectProvider } from "../lib/provider";
 import { proxyImage } from "../lib/proxy";
+import type { ChannelVerification } from "../types/api";
 import type { VideoStream } from "../types/stream";
 
 type ChannelMeta = {
@@ -19,6 +20,7 @@ type ChannelMeta = {
   bannerUrl: string;
   subscriberCount: number;
   isVerified: boolean;
+  verification: ChannelVerification | null;
 };
 
 type ChannelPage = {
@@ -73,6 +75,7 @@ export function useChannel(
               bannerUrl: proxyImage(res.bannerUrl),
               subscriberCount: res.subscriberCount,
               isVerified: res.isVerified,
+              verification: res.verification ?? null,
             }
           : null,
         videos: res.videos.map(mapVideoItem),

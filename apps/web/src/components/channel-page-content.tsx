@@ -138,6 +138,7 @@ export function ChannelPageContent({ sourceUrl, sort, searchQuery, tab, onNaviga
           bannerUrl={meta.bannerUrl}
           subscriberCount={meta.subscriberCount}
           isVerified={meta.isVerified}
+          verification={meta.verification}
           subscribed={subscribed}
           onSubscribe={handleSubscribe}
         />

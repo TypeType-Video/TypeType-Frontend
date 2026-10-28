@@ -883,6 +883,8 @@
   "ui_user_playlists": "Wiedergabelisten des Benutzers",
   "ui_users_with_admin_managed_access_appear_here_search_to_configure_anoth": "Hier werden Benutzer mit vom Administrator verwaltetem Zugriff angezeigt. Suche nach einem weiteren Benutzer, um ein weiteres Konto zu konfigurieren.",
   "ui_verified": "Verifiziert",
+  "ui_verified_organization": "Verifizierte Organisation",
+  "ui_verified_personal": "Verifizierter Creator",
   "ui_versions": "Versionen",
   "ui_video": "Video",
   "ui_videos": "Videos",
