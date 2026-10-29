@@ -26,7 +26,11 @@ function isSupportedHost(host: string): boolean {
   return false;
 }
 
+const NICONICO_VIDEO_ID = /^(sm|nm|so)\d{1,12}$/i;
+
 export function toDirectWatchUrl(value: string): string | null {
+  const id = value.trim();
+  if (NICONICO_VIDEO_ID.test(id)) return `https://www.nicovideo.jp/watch/${id.toLowerCase()}`;
   const parsed = parseUrl(value);
   if (!parsed) return null;
   const host = parsed.hostname.toLowerCase();
