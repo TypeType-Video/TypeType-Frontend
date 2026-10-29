@@ -1857,5 +1857,14 @@
   "device_link_error": "Something went wrong. Try again.",
   "device_link_try_another": "Enter another code",
   "admin_device_login_label": "QR code sign-in for TVs",
-  "admin_device_login_description": "Let TypeType TV sign in by scanning a QR code and confirming on a signed-in phone."
+  "admin_device_login_description": "Let TypeType TV sign in by scanning a QR code and confirming on a signed-in phone.",
+  "settings_bilibili_buffer_label": "BiliBili buffer",
+  "settings_bilibili_buffer_description": "How far ahead BiliBili videos load. It grows with the playback speed, so fast playback stays smooth.",
+  "settings_bilibili_buffer_saver": "Saver",
+  "settings_bilibili_buffer_normal": "Normal",
+  "settings_bilibili_buffer_large": "Large",
+  "settings_bilibili_buffer_saver_hint": "Less data on slow or limited connections",
+  "settings_bilibili_buffer_normal_hint": "Recommended",
+  "settings_bilibili_buffer_large_hint": "Smoothest when the connection to BiliBili is unstable",
+  "settings_bilibili_buffer_seconds": "{seconds} s at 1×"
 }

@@ -1857,5 +1857,14 @@
   "device_link_error": "Une erreur est survenue. Réessaie.",
   "device_link_try_another": "Saisir un autre code",
   "admin_device_login_label": "Connexion des TV par QR code",
-  "admin_device_login_description": "Permet à TypeType TV de se connecter en scannant un QR code puis en confirmant sur un téléphone connecté."
+  "admin_device_login_description": "Permet à TypeType TV de se connecter en scannant un QR code puis en confirmant sur un téléphone connecté.",
+  "settings_bilibili_buffer_label": "Mémoire tampon BiliBili",
+  "settings_bilibili_buffer_description": "Jusqu’où les vidéos BiliBili se chargent à l’avance. Elle augmente avec la vitesse de lecture, pour que la lecture rapide reste fluide.",
+  "settings_bilibili_buffer_saver": "Économe",
+  "settings_bilibili_buffer_normal": "Normal",
+  "settings_bilibili_buffer_large": "Large",
+  "settings_bilibili_buffer_saver_hint": "Moins de données sur une connexion lente ou limitée",
+  "settings_bilibili_buffer_normal_hint": "Recommandé",
+  "settings_bilibili_buffer_large_hint": "Le plus fluide quand la connexion à BiliBili est instable",
+  "settings_bilibili_buffer_seconds": "{seconds} s à 1×"
 }

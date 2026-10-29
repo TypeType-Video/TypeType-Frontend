@@ -1857,5 +1857,14 @@
   "device_link_error": "出现问题，请重试。",
   "device_link_try_another": "输入其他代码",
   "admin_device_login_label": "电视二维码登录",
-  "admin_device_login_description": "允许 TypeType TV 通过扫描二维码并在已登录的手机上确认来登录。"
+  "admin_device_login_description": "允许 TypeType TV 通过扫描二维码并在已登录的手机上确认来登录。",
+  "settings_bilibili_buffer_label": "哔哩哔哩缓冲",
+  "settings_bilibili_buffer_description": "哔哩哔哩视频提前加载的长度。会随播放速度增加，让快速播放保持流畅。",
+  "settings_bilibili_buffer_saver": "省流",
+  "settings_bilibili_buffer_normal": "标准",
+  "settings_bilibili_buffer_large": "大",
+  "settings_bilibili_buffer_saver_hint": "在慢速或流量受限的网络下更省流量",
+  "settings_bilibili_buffer_normal_hint": "推荐",
+  "settings_bilibili_buffer_large_hint": "与哔哩哔哩连接不稳定时最流畅",
+  "settings_bilibili_buffer_seconds": "1× 时 {seconds} 秒"
 }
