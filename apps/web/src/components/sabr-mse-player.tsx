@@ -25,7 +25,7 @@ import {
   captureSabrVideoHandoffCleanupPosition as captureCleanupPosition,
   registerSabrVideoHandoffPositionCapture as registerPosition,
 } from "../lib/sabr-video-handoff-events";
-import { registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
+import { followSabrEngineSeeks, registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
 import { useAuthStore } from "../stores/auth-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
 export function SabrMsePlayer({
@@ -121,6 +121,7 @@ export function SabrMsePlayer({
         playbackRate,
       );
     const offPosition = registerPosition(video, videoHandoffRef.current, config.videoId);
+    const offSeekTargets = followSabrEngineSeeks(video, engine);
     const playEngine = () => engine.play().then(settlePlaybackRate);
     playbackRate.initialize(video);
     const unregisterNativePause = sabrNativePause.registerSabrNativePause(
@@ -196,6 +197,7 @@ export function SabrMsePlayer({
     });
     latestHandlers().onPositionReaderChange(() => positionMs(video));
     return () => {
+      offSeekTargets();
       captureCleanupPosition(video, videoHandoffRef.current, config.videoId);
       stopPlaybackTrace();
       unguardAutoplay();

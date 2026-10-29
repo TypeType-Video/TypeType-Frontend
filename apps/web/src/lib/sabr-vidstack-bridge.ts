@@ -1,3 +1,5 @@
+import type { TypeTypeMsePlayer } from "@typetype/mse";
+
 export type SabrVidstackControls = {
   play: () => Promise<void>;
   pause: (userInitiated?: boolean) => void;
@@ -9,6 +11,30 @@ export type SabrVidstackControls = {
 const controlsByVideo = new WeakMap<HTMLVideoElement, SabrVidstackControls>();
 const pendingPlaybackByVideo = new WeakMap<HTMLVideoElement, boolean>();
 const pendingSeekTargetByVideo = new WeakMap<HTMLVideoElement, number>();
+const seekTargetListeners = new WeakMap<HTMLVideoElement, Set<(seconds: number) => void>>();
+
+export function subscribeSabrSeekTarget(
+  video: HTMLVideoElement,
+  listener: (seconds: number) => void,
+): () => void {
+  const listeners = seekTargetListeners.get(video) ?? new Set();
+  listeners.add(listener);
+  seekTargetListeners.set(video, listeners);
+  return () => listeners.delete(listener);
+}
+
+function announceSabrSeekTarget(video: HTMLVideoElement, seconds: number): void {
+  for (const listener of seekTargetListeners.get(video) ?? []) listener(seconds);
+}
+
+export function followSabrEngineSeeks(
+  video: HTMLVideoElement,
+  engine: TypeTypeMsePlayer,
+): () => void {
+  return engine.on("seek", (event) => {
+    if (event.type === "seek") announceSabrSeekTarget(video, event.positionMs / 1000);
+  });
+}
 
 export function registerSabrVidstackControls(
   video: HTMLVideoElement,
@@ -41,6 +67,7 @@ export function requestSabrSeek(video: HTMLVideoElement, seconds: number): boole
   if (!controls || !Number.isFinite(seconds)) return false;
   const target = Math.max(0, seconds);
   pendingSeekTargetByVideo.set(video, target);
+  announceSabrSeekTarget(video, target);
   try {
     controls.seek(target);
   } catch (error) {

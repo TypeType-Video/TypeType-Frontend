@@ -30,6 +30,18 @@ export function secondsFromMediaSliderPercent(
   return secondsFromSliderPercent(media.duration, percent);
 }
 
+export function percentFromMediaSeconds(
+  media: Pick<HTMLMediaElement, "duration" | "seekable">,
+  seconds: number,
+): number | null {
+  if (!Number.isFinite(seconds)) return null;
+  const ranges = media.seekable;
+  const start = ranges.length > 0 ? ranges.start(0) : 0;
+  const end = ranges.length > 0 ? ranges.end(ranges.length - 1) : media.duration;
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+  return Math.max(0, Math.min(100, ((seconds - start) / (end - start)) * 100));
+}
+
 export function runSabrSeek(
   player: TypeTypeMsePlayer | null,
   position: number,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { secondsFromSliderPercent } from "../lib/sabr-player-seek";
+import { useSabrSeekTarget } from "../hooks/use-sabr-seek-target";
+import { percentFromMediaSeconds, secondsFromSliderPercent } from "../lib/sabr-player-seek";
 import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { TimeSlider, useMediaRemote, useMediaState } from "../lib/vidstack";
 
@@ -9,11 +10,15 @@ type Props = {
 };
 
 export function AudioTimeSlider({ seeking = false, video = null }: Props) {
-  const [seekTarget, setSeekTarget] = useState<number | null>(null);
+  const [dragTarget, setDragTarget] = useState<number | null>(null);
+  const sabrTarget = useSabrSeekTarget(video, seeking);
+  const seekTarget =
+    dragTarget ??
+    (video && sabrTarget !== null ? percentFromMediaSeconds(video, sabrTarget) : null);
   const remote = useMediaRemote();
   const mediaDuration = useMediaState("duration");
   useEffect(() => {
-    if (!seeking) setSeekTarget(null);
+    if (!seeking) setDragTarget(null);
   }, [seeking]);
   const style = seekTarget === null ? undefined : { "--typetype-seek-target": `${seekTarget}%` };
 
@@ -23,9 +28,9 @@ export function AudioTimeSlider({ seeking = false, video = null }: Props) {
       style={style}
       aria-busy={seeking}
       orientation="horizontal"
-      data-seeking={seeking ? "true" : undefined}
+      data-seeking={seeking || seekTarget !== null ? "true" : undefined}
       onDragEnd={(percent) => {
-        setSeekTarget(percent);
+        setDragTarget(percent);
         const seconds = secondsFromSliderPercent(video?.duration ?? mediaDuration, percent);
         if (seconds === null) return;
         if (video && requestSabrSeek(video, seconds)) return;
