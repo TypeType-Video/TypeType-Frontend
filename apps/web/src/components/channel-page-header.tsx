@@ -1,7 +1,9 @@
 import { formatSubscribers } from "../lib/format";
 import { m } from "../paraglide/messages.js";
+import type { ChannelVerification } from "../types/api";
 import { AllowChannelButton } from "./allow-channel-button";
 import { ChannelAvatar } from "./channel-avatar";
+import { ChannelVerificationBadge } from "./channel-verification-badge";
 import { RssShortcut } from "./rss-shortcut";
 import { VerifiedBadgeIcon } from "./watch-icons";
 
@@ -12,6 +14,7 @@ type Props = {
   bannerUrl: string;
   subscriberCount: number;
   isVerified: boolean;
+  verification?: ChannelVerification | null;
   subscribed: boolean;
   onSubscribe: () => void;
 };
@@ -23,6 +26,7 @@ export function ChannelPageHeader({
   bannerUrl,
   subscriberCount,
   isVerified,
+  verification,
   subscribed,
   onSubscribe,
 }: Props) {
@@ -35,7 +39,12 @@ export function ChannelPageHeader({
           <div className="flex flex-col">
             <h1 className="flex items-center gap-1.5 text-lg font-semibold text-fg">
               {name}
-              {isVerified && <VerifiedBadgeIcon />}
+              {isVerified &&
+                (verification ? (
+                  <ChannelVerificationBadge verification={verification} />
+                ) : (
+                  <VerifiedBadgeIcon />
+                ))}
             </h1>
             <p className="text-sm text-fg-soft">{formatSubscribers(subscriberCount)}</p>
           </div>

@@ -42,7 +42,11 @@
 
 .typetype-player-mode-control-progress {
   height: 4px;
-  background: linear-gradient(90deg, #ff174d 0 38%, rgb(255 255 255 / 0.15) 38% 100%);
+  background: linear-gradient(
+    90deg,
+    var(--typetype-player-brand, #ff174d) 0 38%,
+    rgb(255 255 255 / 0.15) 38% 100%
+  );
 }
 
 .typetype-player-mode-control-row {

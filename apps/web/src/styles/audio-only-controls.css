@@ -46,7 +46,7 @@
 
 .typetype-audio-only-player .typetype-audio-time-slider-fill {
   width: var(--slider-fill, 0%);
-  background: #ff174d;
+  background: var(--typetype-player-brand, #ff174d);
 }
 
 .typetype-audio-only-player .typetype-audio-time-slider-thumb {
@@ -57,7 +57,7 @@
   height: 14px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  background: #ff174d;
+  background: var(--typetype-player-brand, #ff174d);
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
   opacity: 1;
   transition: opacity 120ms ease;

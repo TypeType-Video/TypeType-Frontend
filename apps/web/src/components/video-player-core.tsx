@@ -2,6 +2,7 @@ import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
 import { recordClientEvent } from "../lib/client-debug-log";
+import { attachBilibiliSeekBuffer } from "../lib/dash-bilibili-seek-buffer";
 import { attachDashPlaybackDiagnostics } from "../lib/dash-playback-diagnostics";
 import { notifyDashPlayer, setDashPlayer } from "../lib/dash-player-store";
 import { installDashQualityCompat } from "../lib/dash-quality-compat";
@@ -44,15 +45,23 @@ const STREAMING_BUFFER_POLICY = {
   backBufferMs: 20_000,
 } as const;
 
-export function buildDashStreamingSettings() {
-  const dashSettings = createDashSettings(STREAMING_BUFFER_POLICY);
+const BILIBILI_BUFFER_POLICY = {
+  steadyBufferMs: 6_000,
+  maxBufferMs: 8_000,
+  backBufferMs: STREAMING_BUFFER_POLICY.backBufferMs,
+} as const;
+
+export function buildDashStreamingSettings(sourceProvider?: Provider) {
+  const isBilibili = sourceProvider === "bilibili";
+  const bufferPolicy = isBilibili ? BILIBILI_BUFFER_POLICY : STREAMING_BUFFER_POLICY;
+  const dashSettings = createDashSettings(bufferPolicy);
   return {
     ...dashSettings,
     buffer: {
       ...dashSettings.buffer,
-      bufferTimeDefault: 24,
-      bufferTimeAtTopQuality: 36,
-      bufferTimeAtTopQualityLongForm: 60,
+      bufferTimeDefault: isBilibili ? 4 : 24,
+      bufferTimeAtTopQuality: isBilibili ? 6 : 36,
+      bufferTimeAtTopQualityLongForm: isBilibili ? 8 : 60,
     },
     gaps: {
       enableStallFix: true,
@@ -73,8 +82,9 @@ function configureDashPlayer(
   player.on(library.MediaPlayer.events.QUALITY_CHANGE_RENDERED, onDashUpdate);
   if (sourceProvider === "bilibili") attachDashPlaybackDiagnostics(player, library);
   player.updateSettings({
-    streaming: buildDashStreamingSettings(),
+    streaming: buildDashStreamingSettings(sourceProvider),
   });
+  if (sourceProvider === "bilibili") attachBilibiliSeekBuffer(player);
   notifyDashPlayer();
 }
 

@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { bilibiliVariantCount, buildBilibiliDashManifest } from "../src/lib/bilibili-manifest";
 import type { AudioStreamItem, VideoStreamItem } from "../src/types/api";
+import { setTestOrigin } from "./test-origin";
 
 const video = {
   url: "https://example.com/video.m4s",
@@ -41,7 +42,7 @@ const audio = {
 } satisfies AudioStreamItem;
 
 test("describes BiliBili initialization and index byte ranges", () => {
-  Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+  setTestOrigin("https://typetype.test");
   const source = buildBilibiliDashManifest([video], [audio], 179);
   expect(source).not.toBeNull();
   const xml = atob(source?.split(",")[1] ?? "");
@@ -52,7 +53,7 @@ test("describes BiliBili initialization and index byte ranges", () => {
 });
 
 test("keeps the audio bandwidth in bits per second", () => {
-  Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+  setTestOrigin("https://typetype.test");
   const source = buildBilibiliDashManifest(
     [video],
     [{ ...audio, bitrate: 64762, url: "https://example.com/audio.m4s?bw=66923" }],
@@ -65,7 +66,7 @@ test("keeps the audio bandwidth in bits per second", () => {
 });
 
 test("includes all available video resolutions in descending order in a single AdaptationSet", () => {
-  Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+  setTestOrigin("https://typetype.test");
   const video1080: VideoStreamItem = {
     ...video,
     resolution: "1080P",
@@ -146,7 +147,7 @@ test("counts resolution fallback variants per codec group", () => {
 });
 
 test("falls back to lower resolutions when variant increments", () => {
-  Object.assign(globalThis, { window: { location: { origin: "https://typetype.test" } } });
+  setTestOrigin("https://typetype.test");
   const video1080: VideoStreamItem = {
     ...video,
     resolution: "1080P",

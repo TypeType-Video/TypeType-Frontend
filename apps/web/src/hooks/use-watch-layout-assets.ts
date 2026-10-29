@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { buildChaptersVtt, buildSponsorBlockChaptersVtt } from "../lib/chapters-vtt";
 import { proxyUrl } from "../lib/proxy";
 import { buildThumbnailVtt } from "../lib/thumbnail-vtt";
@@ -28,65 +28,41 @@ function sponsorBlockSegmentsKey(segments: SponsorBlockSegmentItem[] | undefined
     .join("|");
 }
 
+function useKeyedObjectUrl(key: string, build: () => string | null): string | null {
+  const asset = useRef<{ key: string; url: string | null } | null>(null);
+  if (asset.current?.key !== key) asset.current = { key, url: build() };
+  const url = asset.current.url;
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
+  return url;
+}
+
 export function useWatchVttAssets(
   stream: VideoStream,
   sponsorBlockSegments: SponsorBlockSegmentItem[] | undefined,
   showSponsorBlockChapters: boolean,
 ) {
-  const [thumbnailVtt, setThumbnailVtt] = useState<string | null>(null);
-  const [chaptersVtt, setChaptersVtt] = useState<string | null>(null);
-  const thumbnailAssetRef = useRef<{ key: string; vtt: string | null }>({ key: "", vtt: null });
-  const chaptersAssetRef = useRef<{ key: string; vtt: string | null }>({ key: "", vtt: null });
   const thumbnailKey = `${stream.duration}:${previewFramesKey(stream)}`;
-  const chaptersKey = streamSegmentsKey(stream);
-  const sponsorChaptersKey = sponsorBlockSegmentsKey(sponsorBlockSegments);
-
-  useEffect(() => {
-    if (thumbnailAssetRef.current.key === thumbnailKey) return;
-    const previousVtt = thumbnailAssetRef.current.vtt;
-    if (!stream.previewFrames) {
-      thumbnailAssetRef.current = { key: thumbnailKey, vtt: null };
-      setThumbnailVtt(null);
-      if (previousVtt) URL.revokeObjectURL(previousVtt);
-      return;
-    }
-    const proxied = stream.previewFrames.map((frame) => ({
-      ...frame,
-      urls: frame.urls.map(proxyUrl),
-    }));
-    const vtt = buildThumbnailVtt(proxied, stream.duration);
-    thumbnailAssetRef.current = { key: thumbnailKey, vtt };
-    setThumbnailVtt(vtt);
-    if (previousVtt) URL.revokeObjectURL(previousVtt);
-  }, [stream.previewFrames, stream.duration, thumbnailKey]);
-
-  useEffect(() => {
-    const key = `${showSponsorBlockChapters}:${stream.duration}:${chaptersKey}:${sponsorChaptersKey}`;
-    if (chaptersAssetRef.current.key === key) return;
-    const vtt = stream.streamSegments
+  const chaptersKey = `${showSponsorBlockChapters}:${stream.duration}:${streamSegmentsKey(stream)}:${sponsorBlockSegmentsKey(sponsorBlockSegments)}`;
+  const thumbnailVtt = useKeyedObjectUrl(thumbnailKey, () =>
+    stream.previewFrames
+      ? buildThumbnailVtt(
+          stream.previewFrames.map((frame) => ({ ...frame, urls: frame.urls.map(proxyUrl) })),
+          stream.duration,
+        )
+      : null,
+  );
+  const chaptersVtt = useKeyedObjectUrl(chaptersKey, () =>
+    stream.streamSegments
       ? buildChaptersVtt(stream.streamSegments, stream.duration)
       : showSponsorBlockChapters
         ? buildSponsorBlockChaptersVtt(sponsorBlockSegments ?? [], stream.duration)
-        : null;
-    const previousVtt = chaptersAssetRef.current.vtt;
-    chaptersAssetRef.current = { key, vtt };
-    setChaptersVtt(vtt);
-    if (previousVtt) URL.revokeObjectURL(previousVtt);
-  }, [
-    chaptersKey,
-    stream.duration,
-    stream.streamSegments,
-    sponsorBlockSegments,
-    sponsorChaptersKey,
-    showSponsorBlockChapters,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      if (thumbnailAssetRef.current.vtt) URL.revokeObjectURL(thumbnailAssetRef.current.vtt);
-      if (chaptersAssetRef.current.vtt) URL.revokeObjectURL(chaptersAssetRef.current.vtt);
-    };
-  }, []);
+        : null,
+  );
 
   return {
     thumbnailVtt: thumbnailVtt ?? undefined,

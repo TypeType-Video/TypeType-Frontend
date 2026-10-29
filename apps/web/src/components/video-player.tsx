@@ -118,7 +118,7 @@ export function VideoPlayer({
         className={mediaClassName ?? "h-full w-full"}
         mediaProps={mediaClassName ? { className: mediaClassName } : undefined}
       >
-        {!audioOnly && <VideoPlayerTracks subtitles={subtitles} chaptersVtt={chaptersVtt} />}
+        <VideoPlayerTracks subtitles={subtitles} chaptersVtt={chaptersVtt} />
       </MediaProvider>
       {sabrConfig && (
         <SabrMsePlayer
