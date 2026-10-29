@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 import type * as dashjs from "dashjs";
 import { selectDashTrack } from "../src/lib/dash-video";
 
-test("selects DASH quality by relative representation index", () => {
+test("selects DASH quality by relative index without forcing a buffer replacement", () => {
   const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   const updateSettings = mock(() => undefined);
   const setRepresentation = mock(() => undefined);
@@ -41,6 +41,6 @@ test("selects DASH quality by relative representation index", () => {
     streaming: { abr: { autoSwitchBitrate: { video: false } } },
   });
   expect(setRepresentation).toHaveBeenCalledTimes(2);
-  expect(setRepresentation).toHaveBeenNthCalledWith(1, "video", 2, true);
-  expect(setRepresentation).toHaveBeenNthCalledWith(2, "video", 2, true);
+  expect(setRepresentation).toHaveBeenNthCalledWith(1, "video", 2);
+  expect(setRepresentation).toHaveBeenNthCalledWith(2, "video", 2);
 });
