@@ -10,7 +10,7 @@ describe("HLS buffer policy", () => {
       capLevelToPlayerSize: true,
       liveMaxLatencyDuration: 15,
       liveSyncDuration: 5,
-      progressive: true,
+      progressive: false,
       startFragPrefetch: true,
       startLevel: 0,
       maxBufferLength: 24,
