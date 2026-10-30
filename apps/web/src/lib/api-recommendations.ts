@@ -1,9 +1,8 @@
 import { getLocale } from "../paraglide/runtime.js";
 import type { HomeRecommendationsResponse } from "../types/api";
-import { request } from "./api";
 import { clientTimezone } from "./client-timezone";
 import { API_BASE as BASE } from "./env";
-import { optionalBearer } from "./optional-bearer";
+import { requestWithSession } from "./session-request";
 
 export type RecommendationIntent = "quick" | "deep" | "auto";
 
@@ -21,7 +20,7 @@ export async function fetchHomeRecommendations(
     timezone: clientTimezone(),
   });
   if (cursor) search.set("cursor", cursor);
-  return request(`${BASE}/recommendations/home?${search.toString()}`, optionalBearer());
+  return requestWithSession(`${BASE}/recommendations/home?${search.toString()}`);
 }
 
 export async function fetchShortsRecommendations(
@@ -36,5 +35,5 @@ export async function fetchShortsRecommendations(
     intent,
   });
   if (cursor) search.set("cursor", cursor);
-  return request(`${BASE}/recommendations/shorts?${search.toString()}`, optionalBearer());
+  return requestWithSession(`${BASE}/recommendations/shorts?${search.toString()}`);
 }

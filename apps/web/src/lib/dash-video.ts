@@ -73,7 +73,8 @@ function applyDashHeight(player: dashjs.MediaPlayerClass, height: number): void 
       },
     },
   });
-  player.setRepresentationForTypeByIndex("video", representationIndex, true);
+  // A forced replacement switch turns dash.js gap jumping off until the next track change, so one buffer hole stalls playback forever.
+  player.setRepresentationForTypeByIndex("video", representationIndex);
 }
 
 export function selectDashTrack(

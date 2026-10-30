@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { secondsFromMediaSliderPercent } from "../lib/sabr-player-seek";
+import { useSabrSeekTarget } from "../hooks/use-sabr-seek-target";
+import { percentFromMediaSeconds, secondsFromMediaSliderPercent } from "../lib/sabr-player-seek";
 import { requestSabrSeek } from "../lib/sabr-vidstack-bridge";
 import { TimeSlider } from "../lib/vidstack";
 import { m } from "../paraglide/messages.js";
@@ -11,10 +11,9 @@ type Props = {
 };
 
 export function SabrTimeSlider({ seeking = false, thumbnails, video }: Props) {
-  const [seekTarget, setSeekTarget] = useState<number | null>(null);
-  useEffect(() => {
-    if (!seeking) setSeekTarget(null);
-  }, [seeking]);
+  const targetSeconds = useSabrSeekTarget(video, seeking);
+  const seekTarget =
+    video && targetSeconds !== null ? percentFromMediaSeconds(video, targetSeconds) : null;
   const style = seekTarget === null ? undefined : { "--typetype-seek-target": `${seekTarget}%` };
 
   return (
@@ -24,9 +23,8 @@ export function SabrTimeSlider({ seeking = false, thumbnails, video }: Props) {
       aria-label={m.ui_seek()}
       aria-busy={seeking}
       orientation="horizontal"
-      data-seeking={seeking ? "true" : undefined}
+      data-seeking={seeking || seekTarget !== null ? "true" : undefined}
       onDragEnd={(percent) => {
-        setSeekTarget(percent);
         const seconds = video ? secondsFromMediaSliderPercent(video, percent) : null;
         if (video && seconds !== null) requestSabrSeek(video, seconds);
       }}

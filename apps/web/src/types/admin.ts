@@ -25,6 +25,7 @@ export type AdminSettings = {
   recommenderAllowedAlgorithms?: string[];
   recommenderTimeoutMs?: number;
   recommenderStreamRequestsPerMinute?: number;
+  deviceLoginEnabled?: boolean;
 };
 
 type AdminSessionNowPlaying = {

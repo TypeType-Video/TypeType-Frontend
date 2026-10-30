@@ -1,6 +1,6 @@
-import { useAuthStore } from "../stores/auth-store";
-import { ApiError, request } from "./api";
+import { ApiError } from "./api";
 import { API_BASE as BASE, toApiUrl } from "./env";
+import { requestWithSession } from "./session-request";
 import type { MediaSrc } from "./vidstack";
 
 export type AudioOnlyResponse = {
@@ -13,15 +13,6 @@ export type AudioOnlyResponse = {
   duration: number | null;
 };
 
-function audioOnlyInit(): RequestInit {
-  const token = useAuthStore.getState().token;
-  if (!token) return { cache: "no-store" };
-  return {
-    cache: "no-store",
-    headers: { Authorization: `Bearer ${token}` },
-  };
-}
-
 export function fetchAudioOnlyStream(
   url: string,
   preferOriginal: boolean,
@@ -32,7 +23,9 @@ export function fetchAudioOnlyStream(
     preferOriginal: String(preferOriginal),
     preferredLocale,
   });
-  return request<AudioOnlyResponse>(`${BASE}/streams/audio-only?${params}`, audioOnlyInit());
+  return requestWithSession<AudioOnlyResponse>(`${BASE}/streams/audio-only?${params}`, {
+    cache: "no-store",
+  });
 }
 
 export function toAudioOnlyMediaSrc(response: AudioOnlyResponse): MediaSrc | null {

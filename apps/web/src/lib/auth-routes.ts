@@ -11,9 +11,11 @@ export type RedirectTarget =
   | "/subscriptions/groups"
   | "/youtube-session"
   | `/youtube-session?returnTo=${string}`
-  | `/shorts?v=${string}`;
+  | `/shorts?v=${string}`
+  | `/link?code=${string}`;
 
 const SHORTS_REDIRECT_PREFIX = "/shorts?v=";
+const DEVICE_LINK_REDIRECT = /^\/link\?code=[A-Za-z0-9-]{1,16}$/;
 
 const PROTECTED_PREFIXES = [
   "/import",
@@ -55,6 +57,7 @@ export function shouldEnforceBootstrapRegistration(pathname: string): boolean {
 export function sanitizeRedirect(value: string | undefined): RedirectTarget {
   if (!value) return "/";
   if (value.startsWith(SHORTS_REDIRECT_PREFIX)) return value as `/shorts?v=${string}`;
+  if (DEVICE_LINK_REDIRECT.test(value)) return value as `/link?code=${string}`;
   if (value.startsWith("/youtube-session?returnTo=")) {
     return value as `/youtube-session?returnTo=${string}`;
   }

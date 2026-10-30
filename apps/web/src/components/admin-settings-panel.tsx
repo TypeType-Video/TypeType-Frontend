@@ -115,6 +115,12 @@ export function AdminSettingsPanel({ settings, pending, onSave }: Props) {
             onChange={(value) => patch("oidcAutoRedirect", value)}
           />
           <AdminToggleRow
+            label={m.admin_device_login_label()}
+            description={m.admin_device_login_description()}
+            checked={draft.deviceLoginEnabled ?? true}
+            onChange={(value) => patch("deviceLoginEnabled", value)}
+          />
+          <AdminToggleRow
             label={m.admin_track_sessions_label()}
             description={m.admin_track_sessions_description()}
             checked={draft.activeSessionsEnabled}

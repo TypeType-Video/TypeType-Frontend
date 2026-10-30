@@ -4,17 +4,13 @@ import { ApiError, request } from "./api";
 import { recordClientEvent } from "./client-debug-log";
 import { sanitizeVideoContext } from "./debug-sanitize";
 import { beginPlaybackTrace } from "./playback-trace";
+import { requestWithSession } from "./session-request";
 import { sabrBootstrapEndpoint, streamEndpoint } from "./stream-request";
 
 type StreamFetchMode = "anonymous_first" | "authenticated_first";
 
-function streamInit(token: string | null, signal?: AbortSignal): RequestInit {
-  if (!token) return { cache: "no-store", signal };
-  return {
-    cache: "no-store",
-    headers: { Authorization: `Bearer ${token}` },
-    signal,
-  };
+function streamInit(signal?: AbortSignal): RequestInit {
+  return { cache: "no-store", signal };
 }
 
 export async function fetchStream(
@@ -50,7 +46,7 @@ async function fetchStreamEndpoint(
   if (token && mode === "authenticated_first") {
     recordClientEvent("stream.fetch_start", { authed: true, video });
     try {
-      const result = await request<StreamResponse>(endpoint, streamInit(token, signal));
+      const result = await requestWithSession<StreamResponse>(endpoint, streamInit(signal));
       recordClientEvent("stream.fetch_success", {
         authed: true,
         video,
@@ -65,7 +61,7 @@ async function fetchStreamEndpoint(
   }
   recordClientEvent("stream.fetch_start", { authed: false, video });
   try {
-    const result = await request<StreamResponse>(endpoint, streamInit(null, signal));
+    const result = await request<StreamResponse>(endpoint, streamInit(signal));
     recordClientEvent("stream.fetch_success", { authed: false, video, hasHls: !!result.hlsUrl });
     return result;
   } catch (error) {
@@ -76,7 +72,7 @@ async function fetchStreamEndpoint(
     recordClientEvent("stream.fetch_authenticated_fallback", { status: error.status, video });
     let result: StreamResponse;
     try {
-      result = await request<StreamResponse>(endpoint, streamInit(token, signal));
+      result = await requestWithSession<StreamResponse>(endpoint, streamInit(signal));
     } catch (authError) {
       logStreamFailure("stream.fetch_failed_authenticated", authError, video);
       throw authError;

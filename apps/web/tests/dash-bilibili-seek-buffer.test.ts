@@ -1,13 +1,24 @@
 import { expect, test } from "bun:test";
 import type * as dashjs from "dashjs";
 import { buildDashStreamingSettings } from "../src/components/video-player-core";
+import { bilibiliBufferSeconds } from "../src/lib/bilibili-buffer";
 import { attachBilibiliSeekBuffer } from "../src/lib/dash-bilibili-seek-buffer";
 
-test("uses modest Bilibili forward targets and keeps the backward cache", () => {
+const buffer = (seconds: number) => ({
+  streaming: {
+    buffer: {
+      bufferTimeDefault: seconds,
+      bufferTimeAtTopQuality: seconds,
+      bufferTimeAtTopQualityLongForm: seconds,
+    },
+  },
+});
+
+test("uses the chosen Bilibili baseline and keeps the backward cache", () => {
   expect(buildDashStreamingSettings("bilibili").buffer).toEqual({
-    bufferTimeDefault: 4,
-    bufferTimeAtTopQuality: 6,
-    bufferTimeAtTopQualityLongForm: 8,
+    bufferTimeDefault: 15,
+    bufferTimeAtTopQuality: 15,
+    bufferTimeAtTopQualityLongForm: 15,
     bufferToKeep: 20,
   });
   expect(buildDashStreamingSettings("youtube").buffer).toEqual({
@@ -18,48 +29,61 @@ test("uses modest Bilibili forward targets and keeps the backward cache", () => 
   });
 });
 
-test("keeps the Bilibili seek target short until playback advances without flushing cache", () => {
+test("the buffer grows with the playback speed and stays capped", () => {
+  expect(bilibiliBufferSeconds("normal", 1)).toBe(15);
+  expect(bilibiliBufferSeconds("normal", 2)).toBe(30);
+  expect(bilibiliBufferSeconds("normal", 4)).toBe(60);
+  expect(bilibiliBufferSeconds("saver", 0.5)).toBe(8);
+  expect(bilibiliBufferSeconds("large", 16)).toBe(120);
+});
+
+function fakePlayer(rate = 1) {
   const listeners = new Map<string, (event: unknown) => void>();
   const updates: unknown[] = [];
-  let paused = true;
-  let seeking = true;
+  const state = { paused: true, seeking: true, rate };
   const player = {
     on: (type: string, listener: (event: unknown) => void) => listeners.set(type, listener),
     updateSettings: (settings: unknown) => updates.push(settings),
-    isPaused: () => paused,
-    isSeeking: () => seeking,
+    isPaused: () => state.paused,
+    isSeeking: () => state.seeking,
+    getPlaybackRate: () => state.rate,
   } as unknown as dashjs.MediaPlayerClass;
-  attachBilibiliSeekBuffer(player);
+  return { player, listeners, updates, state };
+}
+
+test("keeps the Bilibili seek target short until playback advances without flushing cache", () => {
+  const { player, listeners, updates, state } = fakePlayer();
+  attachBilibiliSeekBuffer(player, (rate) => bilibiliBufferSeconds("normal", rate));
 
   listeners.get("playbackSeeking")?.({ seekTime: 30 });
-  expect(updates).toEqual([
-    {
-      streaming: {
-        buffer: {
-          bufferTimeDefault: 2,
-          bufferTimeAtTopQuality: 2,
-          bufferTimeAtTopQualityLongForm: 2,
-        },
-      },
-    },
-  ]);
+  expect(updates).toEqual([buffer(2)]);
   expect(JSON.stringify(updates)).not.toContain("bufferToKeep");
 
   listeners.get("playbackTimeUpdated")?.({ time: 31.6 });
   expect(updates).toHaveLength(1);
 
-  paused = false;
-  seeking = false;
+  state.paused = false;
+  state.seeking = false;
   listeners.get("playbackTimeUpdated")?.({ time: 31.4 });
   expect(updates).toHaveLength(1);
   listeners.get("playbackTimeUpdated")?.({ time: 31.5 });
-  expect(updates[1]).toEqual({
-    streaming: {
-      buffer: {
-        bufferTimeDefault: 4,
-        bufferTimeAtTopQuality: 6,
-        bufferTimeAtTopQualityLongForm: 8,
-      },
-    },
-  });
+  expect(updates[1]).toEqual(buffer(15));
+});
+
+test("a speed change resizes the buffer, but not during a pending seek", () => {
+  const { player, listeners, updates, state } = fakePlayer(2);
+  attachBilibiliSeekBuffer(player, (rate) => bilibiliBufferSeconds("normal", rate));
+
+  listeners.get("playbackRateChanged")?.({});
+  expect(updates).toEqual([buffer(30)]);
+
+  listeners.get("playbackSeeking")?.({ seekTime: 10 });
+  state.rate = 4;
+  listeners.get("playbackRateChanged")?.({});
+  expect(updates).toEqual([buffer(30), buffer(2)]);
+
+  state.paused = false;
+  state.seeking = false;
+  listeners.get("playbackTimeUpdated")?.({ time: 11.5 });
+  expect(updates[2]).toEqual(buffer(60));
 });

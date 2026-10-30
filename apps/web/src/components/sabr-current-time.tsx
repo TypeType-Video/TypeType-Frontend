@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useSabrSeekTarget } from "../hooks/use-sabr-seek-target";
 import { formatDuration } from "../lib/format";
 import { useMediaState } from "../lib/vidstack";
 
@@ -6,7 +7,9 @@ export function stableSabrCurrentTime(
   currentTime: number,
   transitioning: boolean,
   previousTime: number,
+  seekTarget: number | null = null,
 ): number {
+  if (seekTarget !== null) return seekTarget;
   if (transitioning) return previousTime;
   return Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : previousTime;
 }
@@ -22,7 +25,13 @@ export function SabrCurrentTime({
   const currentTime =
     video && Number.isFinite(video.currentTime) ? video.currentTime : mediaStateTime;
   const stableTimeRef = useRef(Number.isFinite(currentTime) ? currentTime : 0);
-  const stableTime = stableSabrCurrentTime(currentTime, transitioning, stableTimeRef.current);
+  const seekTarget = useSabrSeekTarget(video, transitioning);
+  const stableTime = stableSabrCurrentTime(
+    currentTime,
+    transitioning,
+    stableTimeRef.current,
+    seekTarget,
+  );
   stableTimeRef.current = stableTime;
   return (
     <span className="vds-time" data-type="current">

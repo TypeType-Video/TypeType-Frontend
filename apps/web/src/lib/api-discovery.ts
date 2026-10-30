@@ -1,9 +1,6 @@
-import { useAuthStore } from "../stores/auth-store";
 import type { ChannelResponse, SearchFiltersResponse, SearchPageResponse } from "../types/api";
-import { request } from "./api";
-import { authedJson } from "./authed";
 import { API_BASE as BASE } from "./env";
-import { optionalBearer } from "./optional-bearer";
+import { requestWithSession } from "./session-request";
 
 export type ChannelSort = "latest" | "popular" | "oldest";
 
@@ -14,7 +11,7 @@ export function fetchSearchFilters(
 ): Promise<SearchFiltersResponse> {
   const params = new URLSearchParams({ service: String(service) });
   if (contentFilter) params.set("contentFilter", contentFilter);
-  return request(`${BASE}/search/filters?${params}`, optionalBearer({ signal }));
+  return requestWithSession(`${BASE}/search/filters?${params}`, { signal });
 }
 
 export function fetchSearch(
@@ -29,7 +26,7 @@ export function fetchSearch(
   if (nextpage) params.set("nextpage", nextpage);
   if (contentFilter) params.set("contentFilter", contentFilter);
   for (const filter of filters) params.append("filter", filter);
-  return request(`${BASE}/search?${params}`, optionalBearer({ signal }));
+  return requestWithSession(`${BASE}/search?${params}`, { signal });
 }
 
 export function fetchChannel(
@@ -43,7 +40,5 @@ export function fetchChannel(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url, nextpage: nextpage ?? null, sort: sort ?? null }),
   };
-  return useAuthStore.getState().token
-    ? authedJson<ChannelResponse>(endpoint, init)
-    : request<ChannelResponse>(endpoint, init);
+  return requestWithSession<ChannelResponse>(endpoint, init);
 }

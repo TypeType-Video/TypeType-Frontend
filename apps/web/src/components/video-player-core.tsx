@@ -1,6 +1,7 @@
 import { createDashSettings, createHlsConfig } from "@typetype/mse";
 import type * as dashjs from "dashjs";
 import type Hls from "hls.js";
+import { bilibiliBufferSeconds, bilibiliBufferSettings } from "../lib/bilibili-buffer";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { attachBilibiliSeekBuffer } from "../lib/dash-bilibili-seek-buffer";
 import { attachDashPlaybackDiagnostics } from "../lib/dash-playback-diagnostics";
@@ -10,6 +11,7 @@ import type { Provider } from "../lib/provider";
 import type { MediaProviderAdapter } from "../lib/vidstack";
 import { isDASHProvider, isHLSProvider, Track, useMediaState } from "../lib/vidstack";
 import { useAuthStore } from "../stores/auth-store";
+import { useBilibiliBufferStore } from "../stores/bilibili-buffer-store";
 
 type DashRequestInterceptor = Parameters<dashjs.MediaPlayerClass["addRequestInterceptor"]>[0];
 
@@ -45,23 +47,28 @@ const STREAMING_BUFFER_POLICY = {
   backBufferMs: 20_000,
 } as const;
 
-const BILIBILI_BUFFER_POLICY = {
-  steadyBufferMs: 6_000,
-  maxBufferMs: 8_000,
-  backBufferMs: STREAMING_BUFFER_POLICY.backBufferMs,
-} as const;
+function bilibiliSteadySeconds(playbackRate = 1): number {
+  return bilibiliBufferSeconds(useBilibiliBufferStore.getState().level, playbackRate);
+}
 
 export function buildDashStreamingSettings(sourceProvider?: Provider) {
   const isBilibili = sourceProvider === "bilibili";
-  const bufferPolicy = isBilibili ? BILIBILI_BUFFER_POLICY : STREAMING_BUFFER_POLICY;
+  const bilibiliSeconds = bilibiliSteadySeconds();
+  const bufferPolicy = isBilibili
+    ? { ...STREAMING_BUFFER_POLICY, steadyBufferMs: bilibiliSeconds * 1000 }
+    : STREAMING_BUFFER_POLICY;
   const dashSettings = createDashSettings(bufferPolicy);
   return {
     ...dashSettings,
     buffer: {
       ...dashSettings.buffer,
-      bufferTimeDefault: isBilibili ? 4 : 24,
-      bufferTimeAtTopQuality: isBilibili ? 6 : 36,
-      bufferTimeAtTopQualityLongForm: isBilibili ? 8 : 60,
+      ...(isBilibili
+        ? bilibiliBufferSettings(bilibiliSeconds)
+        : {
+            bufferTimeDefault: 24,
+            bufferTimeAtTopQuality: 36,
+            bufferTimeAtTopQualityLongForm: 60,
+          }),
     },
     gaps: {
       enableStallFix: true,
@@ -84,7 +91,7 @@ function configureDashPlayer(
   player.updateSettings({
     streaming: buildDashStreamingSettings(sourceProvider),
   });
-  if (sourceProvider === "bilibili") attachBilibiliSeekBuffer(player);
+  if (sourceProvider === "bilibili") attachBilibiliSeekBuffer(player, bilibiliSteadySeconds);
   notifyDashPlayer();
 }
 

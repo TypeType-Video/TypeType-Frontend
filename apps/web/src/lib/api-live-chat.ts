@@ -1,5 +1,6 @@
+import { useAuthStore } from "../stores/auth-store";
+import { authed } from "./authed";
 import { API_BASE } from "./env";
-import { optionalBearer } from "./optional-bearer";
 
 export type LiveChatMessage = {
   id: string;
@@ -42,10 +43,9 @@ export async function connectYoutubeLiveChat(
   onEvent: (event: LiveChatEvent) => void,
 ) {
   const query = new URLSearchParams({ url: videoUrl });
-  const response = await fetch(
-    `${API_BASE}/live-chat?${query}`,
-    optionalBearer({ signal, headers: { Accept: "text/event-stream, application/json" } }),
-  );
+  const url = `${API_BASE}/live-chat?${query}`;
+  const init: RequestInit = { signal, headers: { Accept: "text/event-stream, application/json" } };
+  const response = useAuthStore.getState().token ? await authed(url, init) : await fetch(url, init);
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null);
     const reason =

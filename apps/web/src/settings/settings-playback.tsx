@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSettings } from "../hooks/use-settings";
 import { DEFAULT_PLAYBACK_SPEED_OPTIONS, playbackSpeedLabel } from "../lib/playback-speed";
 import { m } from "../paraglide/messages.js";
+import { SettingsBilibiliBuffer } from "./settings-bilibili-buffer";
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
@@ -165,6 +166,7 @@ export function SettingsPlayback() {
             onChange={(speed) => update.mutate({ defaultPlaybackSpeed: speed })}
           />
         </div>
+        <SettingsBilibiliBuffer />
       </div>
     </section>
   );

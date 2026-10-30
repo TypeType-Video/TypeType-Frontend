@@ -1,31 +1,26 @@
 import type * as dashjs from "dashjs";
+import { bilibiliBufferSettings } from "./bilibili-buffer";
 
 const SEEK_BUFFER_SECONDS = 2;
 const RESTORE_AFTER_SECONDS = 1.5;
-const STEADY_BUFFER = {
-  bufferTimeDefault: 4,
-  bufferTimeAtTopQuality: 6,
-  bufferTimeAtTopQualityLongForm: 8,
-} as const;
 
 function updateForwardBuffer(player: dashjs.MediaPlayerClass, seconds: number): void {
-  player.updateSettings({
-    streaming: {
-      buffer: {
-        bufferTimeDefault: seconds,
-        bufferTimeAtTopQuality: seconds,
-        bufferTimeAtTopQualityLongForm: seconds,
-      },
-    },
-  });
+  player.updateSettings({ streaming: { buffer: bilibiliBufferSettings(seconds) } });
 }
 
-export function attachBilibiliSeekBuffer(player: dashjs.MediaPlayerClass): void {
+export function attachBilibiliSeekBuffer(
+  player: dashjs.MediaPlayerClass,
+  steadySeconds: (playbackRate: number) => number,
+): void {
   let pendingSeekTime: number | null = null;
+  const restore = () => updateForwardBuffer(player, steadySeconds(player.getPlaybackRate()));
   player.on("playbackSeeking", (event: dashjs.PlaybackSeekingEvent) => {
     if (event.seekTime === null || !Number.isFinite(event.seekTime)) return;
     pendingSeekTime = event.seekTime;
     updateForwardBuffer(player, SEEK_BUFFER_SECONDS);
+  });
+  player.on("playbackRateChanged", () => {
+    if (pendingSeekTime === null) restore();
   });
   player.on("playbackTimeUpdated", (event: dashjs.PlaybackTimeUpdatedEvent) => {
     if (
@@ -38,6 +33,6 @@ export function attachBilibiliSeekBuffer(player: dashjs.MediaPlayerClass): void 
     )
       return;
     pendingSeekTime = null;
-    player.updateSettings({ streaming: { buffer: STEADY_BUFFER } });
+    restore();
   });
 }

@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchPodcastEpisodes } from "../lib/api";
+import { fetchPodcastEpisodes } from "../lib/api-podcasts";
 import { mapVideoItem } from "../lib/mappers";
 import type { PodcastItem } from "../types/api";
 import type { VideoStream } from "../types/stream";
