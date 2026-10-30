@@ -57,6 +57,19 @@ function rejectExpiredSession(message: "Authentication required" | "Session expi
   throw new ApiError(message, 401);
 }
 
+export async function refreshUnauthorizedSession(method: string, path: string): Promise<string> {
+  recordClientEvent("auth.unauthorized_retry", { method, path });
+  try {
+    return await refreshSession();
+  } catch (error) {
+    if (isRefreshSessionRejected(error)) {
+      recordClientEvent("auth.session_expired", { method, path });
+      rejectExpiredSession("Session expired");
+    }
+    throw error;
+  }
+}
+
 export async function authed(
   url: string,
   init?: RequestInit,
@@ -76,17 +89,7 @@ export async function authed(
   }
   const res = await fetchAuthed(url, init, token, method, path);
   if (res.status === 401) {
-    recordClientEvent("auth.unauthorized_retry", { method, path });
-    let retryToken: string;
-    try {
-      retryToken = await refreshSession();
-    } catch (error) {
-      if (isRefreshSessionRejected(error)) {
-        recordClientEvent("auth.session_expired", { method, path });
-        rejectExpiredSession("Session expired");
-      }
-      throw error;
-    }
+    const retryToken = await refreshUnauthorizedSession(method, path);
     const retryRes = await fetchAuthed(url, init, retryToken, method, path);
     if (!retryRes.ok && shouldLogStatus(retryRes.status, options)) {
       recordApiError({
