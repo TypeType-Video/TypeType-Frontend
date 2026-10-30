@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchCommentReplies } from "../lib/api";
+import { fetchCommentReplies } from "../lib/api-comments";
 import { mapCommentItem } from "../lib/mappers";
 import type { Comment } from "../types/comment";
 

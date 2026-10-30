@@ -1,7 +1,6 @@
 import type { ChannelPlaylistsResponse } from "../types/playlist";
-import { request } from "./api";
 import { API_BASE as BASE } from "./env";
-import { optionalBearer } from "./optional-bearer";
+import { requestWithSession } from "./session-request";
 
 export function fetchChannelPlaylists(
   url: string,
@@ -9,5 +8,5 @@ export function fetchChannelPlaylists(
 ): Promise<ChannelPlaylistsResponse> {
   const params = new URLSearchParams({ url });
   if (nextpage) params.set("nextpage", nextpage);
-  return request(`${BASE}/channel/playlists?${params}`, optionalBearer());
+  return requestWithSession(`${BASE}/channel/playlists?${params}`);
 }
