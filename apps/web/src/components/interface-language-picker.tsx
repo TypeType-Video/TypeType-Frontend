@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useInterfaceLocale } from "../hooks/use-interface-locale";
 import { m } from "../paraglide/messages.js";
 import type { Locale } from "../paraglide/runtime.js";
+import { LanguageFlag } from "./language-flags/language-flag";
 
 const OPTIONS: Locale[] = ["en", "zh-Hans-CN", "fr", "de"];
 
@@ -11,66 +12,6 @@ function languageName(locale: Locale): string {
   if (locale === "fr") return m.language_french();
   if (locale === "de") return m.language_german();
   return m.language_english();
-}
-
-function LanguageFlag({ locale }: { locale: Locale }) {
-  if (locale === "zh-Hans-CN") {
-    return (
-      <span
-        className="relative flex h-4 w-6 shrink-0 items-center justify-center overflow-hidden rounded-[2px] bg-[#de2910] ring-1 ring-black/15"
-        aria-hidden="true"
-      >
-        <svg viewBox="0 0 30 20" className="h-full w-full" aria-hidden="true">
-          <defs>
-            <polygon
-              id="zh-star"
-              points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309"
-              fill="#ffde00"
-            />
-          </defs>
-          <rect width="30" height="20" fill="#de2910" />
-          <use href="#zh-star" transform="translate(5, 5) scale(3)" />
-          <use href="#zh-star" transform="translate(10, 2) rotate(239.04)" />
-          <use href="#zh-star" transform="translate(12, 4) rotate(261.87)" />
-          <use href="#zh-star" transform="translate(12, 7) rotate(285.95)" />
-          <use href="#zh-star" transform="translate(10, 9) rotate(308.66)" />
-        </svg>
-      </span>
-    );
-  }
-  if (locale === "de") {
-    return (
-      <span
-        className="grid h-4 w-6 shrink-0 grid-rows-3 overflow-hidden rounded-[2px] ring-1 ring-black/15"
-        aria-hidden="true"
-      >
-        <span className="bg-[#1f1f1f]" />
-        <span className="bg-[#d21f26]" />
-        <span className="bg-[#f5c542]" />
-      </span>
-    );
-  }
-  if (locale === "fr") {
-    return (
-      <span
-        className="grid h-4 w-6 shrink-0 grid-cols-3 overflow-hidden rounded-[2px] ring-1 ring-black/15"
-        aria-hidden="true"
-      >
-        <span className="bg-[#1b4fa3]" />
-        <span className="bg-white" />
-        <span className="bg-[#e33a3a]" />
-      </span>
-    );
-  }
-  return (
-    <span
-      className="relative h-4 w-6 shrink-0 overflow-hidden rounded-[2px] bg-white ring-1 ring-black/15"
-      aria-hidden="true"
-    >
-      <span className="absolute left-0 top-[6px] h-1 w-full bg-[#d62828]" />
-      <span className="absolute left-[10px] top-0 h-full w-1 bg-[#d62828]" />
-    </span>
-  );
 }
 
 export function InterfaceLanguagePicker() {
