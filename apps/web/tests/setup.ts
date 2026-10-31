@@ -20,7 +20,9 @@ const mockStorage = {
 if (!("localStorage" in globalThis) || !globalThis.localStorage) {
   Object.defineProperty(globalThis, "localStorage", { configurable: true, value: mockStorage });
 } else {
-  Object.assign(globalThis.localStorage, mockStorage);
+  // Another test file may have installed a bare stub first; copying descriptors keeps `length` a live getter,
+  // which Object.assign would freeze at its current value.
+  Object.defineProperties(globalThis.localStorage, Object.getOwnPropertyDescriptors(mockStorage));
 }
 
 if (typeof (globalThis as { window?: unknown }).window === "undefined") {

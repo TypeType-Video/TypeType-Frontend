@@ -8,6 +8,7 @@ import {
   usePersistentWatchPlayerStore,
 } from "../hooks/use-persistent-watch-player";
 import { isPlayerOutsideViewport } from "../lib/compact-player-position";
+import { useMediaRemote } from "../lib/vidstack";
 import { m } from "../paraglide/messages.js";
 import { useUiStore } from "../stores/ui-store";
 import { useWatchLayoutStore } from "../stores/watch-layout-store";
@@ -79,6 +80,8 @@ export function PersistentWatchPlayerHost() {
   const [dragging, setDragging] = useState(false);
   const [outsideViewport, setOutsideViewport] = useState(false);
   const [landscapeWatch, setLandscapeWatch] = useState(false);
+  const [floatingDismissed, setFloatingDismissed] = useState(false);
+  const remote = useMediaRemote();
   const watchPage = pathname === "/watch";
   const hiddenPage =
     pathname === "/shorts" || pathname === "/hide-everything" || pathname.startsWith("/embed/");
@@ -244,6 +247,10 @@ export function PersistentWatchPlayerHost() {
   const floating =
     !watchPage || (!cinemaMode && !webFullscreen && !landscapeWatch && outsideViewport);
 
+  useEffect(() => {
+    if (!floating) setFloatingDismissed(false);
+  }, [floating]);
+
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       const drag = dragRef.current;
@@ -318,6 +325,19 @@ export function PersistentWatchPlayerHost() {
                 bottom: `calc(${isMobile ? "4.5rem" : "1rem"} + env(safe-area-inset-bottom, 0px))`,
               };
 
+  // On the watch page the stage still owns the player: closing the floating copy only pauses and hides it, and
+  // scrolling back up docks it again.
+  const closeFloating = () => {
+    if (!watchPage) {
+      close(entry.owner);
+      return;
+    }
+    remote.setTarget(frameRef.current?.querySelector("[data-media-player]") ?? null);
+    // No trigger event: the remote would send the request from the close button, which sits outside the player.
+    remote.pause();
+    setFloatingDismissed(true);
+  };
+
   const beginDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (!floating || !frameRef.current || !event.isPrimary || event.button !== 0) return;
     const rect = frameRef.current.getBoundingClientRect();
@@ -342,7 +362,7 @@ export function PersistentWatchPlayerHost() {
           : floating
             ? "fixed z-30 rounded-lg shadow-2xl ring-1 ring-black/30"
             : "absolute z-10 rounded-none shadow-none ring-0"
-      }`}
+      }${floating && floatingDismissed ? " invisible" : ""}`}
       data-web-fullscreen={webFullscreen && watchPage ? "" : undefined}
       data-floating={floating ? "" : undefined}
       data-dragging={dragging ? "" : undefined}
@@ -365,7 +385,7 @@ export function PersistentWatchPlayerHost() {
             aria-label={m.ui_close_player()}
             title={m.ui_close_player()}
             className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded text-white hover:opacity-80"
-            onClick={() => close(entry.owner)}
+            onClick={closeFloating}
           >
             <X size={16} aria-hidden="true" />
           </button>
