@@ -1866,5 +1866,13 @@
   "settings_bilibili_buffer_saver_hint": "Less data on slow or limited connections",
   "settings_bilibili_buffer_normal_hint": "Recommended",
   "settings_bilibili_buffer_large_hint": "Smoothest when the connection to BiliBili is unstable",
-  "settings_bilibili_buffer_seconds": "{seconds} s at 1×"
+  "settings_bilibili_buffer_seconds": "{seconds} s at 1×",
+  "settings_bilibili_server_region_label": "Bilibili server CDN location",
+  "settings_bilibili_server_region_description": "Specify whether the TypeType server is hosted inside or outside Mainland China to select optimal Bilibili CDN mirrors and prevent cross-border latency",
+  "settings_bilibili_server_region_overseas": "Outside Mainland China",
+  "settings_bilibili_server_region_overseas_hint": "Hosted on a server outside Mainland China; prioritizes international Bilibili CDN mirrors",
+  "settings_bilibili_server_region_domestic": "Inside Mainland China",
+  "settings_bilibili_server_region_domestic_hint": "Hosted in Mainland China (cloud VPS / home NAS); prioritizes domestic Chinese CDN mirrors",
+  "settings_bilibili_prefetch_label": "Concurrent subchunk prefetching",
+  "settings_bilibili_prefetch_description": "Concurrently prefetches the next subchunk while streaming to eliminate network idle time and speed up seeking"
 }

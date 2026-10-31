@@ -3,12 +3,20 @@ export const BILIBILI_BUFFER_LEVELS = ["saver", "normal", "large"] as const;
 export type BilibiliBufferLevel = (typeof BILIBILI_BUFFER_LEVELS)[number];
 
 export const BILIBILI_BUFFER_BASELINE_SECONDS: Record<BilibiliBufferLevel, number> = {
-  saver: 8,
-  normal: 15,
-  large: 30,
+  saver: 15,
+  normal: 45,
+  large: 90,
 };
 
-const MAX_BUFFER_SECONDS = 120;
+export const BILIBILI_CDN_REGIONS = ["overseas", "domestic"] as const;
+
+export type BilibiliCdnRegion = (typeof BILIBILI_CDN_REGIONS)[number];
+
+export function isBilibiliCdnRegion(value: unknown): value is BilibiliCdnRegion {
+  return typeof value === "string" && (BILIBILI_CDN_REGIONS as readonly string[]).includes(value);
+}
+
+const MAX_BUFFER_SECONDS = 180;
 
 export function isBilibiliBufferLevel(value: unknown): value is BilibiliBufferLevel {
   return typeof value === "string" && (BILIBILI_BUFFER_LEVELS as readonly string[]).includes(value);
