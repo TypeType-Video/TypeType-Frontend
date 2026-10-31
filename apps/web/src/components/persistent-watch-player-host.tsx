@@ -327,13 +327,14 @@ export function PersistentWatchPlayerHost() {
 
   // On the watch page the stage still owns the player: closing the floating copy only pauses and hides it, and
   // scrolling back up docks it again.
-  const closeFloating = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const closeFloating = () => {
     if (!watchPage) {
       close(entry.owner);
       return;
     }
     remote.setTarget(frameRef.current?.querySelector("[data-media-player]") ?? null);
-    remote.pause(event.nativeEvent);
+    // No trigger event: the remote would send the request from the close button, which sits outside the player.
+    remote.pause();
     setFloatingDismissed(true);
   };
 
