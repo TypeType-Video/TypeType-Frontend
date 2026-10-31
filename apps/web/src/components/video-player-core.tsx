@@ -71,7 +71,13 @@ export function buildDashStreamingSettings(sourceProvider?: Provider) {
           }),
     },
     gaps: {
+      jumpGaps: true,
+      jumpLargeGaps: true,
+      smallGapLimit: 1.5,
+      threshold: 0.3,
+      enableSeekFix: true,
       enableStallFix: true,
+      stallSeek: 0.1,
     },
     cmcd: { enabled: false },
   };
@@ -144,11 +150,36 @@ export function onProviderChange(
   provider.onInstance((player) => {
     const addAuthHeader: DashRequestInterceptor = async (request) => {
       const token = useAuthStore.getState().token;
-      if (!token) return request;
-      request.headers = {
-        ...request.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      const headers: Record<string, string> = { ...request.headers };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      if (sourceProvider === "bilibili") {
+        const { serverRegion, concurrentPrefetch } = useBilibiliBufferStore.getState();
+        headers["X-Bilibili-Cdn-Region"] = serverRegion;
+        headers["X-Bilibili-Concurrent-Prefetch"] = concurrentPrefetch ? "1" : "0";
+        try {
+          const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+          const urlObj = new URL(request.url, origin);
+          const pathname = urlObj.pathname;
+          if (
+            pathname.startsWith("/media/") ||
+            pathname.startsWith("/api/media/") ||
+            pathname.startsWith("/proxy") ||
+            pathname.startsWith("/api/proxy")
+          ) {
+            urlObj.searchParams.set("cdn_region", serverRegion);
+            urlObj.searchParams.set("concurrent_prefetch", concurrentPrefetch ? "1" : "0");
+            request.url =
+              request.url.startsWith("http://") || request.url.startsWith("https://")
+                ? urlObj.toString()
+                : `${urlObj.pathname}${urlObj.search}`;
+          }
+        } catch {
+          // ignore parsing error
+        }
+      }
+      request.headers = headers;
       return request;
     };
     setDashPlayer(player);
