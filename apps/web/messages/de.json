@@ -1866,5 +1866,13 @@
   "settings_bilibili_buffer_saver_hint": "Weniger Daten bei langsamer oder begrenzter Verbindung",
   "settings_bilibili_buffer_normal_hint": "Empfohlen",
   "settings_bilibili_buffer_large_hint": "Am flüssigsten, wenn die Verbindung zu BiliBili instabil ist",
-  "settings_bilibili_buffer_seconds": "{seconds} s bei 1×"
+  "settings_bilibili_buffer_seconds": "{seconds} s bei 1×",
+  "settings_bilibili_server_region_label": "BiliBili-Serverstandort",
+  "settings_bilibili_server_region_description": "Gibt an, ob dieser TypeType-Server innerhalb oder außerhalb von Festlandchina betrieben wird, um optimale Bilibili-CDN-Spiegel zu wählen",
+  "settings_bilibili_server_region_overseas": "Außerhalb Festlandchinas",
+  "settings_bilibili_server_region_overseas_hint": "Auf einem Server außerhalb Festlandchinas gehostet; bevorzugt internationale Bilibili-CDN-Spiegel",
+  "settings_bilibili_server_region_domestic": "Innerhalb Festlandchinas",
+  "settings_bilibili_server_region_domestic_hint": "In Festlandchina bereitgestellt (Cloud / Heim-NAS); bevorzugt inländische chinesische CDN-Spiegel",
+  "settings_bilibili_prefetch_label": "Paralleles Vorabladen",
+  "settings_bilibili_prefetch_description": "Lädt den nächsten Block parallel im Hintergrund vor, um Wartezeiten zu verringern"
 }
