@@ -23,7 +23,7 @@ export function subscribeSabrSeekTarget(
   return () => listeners.delete(listener);
 }
 
-function announceSabrSeekTarget(video: HTMLVideoElement, seconds: number): void {
+export function announceSabrSeekTarget(video: HTMLVideoElement, seconds: number): void {
   for (const listener of seekTargetListeners.get(video) ?? []) listener(seconds);
 }
 
@@ -81,6 +81,11 @@ export function consumeSabrSeekTarget(video: HTMLVideoElement): number | null {
   const target = pendingSeekTargetByVideo.get(video);
   pendingSeekTargetByVideo.delete(video);
   return target === undefined ? null : Math.round(target * 1000);
+}
+
+export function isPendingSabrSeekTarget(video: HTMLVideoElement, seconds: number): boolean {
+  const target = pendingSeekTargetByVideo.get(video);
+  return target !== undefined && Math.abs(target - seconds) <= 0.25;
 }
 
 export function requestSabrVidstackPlayback(
