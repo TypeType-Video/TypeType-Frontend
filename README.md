@@ -54,6 +54,7 @@ The development server starts at `http://localhost:5173` by default.
 | --- | --- |
 | `VITE_API_URL` | API URL embedded in the frontend |
 | `VITE_DEV_PROXY_TARGET` | API target used by the Vite development proxy |
+| `VITE_PLAYER_MSE_SEEK_MODE` | Default MSE seek mode (`preroll` or `native`, optional) |
 
 ## Project structure
 
