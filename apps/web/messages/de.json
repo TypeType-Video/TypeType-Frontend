@@ -1915,5 +1915,13 @@
   "ui_voice_reply": "Sprachantwort",
   "ui_play_voice_reply": "Sprachantwort abspielen",
   "ui_pause_voice_reply": "Sprachantwort pausieren",
-  "ui_voice_reply_unavailable": "Diese Sprachantwort konnte nicht abgespielt werden."
+  "ui_voice_reply_unavailable": "Diese Sprachantwort konnte nicht abgespielt werden.",
+  "settings_mse_seek_mode_label": "MSE-Seek-Modus",
+  "settings_mse_seek_mode_description": "Wählen Sie das Seek-Verhalten für YouTube-MSE-Medien.",
+  "settings_mse_seek_mode_default": "Systemstandard",
+  "settings_mse_seek_mode_default_hint": "Folgt der Server-Umgebungskonfiguration",
+  "settings_mse_seek_mode_preroll": "Kompatibel (Preroll)",
+  "settings_mse_seek_mode_preroll_hint": "Maskiert GOP-Übergänge mit schneller Vorwärtswiedergabe",
+  "settings_mse_seek_mode_native": "Natives Instant (Hardware)",
+  "settings_mse_seek_mode_native_hint": "Sofortige GPU-Frame-Dekodierung ohne Blackouts"
 }

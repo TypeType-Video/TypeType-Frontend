@@ -1915,5 +1915,13 @@
   "ui_voice_reply": "Réponse vocale",
   "ui_play_voice_reply": "Écouter la réponse vocale",
   "ui_pause_voice_reply": "Mettre en pause la réponse vocale",
-  "ui_voice_reply_unavailable": "Impossible de lire cette réponse vocale."
+  "ui_voice_reply_unavailable": "Impossible de lire cette réponse vocale.",
+  "settings_mse_seek_mode_label": "Mode de navigation MSE",
+  "settings_mse_seek_mode_description": "Sélectionnez le comportement de recherche pour les médias YouTube MSE.",
+  "settings_mse_seek_mode_default": "Par défaut du système",
+  "settings_mse_seek_mode_default_hint": "Suit la configuration d'environnement du serveur",
+  "settings_mse_seek_mode_preroll": "Compatible (preroll)",
+  "settings_mse_seek_mode_preroll_hint": "Masque la transition GOP avec une avance rapide",
+  "settings_mse_seek_mode_native": "Instantané natif (matériel)",
+  "settings_mse_seek_mode_native_hint": "Décodage d'images GPU instantané sans écran noir"
 }

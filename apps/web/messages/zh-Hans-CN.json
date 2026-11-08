@@ -1915,5 +1915,13 @@
   "ui_voice_reply": "语音回复",
   "ui_play_voice_reply": "播放语音回复",
   "ui_pause_voice_reply": "暂停语音回复",
-  "ui_voice_reply_unavailable": "无法播放此语音回复。"
+  "ui_voice_reply_unavailable": "无法播放此语音回复。",
+  "settings_mse_seek_mode_label": "MSE 跳转定位模式",
+  "settings_mse_seek_mode_description": "选择 YouTube MSE 媒体的播放跳转定位策略。",
+  "settings_mse_seek_mode_default": "系统默认",
+  "settings_mse_seek_mode_default_hint": "跟随服务器环境变量配置",
+  "settings_mse_seek_mode_preroll": "兼容模式（预解码快进）",
+  "settings_mse_seek_mode_preroll_hint": "使用黑屏遮罩与倍速追赶对齐关键帧",
+  "settings_mse_seek_mode_native": "原生直跳（硬件加速）",
+  "settings_mse_seek_mode_native_hint": "零黑屏、无静音，直接交由浏览器原生解码到位"
 }

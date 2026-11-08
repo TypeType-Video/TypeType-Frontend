@@ -9,6 +9,7 @@ import {
 } from "../lib/playback-speed";
 import { m } from "../paraglide/messages.js";
 import { SettingsBilibiliBuffer } from "./settings-bilibili-buffer";
+import { SettingsMseSeekMode } from "./settings-mse-seek-mode";
 import { PLAYBACK_ROW, PlaybackNumberRow, PlaybackToggleRow } from "./settings-playback-row";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
@@ -188,6 +189,7 @@ export function SettingsPlayback() {
           />
         </div>
         <SettingsBilibiliBuffer />
+        <SettingsMseSeekMode />
       </div>
     </section>
   );
