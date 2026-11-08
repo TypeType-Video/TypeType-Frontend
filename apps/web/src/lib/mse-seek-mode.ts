@@ -1,4 +1,5 @@
-import type { PlayerSeekMode } from "@typetype/mse";
+/** MSE seek strategy used to align playback to seek positions. */
+export type PlayerSeekMode = "preroll" | "native";
 
 const STORAGE_KEY = "typetype:mse-seek-mode";
 

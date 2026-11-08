@@ -100,6 +100,7 @@ export function SabrMsePlayer({
     );
     const autoplayAttempt = new SabrAutoplayAttempt();
     const initialConfig = latestConfig();
+    const seekMode = getEffectiveMseSeekMode();
     const engine = new TypeTypeMsePlayer(video, {
       endpoint: toAbsoluteApiUrl(""),
       videoId: config.videoId,
@@ -109,9 +110,9 @@ export function SabrMsePlayer({
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
       startTimeMs: initialStartTimeMs,
-      seekMode: getEffectiveMseSeekMode(),
       headers: addPlaybackTraceHeader(new Headers(headersRef.current)),
-    });
+      ...(seekMode ? { seekMode } : {}),
+    } as ConstructorParameters<typeof TypeTypeMsePlayer>[1]);
     const stopPlaybackTrace = observeSabrMsePlayback(video, config.videoId, engine, reportError);
     engineRef.current = engine;
     qualityRef.current = initialConfig;
