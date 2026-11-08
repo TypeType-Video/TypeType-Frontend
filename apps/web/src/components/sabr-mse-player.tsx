@@ -8,6 +8,7 @@ import { useSabrModeSwitch } from "../hooks/use-sabr-mode-switch";
 import { useSabrQualitySwitch } from "../hooks/use-sabr-quality-switch";
 import { recordClientEvent } from "../lib/client-debug-log";
 import { toAbsoluteApiUrl } from "../lib/env";
+import { getEffectiveMseSeekMode } from "../lib/mse-seek-mode";
 import { addPlaybackTraceHeader } from "../lib/playback-trace";
 import {
   confirmAutoplayOnPlaying,
@@ -108,6 +109,7 @@ export function SabrMsePlayer({
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
       startTimeMs: initialStartTimeMs,
+      seekMode: getEffectiveMseSeekMode(),
       headers: addPlaybackTraceHeader(new Headers(headersRef.current)),
     });
     const stopPlaybackTrace = observeSabrMsePlayback(video, config.videoId, engine, reportError);
