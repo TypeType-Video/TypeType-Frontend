@@ -11,6 +11,7 @@ import { useHoldFastForward } from "./use-hold-fast-forward";
 
 const SEEK_THROTTLE_MS = 80;
 const SCRUB_RANGE_SECONDS = 90;
+const MOUSE_HOLD_DELAY_MS = 500;
 
 export function usePlayerGestures(canSeek: boolean, enabled = true) {
   const player = useMediaPlayer();
@@ -50,7 +51,7 @@ export function usePlayerGestures(canSeek: boolean, enabled = true) {
       startYRef.current = event.clientY;
       startTimeRef.current = currentTimeRef.current;
       suppressTapRef.current = false;
-      start();
+      start(event.pointerType === "mouse" ? MOUSE_HOLD_DELAY_MS : undefined);
     }
 
     function onPointerMove(event: PointerEvent) {

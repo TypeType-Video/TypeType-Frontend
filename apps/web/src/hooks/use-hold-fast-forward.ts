@@ -9,7 +9,7 @@ const HOLD_DELAY_MS = 180;
 type HoldFastForward = {
   holding: boolean;
   isActive: () => boolean;
-  start: () => void;
+  start: (delayMs?: number) => void;
   restore: (updateIndicator?: boolean) => void;
 };
 
@@ -42,7 +42,7 @@ export function useHoldFastForward(): HoldFastForward {
     timerRef.current = null;
   }, []);
 
-  const start = useCallback(() => {
+  const start = useCallback((delayMs = HOLD_DELAY_MS) => {
     if (timerRef.current !== null || activeRef.current) return;
     timerRef.current = window.setTimeout(() => {
       timerRef.current = null;
@@ -53,7 +53,7 @@ export function useHoldFastForward(): HoldFastForward {
       restoreRateRef.current = rateRef.current;
       remoteRef.current.changePlaybackRate(holdSpeedRef.current);
       if (pausedRef.current) void Promise.resolve(remoteRef.current.play()).catch(() => {});
-    }, HOLD_DELAY_MS);
+    }, delayMs);
   }, []);
 
   const restore = useCallback(
