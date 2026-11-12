@@ -26,7 +26,9 @@ import {
   registerSabrVideoHandoffPositionCapture as registerPosition,
 } from "../lib/sabr-video-handoff-events";
 import { followSabrEngineSeeks, registerSabrVidstackControls } from "../lib/sabr-vidstack-bridge";
+import { youtubeBufferConfig } from "../lib/youtube-buffer";
 import { useAuthStore } from "../stores/auth-store";
+import { useYoutubeBufferStore } from "../stores/youtube-buffer-store";
 import type { SabrMsePlayerProps } from "./sabr-mse-player-types";
 export function SabrMsePlayer({
   config,
@@ -107,6 +109,7 @@ export function SabrMsePlayer({
       audioTrackId: initialConfig.audioTrackId,
       audioOnly: initialConfig.audioOnly,
       isLive: initialConfig.isLive,
+      ...youtubeBufferConfig(useYoutubeBufferStore.getState().seconds, initialConfig.isLive),
       startTimeMs: initialStartTimeMs,
       headers: addPlaybackTraceHeader(new Headers(headersRef.current)),
     });

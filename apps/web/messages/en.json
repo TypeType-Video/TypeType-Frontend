@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_youtube_buffer_label": "YouTube buffer",
+  "settings_youtube_buffer_description": "Saved only in this browser. Applies to the next YouTube video using SABR playback. Live streams are unchanged. Larger buffers use more data and memory. Default: 30 seconds.",
+  "settings_youtube_buffer_seconds": "{seconds} seconds",
   "search_panel_suggestions": "Suggestions",
   "search_panel_no_history": "No recent searches",
   "search_panel_no_suggestions": "No suggestions. You can still search with your text.",

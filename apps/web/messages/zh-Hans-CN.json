@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_youtube_buffer_label": "YouTube 缓冲",
+  "settings_youtube_buffer_description": "仅保存在此浏览器中，对下一个使用 SABR 播放的 YouTube 视频生效。直播保持不变。更大的缓冲会使用更多流量和内存。默认值：30 秒。",
+  "settings_youtube_buffer_seconds": "{seconds} 秒",
   "account_current_password": "当前密码",
   "account_display_name": "显示名称",
   "account_email": "邮箱地址",

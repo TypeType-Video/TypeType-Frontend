@@ -1,0 +1,38 @@
+.typetype-youtube-buffer {
+  appearance: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 6px;
+}
+
+.typetype-youtube-buffer::-webkit-slider-runnable-track {
+  height: 6px;
+  border: 0;
+  background: transparent;
+}
+
+.typetype-youtube-buffer::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-on-accent, #fff);
+}
+
+.typetype-youtube-buffer::-moz-range-track,
+.typetype-youtube-buffer::-moz-range-progress {
+  height: 6px;
+  border: 0;
+  background: transparent;
+}
+
+.typetype-youtube-buffer::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-on-accent, #fff);
+}

@@ -16,6 +16,7 @@ import {
   PlaybackRangeRow,
   PlaybackToggleRow,
 } from "./settings-playback-row";
+import { SettingsYoutubeBuffer } from "./settings-youtube-buffer";
 
 const SECTION_LABEL = "text-xs font-medium text-fg-soft uppercase tracking-wider px-1";
 const GROUP = "divide-y divide-border border-y border-border";
@@ -227,6 +228,7 @@ export function SettingsPlayback() {
             onChange={(speed) => update.mutate({ holdPlaybackSpeed: speed })}
           />
         </div>
+        <SettingsYoutubeBuffer />
         <SettingsBilibiliBuffer />
       </div>
     </section>

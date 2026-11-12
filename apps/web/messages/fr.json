@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_youtube_buffer_label": "Tampon YouTube",
+  "settings_youtube_buffer_description": "Enregistré uniquement dans ce navigateur. Appliqué à la prochaine vidéo YouTube utilisant SABR. Les directs restent inchangés. Un tampon plus grand utilise plus de données et de mémoire. Valeur par défaut : 30 secondes.",
+  "settings_youtube_buffer_seconds": "{seconds} secondes",
   "search_panel_suggestions": "Suggestions",
   "search_panel_no_history": "Aucune recherche récente",
   "search_panel_no_suggestions": "Aucune suggestion. Vous pouvez rechercher avec votre texte.",
