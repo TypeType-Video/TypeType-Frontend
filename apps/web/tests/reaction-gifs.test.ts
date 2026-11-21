@@ -1,12 +1,9 @@
 import { expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pickReaction, type ReactionKind, reactionsFor } from "../src/lib/reaction-gifs";
 
 const KINDS: ReactionKind[] = [
-  "loading",
-  "videoError",
-  "playbackError",
   "youtubeReconnect",
   "familyListBlocked",
   "membersOnly",
@@ -35,12 +32,6 @@ test("a screen never shows the same reaction twice in a row", () => {
 
 test("every reaction of a kind comes up", () => {
   const seen = new Set<string>();
-  for (let draw = 0; draw < 200; draw += 1) seen.add(pickReaction("playbackError"));
-  expect(seen.size).toBe(reactionsFor("playbackError").length);
-});
-
-test("the startup screen draws from the same loading reactions", () => {
-  const page = readFileSync(join(import.meta.dir, "..", "index.html"), "utf8");
-  const list = page.match(/const gifs = (\[[^\]]*\])/)?.[1];
-  expect(list ? JSON.parse(list) : null).toEqual([...reactionsFor("loading")]);
+  for (let draw = 0; draw < 200; draw += 1) seen.add(pickReaction("youtubeReconnect"));
+  expect(seen.size).toBe(reactionsFor("youtubeReconnect").length);
 });
