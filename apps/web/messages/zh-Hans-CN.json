@@ -2265,5 +2265,8 @@
   "twitch_language_other": "其他",
   "notification_twitch_live": "{name} 正在直播",
   "settings_notifications_twitch_live_label": "Twitch 直播",
-  "settings_notifications_twitch_live_description": "你在 Twitch 上关注的频道开播时通知你。"
+  "settings_notifications_twitch_live_description": "你在 Twitch 上关注的频道开播时通知你。",
+  "settings_notifications_twitch_channels_label": "Twitch 频道",
+  "settings_notifications_twitch_channels_description": "你关注的每个频道开播时都会通知你。关闭你不想要的频道。",
+  "settings_notifications_twitch_channels_empty": "你还没有在 Twitch 上关注任何频道。"
 }

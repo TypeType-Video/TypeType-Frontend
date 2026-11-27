@@ -2265,5 +2265,8 @@
   "twitch_language_other": "Autre",
   "notification_twitch_live": "{name} est en direct",
   "settings_notifications_twitch_live_label": "Directs Twitch",
-  "settings_notifications_twitch_live_description": "Prévenir quand une chaîne que tu suis sur Twitch passe en direct."
+  "settings_notifications_twitch_live_description": "Prévenir quand une chaîne que tu suis sur Twitch passe en direct.",
+  "settings_notifications_twitch_channels_label": "Chaînes Twitch",
+  "settings_notifications_twitch_channels_description": "Chaque chaîne que tu suis te prévient quand elle passe en direct. Coupe celles que tu ne veux pas.",
+  "settings_notifications_twitch_channels_empty": "Tu ne suis encore aucune chaîne sur Twitch."
 }

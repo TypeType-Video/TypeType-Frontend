@@ -2265,5 +2265,8 @@
   "twitch_language_other": "Andere",
   "notification_twitch_live": "{name} ist live",
   "settings_notifications_twitch_live_label": "Twitch-Livestreams",
-  "settings_notifications_twitch_live_description": "Benachrichtigen, wenn ein Kanal, dem du auf Twitch folgst, live geht."
+  "settings_notifications_twitch_live_description": "Benachrichtigen, wenn ein Kanal, dem du auf Twitch folgst, live geht.",
+  "settings_notifications_twitch_channels_label": "Twitch-Kanäle",
+  "settings_notifications_twitch_channels_description": "Jeder Kanal, dem du folgst, benachrichtigt dich, wenn er live geht. Schalte die aus, die du nicht willst.",
+  "settings_notifications_twitch_channels_empty": "Du folgst noch keinem Kanal auf Twitch."
 }

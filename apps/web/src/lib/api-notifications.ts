@@ -45,8 +45,21 @@ export function updateChannelNotificationPreference(
   });
 }
 
-export function fetchTwitchLiveNotifications(): Promise<{ enabled: boolean }> {
+export type TwitchLiveNotifications = { enabled: boolean; mutedChannels: string[] };
+
+export function fetchTwitchLiveNotifications(): Promise<TwitchLiveNotifications> {
   return authedJson(`${BASE}/notifications/twitch-live`);
+}
+
+export function updateTwitchLiveChannel(
+  login: string,
+  enabled: boolean,
+): Promise<{ login: string; enabled: boolean }> {
+  return authedJson(`${BASE}/notifications/twitch-live/channels/${encodeURIComponent(login)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled }),
+  });
 }
 
 export function updateTwitchLiveNotifications(enabled: boolean): Promise<{ enabled: boolean }> {

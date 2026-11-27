@@ -2265,5 +2265,8 @@
   "twitch_language_other": "Other",
   "notification_twitch_live": "{name} is live",
   "settings_notifications_twitch_live_label": "Twitch lives",
-  "settings_notifications_twitch_live_description": "Notify when a channel you follow on Twitch goes live."
+  "settings_notifications_twitch_live_description": "Notify when a channel you follow on Twitch goes live.",
+  "settings_notifications_twitch_channels_label": "Twitch channels",
+  "settings_notifications_twitch_channels_description": "Every channel you follow notifies when it goes live. Switch off the ones you don't want.",
+  "settings_notifications_twitch_channels_empty": "You don't follow any channel on Twitch yet."
 }

@@ -8,6 +8,7 @@ import { normalizeChannelUrl } from "../lib/channel-url";
 import { proxyImage } from "../lib/proxy";
 import { m } from "../paraglide/messages.js";
 import { ROW, ToggleSwitch } from "./settings-toggle-switch";
+import { SettingsTwitchLiveChannels } from "./settings-twitch-live-channels";
 import { SettingsTwitchLiveNotifications } from "./settings-twitch-live-notifications";
 
 export function SettingsNotifications() {
@@ -94,6 +95,7 @@ export function SettingsNotifications() {
         </div>
         <SettingsTwitchLiveNotifications />
       </div>
+      <SettingsTwitchLiveChannels />
       <div className="flex flex-col gap-3 pt-2">
         <div>
           <p className="text-sm font-medium text-fg">{m.settings_channel_notifications()}</p>
