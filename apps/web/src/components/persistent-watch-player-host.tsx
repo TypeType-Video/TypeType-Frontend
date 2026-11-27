@@ -253,6 +253,19 @@ export function PersistentWatchPlayerHost() {
     };
   }, [watchPage, outsideViewport, webFullscreen, entry?.anchor, startTransitionLoop, syncFrame]);
 
+  // The anchor keeps its size when the related column arrives after the player and the page switches from the
+  // centred solo layout to the side layout, so the resize observer never sees it move.
+  useEffect(() => {
+    const anchor = entry?.anchor;
+    const wrap = anchor?.parentElement;
+    const container = wrap?.parentElement;
+    if (!watchPage || webFullscreen || !anchor || !wrap || !container) return;
+    const observer = new MutationObserver(startTransitionLoop);
+    observer.observe(container, { attributes: true, attributeFilter: ["class"], childList: true });
+    observer.observe(wrap, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, [watchPage, webFullscreen, entry?.anchor, startTransitionLoop]);
+
   const floating = !watchPage || (canFloat && !webFullscreen && outsideViewport);
 
   useEffect(() => {
