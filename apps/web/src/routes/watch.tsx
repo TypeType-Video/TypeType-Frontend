@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Suspense, useEffect, useRef } from "react";
 import { BiliBiliSessionGateProvider } from "../components/bilibili-session-gate";
 import { LazyWatchLayout } from "../components/lazy-watch-layout";
@@ -22,6 +22,7 @@ import { selectProgressiveWatchStream } from "../lib/progressive-watch-stream";
 import { proxyImage } from "../lib/proxy";
 import { hasSabrPlayback } from "../lib/stream-delivery";
 import { streamRetryNotice } from "../lib/stream-error-message";
+import { twitchVideoIdFromUrl } from "../lib/twitch-saved-video";
 import { videoAvailabilityCopy } from "../lib/video-availability";
 import { isShortFormContentHidden } from "../lib/video-visibility";
 import { resolveWatchStartTime, shouldWaitForWatchProgress } from "../lib/watch-resume";
@@ -267,5 +268,10 @@ function WatchPage() {
 
 export const Route = createFileRoute("/watch")({
   validateSearch: validateWatchSearch,
+  beforeLoad: ({ search }) => {
+    const twitchVideo = twitchVideoIdFromUrl(search.v);
+    if (twitchVideo)
+      throw redirect({ to: "/twitch/watch", search: { v: twitchVideo }, replace: true });
+  },
   component: WatchPage,
 });

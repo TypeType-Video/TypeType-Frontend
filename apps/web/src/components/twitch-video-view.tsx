@@ -7,6 +7,7 @@ import { useTwitchVodProgress } from "../hooks/use-twitch-vod-progress";
 import { TWITCH_STAGE_SIZE } from "../lib/twitch-stage-size";
 import type { TwitchVideoPlayback } from "../types/twitch";
 import { TwitchPlayer } from "./twitch-player";
+import { TwitchVideoSaveActions } from "./twitch-video-save-actions";
 import { TwitchVodChat } from "./twitch-vod-chat";
 import { TwitchWatchHeading } from "./twitch-watch-heading";
 import { TwitchWatchLayout } from "./twitch-watch-layout";
@@ -110,6 +111,7 @@ export function TwitchVideoView({ id, startAtSeconds }: { id: string; startAtSec
               user={data.video.owner}
               audioOnly={Boolean(data.audioUrl)}
               liveLogin={data.video.recording ? data.video.owner.login : undefined}
+              actions={<TwitchVideoSaveActions video={data.video} />}
             />
           </>
         )}

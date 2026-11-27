@@ -12,6 +12,7 @@ type Props = {
   detail?: string;
   meta?: ReactNode;
   audioOnly?: boolean;
+  actions?: ReactNode;
   // The channel of a past broadcast still recording: its live is one click away.
   liveLogin?: string;
 };
@@ -22,6 +23,7 @@ export function TwitchWatchHeading({
   detail,
   meta,
   audioOnly = false,
+  actions,
   liveLogin,
 }: Props) {
   return (
@@ -56,6 +58,7 @@ export function TwitchWatchHeading({
           </Link>
         )}
         {audioOnly && <TwitchAudioOnlyButton />}
+        {actions}
         <TwitchFollowButton login={user.login} />
       </div>
       {meta}

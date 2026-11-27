@@ -11,6 +11,7 @@ import type {
   TwitchUser,
   TwitchVideo,
 } from "../types/twitch";
+import { TwitchVideoCardMenu } from "./twitch-video-card-menu";
 
 type WatchSearch = { c?: string; v?: string; clip?: string };
 
@@ -50,26 +51,31 @@ function Card({
   thumb,
   title,
   footer,
+  menu,
 }: {
   search: WatchSearch;
   thumb: ReactNode;
   title: string;
   footer: ReactNode;
+  menu?: ReactNode;
 }) {
   return (
     <div className="group flex flex-col gap-2">
       <Link to="/twitch/watch" search={search} className="block" aria-label={title}>
         {thumb}
       </Link>
-      <div className="flex min-w-0 flex-col gap-0.5 px-1 sm:px-0">
-        <Link
-          to="/twitch/watch"
-          search={search}
-          className="line-clamp-2 font-medium text-fg text-sm leading-snug hover:text-fg-strong"
-        >
-          {title}
-        </Link>
-        {footer}
+      <div className="flex items-start gap-1 px-1 sm:px-0">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <Link
+            to="/twitch/watch"
+            search={search}
+            className="line-clamp-2 font-medium text-fg text-sm leading-snug hover:text-fg-strong"
+          >
+            {title}
+          </Link>
+          {footer}
+        </div>
+        {menu}
       </div>
     </div>
   );
@@ -101,6 +107,7 @@ export function TwitchVideoCard({ video }: { video: TwitchVideo }) {
     <Card
       search={{ v: video.id }}
       title={video.title}
+      menu={<TwitchVideoCardMenu video={video} />}
       thumb={
         <Thumb src={video.previewUrl}>
           <span className="absolute right-1.5 bottom-1.5 rounded bg-black/80 px-1 text-white text-xs">
