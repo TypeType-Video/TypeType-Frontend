@@ -1,14 +1,14 @@
-import { Sparkles, Zap } from "lucide-react";
+import { Bell, Sparkles, Zap } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { siDiscord } from "simple-icons";
+import { siDiscord, siTwitch } from "simple-icons";
 import { useSettings } from "../hooks/use-settings";
 import { DISCORD_INVITE_URL } from "../lib/discord";
 import { m } from "../paraglide/messages.js";
 import { ServiceIcon } from "./service-icon";
 
 // Bump with each release that has something to announce: every viewer sees the new notice once.
-const RELEASE_NOTICE = "1.20";
+const RELEASE_NOTICE = "1.21";
 const GO_SERVER_DOCS_URL = "https://typetype-video.github.io/Docs-TypeType/self-hosting/go-server";
 const SEEN_KEY = "typetype-release-notice";
 const SHOW_DELAY_MS = 2500;
@@ -130,6 +130,16 @@ export function ReleaseNotice() {
                 {m.release_notice_go_action()}
               </a>
             }
+          />
+          <NoticeRow
+            icon={<Bell className="size-4" aria-hidden="true" />}
+            tint={`#${siTwitch.hex}`}
+            text={m.release_notice_twitch_live()}
+          />
+          <NoticeRow
+            icon={<ServiceIcon path={siTwitch.path} color="currentColor" label="Twitch" />}
+            tint={`#${siTwitch.hex}`}
+            text={m.release_notice_twitch_vods()}
           />
           <NoticeRow
             icon={<Sparkles className="size-4" aria-hidden="true" />}
