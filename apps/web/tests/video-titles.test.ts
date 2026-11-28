@@ -46,6 +46,8 @@ test("large batches are split at the server cap", async () => {
     return {};
   }, 1);
   for (let i = 1; i <= 45; i++) store.request(`sm${i}`);
-  await tick(20);
+  const deadline = Date.now() + 1000;
+  while (sizes.length < 2 && Date.now() < deadline) await tick();
+  await tick();
   expect(sizes).toEqual([30, 15]);
 });
