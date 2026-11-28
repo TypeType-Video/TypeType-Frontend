@@ -6,8 +6,9 @@ export function stillEmoteUrl(url: string): string {
     .replace(/(static-cdn\.jtvnw\.net\/emoticons\/v2\/[^/]+)\/default\//, "$1/static/");
 }
 
-// WebKit keeps a decoding thread for every animated image it has shown: a busy chat ran Safari past 500 threads and
-// froze playback after about a quarter of an hour. Every iOS browser is WebKit, whatever its name.
+// WebKit keeps a decoding thread for every animated image drawn with decoding="async" (WebKit bug 308730), so emotes
+// never ask for it: a busy chat ran Safari past 500 threads and froze playback after about a quarter of an hour.
+// Every iOS browser is WebKit, whatever its name.
 export function isWebKitBrowser(userAgent: string, maxTouchPoints: number): boolean {
   if (/iPhone|iPad|iPod/.test(userAgent)) return true;
   if (/Macintosh/.test(userAgent) && maxTouchPoints > 1) return true;

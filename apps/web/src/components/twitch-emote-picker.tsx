@@ -27,14 +27,7 @@ function EmoteButton({ emote, onPick }: { emote: ChatEmoteImage; onPick: (name: 
       onClick={() => onPick(emote.name)}
       className="flex size-10 cursor-pointer items-center justify-center rounded-md hover:bg-surface-strong focus-visible:outline-2 focus-visible:outline-accent"
     >
-      <img
-        src={src}
-        srcSet={srcSet}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        className="max-h-8 max-w-8"
-      />
+      <img src={src} srcSet={srcSet} alt="" loading="lazy" className="max-h-8 max-w-8" />
     </button>
   );
 }

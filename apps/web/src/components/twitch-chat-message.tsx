@@ -15,7 +15,6 @@ function EmoteImage({ image, overlay = false }: { image: ChatEmoteImage; overlay
       alt={image.name}
       title={image.name}
       loading="lazy"
-      decoding="async"
       className={
         overlay
           ? "pointer-events-none absolute inset-0 m-auto h-7 max-w-none"
